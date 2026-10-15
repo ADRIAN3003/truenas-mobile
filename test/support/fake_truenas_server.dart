@@ -70,6 +70,9 @@ class FakeTrueNasServer {
     _snapshot('tank/media@auto-2', 1760100000000),
   ];
 
+  /// Pools served by `pool.query`.
+  List<Map<String, dynamic>> pools = [samplePool];
+
   /// Behave like 25.04: no `service.control`, no NVMe-oF, SMB `ro` field.
   bool legacy = false;
 
@@ -392,6 +395,29 @@ class FakeTrueNasServer {
       },
     ],
     'cloud_backup': [],
+    'rsynctask': [
+      {
+        'id': 1,
+        'desc': 'Mirror to backup box',
+        'path': '/mnt/tank/media',
+        'user': 'root',
+        'mode': 'MODULE',
+        'remotehost': 'backup.lan',
+        'remotemodule': 'media',
+        'remotepath': '',
+        'direction': 'PUSH',
+        'delete': false,
+        'enabled': true,
+        'schedule': {
+          'minute': '0',
+          'hour': '0',
+          'dom': '*',
+          'month': '*',
+          'dow': '0',
+        },
+        'job': null,
+      },
+    ],
   };
 
   final _finishedJobs = <int, Map<String, dynamic>>{};
@@ -571,6 +597,15 @@ class FakeTrueNasServer {
           case 'sharing.nfs.delete':
             nfsShares.removeWhere((s) => s['id'] == params[0]);
             result = true;
+          case 'app.container_console_choices':
+            result = {
+              'c0ffee': {
+                'service_name': 'jellyfin',
+                'image': 'jellyfin/jellyfin:10.10.7',
+                'state': 'running',
+                'id': 'c0ffee',
+              },
+            };
           case 'app.query':
             result = apps;
           case 'app.start' || 'app.stop' || 'app.redeploy' || 'app.upgrade':
@@ -820,7 +855,7 @@ class FakeTrueNasServer {
           case 'test.job':
             result = _job();
           case 'pool.query':
-            result = [samplePool];
+            result = pools;
           case 'pool.scrub.scrub':
             result = 12;
           case 'pool.dataset.query':

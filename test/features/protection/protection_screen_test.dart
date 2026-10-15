@@ -297,4 +297,88 @@ void main() {
     expect(created['schedule'], containsPair('hour', '0'));
     await disconnect(tester);
   });
+
+  testWidgets('adds a TrueCloud backup task', (tester) async {
+    await connect(tester);
+    await tester.pumpWidget(wrap(ProtectionScreen(session: session)));
+    await settle(tester);
+
+    await tester.tap(find.text('Add task'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('TrueCloud backup').last);
+    await settle(tester);
+    expect(find.text('New TrueCloud backup task'), findsOneWidget);
+
+    await tester.tap(find.byType(DropdownButtonFormField<int>));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Backblaze (B2)').last);
+    await tester.pumpAndSettle();
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Bucket'),
+      'backups',
+    );
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Local folder'),
+      '/mnt/tank/media',
+    );
+    await tester.tap(find.text('Save'));
+    await tester.pumpAndSettle();
+    expect(find.text('Required'), findsOneWidget);
+
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Repository password'),
+      'hunter2',
+    );
+    await tester.tap(find.text('Save'));
+    await settle(tester);
+    final created = lastCall('cloud_backup.create');
+    expect(created['credentials'], 1);
+    expect(created['path'], '/mnt/tank/media');
+    expect(created['password'], 'hunter2');
+    expect(created['keep_last'], 14);
+    expect(created['attributes'], {'bucket': 'backups', 'folder': ''});
+    await disconnect(tester);
+  });
+
+  testWidgets('edits an rsync task to go over SSH', (tester) async {
+    await connect(tester);
+    await tester.pumpWidget(wrap(ProtectionScreen(session: session)));
+    await settle(tester);
+
+    await tester.scrollUntilVisible(find.text('Mirror to backup box'), 100);
+    // Clear the floating Add task button.
+    await tester.drag(find.byType(ListView), const Offset(0, -200));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Mirror to backup box'));
+    await settle(tester);
+    expect(find.text('Edit rsync task'), findsOneWidget);
+    expect(find.widgetWithText(TextFormField, 'media'), findsOneWidget);
+
+    await tester.tap(find.text('Rsync daemon module'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('SSH').last);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Enter a host instead'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('backup-box').last);
+    await tester.pumpAndSettle();
+    await tapVisible(tester, find.widgetWithText(TextFormField, 'Remote path'));
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Remote path'),
+      '/srv/media',
+    );
+
+    await tester.tap(find.text('Save'));
+    await settle(tester);
+    final call = server.calls.lastWhere((c) => c.$1 == 'rsynctask.update');
+    expect(call.$2.first, 1);
+    final update = call.$2[1] as Map<String, dynamic>;
+    expect(update['mode'], 'SSH');
+    expect(update['ssh_credentials'], 3);
+    expect(update['remotehost'], isNull);
+    expect(update['remotemodule'], isNull);
+    expect(update['remotepath'], '/srv/media');
+    expect(update['schedule'], containsPair('dow', '0'));
+    await disconnect(tester);
+  });
 }

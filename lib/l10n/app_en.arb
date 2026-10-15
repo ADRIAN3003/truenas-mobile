@@ -2492,5 +2492,97 @@
   "shellKeyRight": "Arrow right",
   "@shellKeyRight": {
     "description": "Shell key button."
+  },
+  "shellNoContainers": "This app has no running containers to open a shell in.",
+  "@shellNoContainers": {
+    "description": "Snackbar when an app has no container for a shell."
+  },
+  "shellPickContainer": "Open a shell in",
+  "@shellPickContainer": {
+    "description": "Title of the dialog that picks an app container."
+  },
+  "rsyncNew": "New rsync task",
+  "@rsyncNew": {
+    "description": "Editor title."
+  },
+  "rsyncEdit": "Edit rsync task",
+  "@rsyncEdit": {
+    "description": "Editor title."
+  },
+  "rsyncUser": "Run as user",
+  "@rsyncUser": {
+    "description": "Field label."
+  },
+  "rsyncUserHint": "A local user; over SSH without a saved connection, it needs its own SSH key",
+  "@rsyncUserHint": {
+    "description": "Helper text."
+  },
+  "rsyncPush": "Push: copy to the remote host",
+  "@rsyncPush": {
+    "description": "Rsync direction."
+  },
+  "rsyncPull": "Pull: copy from the remote host",
+  "@rsyncPull": {
+    "description": "Rsync direction."
+  },
+  "rsyncMode": "Connect with",
+  "@rsyncMode": {
+    "description": "Field label for the rsync mode."
+  },
+  "rsyncModeSsh": "SSH",
+  "@rsyncModeSsh": {
+    "description": "Rsync mode."
+  },
+  "rsyncModeModule": "Rsync daemon module",
+  "@rsyncModeModule": {
+    "description": "Rsync mode."
+  },
+  "rsyncManualHost": "Enter a host instead",
+  "@rsyncManualHost": {
+    "description": "Dropdown entry for typing the SSH host by hand."
+  },
+  "rsyncHost": "Remote host",
+  "@rsyncHost": {
+    "description": "Field label."
+  },
+  "rsyncPort": "SSH port",
+  "@rsyncPort": {
+    "description": "Field label."
+  },
+  "rsyncModule": "Module name",
+  "@rsyncModule": {
+    "description": "Field label."
+  },
+  "rsyncRemotePath": "Remote path",
+  "@rsyncRemotePath": {
+    "description": "Field label."
+  },
+  "rsyncDelete": "Delete files missing at the source",
+  "@rsyncDelete": {
+    "description": "Switch label."
+  },
+  "cloudBackupNew": "New TrueCloud backup task",
+  "@cloudBackupNew": {
+    "description": "Editor title."
+  },
+  "cloudBackupEdit": "Edit TrueCloud backup task",
+  "@cloudBackupEdit": {
+    "description": "Editor title."
+  },
+  "cloudBackupPassword": "Repository password",
+  "@cloudBackupPassword": {
+    "description": "Field label."
+  },
+  "cloudBackupPasswordHint": "Encrypts the backups. Keep it safe: without it they can't be restored.",
+  "@cloudBackupPasswordHint": {
+    "description": "Helper text when creating."
+  },
+  "cloudBackupPasswordKeep": "Leave empty to keep the current password",
+  "@cloudBackupPasswordKeep": {
+    "description": "Helper text when editing."
+  },
+  "cloudBackupKeepLast": "Backups to keep",
+  "@cloudBackupKeepLast": {
+    "description": "Field label."
   }
 }

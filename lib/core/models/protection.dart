@@ -19,10 +19,6 @@ enum ProtectionKind {
     cloudSync || cloudBackup => '$service.sync',
   };
 
-  /// Whether the app can add, edit and delete tasks of this kind.
-  bool get editable =>
-      this == snapshot || this == replication || this == cloudSync;
-
   /// Whether a running task can be stopped from the app.
   bool get abortable => this == cloudSync || this == cloudBackup;
 }
@@ -99,8 +95,7 @@ class ProtectionTask {
       ProtectionKind.rsync => (
         _first(json['desc'], json['path']),
         '${json['direction'] ?? ''} ${json['path'] ?? ''} → '
-            '${json['remotehost'] ?? json['remotemodule'] ?? ''}'
-            '${json['remotepath'] == null ? '' : ':${json['remotepath']}'}',
+            '${_rsyncRemote(json)}',
       ),
     };
     final error = source['error'];
@@ -198,3 +193,17 @@ List<String> _strings(Object? value) => [
   if (value is List)
     for (final v in value) v.toString(),
 ];
+
+/// Where an rsync task copies to, written the way rsync itself takes it:
+/// `host::module/path` for a daemon module, `host:path` over SSH.
+String _rsyncRemote(Map<String, dynamic> json) {
+  final path = (json['remotepath'] ?? '').toString();
+  if (json['mode'] == 'MODULE') {
+    final module = (json['remotemodule'] ?? '').toString();
+    final sub = path.isEmpty ? '' : '/${path.replaceFirst(RegExp('^/+'), '')}';
+    return '${json['remotehost'] ?? ''}::$module$sub';
+  }
+  final host =
+      json['remotehost'] ?? asMap(json['ssh_credentials'])['name'] ?? '';
+  return '$host:$path';
+}

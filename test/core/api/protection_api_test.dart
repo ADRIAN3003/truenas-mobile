@@ -41,6 +41,7 @@ void main() {
       ProtectionKind.snapshot,
       ProtectionKind.replication,
       ProtectionKind.cloudSync,
+      ProtectionKind.rsync,
     ]);
   });
 
@@ -132,5 +133,33 @@ void main() {
     });
     expect(task.schedule, '15 */6 * * *');
     expect(task.status, TaskStatus.waiting);
+  });
+
+  test('rsync destinations read the way rsync writes them', () {
+    String detail(Map<String, dynamic> json) => ProtectionTask.fromJson(
+      ProtectionKind.rsync,
+      {'id': 1, 'direction': 'PUSH', 'path': '/mnt/tank/media', ...json},
+    ).detail;
+    expect(
+      detail({'mode': 'MODULE', 'remotehost': 'nas', 'remotemodule': 'media'}),
+      'PUSH /mnt/tank/media → nas::media',
+    );
+    expect(
+      detail({
+        'mode': 'MODULE',
+        'remotehost': 'nas',
+        'remotemodule': 'media',
+        'remotepath': '/films',
+      }),
+      'PUSH /mnt/tank/media → nas::media/films',
+    );
+    expect(
+      detail({
+        'mode': 'SSH',
+        'ssh_credentials': {'id': 3, 'name': 'backup-box'},
+        'remotepath': '/srv/media',
+      }),
+      'PUSH /mnt/tank/media → backup-box:/srv/media',
+    );
   });
 }

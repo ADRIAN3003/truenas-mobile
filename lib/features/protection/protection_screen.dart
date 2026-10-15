@@ -88,9 +88,22 @@ class _ProtectionScreenState extends State<ProtectionScreen>
     final saved = await Navigator.push<bool>(
       context,
       MaterialPageRoute(
-        builder: (_) => kind == ProtectionKind.replication
-            ? ReplicationEditor(session: _session, task: task)
-            : CloudSyncEditor(session: _session, task: task),
+        builder: (_) => switch (kind) {
+          ProtectionKind.replication => ReplicationEditor(
+            session: _session,
+            task: task,
+          ),
+          ProtectionKind.cloudSync => CloudSyncEditor(
+            session: _session,
+            task: task,
+          ),
+          ProtectionKind.cloudBackup => CloudBackupEditor(
+            session: _session,
+            task: task,
+          ),
+          ProtectionKind.rsync => RsyncEditor(session: _session, task: task),
+          ProtectionKind.snapshot => throw StateError('dialog'),
+        },
       ),
     );
     if (saved == true && mounted) await load();
@@ -146,8 +159,7 @@ class _ProtectionScreenState extends State<ProtectionScreen>
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final creatable = [
-      for (final kind in data?.keys ?? const <ProtectionKind>[])
-        if (kind.editable) kind,
+      for (final kind in data?.keys ?? const <ProtectionKind>[]) kind,
     ];
     return Scaffold(
       appBar: AppBar(title: Text(l10n.protectionTitle)),
@@ -283,7 +295,7 @@ class _TaskTile extends StatelessWidget {
     return ListTile(
       leading: Icon(kindIcon(task.kind)),
       title: Text(task.name),
-      onTap: task.kind.editable && task.kind != ProtectionKind.snapshot
+      onTap: task.kind != ProtectionKind.snapshot
           ? () => onAction('edit')
           : null,
       subtitle: Column(
@@ -336,10 +348,9 @@ class _TaskTile extends StatelessWidget {
                 PopupMenuItem(value: 'stop', child: Text(l10n.taskStop))
               else if (!running)
                 PopupMenuItem(value: 'run', child: Text(l10n.taskRunNow)),
-              if (task.kind.editable && task.kind != ProtectionKind.snapshot)
+              if (task.kind != ProtectionKind.snapshot)
                 PopupMenuItem(value: 'edit', child: Text(l10n.edit)),
-              if (task.kind.editable)
-                PopupMenuItem(value: 'delete', child: Text(l10n.delete)),
+              PopupMenuItem(value: 'delete', child: Text(l10n.delete)),
             ],
           ),
         ],

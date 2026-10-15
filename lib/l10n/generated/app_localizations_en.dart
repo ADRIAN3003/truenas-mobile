@@ -1793,4 +1793,77 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get shellKeyRight => 'Arrow right';
+
+  @override
+  String get shellNoContainers =>
+      'This app has no running containers to open a shell in.';
+
+  @override
+  String get shellPickContainer => 'Open a shell in';
+
+  @override
+  String get rsyncNew => 'New rsync task';
+
+  @override
+  String get rsyncEdit => 'Edit rsync task';
+
+  @override
+  String get rsyncUser => 'Run as user';
+
+  @override
+  String get rsyncUserHint =>
+      'A local user; over SSH without a saved connection, it needs its own SSH key';
+
+  @override
+  String get rsyncPush => 'Push: copy to the remote host';
+
+  @override
+  String get rsyncPull => 'Pull: copy from the remote host';
+
+  @override
+  String get rsyncMode => 'Connect with';
+
+  @override
+  String get rsyncModeSsh => 'SSH';
+
+  @override
+  String get rsyncModeModule => 'Rsync daemon module';
+
+  @override
+  String get rsyncManualHost => 'Enter a host instead';
+
+  @override
+  String get rsyncHost => 'Remote host';
+
+  @override
+  String get rsyncPort => 'SSH port';
+
+  @override
+  String get rsyncModule => 'Module name';
+
+  @override
+  String get rsyncRemotePath => 'Remote path';
+
+  @override
+  String get rsyncDelete => 'Delete files missing at the source';
+
+  @override
+  String get cloudBackupNew => 'New TrueCloud backup task';
+
+  @override
+  String get cloudBackupEdit => 'Edit TrueCloud backup task';
+
+  @override
+  String get cloudBackupPassword => 'Repository password';
+
+  @override
+  String get cloudBackupPasswordHint =>
+      'Encrypts the backups. Keep it safe: without it they can\'t be restored.';
+
+  @override
+  String get cloudBackupPasswordKeep =>
+      'Leave empty to keep the current password';
+
+  @override
+  String get cloudBackupKeepLast => 'Backups to keep';
 }

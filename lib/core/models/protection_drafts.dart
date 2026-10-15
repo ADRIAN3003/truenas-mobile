@@ -202,3 +202,120 @@ class CloudSyncDraft {
     if (schedule case final SnapshotSchedule preset) 'schedule': preset.cron,
   };
 }
+
+/// The editable part of an rsync task.
+class RsyncDraft {
+  RsyncDraft();
+
+  factory RsyncDraft.fromJson(Map<String, dynamic> json) => RsyncDraft()
+    ..description = (json['desc'] ?? '').toString()
+    ..path = (json['path'] ?? '').toString()
+    ..user = (json['user'] ?? 'root').toString()
+    ..push = json['direction'] != 'PULL'
+    ..ssh = json['mode'] == 'SSH'
+    ..sshCredentials = json['ssh_credentials'] is Map
+        ? asInt((json['ssh_credentials'] as Map)['id'])
+        : json['ssh_credentials'] as int?
+    ..remoteHost = (json['remotehost'] ?? '').toString()
+    ..remotePort = json['remoteport'] is num
+        ? (json['remoteport'] as num).toInt()
+        : 22
+    ..remoteModule = (json['remotemodule'] ?? '').toString()
+    ..remotePath = (json['remotepath'] ?? '').toString()
+    ..delete = json['delete'] == true
+    ..schedule =
+        parseSchedule(asMap(json['schedule'])) ?? SnapshotSchedule.daily;
+
+  String description = '';
+  String path = '/mnt/';
+
+  /// The local user rsync runs as.
+  String user = 'root';
+  bool push = true;
+
+  /// Over SSH, or to an rsync daemon module.
+  bool ssh = true;
+
+  /// A keychain SSH connection; null to use [remoteHost] and the user's
+  /// own SSH key.
+  int? sshCredentials;
+  String remoteHost = '';
+  int remotePort = 22;
+  String remoteModule = '';
+  String remotePath = '';
+
+  /// Delete files on the destination that are gone from the source.
+  bool delete = false;
+
+  /// A [SnapshotSchedule], or cron text to keep unchanged.
+  Object schedule = SnapshotSchedule.daily;
+
+  Map<String, dynamic> toJson() {
+    final viaKeychain = ssh && sshCredentials != null;
+    return {
+      'desc': description,
+      'path': path,
+      'user': user,
+      'direction': push ? 'PUSH' : 'PULL',
+      'mode': ssh ? 'SSH' : 'MODULE',
+      'ssh_credentials': viaKeychain ? sshCredentials : null,
+      'remotehost': viaKeychain ? null : remoteHost,
+      'remoteport': ssh && !viaKeychain ? remotePort : null,
+      'remotemodule': ssh ? null : remoteModule,
+      'remotepath': remotePath,
+      'delete': delete,
+      if (schedule case final SnapshotSchedule preset) 'schedule': preset.cron,
+    };
+  }
+}
+
+/// The editable part of a TrueCloud backup task.
+class CloudBackupDraft {
+  CloudBackupDraft();
+
+  factory CloudBackupDraft.fromJson(Map<String, dynamic> json) {
+    final attributes = asMap(json['attributes']);
+    return CloudBackupDraft()
+      ..description = (json['description'] ?? '').toString()
+      ..credentials = json['credentials'] is Map
+          ? asInt((json['credentials'] as Map)['id'])
+          : json['credentials'] as int?
+      ..attributes = attributes
+      ..bucket = (attributes['bucket'] ?? '').toString()
+      ..folder = (attributes['folder'] ?? '').toString()
+      ..path = (json['path'] ?? '').toString()
+      ..keepLast = json['keep_last'] is num
+          ? (json['keep_last'] as num).toInt()
+          : 14
+      ..schedule =
+          parseSchedule(asMap(json['schedule'])) ?? SnapshotSchedule.daily;
+  }
+
+  String description = '';
+  int? credentials;
+  Map<String, dynamic> attributes = const {};
+  String bucket = '';
+  String folder = '';
+  String path = '/mnt/';
+
+  /// The repository password; empty keeps the current one when editing.
+  String password = '';
+
+  /// How many backups to keep.
+  int keepLast = 14;
+  Object schedule = SnapshotSchedule.daily;
+
+  Map<String, dynamic> toJson() => {
+    'description': description,
+    'credentials': credentials,
+    'path': path,
+    'attributes': {
+      ...Map.of(attributes)..remove('bucket'),
+      if (bucket.isNotEmpty) 'bucket': bucket,
+      'folder': folder,
+    },
+    'keep_last': keepLast,
+    if (password.isNotEmpty) 'password': password,
+    if (schedule case final SnapshotSchedule preset) 'schedule': preset.cron,
+  };
+}

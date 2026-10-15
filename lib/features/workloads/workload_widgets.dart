@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 
 import '../../core/api/workloads_api.dart';
 import '../../core/models/workloads.dart';
+import '../../core/session/truenas_session.dart';
 import '../../l10n/generated/app_localizations.dart';
+import '../../shared/connect_dialogs.dart';
 import '../../shared/viz_colors.dart';
 import '../../shared/widgets.dart';
+import '../shell/shell_screen.dart';
 import '../storage/storage_helpers.dart';
 
 /// State label with icon and colour, for apps, VMs and containers.
@@ -163,11 +166,15 @@ class WorkloadMenu extends StatelessWidget {
     required this.actions,
     required this.busy,
     required this.onSelected,
+    this.onShell,
   });
 
   final List<WorkloadAction> actions;
   final bool busy;
   final ValueChanged<WorkloadAction> onSelected;
+
+  /// Adds a Shell entry when set.
+  final VoidCallback? onShell;
 
   @override
   Widget build(BuildContext context) {
@@ -181,13 +188,78 @@ class WorkloadMenu extends StatelessWidget {
         ),
       );
     }
-    return PopupMenuButton<WorkloadAction>(
-      enabled: actions.isNotEmpty,
-      onSelected: onSelected,
+    final onShell = this.onShell;
+    return PopupMenuButton<Object>(
+      enabled: actions.isNotEmpty || onShell != null,
+      onSelected: (value) =>
+          value is WorkloadAction ? onSelected(value) : onShell?.call(),
       itemBuilder: (_) => [
+        if (onShell != null)
+          PopupMenuItem(value: 'shell', child: Text(l10n.shellTitle)),
         for (final action in actions)
           PopupMenuItem(value: action, child: Text(actionLabel(l10n, action))),
       ],
     );
   }
+}
+
+/// Opens a shell with [options] (a VM console, app or container shell).
+Future<void> openShell(
+  BuildContext context,
+  TrueNasSession session,
+  Map<String, Object?> options,
+  String title,
+) => Navigator.push(
+  context,
+  MaterialPageRoute<void>(
+    builder: (_) =>
+        ShellScreen(session: session, options: options, title: title),
+  ),
+);
+
+/// Opens a shell in one of [app]'s containers, asking which when it has
+/// several.
+Future<void> openAppShell(
+  BuildContext context,
+  TrueNasSession session,
+  String app,
+) async {
+  final l10n = AppLocalizations.of(context);
+  final messenger = ScaffoldMessenger.of(context);
+  final Map<String, String> containers;
+  try {
+    containers = await session.workloads.appShellContainers(app);
+  } catch (error) {
+    messenger.showSnackBar(
+      SnackBar(content: Text(describeConnectError(l10n, error))),
+    );
+    return;
+  }
+  if (!context.mounted) return;
+  if (containers.isEmpty) {
+    messenger.showSnackBar(SnackBar(content: Text(l10n.shellNoContainers)));
+    return;
+  }
+  final id = containers.length == 1
+      ? containers.keys.single
+      : await showDialog<String>(
+          context: context,
+          builder: (context) => SimpleDialog(
+            title: Text(l10n.shellPickContainer),
+            children: [
+              for (final MapEntry(:key, :value) in containers.entries)
+                SimpleDialogOption(
+                  onPressed: () => Navigator.pop(context, key),
+                  child: Text(value),
+                ),
+            ],
+          ),
+        );
+  if (id == null || !context.mounted) return;
+  await openShell(
+    context,
+    session,
+    WorkloadsApi.appShell(app, id),
+    '$app · ${containers[id]}',
+  );
 }

@@ -138,6 +138,16 @@ class _AppScreenState extends State<AppScreen> {
                                     onPressed: () => _run(action),
                                     child: Text(actionLabel(l10n, action)),
                                   ),
+                          if (app.state == WorkloadState.running)
+                            OutlinedButton.icon(
+                              onPressed: () => openAppShell(
+                                context,
+                                widget.session,
+                                app.name,
+                              ),
+                              icon: const Icon(Icons.terminal),
+                              label: Text(l10n.shellTitle),
+                            ),
                         ],
                       ),
                   ],

@@ -254,6 +254,87 @@ class FakeTrueNasServer {
   /// Version offered by the update check, or null when up to date.
   String? availableUpdate = '25.10.8';
 
+  /// Token handed out by `auth.generate_token` and accepted by `/_shell/`.
+  String shellToken = 'shell-token';
+  List<dynamic>? shellTokenParams;
+
+  /// Refuse every shell, as for a user without web shell access.
+  bool shellDenied = false;
+  Map<String, dynamic>? shellOptions;
+  final shellInput = StringBuffer();
+  final shellResizes = <List<dynamic>>[];
+
+  /// What `core.get_methods` returns without a service filter.
+  final methodDocs = <String, dynamic>{
+    'system.info': {
+      'description': 'Returns basic system information.',
+      'job': false,
+      'filterable': false,
+      'roles': ['READONLY_ADMIN'],
+      'accepts': [],
+      'returns': [
+        {'type': 'object', 'title': 'system_info'},
+      ],
+    },
+    'pool.query': {
+      'description': 'Query pools.\n\nLonger details.',
+      'job': false,
+      'filterable': true,
+      'accepts': [
+        {
+          'type': 'array',
+          '_name_': 'filters',
+          '_required_': false,
+          'default': [],
+        },
+        {
+          'type': 'object',
+          '_name_': 'options',
+          '_required_': false,
+          'default': {},
+        },
+      ],
+    },
+    'test.fail': {
+      'description': 'Always fails validation.',
+      'job': false,
+      'accepts': [
+        {'type': 'string', '_name_': 'name', '_required_': true},
+      ],
+    },
+    'test.job': {
+      'description': 'Runs a job.',
+      'job': true,
+      'accepts': [
+        {
+          '_name_': 'mode',
+          '_required_': true,
+          'anyOf': [
+            {'const': 'FAST'},
+            {'const': 'SLOW'},
+          ],
+        },
+        {'type': 'boolean', '_name_': 'force', '_required_': false},
+      ],
+    },
+    'user.update': {
+      'description': 'Update a user.',
+      'job': false,
+      'accepts': [
+        {'type': 'integer', '_name_': 'id', '_required_': true},
+        {
+          'type': 'object',
+          '_name_': 'user_update',
+          '_required_': true,
+          'properties': {
+            'full_name': {'type': 'string', '_required_': false},
+            'locked': {'type': 'boolean', '_required_': true},
+          },
+        },
+      ],
+    },
+  };
+
   final _finishedJobs = <int, Map<String, dynamic>>{};
   var _nextJobId = 100;
 
@@ -329,6 +410,8 @@ class FakeTrueNasServer {
             result = 'sub-${subscriptions.length}';
           case 'core.unsubscribe':
             result = null;
+          case 'core.get_methods' when params.isEmpty:
+            result = methodDocs;
           case 'core.get_methods':
             final service = params.first as String;
             result = <String, dynamic>{
@@ -612,6 +695,26 @@ class FakeTrueNasServer {
             result = null;
           case 'system.reboot' || 'system.shutdown':
             result = _job();
+          case 'auth.generate_token':
+            shellTokenParams = params;
+            result = shellToken;
+          case 'core.resize_shell':
+            shellResizes.add(params);
+          case 'test.fail':
+            socket.add(
+              jsonEncode({
+                'jsonrpc': '2.0',
+                'id': message['id'],
+                'error': {
+                  'code': -32001,
+                  'message': 'Method call error',
+                  'data': {'reason': '[EINVAL] test.fail.name: Bad name'},
+                },
+              }),
+            );
+            return;
+          case 'test.job':
+            result = _job();
           case 'pool.query':
             result = [samplePool];
           case 'pool.scrub.scrub':
@@ -689,6 +792,35 @@ class FakeTrueNasServer {
             message['method'] == 'alert.restore') {
           notify('alert.list', 'changed', {'uuid': params.first});
         }
+      });
+      return;
+    }
+    if (request.uri.path == '/_shell/' &&
+        WebSocketTransformer.isUpgradeRequest(request)) {
+      final socket = await WebSocketTransformer.upgrade(request);
+      var connected = false;
+      socket.listen((raw) {
+        if (!connected) {
+          final message = jsonDecode(raw as String) as Map<String, dynamic>;
+          shellOptions = message['options'] as Map<String, dynamic>?;
+          if (shellDenied || message['token'] != shellToken) {
+            socket.add(
+              jsonEncode({
+                'msg': 'failed',
+                'error': {'error': 14, 'reason': 'Invalid token'},
+              }),
+            );
+            return;
+          }
+          connected = true;
+          socket.add(jsonEncode({'msg': 'connected', 'id': 'shell-1'}));
+          socket.add(utf8.encode('truenas# '));
+          return;
+        }
+        final input = utf8.decode(raw as List<int>);
+        shellInput.write(input);
+        socket.add(utf8.encode('you typed: $input'));
+        if (input.contains('exit')) socket.close();
       });
       return;
     }

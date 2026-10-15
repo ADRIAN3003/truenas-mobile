@@ -39,6 +39,10 @@ class ServerAddress {
   Uri webSocketUri(String apiVersion) =>
       uri.replace(scheme: isSecure ? 'wss' : 'ws', path: '/api/$apiVersion');
 
+  /// A WebSocket on this server at [path], e.g. `wss://host/_shell/`.
+  Uri socketUri(String path) =>
+      uri.replace(scheme: isSecure ? 'wss' : 'ws', path: path);
+
   /// The address as stored and shown, e.g. `https://nas.local:8443`.
   @override
   String toString() => uri.toString();

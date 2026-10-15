@@ -4,6 +4,8 @@ import '../../core/session/truenas_session.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../shared/widgets.dart';
 import '../storage/storage_helpers.dart';
+import '../explorer/api_explorer_screen.dart';
+import '../shell/shell_screen.dart';
 import '../system/api_keys_screen.dart';
 import '../system/network_screen.dart';
 import '../system/updates_screen.dart';
@@ -106,6 +108,17 @@ class MoreTab extends StatelessWidget {
           Icons.system_update_outlined,
           l10n.updatesTitle,
           () => UpdatesScreen(session: session),
+        ),
+        header(l10n.moreTools),
+        entry(
+          Icons.terminal,
+          l10n.shellTitle,
+          () => ShellScreen(session: session),
+        ),
+        entry(
+          Icons.api,
+          l10n.explorerTitle,
+          () => ApiExplorerScreen(session: session),
         ),
         header(l10n.moreActivity),
         ListTile(

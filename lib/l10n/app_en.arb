@@ -1859,5 +1859,154 @@
         "type": "int"
       }
     }
+  },
+  "moreTools": "Tools",
+  "@moreTools": {
+    "description": "Section header in the More tab."
+  },
+  "explorerTitle": "API explorer",
+  "@explorerTitle": {
+    "description": "API explorer screen title."
+  },
+  "explorerSearch": "Search methods",
+  "@explorerSearch": {
+    "description": "Search field hint."
+  },
+  "explorerNoMatches": "No methods match.",
+  "@explorerNoMatches": {
+    "description": "Shown when the search finds nothing."
+  },
+  "explorerMethodCount": "{count, plural, =1{1 method} other{{count} methods}}",
+  "@explorerMethodCount": {
+    "description": "Number of methods in a namespace.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "explorerJob": "Job",
+  "@explorerJob": {
+    "description": "Badge for methods that run as a job."
+  },
+  "explorerReadOnly": "Read-only",
+  "@explorerReadOnly": {
+    "description": "Badge for methods that don't change anything."
+  },
+  "explorerNoAuth": "No sign-in needed",
+  "@explorerNoAuth": {
+    "description": "Badge for methods that work without signing in."
+  },
+  "explorerRoles": "Roles: {roles}",
+  "@explorerRoles": {
+    "description": "Roles allowed to call the method.",
+    "placeholders": {
+      "roles": {
+        "type": "String"
+      }
+    }
+  },
+  "explorerParameters": "Parameters",
+  "@explorerParameters": {
+    "description": "Section header."
+  },
+  "explorerNoParameters": "This method takes no parameters.",
+  "@explorerNoParameters": {
+    "description": "Shown when there are no parameters."
+  },
+  "explorerSendParam": "Send",
+  "@explorerSendParam": {
+    "description": "Checkbox to include an optional parameter."
+  },
+  "explorerOptional": "optional",
+  "@explorerOptional": {
+    "description": "Label for an optional parameter."
+  },
+  "explorerInvalidJson": "Not valid JSON: {reason}",
+  "@explorerInvalidJson": {
+    "description": "Validation message for JSON fields.",
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "explorerInvalidNumber": "Enter a number",
+  "@explorerInvalidNumber": {
+    "description": "Validation message."
+  },
+  "explorerRun": "Run",
+  "@explorerRun": {
+    "description": "Button that calls the method."
+  },
+  "explorerRunTitle": "Run {method}?",
+  "@explorerRunTitle": {
+    "description": "Confirmation title before calling a method that may change things.",
+    "placeholders": {
+      "method": {
+        "type": "String"
+      }
+    }
+  },
+  "explorerRunBody": "This method can change settings or data on the server.",
+  "@explorerRunBody": {
+    "description": "Confirmation body."
+  },
+  "explorerResult": "Result",
+  "@explorerResult": {
+    "description": "Section header."
+  },
+  "explorerJobRunning": "Running as job {id}…",
+  "@explorerJobRunning": {
+    "description": "Shown while a job runs.",
+    "placeholders": {
+      "id": {
+        "type": "int"
+      }
+    }
+  },
+  "explorerReturns": "Returns",
+  "@explorerReturns": {
+    "description": "Section header for the result schema."
+  },
+  "explorerFileTransfer": "This method transfers a file, which the explorer can't do yet.",
+  "@explorerFileTransfer": {
+    "description": "Shown for upload/download methods."
+  },
+  "explorerCopied": "Copied to clipboard",
+  "@explorerCopied": {
+    "description": "Snackbar."
+  },
+  "explorerUnset": "Not set",
+  "@explorerUnset": {
+    "description": "Dropdown entry for leaving a value null."
+  },
+  "shellTitle": "Shell",
+  "@shellTitle": {
+    "description": "Shell screen title."
+  },
+  "shellConnecting": "Opening a shell…",
+  "@shellConnecting": {
+    "description": "Shown while the shell starts."
+  },
+  "shellClosed": "The shell has ended.",
+  "@shellClosed": {
+    "description": "Shown when the server closes the shell."
+  },
+  "shellReconnect": "Start a new shell",
+  "@shellReconnect": {
+    "description": "Button."
+  },
+  "shellKeyCtrlC": "Ctrl+C",
+  "@shellKeyCtrlC": {
+    "description": "Key button that sends an interrupt."
+  },
+  "shellKeyEsc": "Esc",
+  "@shellKeyEsc": {
+    "description": "Key button."
+  },
+  "shellKeyTab": "Tab",
+  "@shellKeyTab": {
+    "description": "Key button."
   }
 }

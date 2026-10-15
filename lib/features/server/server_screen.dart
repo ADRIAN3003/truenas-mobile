@@ -6,6 +6,7 @@ import '../../core/instances/server_instance.dart';
 import '../../core/session/truenas_session.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../shared/connect_dialogs.dart';
+import '../../shared/glass.dart';
 import '../sharing/shares_tab.dart';
 import '../storage/storage_tab.dart';
 import '../workloads/apps_tab.dart';
@@ -150,6 +151,29 @@ class _ServerScreenState extends ConsumerState<ServerScreen> {
                 Expanded(child: body),
               ],
             ),
+          ),
+        );
+      }
+      if (useGlassChrome(context)) {
+        // iOS: content scrolls under a transparent top bar and a floating
+        // liquid glass tab bar.
+        final insets = glassChromeInsets(context);
+        return Scaffold(
+          extendBodyBehindAppBar: true,
+          appBar: AppBar(
+            title: Text(instance?.name ?? ''),
+            backgroundColor: Colors.transparent,
+          ),
+          body: Stack(
+            children: [
+              ChromeInsets(insets: insets, child: body),
+              GlassTopEdge(height: insets.top - 8),
+              GlassTabBar(
+                destinations: destinations,
+                selectedIndex: _tab,
+                onSelected: select,
+              ),
+            ],
           ),
         );
       }

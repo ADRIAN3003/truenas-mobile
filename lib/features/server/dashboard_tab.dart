@@ -9,6 +9,7 @@ import '../../core/models/pool_summary.dart';
 import '../../core/models/realtime_stats.dart';
 import '../../core/session/truenas_session.dart';
 import '../../l10n/generated/app_localizations.dart';
+import '../../shared/glass.dart';
 import '../../shared/formatting.dart';
 import '../../shared/theme.dart';
 import '../../shared/ui.dart';
@@ -97,10 +98,14 @@ class _DashboardTabState extends State<DashboardTab> {
         : [_GaugesCard(history: _history), _NetworkCard(history: _history)];
     final pools = [if (_pools != null) _PoolsCard(pools: _pools!)];
     return RefreshIndicator.adaptive(
+      edgeOffset: ChromeInsets.of(context).top,
       onRefresh: _refresh,
       child: LayoutBuilder(
         builder: (context, constraints) => ListView(
-          padding: const EdgeInsets.fromLTRB(16, 4, 16, 24),
+          padding: ChromeInsets.pad(
+            context,
+            const EdgeInsets.fromLTRB(16, 4, 16, 24),
+          ),
           children: constraints.maxWidth < 840
               ? [...system, ...live, ...pools]
               // Two columns on wide screens: system and pools beside the

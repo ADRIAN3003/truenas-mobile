@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../core/models/storage.dart';
 import '../../core/session/truenas_session.dart';
 import '../../l10n/generated/app_localizations.dart';
+import '../../shared/glass.dart';
 import '../../shared/formatting.dart';
 import '../../shared/theme.dart';
 import '../../shared/ui.dart';
@@ -53,7 +54,10 @@ class _StorageTabState extends State<StorageTab> {
       error: _error,
       onRefresh: _load,
       builder: (pools) => ListView(
-        padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+        padding: ChromeInsets.pad(
+          context,
+          const EdgeInsets.fromLTRB(16, 8, 16, 24),
+        ),
         children: [
           if (pools.isEmpty)
             Padding(

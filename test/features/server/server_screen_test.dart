@@ -7,6 +7,8 @@ import 'package:truenas_mobile/core/instances/instance_repository.dart';
 import 'package:truenas_mobile/core/instances/instances_provider.dart';
 import 'package:truenas_mobile/core/instances/server_instance.dart';
 import 'package:truenas_mobile/features/server/server_screen.dart';
+import 'package:truenas_mobile/shared/glass.dart';
+import 'package:truenas_mobile/shared/theme.dart';
 import 'package:truenas_mobile/l10n/generated/app_localizations.dart';
 
 import '../../support/fake_truenas_server.dart';
@@ -27,7 +29,11 @@ void main() {
     }
   }
 
-  Future<void> open(WidgetTester tester, Size size) async {
+  Future<void> open(
+    WidgetTester tester,
+    Size size, {
+    TargetPlatform platform = TargetPlatform.android,
+  }) async {
     tester.view.physicalSize = size;
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
@@ -60,6 +66,7 @@ void main() {
         UncontrolledProviderScope(
           container: container,
           child: MaterialApp(
+            theme: buildAppTheme(Brightness.light, platform: platform),
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
             home: const ServerScreen('1'),
@@ -95,6 +102,20 @@ void main() {
     await settle(tester);
     expect(
       tester.widget<NavigationRail>(find.byType(NavigationRail)).selectedIndex,
+      1,
+    );
+    await close(tester);
+  });
+
+  testWidgets('iPhones get a floating glass tab bar', (tester) async {
+    await open(tester, const Size(400, 800), platform: TargetPlatform.iOS);
+    expect(find.byType(GlassTabBar), findsOneWidget);
+    expect(find.byType(NavigationBar), findsNothing);
+    // The bar draws each label twice: plain, and highlighted under the pill.
+    await tester.tap(find.text('Storage').first);
+    await settle(tester);
+    expect(
+      tester.widget<GlassTabBar>(find.byType(GlassTabBar)).selectedIndex,
       1,
     );
     await close(tester);

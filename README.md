@@ -9,6 +9,7 @@ for Android and iOS that talks to the official TrueNAS middleware API
 <p>
   <img src="docs/screenshots/servers.png" width="200" alt="Server list">
   <img src="docs/screenshots/dashboard.png" width="200" alt="Dashboard">
+  <img src="docs/screenshots/dashboard_ios.png" width="200" alt="Dashboard on iOS with the liquid glass tab bar">
   <img src="docs/screenshots/storage.png" width="200" alt="Storage">
   <img src="docs/screenshots/apps.png" width="200" alt="Apps, VMs and containers">
   <img src="docs/screenshots/more.png" width="200" alt="More, dark theme">

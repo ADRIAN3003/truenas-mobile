@@ -418,17 +418,245 @@ abstract class AppLocalizations {
   /// **'Signed in as'**
   String get infoSignedInAs;
 
-  /// Note at the bottom of the server overview.
-  ///
-  /// In en, this message translates to:
-  /// **'More management screens are coming in the next milestones.'**
-  String get serverOverviewNote;
-
   /// Shown when the user cancels a certificate or 2FA prompt.
   ///
   /// In en, this message translates to:
   /// **'Connection cancelled.'**
   String get errorCancelled;
+
+  /// Bottom navigation tab for the dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Dashboard'**
+  String get tabDashboard;
+
+  /// Bottom navigation tab for alerts.
+  ///
+  /// In en, this message translates to:
+  /// **'Alerts'**
+  String get tabAlerts;
+
+  /// Bottom navigation tab for background jobs.
+  ///
+  /// In en, this message translates to:
+  /// **'Jobs'**
+  String get tabJobs;
+
+  /// Title of the CPU usage card.
+  ///
+  /// In en, this message translates to:
+  /// **'CPU'**
+  String get cpuTitle;
+
+  /// CPU temperature value.
+  ///
+  /// In en, this message translates to:
+  /// **'{temp} °C'**
+  String cpuTemperature(String temp);
+
+  /// Title of the memory card.
+  ///
+  /// In en, this message translates to:
+  /// **'Memory'**
+  String get memoryTitle;
+
+  /// Memory usage summary.
+  ///
+  /// In en, this message translates to:
+  /// **'{used} of {total} used'**
+  String memoryUsedOf(String used, String total);
+
+  /// Legend label for memory used by services and apps.
+  ///
+  /// In en, this message translates to:
+  /// **'Services'**
+  String get memoryServices;
+
+  /// Legend label for memory used by the ZFS ARC cache.
+  ///
+  /// In en, this message translates to:
+  /// **'ZFS cache'**
+  String get memoryArc;
+
+  /// Legend label for free memory.
+  ///
+  /// In en, this message translates to:
+  /// **'Free'**
+  String get memoryFree;
+
+  /// Title of the network throughput card.
+  ///
+  /// In en, this message translates to:
+  /// **'Network'**
+  String get networkTitle;
+
+  /// Legend label for received traffic.
+  ///
+  /// In en, this message translates to:
+  /// **'In'**
+  String get networkIn;
+
+  /// Legend label for sent traffic.
+  ///
+  /// In en, this message translates to:
+  /// **'Out'**
+  String get networkOut;
+
+  /// Title of the storage pools card.
+  ///
+  /// In en, this message translates to:
+  /// **'Pools'**
+  String get poolsTitle;
+
+  /// Shown when the server has no storage pools.
+  ///
+  /// In en, this message translates to:
+  /// **'No pools'**
+  String get poolsEmpty;
+
+  /// Pool usage summary.
+  ///
+  /// In en, this message translates to:
+  /// **'{used} of {total}'**
+  String poolUsage(String used, String total);
+
+  /// Title of the alerts summary card.
+  ///
+  /// In en, this message translates to:
+  /// **'Alerts'**
+  String get alertsTitle;
+
+  /// Shown when there are no active alerts.
+  ///
+  /// In en, this message translates to:
+  /// **'No active alerts'**
+  String get alertsNone;
+
+  /// Number of critical alerts.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 critical} other{{count} critical}}'**
+  String alertsCritical(int count);
+
+  /// Number of warning alerts.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 warning} other{{count} warnings}}'**
+  String alertsWarning(int count);
+
+  /// Number of informational alerts.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 notice} other{{count} notices}}'**
+  String alertsInfo(int count);
+
+  /// Heading for alerts that are not dismissed.
+  ///
+  /// In en, this message translates to:
+  /// **'Active'**
+  String get alertsActive;
+
+  /// Heading for dismissed alerts.
+  ///
+  /// In en, this message translates to:
+  /// **'Dismissed'**
+  String get alertsDismissed;
+
+  /// Action that dismisses an alert.
+  ///
+  /// In en, this message translates to:
+  /// **'Dismiss'**
+  String get alertDismiss;
+
+  /// Action that restores a dismissed alert.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore'**
+  String get alertRestore;
+
+  /// Label for critical alert level.
+  ///
+  /// In en, this message translates to:
+  /// **'Critical'**
+  String get levelCritical;
+
+  /// Label for warning alert level.
+  ///
+  /// In en, this message translates to:
+  /// **'Warning'**
+  String get levelWarning;
+
+  /// Label for informational alert level.
+  ///
+  /// In en, this message translates to:
+  /// **'Info'**
+  String get levelInfo;
+
+  /// Shown when there are no jobs.
+  ///
+  /// In en, this message translates to:
+  /// **'No recent jobs'**
+  String get jobsEmpty;
+
+  /// Action that aborts a running job.
+  ///
+  /// In en, this message translates to:
+  /// **'Abort'**
+  String get jobAbort;
+
+  /// Title of the abort confirmation dialog.
+  ///
+  /// In en, this message translates to:
+  /// **'Abort this job?'**
+  String get jobAbortTitle;
+
+  /// Job state label.
+  ///
+  /// In en, this message translates to:
+  /// **'Waiting'**
+  String get jobStateWaiting;
+
+  /// Job state label.
+  ///
+  /// In en, this message translates to:
+  /// **'Running'**
+  String get jobStateRunning;
+
+  /// Job state label.
+  ///
+  /// In en, this message translates to:
+  /// **'Succeeded'**
+  String get jobStateSuccess;
+
+  /// Job state label.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed'**
+  String get jobStateFailed;
+
+  /// Job state label.
+  ///
+  /// In en, this message translates to:
+  /// **'Aborted'**
+  String get jobStateAborted;
+
+  /// Button that closes a dialog.
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get close;
+
+  /// Shown until the first live statistics sample arrives.
+  ///
+  /// In en, this message translates to:
+  /// **'Waiting for live data…'**
+  String get liveWaiting;
+
+  /// Title of the system information card.
+  ///
+  /// In en, this message translates to:
+  /// **'System'**
+  String get systemTitle;
 }
 
 class _AppLocalizationsDelegate

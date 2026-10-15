@@ -6,6 +6,9 @@ import '../../core/instances/server_instance.dart';
 import '../../core/session/truenas_session.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../shared/connect_dialogs.dart';
+import 'alerts_tab.dart';
+import 'dashboard_tab.dart';
+import 'jobs_tab.dart';
 
 /// Connects to one saved server and shows its overview.
 class ServerScreen extends ConsumerStatefulWidget {
@@ -21,6 +24,7 @@ class _ServerScreenState extends ConsumerState<ServerScreen> {
   TrueNasSession? _session;
   Map<String, dynamic>? _info;
   Object? _error;
+  var _tab = 0;
 
   ServerInstance? get _instance => ref
       .read(instancesProvider)
@@ -43,6 +47,9 @@ class _ServerScreenState extends ConsumerState<ServerScreen> {
   Future<void> _connect() async {
     final instance = _instance;
     if (instance == null) return;
+    final previous = _session;
+    _session = null;
+    await previous?.close();
     setState(() {
       _error = null;
       _info = null;
@@ -73,91 +80,63 @@ class _ServerScreenState extends ConsumerState<ServerScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final instance = _instance;
+    final session = _session;
+    final info = _info;
+    if (session != null && info != null) {
+      return Scaffold(
+        appBar: AppBar(title: Text(instance?.name ?? '')),
+        body: IndexedStack(
+          index: _tab,
+          children: [
+            DashboardTab(
+              session: session,
+              info: info,
+              onOpenAlerts: () => setState(() => _tab = 1),
+            ),
+            AlertsTab(session: session),
+            JobsTab(session: session),
+          ],
+        ),
+        bottomNavigationBar: NavigationBar(
+          selectedIndex: _tab,
+          onDestinationSelected: (index) => setState(() => _tab = index),
+          destinations: [
+            NavigationDestination(
+              icon: const Icon(Icons.dashboard_outlined),
+              selectedIcon: const Icon(Icons.dashboard),
+              label: l10n.tabDashboard,
+            ),
+            NavigationDestination(
+              icon: const Icon(Icons.notifications_outlined),
+              selectedIcon: const Icon(Icons.notifications),
+              label: l10n.tabAlerts,
+            ),
+            NavigationDestination(
+              icon: const Icon(Icons.work_history_outlined),
+              selectedIcon: const Icon(Icons.work_history),
+              label: l10n.tabJobs,
+            ),
+          ],
+        ),
+      );
+    }
     return Scaffold(
       appBar: AppBar(title: Text(instance?.name ?? '')),
-      body: switch ((_info, _error)) {
-        (final info?, _) => RefreshIndicator(
-          onRefresh: () async {
-            final info = await _session!.systemInfo();
-            if (mounted) setState(() => _info = info);
-          },
-          child: _Overview(info: info, session: _session!),
-        ),
-        (_, final error?) => _ErrorState(
-          message: describeConnectError(l10n, error),
-          onRetry: _connect,
-        ),
-        _ => Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const CircularProgressIndicator(),
-              const SizedBox(height: 16),
-              Text(l10n.connecting),
-            ],
-          ),
-        ),
-      },
-    );
-  }
-}
-
-class _Overview extends StatelessWidget {
-  const _Overview({required this.info, required this.session});
-
-  final Map<String, dynamic> info;
-  final TrueNasSession session;
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-    final theme = Theme.of(context);
-    final memory = info['physmem'];
-    final uptime = info['uptime_seconds'];
-    final user = session.userInfo?['pw_name'];
-    final rows = <(IconData, String, String?)>[
-      (Icons.dns_outlined, l10n.infoHostname, info['hostname']?.toString()),
-      (Icons.info_outline, l10n.infoVersion, info['version']?.toString()),
-      (Icons.api_outlined, l10n.infoApiVersion, session.apiVersion),
-      (Icons.memory, l10n.infoModel, info['model']?.toString()),
-      (Icons.developer_board, l10n.infoCores, info['cores']?.toString()),
-      (
-        Icons.storage_outlined,
-        l10n.infoMemory,
-        memory is num ? formatBytes(memory) : null,
-      ),
-      (
-        Icons.schedule,
-        l10n.infoUptime,
-        uptime is num
-            ? formatDuration(Duration(seconds: uptime.round()))
-            : null,
-      ),
-      (Icons.person_outline, l10n.infoSignedInAs, user?.toString()),
-    ];
-    return ListView(
-      padding: const EdgeInsets.all(16),
-      children: [
-        Card(
-          child: Column(
-            children: [
-              for (final (icon, label, value) in rows)
-                if (value != null && value.isNotEmpty)
-                  ListTile(
-                    leading: Icon(icon),
-                    title: Text(label),
-                    subtitle: Text(value),
-                  ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 16),
-        Text(
-          l10n.serverOverviewNote,
-          textAlign: TextAlign.center,
-          style: theme.textTheme.bodySmall,
-        ),
-      ],
+      body: _error != null
+          ? _ErrorState(
+              message: describeConnectError(l10n, _error!),
+              onRetry: _connect,
+            )
+          : Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const CircularProgressIndicator(),
+                  const SizedBox(height: 16),
+                  Text(l10n.connecting),
+                ],
+              ),
+            ),
     );
   }
 }
@@ -190,28 +169,4 @@ class _ErrorState extends StatelessWidget {
       ),
     );
   }
-}
-
-/// `17179869184` → `16.0 GiB`
-String formatBytes(num bytes) {
-  const units = ['B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB'];
-  var value = bytes.toDouble();
-  var unit = 0;
-  while (value >= 1024 && unit < units.length - 1) {
-    value /= 1024;
-    unit++;
-  }
-  return unit == 0 ? '$bytes B' : '${value.toStringAsFixed(1)} ${units[unit]}';
-}
-
-/// `Duration(days: 3, hours: 4, minutes: 5)` → `3d 4h 5m`
-String formatDuration(Duration duration) {
-  final days = duration.inDays;
-  final hours = duration.inHours % 24;
-  final minutes = duration.inMinutes % 60;
-  return [
-    if (days > 0) '${days}d',
-    if (days > 0 || hours > 0) '${hours}h',
-    '${minutes}m',
-  ].join(' ');
 }

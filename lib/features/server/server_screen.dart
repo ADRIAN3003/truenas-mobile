@@ -98,7 +98,7 @@ class _ServerScreenState extends ConsumerState<ServerScreen> {
             StorageTab(session: session),
             SharesTab(session: session),
             AppsTab(session: session),
-            MoreTab(session: session),
+            MoreTab(session: session, serverName: instance?.name ?? ''),
           ],
         ),
         bottomNavigationBar: NavigationBar(

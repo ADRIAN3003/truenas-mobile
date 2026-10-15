@@ -1707,6 +1707,570 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Copied'**
   String get copied;
+
+  /// Section header in the More tab.
+  ///
+  /// In en, this message translates to:
+  /// **'Accounts'**
+  String get moreAccounts;
+
+  /// Section header in the More tab.
+  ///
+  /// In en, this message translates to:
+  /// **'System'**
+  String get moreSystem;
+
+  /// Section header in the More tab.
+  ///
+  /// In en, this message translates to:
+  /// **'Activity'**
+  String get moreActivity;
+
+  /// Users screen title.
+  ///
+  /// In en, this message translates to:
+  /// **'Users'**
+  String get usersTitle;
+
+  /// Shown when there are no non-built-in users.
+  ///
+  /// In en, this message translates to:
+  /// **'No users yet. System accounts are hidden.'**
+  String get usersEmpty;
+
+  /// Toggle to include built-in accounts.
+  ///
+  /// In en, this message translates to:
+  /// **'Show system accounts'**
+  String get usersShowBuiltin;
+
+  /// Button to create a user.
+  ///
+  /// In en, this message translates to:
+  /// **'Add user'**
+  String get userCreate;
+
+  /// Field label.
+  ///
+  /// In en, this message translates to:
+  /// **'Username'**
+  String get userUsername;
+
+  /// Field label.
+  ///
+  /// In en, this message translates to:
+  /// **'Full name'**
+  String get userFullName;
+
+  /// Field label.
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get userPassword;
+
+  /// Switch label when creating a user.
+  ///
+  /// In en, this message translates to:
+  /// **'Allow SMB access'**
+  String get userSmb;
+
+  /// Validation message.
+  ///
+  /// In en, this message translates to:
+  /// **'Use lowercase letters, digits, - or _, starting with a letter'**
+  String get userUsernameInvalid;
+
+  /// Validation message.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a password'**
+  String get userPasswordRequired;
+
+  /// Snackbar after creating a user.
+  ///
+  /// In en, this message translates to:
+  /// **'Added {name}'**
+  String userCreated(String name);
+
+  /// Status for a locked user.
+  ///
+  /// In en, this message translates to:
+  /// **'Locked'**
+  String get userLocked;
+
+  /// Label for a built-in account or group.
+  ///
+  /// In en, this message translates to:
+  /// **'System'**
+  String get userBuiltin;
+
+  /// Menu action to lock a user.
+  ///
+  /// In en, this message translates to:
+  /// **'Lock'**
+  String get userLock;
+
+  /// Menu action to unlock a user.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlock'**
+  String get userUnlock;
+
+  /// Snackbar.
+  ///
+  /// In en, this message translates to:
+  /// **'Locked {name}'**
+  String userLockedMessage(String name);
+
+  /// Snackbar.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlocked {name}'**
+  String userUnlockedMessage(String name);
+
+  /// Confirmation title.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete user {name}?'**
+  String userDeleteTitle(String name);
+
+  /// Confirmation body.
+  ///
+  /// In en, this message translates to:
+  /// **'The account and its private group are removed. Files it owns stay on disk.'**
+  String get userDeleteBody;
+
+  /// Snackbar.
+  ///
+  /// In en, this message translates to:
+  /// **'Deleted {name}'**
+  String userDeleted(String name);
+
+  /// Label when a user has two-factor sign-in set up.
+  ///
+  /// In en, this message translates to:
+  /// **'Two-factor'**
+  String get userTwoFactor;
+
+  /// Groups section title.
+  ///
+  /// In en, this message translates to:
+  /// **'Groups'**
+  String get groupsTitle;
+
+  /// Empty state.
+  ///
+  /// In en, this message translates to:
+  /// **'No groups yet. System groups are hidden.'**
+  String get groupsEmpty;
+
+  /// Button to create a group.
+  ///
+  /// In en, this message translates to:
+  /// **'Add group'**
+  String get groupCreate;
+
+  /// Field label.
+  ///
+  /// In en, this message translates to:
+  /// **'Group name'**
+  String get groupName;
+
+  /// Snackbar.
+  ///
+  /// In en, this message translates to:
+  /// **'Added {name}'**
+  String groupCreated(String name);
+
+  /// Confirmation title.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete group {name}?'**
+  String groupDeleteTitle(String name);
+
+  /// Confirmation body.
+  ///
+  /// In en, this message translates to:
+  /// **'Members keep their accounts.'**
+  String get groupDeleteBody;
+
+  /// Snackbar.
+  ///
+  /// In en, this message translates to:
+  /// **'Deleted {name}'**
+  String groupDeleted(String name);
+
+  /// API keys screen title.
+  ///
+  /// In en, this message translates to:
+  /// **'API keys'**
+  String get apiKeysTitle;
+
+  /// Empty state.
+  ///
+  /// In en, this message translates to:
+  /// **'No API keys yet.'**
+  String get apiKeysEmpty;
+
+  /// Button to create an API key.
+  ///
+  /// In en, this message translates to:
+  /// **'Add API key'**
+  String get apiKeyCreate;
+
+  /// Field label.
+  ///
+  /// In en, this message translates to:
+  /// **'Key name'**
+  String get apiKeyName;
+
+  /// Field label for the user a key belongs to.
+  ///
+  /// In en, this message translates to:
+  /// **'For user'**
+  String get apiKeyUser;
+
+  /// Dialog title after creating a key.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy your API key'**
+  String get apiKeyCreatedTitle;
+
+  /// Dialog body after creating a key.
+  ///
+  /// In en, this message translates to:
+  /// **'This is the only time the key is shown. Store it somewhere safe.'**
+  String get apiKeyCreatedBody;
+
+  /// Snackbar after copying.
+  ///
+  /// In en, this message translates to:
+  /// **'Copied to clipboard'**
+  String get apiKeyCopied;
+
+  /// Status for a revoked key.
+  ///
+  /// In en, this message translates to:
+  /// **'Revoked'**
+  String get apiKeyRevoked;
+
+  /// Expiry line.
+  ///
+  /// In en, this message translates to:
+  /// **'Expires {date}'**
+  String apiKeyExpires(String date);
+
+  /// Creation line.
+  ///
+  /// In en, this message translates to:
+  /// **'Created {date}'**
+  String apiKeyCreatedOn(String date);
+
+  /// Confirmation title.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete API key {name}?'**
+  String apiKeyDeleteTitle(String name);
+
+  /// Confirmation body.
+  ///
+  /// In en, this message translates to:
+  /// **'Anything using this key loses access.'**
+  String get apiKeyDeleteBody;
+
+  /// Snackbar.
+  ///
+  /// In en, this message translates to:
+  /// **'Deleted {name}'**
+  String apiKeyDeleted(String name);
+
+  /// Button.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy'**
+  String get copy;
+
+  /// Button.
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get done;
+
+  /// Label.
+  ///
+  /// In en, this message translates to:
+  /// **'Hostname'**
+  String get networkHostname;
+
+  /// Label.
+  ///
+  /// In en, this message translates to:
+  /// **'Default gateway'**
+  String get networkGateway;
+
+  /// Label.
+  ///
+  /// In en, this message translates to:
+  /// **'DNS servers'**
+  String get networkDns;
+
+  /// Section header.
+  ///
+  /// In en, this message translates to:
+  /// **'Interfaces'**
+  String get networkInterfaces;
+
+  /// Interface status.
+  ///
+  /// In en, this message translates to:
+  /// **'Link up'**
+  String get networkLinkUp;
+
+  /// Interface status.
+  ///
+  /// In en, this message translates to:
+  /// **'Link down'**
+  String get networkLinkDown;
+
+  /// Label for an interface using DHCP.
+  ///
+  /// In en, this message translates to:
+  /// **'DHCP'**
+  String get networkDhcp;
+
+  /// Shown when a value is not set.
+  ///
+  /// In en, this message translates to:
+  /// **'None'**
+  String get networkNone;
+
+  /// Certificates screen title.
+  ///
+  /// In en, this message translates to:
+  /// **'Certificates'**
+  String get certificatesTitle;
+
+  /// Empty state.
+  ///
+  /// In en, this message translates to:
+  /// **'No certificates.'**
+  String get certificatesEmpty;
+
+  /// Status.
+  ///
+  /// In en, this message translates to:
+  /// **'Expired'**
+  String get certificateExpired;
+
+  /// Expiry line.
+  ///
+  /// In en, this message translates to:
+  /// **'Valid until {date}'**
+  String certificateValidUntil(String date);
+
+  /// Updates screen title.
+  ///
+  /// In en, this message translates to:
+  /// **'Updates'**
+  String get updatesTitle;
+
+  /// Current version line.
+  ///
+  /// In en, this message translates to:
+  /// **'Running {version}'**
+  String updateCurrent(String version);
+
+  /// Update status.
+  ///
+  /// In en, this message translates to:
+  /// **'{version} is available'**
+  String updateAvailable(String version);
+
+  /// Update status.
+  ///
+  /// In en, this message translates to:
+  /// **'TrueNAS is up to date'**
+  String get updateNone;
+
+  /// Update status.
+  ///
+  /// In en, this message translates to:
+  /// **'An update is installed. Restart to finish.'**
+  String get updateRebootRequired;
+
+  /// Update status.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t check for updates: {reason}'**
+  String updateCheckFailed(String reason);
+
+  /// Button.
+  ///
+  /// In en, this message translates to:
+  /// **'Install and restart'**
+  String get updateInstall;
+
+  /// Confirmation title.
+  ///
+  /// In en, this message translates to:
+  /// **'Install {version}?'**
+  String updateInstallTitle(String version);
+
+  /// Confirmation body.
+  ///
+  /// In en, this message translates to:
+  /// **'The server downloads the update, installs it and restarts. It is unavailable while it restarts.'**
+  String get updateInstallBody;
+
+  /// Snackbar.
+  ///
+  /// In en, this message translates to:
+  /// **'Update started. The server restarts when it\'s done.'**
+  String get updateStarted;
+
+  /// Button.
+  ///
+  /// In en, this message translates to:
+  /// **'Release notes'**
+  String get updateReleaseNotes;
+
+  /// Section header.
+  ///
+  /// In en, this message translates to:
+  /// **'Boot environments'**
+  String get bootEnvsTitle;
+
+  /// Status.
+  ///
+  /// In en, this message translates to:
+  /// **'Running now'**
+  String get bootEnvActive;
+
+  /// Status.
+  ///
+  /// In en, this message translates to:
+  /// **'Used on next boot'**
+  String get bootEnvNextBoot;
+
+  /// Status for a protected boot environment.
+  ///
+  /// In en, this message translates to:
+  /// **'Kept'**
+  String get bootEnvKept;
+
+  /// Menu action.
+  ///
+  /// In en, this message translates to:
+  /// **'Use on next boot'**
+  String get bootEnvActivate;
+
+  /// Confirmation title.
+  ///
+  /// In en, this message translates to:
+  /// **'Boot {name} next time?'**
+  String bootEnvActivateTitle(String name);
+
+  /// Confirmation body.
+  ///
+  /// In en, this message translates to:
+  /// **'The server uses this version after its next restart.'**
+  String get bootEnvActivateBody;
+
+  /// Menu action.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep'**
+  String get bootEnvKeep;
+
+  /// Menu action.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop keeping'**
+  String get bootEnvUnkeep;
+
+  /// Confirmation title.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete boot environment {name}?'**
+  String bootEnvDeleteTitle(String name);
+
+  /// Confirmation body.
+  ///
+  /// In en, this message translates to:
+  /// **'You can\'t go back to this version afterwards.'**
+  String get bootEnvDeleteBody;
+
+  /// Snackbar.
+  ///
+  /// In en, this message translates to:
+  /// **'Boot environment updated'**
+  String get bootEnvChanged;
+
+  /// More tab action.
+  ///
+  /// In en, this message translates to:
+  /// **'Restart server'**
+  String get powerReboot;
+
+  /// More tab action.
+  ///
+  /// In en, this message translates to:
+  /// **'Shut down server'**
+  String get powerShutdown;
+
+  /// Confirmation title.
+  ///
+  /// In en, this message translates to:
+  /// **'Restart {name}?'**
+  String powerRebootTitle(String name);
+
+  /// Confirmation title.
+  ///
+  /// In en, this message translates to:
+  /// **'Shut down {name}?'**
+  String powerShutdownTitle(String name);
+
+  /// Confirmation body.
+  ///
+  /// In en, this message translates to:
+  /// **'Everything on the server, including shares, apps and VMs, stops until it is back.'**
+  String get powerRebootBody;
+
+  /// Confirmation body.
+  ///
+  /// In en, this message translates to:
+  /// **'Everything on the server stops. You need physical or remote console access to turn it back on.'**
+  String get powerShutdownBody;
+
+  /// Snackbar.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} is restarting'**
+  String powerRebooting(String name);
+
+  /// Snackbar.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} is shutting down'**
+  String powerShuttingDown(String name);
+
+  /// Button.
+  ///
+  /// In en, this message translates to:
+  /// **'Restart'**
+  String get restart;
+
+  /// Button.
+  ///
+  /// In en, this message translates to:
+  /// **'Shut down'**
+  String get shutDown;
+
+  /// Member count of a group.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{No members} =1{1 member} other{{count} members}}'**
+  String groupMembers(int count);
 }
 
 class _AppLocalizationsDelegate

@@ -967,4 +967,351 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get copied => 'Copied';
+
+  @override
+  String get moreAccounts => 'Accounts';
+
+  @override
+  String get moreSystem => 'System';
+
+  @override
+  String get moreActivity => 'Activity';
+
+  @override
+  String get usersTitle => 'Users';
+
+  @override
+  String get usersEmpty => 'No users yet. System accounts are hidden.';
+
+  @override
+  String get usersShowBuiltin => 'Show system accounts';
+
+  @override
+  String get userCreate => 'Add user';
+
+  @override
+  String get userUsername => 'Username';
+
+  @override
+  String get userFullName => 'Full name';
+
+  @override
+  String get userPassword => 'Password';
+
+  @override
+  String get userSmb => 'Allow SMB access';
+
+  @override
+  String get userUsernameInvalid =>
+      'Use lowercase letters, digits, - or _, starting with a letter';
+
+  @override
+  String get userPasswordRequired => 'Enter a password';
+
+  @override
+  String userCreated(String name) {
+    return 'Added $name';
+  }
+
+  @override
+  String get userLocked => 'Locked';
+
+  @override
+  String get userBuiltin => 'System';
+
+  @override
+  String get userLock => 'Lock';
+
+  @override
+  String get userUnlock => 'Unlock';
+
+  @override
+  String userLockedMessage(String name) {
+    return 'Locked $name';
+  }
+
+  @override
+  String userUnlockedMessage(String name) {
+    return 'Unlocked $name';
+  }
+
+  @override
+  String userDeleteTitle(String name) {
+    return 'Delete user $name?';
+  }
+
+  @override
+  String get userDeleteBody =>
+      'The account and its private group are removed. Files it owns stay on disk.';
+
+  @override
+  String userDeleted(String name) {
+    return 'Deleted $name';
+  }
+
+  @override
+  String get userTwoFactor => 'Two-factor';
+
+  @override
+  String get groupsTitle => 'Groups';
+
+  @override
+  String get groupsEmpty => 'No groups yet. System groups are hidden.';
+
+  @override
+  String get groupCreate => 'Add group';
+
+  @override
+  String get groupName => 'Group name';
+
+  @override
+  String groupCreated(String name) {
+    return 'Added $name';
+  }
+
+  @override
+  String groupDeleteTitle(String name) {
+    return 'Delete group $name?';
+  }
+
+  @override
+  String get groupDeleteBody => 'Members keep their accounts.';
+
+  @override
+  String groupDeleted(String name) {
+    return 'Deleted $name';
+  }
+
+  @override
+  String get apiKeysTitle => 'API keys';
+
+  @override
+  String get apiKeysEmpty => 'No API keys yet.';
+
+  @override
+  String get apiKeyCreate => 'Add API key';
+
+  @override
+  String get apiKeyName => 'Key name';
+
+  @override
+  String get apiKeyUser => 'For user';
+
+  @override
+  String get apiKeyCreatedTitle => 'Copy your API key';
+
+  @override
+  String get apiKeyCreatedBody =>
+      'This is the only time the key is shown. Store it somewhere safe.';
+
+  @override
+  String get apiKeyCopied => 'Copied to clipboard';
+
+  @override
+  String get apiKeyRevoked => 'Revoked';
+
+  @override
+  String apiKeyExpires(String date) {
+    return 'Expires $date';
+  }
+
+  @override
+  String apiKeyCreatedOn(String date) {
+    return 'Created $date';
+  }
+
+  @override
+  String apiKeyDeleteTitle(String name) {
+    return 'Delete API key $name?';
+  }
+
+  @override
+  String get apiKeyDeleteBody => 'Anything using this key loses access.';
+
+  @override
+  String apiKeyDeleted(String name) {
+    return 'Deleted $name';
+  }
+
+  @override
+  String get copy => 'Copy';
+
+  @override
+  String get done => 'Done';
+
+  @override
+  String get networkHostname => 'Hostname';
+
+  @override
+  String get networkGateway => 'Default gateway';
+
+  @override
+  String get networkDns => 'DNS servers';
+
+  @override
+  String get networkInterfaces => 'Interfaces';
+
+  @override
+  String get networkLinkUp => 'Link up';
+
+  @override
+  String get networkLinkDown => 'Link down';
+
+  @override
+  String get networkDhcp => 'DHCP';
+
+  @override
+  String get networkNone => 'None';
+
+  @override
+  String get certificatesTitle => 'Certificates';
+
+  @override
+  String get certificatesEmpty => 'No certificates.';
+
+  @override
+  String get certificateExpired => 'Expired';
+
+  @override
+  String certificateValidUntil(String date) {
+    return 'Valid until $date';
+  }
+
+  @override
+  String get updatesTitle => 'Updates';
+
+  @override
+  String updateCurrent(String version) {
+    return 'Running $version';
+  }
+
+  @override
+  String updateAvailable(String version) {
+    return '$version is available';
+  }
+
+  @override
+  String get updateNone => 'TrueNAS is up to date';
+
+  @override
+  String get updateRebootRequired =>
+      'An update is installed. Restart to finish.';
+
+  @override
+  String updateCheckFailed(String reason) {
+    return 'Couldn\'t check for updates: $reason';
+  }
+
+  @override
+  String get updateInstall => 'Install and restart';
+
+  @override
+  String updateInstallTitle(String version) {
+    return 'Install $version?';
+  }
+
+  @override
+  String get updateInstallBody =>
+      'The server downloads the update, installs it and restarts. It is unavailable while it restarts.';
+
+  @override
+  String get updateStarted =>
+      'Update started. The server restarts when it\'s done.';
+
+  @override
+  String get updateReleaseNotes => 'Release notes';
+
+  @override
+  String get bootEnvsTitle => 'Boot environments';
+
+  @override
+  String get bootEnvActive => 'Running now';
+
+  @override
+  String get bootEnvNextBoot => 'Used on next boot';
+
+  @override
+  String get bootEnvKept => 'Kept';
+
+  @override
+  String get bootEnvActivate => 'Use on next boot';
+
+  @override
+  String bootEnvActivateTitle(String name) {
+    return 'Boot $name next time?';
+  }
+
+  @override
+  String get bootEnvActivateBody =>
+      'The server uses this version after its next restart.';
+
+  @override
+  String get bootEnvKeep => 'Keep';
+
+  @override
+  String get bootEnvUnkeep => 'Stop keeping';
+
+  @override
+  String bootEnvDeleteTitle(String name) {
+    return 'Delete boot environment $name?';
+  }
+
+  @override
+  String get bootEnvDeleteBody =>
+      'You can\'t go back to this version afterwards.';
+
+  @override
+  String get bootEnvChanged => 'Boot environment updated';
+
+  @override
+  String get powerReboot => 'Restart server';
+
+  @override
+  String get powerShutdown => 'Shut down server';
+
+  @override
+  String powerRebootTitle(String name) {
+    return 'Restart $name?';
+  }
+
+  @override
+  String powerShutdownTitle(String name) {
+    return 'Shut down $name?';
+  }
+
+  @override
+  String get powerRebootBody =>
+      'Everything on the server, including shares, apps and VMs, stops until it is back.';
+
+  @override
+  String get powerShutdownBody =>
+      'Everything on the server stops. You need physical or remote console access to turn it back on.';
+
+  @override
+  String powerRebooting(String name) {
+    return '$name is restarting';
+  }
+
+  @override
+  String powerShuttingDown(String name) {
+    return '$name is shutting down';
+  }
+
+  @override
+  String get restart => 'Restart';
+
+  @override
+  String get shutDown => 'Shut down';
+
+  @override
+  String groupMembers(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count members',
+      one: '1 member',
+      zero: 'No members',
+    );
+    return '$_temp0';
+  }
 }

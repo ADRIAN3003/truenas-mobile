@@ -6,6 +6,7 @@ import '../api/json_rpc_client.dart';
 import '../api/method_catalog.dart';
 import '../api/sharing_api.dart';
 import '../api/storage_api.dart';
+import '../api/system_api.dart';
 import '../api/truenas_connection.dart';
 import '../api/workloads_api.dart';
 import '../instances/server_instance.dart';
@@ -25,6 +26,7 @@ class TrueNasSession {
   late final storage = StorageApi(client, catalog);
   late final sharing = SharingApi(client, catalog);
   late final workloads = WorkloadsApi(client, catalog);
+  late final system = SystemApi(client, catalog);
 
   String get apiVersion => connection.apiVersion;
   JsonRpcClient get client => connection.client;

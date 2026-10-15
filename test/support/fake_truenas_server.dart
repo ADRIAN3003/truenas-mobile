@@ -180,6 +180,80 @@ class FakeTrueNasServer {
       },
   ];
 
+  /// Users served by `user.query`; create, update and delete change them.
+  final users = <Map<String, dynamic>>[
+    {
+      'id': 1,
+      'uid': 0,
+      'username': 'root',
+      'full_name': 'root',
+      'builtin': true,
+      'locked': false,
+      'smb': false,
+      'local': true,
+    },
+    {
+      'id': 70,
+      'uid': 3000,
+      'username': 'alice',
+      'full_name': 'Alice Smith',
+      'builtin': false,
+      'locked': false,
+      'smb': true,
+      'local': true,
+      'twofactor_auth_configured': true,
+    },
+  ];
+
+  /// Groups served by `group.query`.
+  final groups = <Map<String, dynamic>>[
+    {
+      'id': 40,
+      'gid': 3000,
+      'name': 'alice',
+      'builtin': false,
+      'users': [70],
+      'local': true,
+    },
+  ];
+
+  /// API keys served by `api_key.query`.
+  final apiKeys = <Map<String, dynamic>>[
+    {
+      'id': 1,
+      'name': 'home-assistant',
+      'username': 'truenas_admin',
+      'revoked': false,
+      'created_at': {r'$date': 1760000000000},
+      'expires_at': null,
+    },
+  ];
+
+  /// Boot environments served by `boot.environment.query`.
+  final bootEnvironments = <Map<String, dynamic>>[
+    {
+      'id': '25.10.6',
+      'active': false,
+      'activated': false,
+      'keep': false,
+      'can_activate': true,
+      'used_bytes': 3000000000,
+      'created': {r'$date': 1750000000000},
+    },
+    {
+      'id': '25.10.7',
+      'active': true,
+      'activated': true,
+      'keep': false,
+      'can_activate': true,
+      'used_bytes': 3200000000,
+      'created': {r'$date': 1760000000000},
+    },
+  ];
+
+  /// Version offered by the update check, or null when up to date.
+  String? availableUpdate = '25.10.8';
+
   final _finishedJobs = <int, Map<String, dynamic>>{};
   var _nextJobId = 100;
 
@@ -269,6 +343,12 @@ class FakeTrueNasServer {
                 'container.query': <String, dynamic>{},
               if (service == 'virt.instance' && legacy)
                 'virt.instance.query': <String, dynamic>{},
+              if (service == 'update')
+                for (final m
+                    in legacy
+                        ? ['check_available', 'update']
+                        : ['status', 'run'])
+                  'update.$m': <String, dynamic>{},
             };
           case 'service.query':
             result = services;
@@ -386,6 +466,152 @@ class FakeTrueNasServer {
                 'allow_any_host': false,
               },
             ];
+          case 'user.query':
+            final hideBuiltin = (params.first as List).length > 1;
+            result = [
+              for (final u in users)
+                if (!hideBuiltin || u['builtin'] != true) u,
+            ];
+          case 'user.create':
+            final data = params.first as Map<String, dynamic>;
+            users.add({
+              'id': 71,
+              'uid': 3001,
+              'username': data['username'],
+              'full_name': data['full_name'],
+              'builtin': false,
+              'locked': false,
+              'smb': data['smb'],
+              'local': true,
+            });
+            result = 71;
+          case 'user.update':
+            users
+                .firstWhere((u) => u['id'] == params.first)
+                .addAll(params[1] as Map<String, dynamic>);
+            result = params.first;
+          case 'user.delete':
+            users.removeWhere((u) => u['id'] == params.first);
+            result = true;
+          case 'group.query':
+            result = groups;
+          case 'group.create':
+            groups.add({
+              'id': 41,
+              'gid': 3001,
+              'name': (params.first as Map)['name'],
+              'builtin': false,
+              'users': [],
+              'local': true,
+            });
+            result = 41;
+          case 'group.delete':
+            groups.removeWhere((g) => g['id'] == params.first);
+            result = true;
+          case 'api_key.query':
+            result = apiKeys;
+          case 'api_key.create':
+            final data = params.first as Map<String, dynamic>;
+            apiKeys.add({
+              'id': 2,
+              'name': data['name'],
+              'username': data['username'],
+              'revoked': false,
+            });
+            result = {'id': 2, 'name': data['name'], 'key': '2-SECRETKEY'};
+          case 'api_key.delete':
+            apiKeys.removeWhere((k) => k['id'] == params.first);
+            result = true;
+          case 'network.general.summary':
+            result = {
+              'ips': {
+                'enp1s0': {
+                  'IPV4': ['192.168.1.10/24'],
+                  'IPV6': ['fe80::1/64'],
+                },
+              },
+              'default_routes': ['192.168.1.1'],
+              'nameservers': ['1.1.1.1', '9.9.9.9'],
+            };
+          case 'network.configuration.config':
+            result = {'hostname': 'nas', 'domain': 'local'};
+          case 'interface.query':
+            result = [
+              {
+                'id': 'enp1s0',
+                'name': 'enp1s0',
+                'type': 'PHYSICAL',
+                'description': 'Onboard',
+                'ipv4_dhcp': true,
+                'state': {'link_state': 'LINK_STATE_UP', 'mtu': 1500},
+              },
+              {
+                'id': 'enp2s0',
+                'name': 'enp2s0',
+                'type': 'PHYSICAL',
+                'description': '',
+                'ipv4_dhcp': false,
+                'state': {'link_state': 'LINK_STATE_DOWN', 'mtu': 1500},
+              },
+            ];
+          case 'certificate.query':
+            result = [
+              {
+                'id': 1,
+                'name': 'truenas_default',
+                'common': 'localhost',
+                'san': ['DNS:localhost'],
+                'until': 'Tue Oct 13 08:00:00 2026',
+                'expired': false,
+              },
+              {
+                'id': 2,
+                'name': 'old',
+                'common': 'nas.example.com',
+                'san': [],
+                'until': 'Mon Jan  1 00:00:00 2024',
+                'expired': true,
+              },
+            ];
+          case 'update.status':
+            result = {
+              'code': 'NORMAL',
+              'error': null,
+              'status': {
+                'current_version': {'version': '25.10.7'},
+                'new_version': availableUpdate == null
+                    ? null
+                    : {
+                        'version': availableUpdate,
+                        'release_notes_url': 'https://example.com/notes',
+                      },
+              },
+            };
+          case 'update.check_available':
+            result = availableUpdate == null
+                ? {'status': 'UNAVAILABLE'}
+                : {'status': 'AVAILABLE', 'version': availableUpdate};
+          case 'update.run' || 'update.update':
+            result = _job();
+          case 'boot.environment.query':
+            result = bootEnvironments;
+          case 'boot.environment.activate':
+            final id = (params.first as Map)['id'];
+            for (final env in bootEnvironments) {
+              env['activated'] = env['id'] == id;
+            }
+            result = true;
+          case 'boot.environment.keep':
+            final data = params.first as Map;
+            bootEnvironments.firstWhere((e) => e['id'] == data['id'])['keep'] =
+                data['value'];
+            result = true;
+          case 'boot.environment.destroy':
+            final id = (params.first as Map)['id'];
+            bootEnvironments.removeWhere((e) => e['id'] == id);
+            result = null;
+          case 'system.reboot' || 'system.shutdown':
+            result = _job();
           case 'pool.query':
             result = [samplePool];
           case 'pool.scrub.scrub':

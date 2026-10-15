@@ -1363,5 +1363,501 @@
   "copied": "Copied",
   "@copied": {
     "description": "Snackbar after copying text."
+  },
+  "moreAccounts": "Accounts",
+  "@moreAccounts": {
+    "description": "Section header in the More tab."
+  },
+  "moreSystem": "System",
+  "@moreSystem": {
+    "description": "Section header in the More tab."
+  },
+  "moreActivity": "Activity",
+  "@moreActivity": {
+    "description": "Section header in the More tab."
+  },
+  "usersTitle": "Users",
+  "@usersTitle": {
+    "description": "Users screen title."
+  },
+  "usersEmpty": "No users yet. System accounts are hidden.",
+  "@usersEmpty": {
+    "description": "Shown when there are no non-built-in users."
+  },
+  "usersShowBuiltin": "Show system accounts",
+  "@usersShowBuiltin": {
+    "description": "Toggle to include built-in accounts."
+  },
+  "userCreate": "Add user",
+  "@userCreate": {
+    "description": "Button to create a user."
+  },
+  "userUsername": "Username",
+  "@userUsername": {
+    "description": "Field label."
+  },
+  "userFullName": "Full name",
+  "@userFullName": {
+    "description": "Field label."
+  },
+  "userPassword": "Password",
+  "@userPassword": {
+    "description": "Field label."
+  },
+  "userSmb": "Allow SMB access",
+  "@userSmb": {
+    "description": "Switch label when creating a user."
+  },
+  "userUsernameInvalid": "Use lowercase letters, digits, - or _, starting with a letter",
+  "@userUsernameInvalid": {
+    "description": "Validation message."
+  },
+  "userPasswordRequired": "Enter a password",
+  "@userPasswordRequired": {
+    "description": "Validation message."
+  },
+  "userCreated": "Added {name}",
+  "@userCreated": {
+    "description": "Snackbar after creating a user.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "userLocked": "Locked",
+  "@userLocked": {
+    "description": "Status for a locked user."
+  },
+  "userBuiltin": "System",
+  "@userBuiltin": {
+    "description": "Label for a built-in account or group."
+  },
+  "userLock": "Lock",
+  "@userLock": {
+    "description": "Menu action to lock a user."
+  },
+  "userUnlock": "Unlock",
+  "@userUnlock": {
+    "description": "Menu action to unlock a user."
+  },
+  "userLockedMessage": "Locked {name}",
+  "@userLockedMessage": {
+    "description": "Snackbar.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "userUnlockedMessage": "Unlocked {name}",
+  "@userUnlockedMessage": {
+    "description": "Snackbar.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "userDeleteTitle": "Delete user {name}?",
+  "@userDeleteTitle": {
+    "description": "Confirmation title.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "userDeleteBody": "The account and its private group are removed. Files it owns stay on disk.",
+  "@userDeleteBody": {
+    "description": "Confirmation body."
+  },
+  "userDeleted": "Deleted {name}",
+  "@userDeleted": {
+    "description": "Snackbar.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "userTwoFactor": "Two-factor",
+  "@userTwoFactor": {
+    "description": "Label when a user has two-factor sign-in set up."
+  },
+  "groupsTitle": "Groups",
+  "@groupsTitle": {
+    "description": "Groups section title."
+  },
+  "groupsEmpty": "No groups yet. System groups are hidden.",
+  "@groupsEmpty": {
+    "description": "Empty state."
+  },
+  "groupCreate": "Add group",
+  "@groupCreate": {
+    "description": "Button to create a group."
+  },
+  "groupName": "Group name",
+  "@groupName": {
+    "description": "Field label."
+  },
+  "groupCreated": "Added {name}",
+  "@groupCreated": {
+    "description": "Snackbar.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "groupDeleteTitle": "Delete group {name}?",
+  "@groupDeleteTitle": {
+    "description": "Confirmation title.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "groupDeleteBody": "Members keep their accounts.",
+  "@groupDeleteBody": {
+    "description": "Confirmation body."
+  },
+  "groupDeleted": "Deleted {name}",
+  "@groupDeleted": {
+    "description": "Snackbar.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "apiKeysTitle": "API keys",
+  "@apiKeysTitle": {
+    "description": "API keys screen title."
+  },
+  "apiKeysEmpty": "No API keys yet.",
+  "@apiKeysEmpty": {
+    "description": "Empty state."
+  },
+  "apiKeyCreate": "Add API key",
+  "@apiKeyCreate": {
+    "description": "Button to create an API key."
+  },
+  "apiKeyName": "Key name",
+  "@apiKeyName": {
+    "description": "Field label."
+  },
+  "apiKeyUser": "For user",
+  "@apiKeyUser": {
+    "description": "Field label for the user a key belongs to."
+  },
+  "apiKeyCreatedTitle": "Copy your API key",
+  "@apiKeyCreatedTitle": {
+    "description": "Dialog title after creating a key."
+  },
+  "apiKeyCreatedBody": "This is the only time the key is shown. Store it somewhere safe.",
+  "@apiKeyCreatedBody": {
+    "description": "Dialog body after creating a key."
+  },
+  "apiKeyCopied": "Copied to clipboard",
+  "@apiKeyCopied": {
+    "description": "Snackbar after copying."
+  },
+  "apiKeyRevoked": "Revoked",
+  "@apiKeyRevoked": {
+    "description": "Status for a revoked key."
+  },
+  "apiKeyExpires": "Expires {date}",
+  "@apiKeyExpires": {
+    "description": "Expiry line.",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "apiKeyCreatedOn": "Created {date}",
+  "@apiKeyCreatedOn": {
+    "description": "Creation line.",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "apiKeyDeleteTitle": "Delete API key {name}?",
+  "@apiKeyDeleteTitle": {
+    "description": "Confirmation title.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "apiKeyDeleteBody": "Anything using this key loses access.",
+  "@apiKeyDeleteBody": {
+    "description": "Confirmation body."
+  },
+  "apiKeyDeleted": "Deleted {name}",
+  "@apiKeyDeleted": {
+    "description": "Snackbar.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "copy": "Copy",
+  "@copy": {
+    "description": "Button."
+  },
+  "done": "Done",
+  "@done": {
+    "description": "Button."
+  },
+  "networkHostname": "Hostname",
+  "@networkHostname": {
+    "description": "Label."
+  },
+  "networkGateway": "Default gateway",
+  "@networkGateway": {
+    "description": "Label."
+  },
+  "networkDns": "DNS servers",
+  "@networkDns": {
+    "description": "Label."
+  },
+  "networkInterfaces": "Interfaces",
+  "@networkInterfaces": {
+    "description": "Section header."
+  },
+  "networkLinkUp": "Link up",
+  "@networkLinkUp": {
+    "description": "Interface status."
+  },
+  "networkLinkDown": "Link down",
+  "@networkLinkDown": {
+    "description": "Interface status."
+  },
+  "networkDhcp": "DHCP",
+  "@networkDhcp": {
+    "description": "Label for an interface using DHCP."
+  },
+  "networkNone": "None",
+  "@networkNone": {
+    "description": "Shown when a value is not set."
+  },
+  "certificatesTitle": "Certificates",
+  "@certificatesTitle": {
+    "description": "Certificates screen title."
+  },
+  "certificatesEmpty": "No certificates.",
+  "@certificatesEmpty": {
+    "description": "Empty state."
+  },
+  "certificateExpired": "Expired",
+  "@certificateExpired": {
+    "description": "Status."
+  },
+  "certificateValidUntil": "Valid until {date}",
+  "@certificateValidUntil": {
+    "description": "Expiry line.",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "updatesTitle": "Updates",
+  "@updatesTitle": {
+    "description": "Updates screen title."
+  },
+  "updateCurrent": "Running {version}",
+  "@updateCurrent": {
+    "description": "Current version line.",
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "updateAvailable": "{version} is available",
+  "@updateAvailable": {
+    "description": "Update status.",
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "updateNone": "TrueNAS is up to date",
+  "@updateNone": {
+    "description": "Update status."
+  },
+  "updateRebootRequired": "An update is installed. Restart to finish.",
+  "@updateRebootRequired": {
+    "description": "Update status."
+  },
+  "updateCheckFailed": "Couldn't check for updates: {reason}",
+  "@updateCheckFailed": {
+    "description": "Update status.",
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "updateInstall": "Install and restart",
+  "@updateInstall": {
+    "description": "Button."
+  },
+  "updateInstallTitle": "Install {version}?",
+  "@updateInstallTitle": {
+    "description": "Confirmation title.",
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "updateInstallBody": "The server downloads the update, installs it and restarts. It is unavailable while it restarts.",
+  "@updateInstallBody": {
+    "description": "Confirmation body."
+  },
+  "updateStarted": "Update started. The server restarts when it's done.",
+  "@updateStarted": {
+    "description": "Snackbar."
+  },
+  "updateReleaseNotes": "Release notes",
+  "@updateReleaseNotes": {
+    "description": "Button."
+  },
+  "bootEnvsTitle": "Boot environments",
+  "@bootEnvsTitle": {
+    "description": "Section header."
+  },
+  "bootEnvActive": "Running now",
+  "@bootEnvActive": {
+    "description": "Status."
+  },
+  "bootEnvNextBoot": "Used on next boot",
+  "@bootEnvNextBoot": {
+    "description": "Status."
+  },
+  "bootEnvKept": "Kept",
+  "@bootEnvKept": {
+    "description": "Status for a protected boot environment."
+  },
+  "bootEnvActivate": "Use on next boot",
+  "@bootEnvActivate": {
+    "description": "Menu action."
+  },
+  "bootEnvActivateTitle": "Boot {name} next time?",
+  "@bootEnvActivateTitle": {
+    "description": "Confirmation title.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "bootEnvActivateBody": "The server uses this version after its next restart.",
+  "@bootEnvActivateBody": {
+    "description": "Confirmation body."
+  },
+  "bootEnvKeep": "Keep",
+  "@bootEnvKeep": {
+    "description": "Menu action."
+  },
+  "bootEnvUnkeep": "Stop keeping",
+  "@bootEnvUnkeep": {
+    "description": "Menu action."
+  },
+  "bootEnvDeleteTitle": "Delete boot environment {name}?",
+  "@bootEnvDeleteTitle": {
+    "description": "Confirmation title.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "bootEnvDeleteBody": "You can't go back to this version afterwards.",
+  "@bootEnvDeleteBody": {
+    "description": "Confirmation body."
+  },
+  "bootEnvChanged": "Boot environment updated",
+  "@bootEnvChanged": {
+    "description": "Snackbar."
+  },
+  "powerReboot": "Restart server",
+  "@powerReboot": {
+    "description": "More tab action."
+  },
+  "powerShutdown": "Shut down server",
+  "@powerShutdown": {
+    "description": "More tab action."
+  },
+  "powerRebootTitle": "Restart {name}?",
+  "@powerRebootTitle": {
+    "description": "Confirmation title.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "powerShutdownTitle": "Shut down {name}?",
+  "@powerShutdownTitle": {
+    "description": "Confirmation title.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "powerRebootBody": "Everything on the server, including shares, apps and VMs, stops until it is back.",
+  "@powerRebootBody": {
+    "description": "Confirmation body."
+  },
+  "powerShutdownBody": "Everything on the server stops. You need physical or remote console access to turn it back on.",
+  "@powerShutdownBody": {
+    "description": "Confirmation body."
+  },
+  "powerRebooting": "{name} is restarting",
+  "@powerRebooting": {
+    "description": "Snackbar.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "powerShuttingDown": "{name} is shutting down",
+  "@powerShuttingDown": {
+    "description": "Snackbar.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "restart": "Restart",
+  "@restart": {
+    "description": "Button."
+  },
+  "shutDown": "Shut down",
+  "@shutDown": {
+    "description": "Button."
+  },
+  "groupMembers": "{count, plural, =0{No members} =1{1 member} other{{count} members}}",
+  "@groupMembers": {
+    "description": "Member count of a group.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   }
 }

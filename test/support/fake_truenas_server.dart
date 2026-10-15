@@ -335,6 +335,65 @@ class FakeTrueNasServer {
     },
   };
 
+  /// Data protection tasks by service; remove a key to hide that kind.
+  final protection = <String, List<Map<String, dynamic>>>{
+    'pool.snapshottask': [
+      {
+        'id': 1,
+        'dataset': 'tank/media',
+        'recursive': true,
+        'lifetime_value': 2,
+        'lifetime_unit': 'WEEK',
+        'enabled': true,
+        'schedule': {
+          'minute': '00',
+          'hour': '*',
+          'dom': '*',
+          'month': '*',
+          'dow': '*',
+          'begin': '00:00',
+          'end': '23:59',
+        },
+        'state': {
+          'state': 'FINISHED',
+          'datetime': {r'$date': 1760000000000},
+        },
+      },
+    ],
+    'replication': [
+      {
+        'id': 1,
+        'name': 'offsite',
+        'direction': 'PUSH',
+        'source_datasets': ['tank/media'],
+        'target_dataset': 'backup/media',
+        'enabled': true,
+        'state': {
+          'state': 'ERROR',
+          'datetime': {r'$date': 1760000000000},
+          'error': 'No route to host',
+        },
+        'job': null,
+      },
+    ],
+    'cloudsync': [
+      {
+        'id': 1,
+        'description': 'Photos to B2',
+        'direction': 'PUSH',
+        'path': '/mnt/tank/photos',
+        'credentials': {'id': 1, 'name': 'Backblaze'},
+        'enabled': false,
+        'job': {
+          'id': 5,
+          'state': 'RUNNING',
+          'progress': {'percent': 42},
+        },
+      },
+    ],
+    'cloud_backup': [],
+  };
+
   final _finishedJobs = <int, Map<String, dynamic>>{};
   var _nextJobId = 100;
 
@@ -384,6 +443,14 @@ class FakeTrueNasServer {
         if (method.startsWith('$snapshotService.')) {
           result = _snapshotCall(method.split('.').last, params);
         }
+        final dot = method.lastIndexOf('.');
+        if (dot > 0 && protection.containsKey(method.substring(0, dot))) {
+          result = _protectionCall(
+            method.substring(0, dot),
+            method.substring(dot + 1),
+            params,
+          );
+        }
         switch (method) {
           case 'auth.login_ex':
             final data = params.first as Map<String, dynamic>;
@@ -426,6 +493,8 @@ class FakeTrueNasServer {
                 'container.query': <String, dynamic>{},
               if (service == 'virt.instance' && legacy)
                 'virt.instance.query': <String, dynamic>{},
+              if (protection.containsKey(service))
+                '$service.query': <String, dynamic>{},
               if (service == 'update')
                 for (final m
                     in legacy
@@ -826,6 +895,34 @@ class FakeTrueNasServer {
     }
     request.response.statusCode = HttpStatus.notFound;
     await request.response.close();
+  }
+
+  Object? _protectionCall(String service, String verb, List<dynamic> params) {
+    final tasks = protection[service]!;
+    switch (verb) {
+      case 'query':
+        return tasks;
+      case 'update':
+        tasks
+            .firstWhere((t) => t['id'] == params.first)
+            .addAll(params[1] as Map<String, dynamic>);
+        return true;
+      case 'delete':
+        tasks.removeWhere((t) => t['id'] == params.first);
+        return true;
+      case 'create':
+        tasks.add({
+          'id': 99,
+          ...params.first as Map<String, dynamic>,
+          'state': {'state': 'PENDING'},
+        });
+        return 99;
+      case 'run' || 'sync':
+        return service == 'pool.snapshottask' ? null : _job();
+      case 'abort':
+        return true;
+    }
+    return null;
   }
 
   /// Records a finished job and returns its id.

@@ -2008,5 +2008,263 @@
   "shellKeyTab": "Tab",
   "@shellKeyTab": {
     "description": "Key button."
+  },
+  "protectionTitle": "Data protection",
+  "@protectionTitle": {
+    "description": "Data protection screen title and More tab entry."
+  },
+  "protectionEmpty": "No tasks yet.",
+  "@protectionEmpty": {
+    "description": "Shown under a section with no tasks."
+  },
+  "protectionSnapshots": "Periodic snapshots",
+  "@protectionSnapshots": {
+    "description": "Section header."
+  },
+  "protectionReplication": "Replication",
+  "@protectionReplication": {
+    "description": "Section header."
+  },
+  "protectionCloudSync": "Cloud sync",
+  "@protectionCloudSync": {
+    "description": "Section header."
+  },
+  "protectionCloudBackup": "TrueCloud backup",
+  "@protectionCloudBackup": {
+    "description": "Section header."
+  },
+  "protectionRsync": "Rsync",
+  "@protectionRsync": {
+    "description": "Section header."
+  },
+  "taskNever": "Not run yet",
+  "@taskNever": {
+    "description": "Task status."
+  },
+  "taskWaiting": "Waiting",
+  "@taskWaiting": {
+    "description": "Task status."
+  },
+  "taskRunning": "Running",
+  "@taskRunning": {
+    "description": "Task status."
+  },
+  "taskRunningPercent": "Running · {percent}%",
+  "@taskRunningPercent": {
+    "description": "Task status with progress.",
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "taskSuccess": "Succeeded",
+  "@taskSuccess": {
+    "description": "Task status."
+  },
+  "taskFailed": "Failed",
+  "@taskFailed": {
+    "description": "Task status."
+  },
+  "taskHeld": "On hold",
+  "@taskHeld": {
+    "description": "Task status."
+  },
+  "taskLastRun": "Last run {date}",
+  "@taskLastRun": {
+    "description": "When the task last ran.",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "taskEnabled": "Enabled",
+  "@taskEnabled": {
+    "description": "Accessibility label for the task enable switch."
+  },
+  "taskRunNow": "Run now",
+  "@taskRunNow": {
+    "description": "Menu action."
+  },
+  "taskStop": "Stop",
+  "@taskStop": {
+    "description": "Menu action for a running cloud task."
+  },
+  "taskStarted": "Started {name}",
+  "@taskStarted": {
+    "description": "Snackbar.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "taskStopped": "Stopped {name}",
+  "@taskStopped": {
+    "description": "Snackbar.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "taskEnabledMessage": "Enabled {name}",
+  "@taskEnabledMessage": {
+    "description": "Snackbar.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "taskDisabledMessage": "Disabled {name}",
+  "@taskDisabledMessage": {
+    "description": "Snackbar.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "taskDeleteTitle": "Delete the task for {name}?",
+  "@taskDeleteTitle": {
+    "description": "Confirmation title.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "taskDeleteBody": "Snapshots it already took are kept.",
+  "@taskDeleteBody": {
+    "description": "Confirmation body for deleting a snapshot task."
+  },
+  "taskDeleted": "Task deleted",
+  "@taskDeleted": {
+    "description": "Snackbar."
+  },
+  "snapshotTaskCreate": "Add snapshot task",
+  "@snapshotTaskCreate": {
+    "description": "Button."
+  },
+  "snapshotTaskCreated": "Added a snapshot task for {name}",
+  "@snapshotTaskCreated": {
+    "description": "Snackbar.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "snapshotTaskDataset": "Dataset",
+  "@snapshotTaskDataset": {
+    "description": "Field label."
+  },
+  "snapshotTaskRecursive": "Include child datasets",
+  "@snapshotTaskRecursive": {
+    "description": "Switch label."
+  },
+  "snapshotTaskSchedule": "How often",
+  "@snapshotTaskSchedule": {
+    "description": "Field label."
+  },
+  "snapshotTaskKeepFor": "Keep for",
+  "@snapshotTaskKeepFor": {
+    "description": "Field label."
+  },
+  "scheduleHourly": "Every hour",
+  "@scheduleHourly": {
+    "description": "Schedule."
+  },
+  "scheduleDaily": "Every day at midnight",
+  "@scheduleDaily": {
+    "description": "Schedule."
+  },
+  "scheduleWeekly": "Every Sunday at midnight",
+  "@scheduleWeekly": {
+    "description": "Schedule."
+  },
+  "scheduleCustom": "Cron: {cron}",
+  "@scheduleCustom": {
+    "description": "Schedule that matches no preset.",
+    "placeholders": {
+      "cron": {
+        "type": "String"
+      }
+    }
+  },
+  "snapshotTaskRecursiveLabel": "with child datasets",
+  "@snapshotTaskRecursiveLabel": {
+    "description": "Detail for recursive tasks."
+  },
+  "keepHours": "{count, plural, =1{Keep 1 hour} other{Keep {count} hours}}",
+  "@keepHours": {
+    "description": "Retention.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "keepDays": "{count, plural, =1{Keep 1 day} other{Keep {count} days}}",
+  "@keepDays": {
+    "description": "Retention.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "keepWeeks": "{count, plural, =1{Keep 1 week} other{Keep {count} weeks}}",
+  "@keepWeeks": {
+    "description": "Retention.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "keepMonths": "{count, plural, =1{Keep 1 month} other{Keep {count} months}}",
+  "@keepMonths": {
+    "description": "Retention.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "keepYears": "{count, plural, =1{Keep 1 year} other{Keep {count} years}}",
+  "@keepYears": {
+    "description": "Retention.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "unitHours": "Hours",
+  "@unitHours": {
+    "description": "Lifetime unit."
+  },
+  "unitDays": "Days",
+  "@unitDays": {
+    "description": "Lifetime unit."
+  },
+  "unitWeeks": "Weeks",
+  "@unitWeeks": {
+    "description": "Lifetime unit."
+  },
+  "unitMonths": "Months",
+  "@unitMonths": {
+    "description": "Lifetime unit."
+  },
+  "unitYears": "Years",
+  "@unitYears": {
+    "description": "Lifetime unit."
+  },
+  "protectionSubtitle": "Snapshot tasks, replication and cloud sync",
+  "@protectionSubtitle": {
+    "description": "Subtitle of the data protection entry in the Storage tab."
   }
 }

@@ -1107,6 +1107,300 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Create'**
   String get create;
+
+  /// Bottom navigation tab for shares and services.
+  ///
+  /// In en, this message translates to:
+  /// **'Shares'**
+  String get tabShares;
+
+  /// Title of the services screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Services'**
+  String get servicesTitle;
+
+  /// Subtitle of the services entry.
+  ///
+  /// In en, this message translates to:
+  /// **'Start, stop, and choose what starts on boot'**
+  String get servicesSubtitle;
+
+  /// Shown when the server lists no services.
+  ///
+  /// In en, this message translates to:
+  /// **'No services'**
+  String get servicesEmpty;
+
+  /// Service state label.
+  ///
+  /// In en, this message translates to:
+  /// **'Running'**
+  String get serviceRunning;
+
+  /// Service state label.
+  ///
+  /// In en, this message translates to:
+  /// **'Stopped'**
+  String get serviceStopped;
+
+  /// Starts a service.
+  ///
+  /// In en, this message translates to:
+  /// **'Start'**
+  String get serviceStart;
+
+  /// Stops a service.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop'**
+  String get serviceStop;
+
+  /// Restarts a service.
+  ///
+  /// In en, this message translates to:
+  /// **'Restart'**
+  String get serviceRestart;
+
+  /// Switch that makes a service start when the server boots.
+  ///
+  /// In en, this message translates to:
+  /// **'Start on boot'**
+  String get serviceStartOnBoot;
+
+  /// Confirmation title for stopping a service.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop {name}?'**
+  String serviceStopTitle(String name);
+
+  /// Confirmation body for stopping a service.
+  ///
+  /// In en, this message translates to:
+  /// **'Clients using this service lose access until it is started again.'**
+  String get serviceStopBody;
+
+  /// Snackbar after starting or restarting a service.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} is running'**
+  String serviceStartedMessage(String name);
+
+  /// Snackbar after stopping a service.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} stopped'**
+  String serviceStoppedMessage(String name);
+
+  /// Banner on a share list when its service is not running.
+  ///
+  /// In en, this message translates to:
+  /// **'The {name} service is stopped, so these shares can\'t be reached.'**
+  String serviceNotRunning(String name);
+
+  /// Title of the SMB share list.
+  ///
+  /// In en, this message translates to:
+  /// **'SMB shares'**
+  String get smbTitle;
+
+  /// Title of the NFS share list.
+  ///
+  /// In en, this message translates to:
+  /// **'NFS shares'**
+  String get nfsTitle;
+
+  /// Number of shares of one protocol.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{No shares} =1{1 share} other{{count} shares}}'**
+  String sharesCount(int count);
+
+  /// Shown when a share list is empty.
+  ///
+  /// In en, this message translates to:
+  /// **'No shares yet'**
+  String get sharesEmpty;
+
+  /// Button that creates a share.
+  ///
+  /// In en, this message translates to:
+  /// **'Add share'**
+  String get shareCreate;
+
+  /// Title of the share edit dialog.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit share'**
+  String get shareEdit;
+
+  /// Field for the SMB share name.
+  ///
+  /// In en, this message translates to:
+  /// **'Share name'**
+  String get shareName;
+
+  /// Field for the dataset folder a share exports.
+  ///
+  /// In en, this message translates to:
+  /// **'Folder'**
+  String get sharePath;
+
+  /// Field for a share's description.
+  ///
+  /// In en, this message translates to:
+  /// **'Description'**
+  String get shareComment;
+
+  /// Switch that makes a share read only.
+  ///
+  /// In en, this message translates to:
+  /// **'Read only'**
+  String get shareReadOnly;
+
+  /// Switch for SMB share browsability.
+  ///
+  /// In en, this message translates to:
+  /// **'Visible when browsing the network'**
+  String get shareBrowsable;
+
+  /// Switch that turns a share on or off.
+  ///
+  /// In en, this message translates to:
+  /// **'Enabled'**
+  String get shareEnabled;
+
+  /// Label for a share that is turned off.
+  ///
+  /// In en, this message translates to:
+  /// **'Disabled'**
+  String get shareDisabled;
+
+  /// Label for a share whose encrypted dataset is locked.
+  ///
+  /// In en, this message translates to:
+  /// **'Dataset locked'**
+  String get shareLocked;
+
+  /// Shown when there is no dataset to share.
+  ///
+  /// In en, this message translates to:
+  /// **'Create a dataset first. A share always points at a dataset\'s folder.'**
+  String get shareNoDatasets;
+
+  /// Snackbar after creating a share.
+  ///
+  /// In en, this message translates to:
+  /// **'Share added'**
+  String get shareCreated;
+
+  /// Snackbar after changing a share.
+  ///
+  /// In en, this message translates to:
+  /// **'Share saved'**
+  String get shareSaved;
+
+  /// Button that deletes a share.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete share'**
+  String get shareDelete;
+
+  /// Confirmation title for deleting a share.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete share {name}?'**
+  String shareDeleteTitle(String name);
+
+  /// Confirmation body for deleting a share.
+  ///
+  /// In en, this message translates to:
+  /// **'Clients can no longer reach it. The files in {path} are kept.'**
+  String shareDeleteBody(String path);
+
+  /// Snackbar after deleting a share.
+  ///
+  /// In en, this message translates to:
+  /// **'Share deleted'**
+  String get shareDeleted;
+
+  /// NFS export without host or network limits.
+  ///
+  /// In en, this message translates to:
+  /// **'Any host can connect'**
+  String get nfsAllowedEveryone;
+
+  /// NFS export limited to some hosts or networks.
+  ///
+  /// In en, this message translates to:
+  /// **'Allowed: {list}'**
+  String nfsAllowed(String list);
+
+  /// Title of the iSCSI screen.
+  ///
+  /// In en, this message translates to:
+  /// **'iSCSI'**
+  String get iscsiTitle;
+
+  /// Section heading for iSCSI targets.
+  ///
+  /// In en, this message translates to:
+  /// **'Targets'**
+  String get iscsiTargets;
+
+  /// Section heading for iSCSI extents.
+  ///
+  /// In en, this message translates to:
+  /// **'Extents'**
+  String get iscsiExtents;
+
+  /// Summary of iSCSI configuration.
+  ///
+  /// In en, this message translates to:
+  /// **'Targets: {targets} · Extents: {extents}'**
+  String iscsiSummary(int targets, int extents);
+
+  /// Shown when no iSCSI target exists.
+  ///
+  /// In en, this message translates to:
+  /// **'No iSCSI targets'**
+  String get iscsiEmpty;
+
+  /// Title of the NVMe-oF screen.
+  ///
+  /// In en, this message translates to:
+  /// **'NVMe over Fabrics'**
+  String get nvmetTitle;
+
+  /// Summary of NVMe-oF configuration.
+  ///
+  /// In en, this message translates to:
+  /// **'Subsystems: {count}'**
+  String nvmetSummary(int count);
+
+  /// Shown when no subsystem exists.
+  ///
+  /// In en, this message translates to:
+  /// **'No NVMe-oF subsystems'**
+  String get nvmetEmpty;
+
+  /// NVMe-oF subsystem open to all hosts.
+  ///
+  /// In en, this message translates to:
+  /// **'Any host can connect'**
+  String get nvmetAnyHost;
+
+  /// NVMe-oF subsystem limited to some hosts.
+  ///
+  /// In en, this message translates to:
+  /// **'Only allowed hosts can connect'**
+  String get nvmetAllowedHosts;
+
+  /// Note on read-only screens.
+  ///
+  /// In en, this message translates to:
+  /// **'View only for now. Use the TrueNAS web interface to change these.'**
+  String get viewOnlyNote;
 }
 
 class _AppLocalizationsDelegate

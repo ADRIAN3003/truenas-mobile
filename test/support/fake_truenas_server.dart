@@ -70,6 +70,60 @@ class FakeTrueNasServer {
     _snapshot('tank/media@auto-2', 1760100000000),
   ];
 
+  /// Behave like 25.04: no `service.control`, no NVMe-oF, SMB `ro` field.
+  bool legacy = false;
+
+  /// Services served by `service.query`; control calls change their state.
+  final services = <Map<String, dynamic>>[
+    {
+      'id': 1,
+      'service': 'cifs',
+      'enable': true,
+      'state': 'RUNNING',
+      'pids': [],
+    },
+    {
+      'id': 2,
+      'service': 'nfs',
+      'enable': false,
+      'state': 'STOPPED',
+      'pids': [],
+    },
+    {'id': 3, 'service': 'ssh', 'enable': true, 'state': 'RUNNING', 'pids': []},
+  ];
+
+  /// SMB shares served by `sharing.smb.query`.
+  late final smbShares = <Map<String, dynamic>>[
+    {
+      'id': 1,
+      'name': 'media',
+      'path': '/mnt/tank/media',
+      'enabled': true,
+      'comment': 'Movies',
+      legacy ? 'ro' : 'readonly': false,
+      'browsable': true,
+      'locked': false,
+      'purpose': 'DEFAULT_SHARE',
+    },
+  ];
+
+  /// NFS exports served by `sharing.nfs.query`.
+  final nfsShares = <Map<String, dynamic>>[
+    {
+      'id': 1,
+      'path': '/mnt/tank/media',
+      'enabled': true,
+      'comment': '',
+      'ro': true,
+      'networks': ['192.168.1.0/24'],
+      'hosts': [],
+      'locked': false,
+    },
+  ];
+
+  final _finishedJobs = <int, Map<String, dynamic>>{};
+  var _nextJobId = 100;
+
   /// Events passed to `core.subscribe`.
   final subscriptions = <String>[];
 
@@ -144,12 +198,91 @@ class FakeTrueNasServer {
             result = null;
           case 'core.get_methods':
             final service = params.first as String;
-            result = service == snapshotService
-                ? {
-                    for (final m in ['query', 'create', 'delete', 'rollback'])
-                      '$service.$m': <String, dynamic>{},
-                  }
-                : <String, dynamic>{};
+            result = <String, dynamic>{
+              if (service == snapshotService)
+                for (final m in ['query', 'create', 'delete', 'rollback'])
+                  '$service.$m': <String, dynamic>{},
+              if (service == 'service' && !legacy)
+                'service.control': <String, dynamic>{},
+              if (service == 'nvmet.subsys' && !legacy)
+                'nvmet.subsys.query': <String, dynamic>{},
+            };
+          case 'service.query':
+            result = services;
+          case 'service.control':
+            _setServiceState(params[1] as String, params[0] as String);
+            final id = _nextJobId++;
+            _finishedJobs[id] = {'id': id, 'state': 'SUCCESS', 'result': true};
+            result = id;
+          case 'service.start' || 'service.stop' || 'service.restart':
+            _setServiceState(params[0] as String, method.split('.').last);
+            result = true;
+          case 'service.update':
+            services.firstWhere((s) => s['id'] == params[0])['enable'] =
+                (params[1] as Map)['enable'];
+            result = params[0];
+          case 'sharing.smb.query':
+            result = smbShares;
+          case 'sharing.smb.create':
+            final data = params.first as Map<String, dynamic>;
+            smbShares.add({
+              'id': smbShares.length + 1,
+              'enabled': true,
+              'browsable': true,
+              'locked': false,
+              ...data,
+            });
+            result = smbShares.last;
+          case 'sharing.smb.update':
+            smbShares
+                .firstWhere((s) => s['id'] == params[0])
+                .addAll(params[1] as Map<String, dynamic>);
+            result = true;
+          case 'sharing.smb.delete':
+            smbShares.removeWhere((s) => s['id'] == params[0]);
+            result = true;
+          case 'sharing.nfs.query':
+            result = nfsShares;
+          case 'sharing.nfs.create':
+            final data = params.first as Map<String, dynamic>;
+            nfsShares.add({
+              'id': nfsShares.length + 1,
+              'enabled': true,
+              ...data,
+            });
+            result = nfsShares.last;
+          case 'sharing.nfs.update':
+            nfsShares
+                .firstWhere((s) => s['id'] == params[0])
+                .addAll(params[1] as Map<String, dynamic>);
+            result = true;
+          case 'sharing.nfs.delete':
+            nfsShares.removeWhere((s) => s['id'] == params[0]);
+            result = true;
+          case 'iscsi.target.query':
+            result = [
+              {'id': 1, 'name': 'vm', 'alias': 'VM disks', 'mode': 'ISCSI'},
+            ];
+          case 'iscsi.extent.query':
+            result = [
+              {
+                'id': 1,
+                'name': 'vm-disk',
+                'type': 'DISK',
+                'disk': 'zvol/tank/vm',
+                'enabled': true,
+                'ro': false,
+              },
+            ];
+          case 'nvmet.subsys.query':
+            result = [
+              {
+                'id': 1,
+                'name': 'fast',
+                'subnqn': 'nqn.2011-06.com.truenas:uuid:fast',
+                'allow_any_host': false,
+              },
+            ];
           case 'pool.query':
             result = [samplePool];
           case 'pool.scrub.scrub':
@@ -200,6 +333,10 @@ class FakeTrueNasServer {
           case 'alert.dismiss' || 'alert.restore':
             final alert = alerts.firstWhere((a) => a['uuid'] == params.first);
             alert['dismissed'] = message['method'] == 'alert.dismiss';
+          case 'core.get_jobs'
+              when params.isNotEmpty && (params.first as List).isNotEmpty:
+            final id = ((params.first as List).first as List)[2];
+            result = [?_finishedJobs[id]];
           case 'core.get_jobs':
             result = [
               {
@@ -228,6 +365,11 @@ class FakeTrueNasServer {
     }
     request.response.statusCode = HttpStatus.notFound;
     await request.response.close();
+  }
+
+  void _setServiceState(String service, String verb) {
+    services.firstWhere((s) => s['service'] == service)['state'] =
+        verb.toUpperCase() == 'STOP' ? 'STOPPED' : 'RUNNING';
   }
 
   Object? _snapshotCall(String method, List<dynamic> params) {

@@ -19,5 +19,227 @@
   "addServer": "Add server",
   "@addServer": {
     "description": "Button that opens the form for adding a TrueNAS server."
+  },
+  "editServer": "Edit server",
+  "@editServer": {
+    "description": "Title of the form for editing a saved server."
+  },
+  "edit": "Edit",
+  "@edit": {
+    "description": "Menu item that opens the edit form."
+  },
+  "delete": "Delete",
+  "@delete": {
+    "description": "Menu item or button that deletes something."
+  },
+  "cancel": "Cancel",
+  "@cancel": {
+    "description": "Button that dismisses a dialog without acting."
+  },
+  "save": "Save",
+  "@save": {
+    "description": "Button that saves the form."
+  },
+  "retry": "Try again",
+  "@retry": {
+    "description": "Button that retries a failed connection."
+  },
+  "deleteServerTitle": "Delete {name}?",
+  "@deleteServerTitle": {
+    "description": "Title of the dialog confirming that a saved server is deleted.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "deleteServerBody": "The server is only removed from this app. Nothing changes on the server itself.",
+  "@deleteServerBody": {
+    "description": "Body of the delete confirmation dialog."
+  },
+  "fieldName": "Name",
+  "@fieldName": {
+    "description": "Label of the server name field."
+  },
+  "fieldNameHint": "Home NAS",
+  "@fieldNameHint": {
+    "description": "Example server name shown in the empty name field."
+  },
+  "fieldAddress": "Address",
+  "@fieldAddress": {
+    "description": "Label of the server address field."
+  },
+  "fieldAddressHint": "nas.local or https://192.168.1.10",
+  "@fieldAddressHint": {
+    "description": "Example address shown in the empty address field."
+  },
+  "fieldUsername": "Username",
+  "@fieldUsername": {
+    "description": "Label of the username field."
+  },
+  "fieldApiKey": "API key",
+  "@fieldApiKey": {
+    "description": "Label of the API key field."
+  },
+  "fieldApiKeyHelp": "Create one in TrueNAS under Credentials > Users > API keys.",
+  "@fieldApiKeyHelp": {
+    "description": "Helper text under the API key field."
+  },
+  "fieldPassword": "Password",
+  "@fieldPassword": {
+    "description": "Label of the password field."
+  },
+  "authApiKey": "API key",
+  "@authApiKey": {
+    "description": "Segment for signing in with an API key."
+  },
+  "authPassword": "Password",
+  "@authPassword": {
+    "description": "Segment for signing in with username and password."
+  },
+  "validationRequired": "Required",
+  "@validationRequired": {
+    "description": "Error shown under an empty required field."
+  },
+  "validationAddress": "Enter a host name or an http(s) address",
+  "@validationAddress": {
+    "description": "Error shown when the server address cannot be parsed."
+  },
+  "validationApiKeyHttps": "API keys need HTTPS. TrueNAS revokes keys that are sent over plain HTTP.",
+  "@validationApiKeyHttps": {
+    "description": "Error shown when an API key is used with an http:// address."
+  },
+  "testConnection": "Test connection",
+  "@testConnection": {
+    "description": "Button that tries to connect with the values in the form."
+  },
+  "testSucceeded": "Connected to {hostname} (TrueNAS {version})",
+  "@testSucceeded": {
+    "description": "Snackbar shown after a successful connection test.",
+    "placeholders": {
+      "hostname": {
+        "type": "String"
+      },
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "connecting": "Connecting…",
+  "@connecting": {
+    "description": "Shown while connecting to a server."
+  },
+  "certificateTitle": "Trust this certificate?",
+  "@certificateTitle": {
+    "description": "Title of the dialog shown for a self-signed or unknown certificate."
+  },
+  "certificateChangedTitle": "Certificate changed",
+  "@certificateChangedTitle": {
+    "description": "Title of the dialog shown when a pinned certificate no longer matches."
+  },
+  "certificateBody": "The server's certificate is not signed by an authority this device trusts. This is normal for the self-signed certificate TrueNAS creates. Only trust it if the fingerprint matches the one in TrueNAS under Credentials > Certificates.",
+  "@certificateBody": {
+    "description": "Explanation in the certificate dialog."
+  },
+  "certificateChangedBody": "The server's certificate is different from the one you trusted before. If you did not replace it, someone may be intercepting the connection.",
+  "@certificateChangedBody": {
+    "description": "Warning shown when a pinned certificate changed."
+  },
+  "certificateSubject": "Issued to",
+  "@certificateSubject": {
+    "description": "Label for the certificate subject."
+  },
+  "certificateIssuer": "Issued by",
+  "@certificateIssuer": {
+    "description": "Label for the certificate issuer."
+  },
+  "certificateExpires": "Expires",
+  "@certificateExpires": {
+    "description": "Label for the certificate expiry date."
+  },
+  "certificateFingerprint": "SHA-256 fingerprint",
+  "@certificateFingerprint": {
+    "description": "Label for the certificate fingerprint."
+  },
+  "trust": "Trust",
+  "@trust": {
+    "description": "Button that trusts and pins the certificate."
+  },
+  "otpTitle": "Two-factor code",
+  "@otpTitle": {
+    "description": "Title of the dialog asking for a 2FA code."
+  },
+  "otpBody": "Enter the 6-digit code from your authenticator app.",
+  "@otpBody": {
+    "description": "Body of the 2FA dialog."
+  },
+  "otpSubmit": "Verify",
+  "@otpSubmit": {
+    "description": "Button that submits the 2FA code."
+  },
+  "errorLoginRejected": "The server rejected the sign-in. Check the username and the API key or password.",
+  "@errorLoginRejected": {
+    "description": "Error when credentials are wrong."
+  },
+  "errorLoginExpired": "The API key or password has expired.",
+  "@errorLoginExpired": {
+    "description": "Error when the credentials have expired."
+  },
+  "errorUnsupported": "This server is too old. TrueNAS Mobile needs TrueNAS 25.04 or newer.",
+  "@errorUnsupported": {
+    "description": "Error when the server API is older than 25.04."
+  },
+  "errorCertificate": "The certificate was not trusted, so the app did not connect.",
+  "@errorCertificate": {
+    "description": "Error when the user declined the certificate."
+  },
+  "errorGeneric": "Could not connect: {details}",
+  "@errorGeneric": {
+    "description": "Generic connection error.",
+    "placeholders": {
+      "details": {
+        "type": "String"
+      }
+    }
+  },
+  "infoHostname": "Hostname",
+  "@infoHostname": {
+    "description": "Label for the server host name."
+  },
+  "infoVersion": "TrueNAS version",
+  "@infoVersion": {
+    "description": "Label for the TrueNAS version."
+  },
+  "infoApiVersion": "API version",
+  "@infoApiVersion": {
+    "description": "Label for the API version in use."
+  },
+  "infoModel": "CPU",
+  "@infoModel": {
+    "description": "Label for the CPU model."
+  },
+  "infoCores": "CPU cores",
+  "@infoCores": {
+    "description": "Label for the number of CPU cores."
+  },
+  "infoMemory": "Memory",
+  "@infoMemory": {
+    "description": "Label for installed memory."
+  },
+  "infoUptime": "Uptime",
+  "@infoUptime": {
+    "description": "Label for the time since boot."
+  },
+  "infoSignedInAs": "Signed in as",
+  "@infoSignedInAs": {
+    "description": "Label for the signed-in user."
+  },
+  "serverOverviewNote": "More management screens are coming in the next milestones.",
+  "@serverOverviewNote": {
+    "description": "Note at the bottom of the server overview."
+  },
+  "errorCancelled": "Connection cancelled.",
+  "@errorCancelled": {
+    "description": "Shown when the user cancels a certificate or 2FA prompt."
   }
 }

@@ -21,7 +21,7 @@ jobs:
     name: Build APK and AAB
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           ref: ${{ env.TAG }}
       - uses: actions/setup-java@v5
@@ -64,7 +64,7 @@ jobs:
           cp build/app/outputs/bundle/release/app-release.aab dist/
           for f in dist/*; do mv "$f" "dist/truenas-mobile-$TAG-${f#dist/app-}"; done
           ls -l dist
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: android
           path: dist/*
@@ -73,7 +73,7 @@ jobs:
     name: Build IPA (unsigned)
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           ref: ${{ env.TAG }}
       - uses: subosito/flutter-action@v2
@@ -90,7 +90,7 @@ jobs:
           cp -R build/ios/iphoneos/Runner.app Payload/
           zip -qry "dist/truenas-mobile-$TAG-unsigned.ipa" Payload
           ls -l dist
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: ios
           path: dist/*.ipa
@@ -100,11 +100,11 @@ jobs:
     needs: [android, ios]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           path: dist
           merge-multiple: true
-      - uses: softprops/action-gh-release@v2
+      - uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ env.TAG }}
           generate_release_notes: true

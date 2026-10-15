@@ -429,5 +429,412 @@
   "systemTitle": "System",
   "@systemTitle": {
     "description": "Title of the system information card."
+  },
+  "tabStorage": "Storage",
+  "@tabStorage": {
+    "description": "Bottom navigation tab for storage."
+  },
+  "disksTitle": "Disks",
+  "@disksTitle": {
+    "description": "Title of the disks screen and its entry."
+  },
+  "disksSubtitle": "Health, temperature and pool membership",
+  "@disksSubtitle": {
+    "description": "Subtitle of the disks entry."
+  },
+  "disksEmpty": "No disks",
+  "@disksEmpty": {
+    "description": "Shown when no disks are reported."
+  },
+  "diskUnused": "Not in a pool",
+  "@diskUnused": {
+    "description": "Shown for disks that do not belong to a pool."
+  },
+  "diskPool": "Pool {pool}",
+  "@diskPool": {
+    "description": "Pool a disk belongs to.",
+    "placeholders": {
+      "pool": {
+        "type": "String"
+      }
+    }
+  },
+  "diskSerial": "Serial {serial}",
+  "@diskSerial": {
+    "description": "Disk serial number.",
+    "placeholders": {
+      "serial": {
+        "type": "String"
+      }
+    }
+  },
+  "diskSsd": "SSD",
+  "@diskSsd": {
+    "description": "Disk type label for solid-state disks."
+  },
+  "diskRpm": "{rpm} rpm",
+  "@diskRpm": {
+    "description": "Disk rotation rate.",
+    "placeholders": {
+      "rpm": {
+        "type": "int"
+      }
+    }
+  },
+  "scrubTitle": "Scrub",
+  "@scrubTitle": {
+    "description": "Title of the scrub card."
+  },
+  "scrubRunning": "Scrub running: {percent}%",
+  "@scrubRunning": {
+    "description": "Scrub progress.",
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "resilverRunning": "Resilver running: {percent}%",
+  "@resilverRunning": {
+    "description": "Resilver progress.",
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "scrubPaused": "Scrub paused at {percent}%",
+  "@scrubPaused": {
+    "description": "Paused scrub progress.",
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "scrubFinished": "Last scrub finished {date} with {errors, plural, =0{no errors} =1{1 error} other{{errors} errors}}",
+  "@scrubFinished": {
+    "description": "Result of the last scrub.",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "errors": {
+        "type": "int"
+      }
+    }
+  },
+  "scrubCanceled": "Last scrub was stopped",
+  "@scrubCanceled": {
+    "description": "Shown when the last scrub was canceled."
+  },
+  "scrubNever": "No scrub has run yet",
+  "@scrubNever": {
+    "description": "Shown when the pool has never been scrubbed."
+  },
+  "scrubStart": "Start scrub",
+  "@scrubStart": {
+    "description": "Button that starts a scrub."
+  },
+  "scrubPause": "Pause",
+  "@scrubPause": {
+    "description": "Button that pauses a scrub."
+  },
+  "scrubResume": "Resume",
+  "@scrubResume": {
+    "description": "Button that resumes a paused scrub."
+  },
+  "scrubStop": "Stop",
+  "@scrubStop": {
+    "description": "Button that stops a scrub."
+  },
+  "scrubStarted": "Scrub started",
+  "@scrubStarted": {
+    "description": "Snackbar after a scrub starts."
+  },
+  "scrubStopTitle": "Stop the scrub on {pool}?",
+  "@scrubStopTitle": {
+    "description": "Confirmation title for stopping a scrub.",
+    "placeholders": {
+      "pool": {
+        "type": "String"
+      }
+    }
+  },
+  "scrubStopBody": "Progress is lost and the next scrub starts from the beginning.",
+  "@scrubStopBody": {
+    "description": "Confirmation body for stopping a scrub."
+  },
+  "topologyTitle": "Layout",
+  "@topologyTitle": {
+    "description": "Title of the pool layout card."
+  },
+  "vdevGroupData": "Data",
+  "@vdevGroupData": {
+    "description": "Pool vdev group name."
+  },
+  "vdevGroupLog": "Log",
+  "@vdevGroupLog": {
+    "description": "Pool vdev group name."
+  },
+  "vdevGroupCache": "Cache",
+  "@vdevGroupCache": {
+    "description": "Pool vdev group name."
+  },
+  "vdevGroupSpare": "Spare",
+  "@vdevGroupSpare": {
+    "description": "Pool vdev group name."
+  },
+  "vdevGroupSpecial": "Metadata",
+  "@vdevGroupSpecial": {
+    "description": "Pool vdev group name."
+  },
+  "vdevGroupDedup": "Dedup",
+  "@vdevGroupDedup": {
+    "description": "Pool vdev group name."
+  },
+  "vdevErrors": "{read} read, {write} write, {checksum} checksum errors",
+  "@vdevErrors": {
+    "description": "Error counters of a vdev or disk.",
+    "placeholders": {
+      "read": {
+        "type": "int"
+      },
+      "write": {
+        "type": "int"
+      },
+      "checksum": {
+        "type": "int"
+      }
+    }
+  },
+  "poolFree": "{free} free",
+  "@poolFree": {
+    "description": "Free space in a pool.",
+    "placeholders": {
+      "free": {
+        "type": "String"
+      }
+    }
+  },
+  "datasetsTitle": "Datasets",
+  "@datasetsTitle": {
+    "description": "Title of the datasets screen and its entry."
+  },
+  "datasetsEmpty": "No datasets",
+  "@datasetsEmpty": {
+    "description": "Shown when a pool has no datasets."
+  },
+  "datasetCreate": "Create dataset",
+  "@datasetCreate": {
+    "description": "Button and dialog title for creating a dataset."
+  },
+  "datasetCreated": "Created {name}",
+  "@datasetCreated": {
+    "description": "Snackbar after creating a dataset.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "datasetParent": "Parent",
+  "@datasetParent": {
+    "description": "Label of the parent dataset dropdown."
+  },
+  "datasetNameField": "Name",
+  "@datasetNameField": {
+    "description": "Label of the new dataset name field."
+  },
+  "datasetNameInvalid": "Use letters, numbers, - _ . and : only",
+  "@datasetNameInvalid": {
+    "description": "Validation error for dataset names."
+  },
+  "datasetTypeFilesystem": "Dataset",
+  "@datasetTypeFilesystem": {
+    "description": "Segment for creating a filesystem dataset."
+  },
+  "datasetTypeVolume": "Zvol",
+  "@datasetTypeVolume": {
+    "description": "Segment for creating a zvol."
+  },
+  "datasetSizeGib": "Size (GiB)",
+  "@datasetSizeGib": {
+    "description": "Label of the zvol size field."
+  },
+  "datasetSizeInvalid": "Enter a size above 0",
+  "@datasetSizeInvalid": {
+    "description": "Validation error for zvol size."
+  },
+  "datasetUsed": "Used",
+  "@datasetUsed": {
+    "description": "Label for used space."
+  },
+  "datasetAvailable": "Available",
+  "@datasetAvailable": {
+    "description": "Label for available space."
+  },
+  "datasetCompression": "Compression",
+  "@datasetCompression": {
+    "description": "Label for the compression algorithm."
+  },
+  "datasetCompressRatio": "Compression ratio",
+  "@datasetCompressRatio": {
+    "description": "Label for the compression ratio."
+  },
+  "datasetMountpoint": "Mount point",
+  "@datasetMountpoint": {
+    "description": "Label for the mount point."
+  },
+  "datasetVolsize": "Zvol size",
+  "@datasetVolsize": {
+    "description": "Label for the size of a zvol."
+  },
+  "datasetEncryption": "Encryption",
+  "@datasetEncryption": {
+    "description": "Label for encryption state."
+  },
+  "datasetEncrypted": "Encrypted",
+  "@datasetEncrypted": {
+    "description": "Value when a dataset is encrypted."
+  },
+  "datasetLocked": "Encrypted, locked",
+  "@datasetLocked": {
+    "description": "Value when an encrypted dataset is locked."
+  },
+  "datasetNotEncrypted": "Not encrypted",
+  "@datasetNotEncrypted": {
+    "description": "Value when a dataset is not encrypted."
+  },
+  "datasetZvol": "Zvol",
+  "@datasetZvol": {
+    "description": "Label marking a dataset as a zvol."
+  },
+  "datasetDelete": "Delete dataset",
+  "@datasetDelete": {
+    "description": "Menu item that deletes a dataset."
+  },
+  "datasetDeleteTitle": "Delete {name}?",
+  "@datasetDeleteTitle": {
+    "description": "Confirmation title for deleting a dataset.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "datasetDeleteBody": "This permanently destroys the dataset, its child datasets and all their snapshots and data. It cannot be undone.",
+  "@datasetDeleteBody": {
+    "description": "Confirmation body for deleting a dataset."
+  },
+  "typeNameToConfirm": "Type {name} to confirm",
+  "@typeNameToConfirm": {
+    "description": "Hint for the type-to-confirm field.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "datasetDeleted": "Deleted {name}",
+  "@datasetDeleted": {
+    "description": "Snackbar after deleting a dataset.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "snapshotsTitle": "Snapshots",
+  "@snapshotsTitle": {
+    "description": "Title of the snapshots section."
+  },
+  "snapshotsEmpty": "No snapshots",
+  "@snapshotsEmpty": {
+    "description": "Shown when a dataset has no snapshots."
+  },
+  "snapshotCreate": "Create snapshot",
+  "@snapshotCreate": {
+    "description": "Button and dialog title for creating a snapshot."
+  },
+  "snapshotNameField": "Snapshot name",
+  "@snapshotNameField": {
+    "description": "Label of the snapshot name field."
+  },
+  "snapshotRecursive": "Include child datasets",
+  "@snapshotRecursive": {
+    "description": "Checkbox to snapshot child datasets too."
+  },
+  "snapshotCreated": "Snapshot created",
+  "@snapshotCreated": {
+    "description": "Snackbar after creating a snapshot."
+  },
+  "snapshotDelete": "Delete",
+  "@snapshotDelete": {
+    "description": "Menu item that deletes a snapshot."
+  },
+  "snapshotDeleteTitle": "Delete snapshot {name}?",
+  "@snapshotDeleteTitle": {
+    "description": "Confirmation title for deleting a snapshot.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "snapshotDeleteBody": "The snapshot is destroyed. Data in the live dataset is not affected.",
+  "@snapshotDeleteBody": {
+    "description": "Confirmation body for deleting a snapshot."
+  },
+  "snapshotDeleted": "Snapshot deleted",
+  "@snapshotDeleted": {
+    "description": "Snackbar after deleting a snapshot."
+  },
+  "snapshotRollback": "Roll back",
+  "@snapshotRollback": {
+    "description": "Menu item that rolls back to a snapshot."
+  },
+  "snapshotRollbackTitle": "Roll back {dataset}?",
+  "@snapshotRollbackTitle": {
+    "description": "Confirmation title for rolling back.",
+    "placeholders": {
+      "dataset": {
+        "type": "String"
+      }
+    }
+  },
+  "snapshotRollbackBody": "The dataset returns to its state at snapshot {name}. All changes made since then are lost, and newer snapshots are destroyed.",
+  "@snapshotRollbackBody": {
+    "description": "Confirmation body for rolling back.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "snapshotRolledBack": "Rolled back to {name}",
+  "@snapshotRolledBack": {
+    "description": "Snackbar after rolling back.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "snapshotSize": "{used} used · {referenced} referenced",
+  "@snapshotSize": {
+    "description": "Snapshot size line.",
+    "placeholders": {
+      "used": {
+        "type": "String"
+      },
+      "referenced": {
+        "type": "String"
+      }
+    }
+  },
+  "create": "Create",
+  "@create": {
+    "description": "Button that creates something."
   }
 }

@@ -11,6 +11,7 @@ import '../../core/session/truenas_session.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../shared/formatting.dart';
 import '../../shared/viz_colors.dart';
+import '../../shared/widgets.dart';
 
 /// Number of live samples kept for the charts (2 minutes at 2 s each).
 const _historyLength = 60;
@@ -286,7 +287,7 @@ class _MemoryCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 12),
-          _SegmentedBar(
+          SegmentedBar(
             segments: [
               (services / total, colors.series1),
               (arc / total, colors.series2),
@@ -298,15 +299,15 @@ class _MemoryCard extends StatelessWidget {
             spacing: 16,
             runSpacing: 4,
             children: [
-              _LegendItem(
+              LegendItem(
                 colors.series1,
                 '${l10n.memoryServices} ${formatBytes(services)}',
               ),
-              _LegendItem(
+              LegendItem(
                 colors.series2,
                 '${l10n.memoryArc} ${formatBytes(arc)}',
               ),
-              _LegendItem(
+              LegendItem(
                 colors.track,
                 '${l10n.memoryFree} ${formatBytes(free)}',
               ),
@@ -336,11 +337,11 @@ class _NetworkCard extends StatelessWidget {
           Wrap(
             spacing: 16,
             children: [
-              _LegendItem(
+              LegendItem(
                 colors.series1,
                 '${l10n.networkIn} ${formatBitRate(latest.receivedBytesPerSecond)}',
               ),
-              _LegendItem(
+              LegendItem(
                 colors.series2,
                 '${l10n.networkOut} ${formatBitRate(latest.sentBytesPerSecond)}',
               ),
@@ -398,7 +399,7 @@ class _PoolsCard extends StatelessWidget {
                                 style: theme.textTheme.titleSmall,
                               ),
                             ),
-                            _StatusLabel(
+                            StatusLabel(
                               icon: pool.healthy
                                   ? Icons.check_circle
                                   : Icons.error,
@@ -410,7 +411,7 @@ class _PoolsCard extends StatelessWidget {
                           ],
                         ),
                         const SizedBox(height: 8),
-                        _SegmentedBar(
+                        SegmentedBar(
                           segments: [
                             (pool.usedFraction, colors.series1),
                             (1 - pool.usedFraction, colors.track),
@@ -455,7 +456,7 @@ class _AlertsSummaryCard extends StatelessWidget {
         title: l10n.alertsTitle,
         trailing: const Icon(Icons.chevron_right),
         child: active.isEmpty
-            ? _StatusLabel(
+            ? StatusLabel(
                 icon: Icons.check_circle,
                 color: VizColors.good,
                 label: l10n.alertsNone,
@@ -465,103 +466,25 @@ class _AlertsSummaryCard extends StatelessWidget {
                 runSpacing: 8,
                 children: [
                   if (critical > 0)
-                    _StatusLabel(
+                    StatusLabel(
                       icon: Icons.error,
                       color: VizColors.critical,
                       label: l10n.alertsCritical(critical),
                     ),
                   if (warning > 0)
-                    _StatusLabel(
+                    StatusLabel(
                       icon: Icons.warning_amber,
                       color: VizColors.warning,
                       label: l10n.alertsWarning(warning),
                     ),
                   if (info > 0)
-                    _StatusLabel(
+                    StatusLabel(
                       icon: Icons.info_outline,
                       color: Theme.of(context).colorScheme.onSurfaceVariant,
                       label: l10n.alertsInfo(info),
                     ),
                 ],
               ),
-      ),
-    );
-  }
-}
-
-/// An icon in a status colour followed by a label in normal text colour.
-class _StatusLabel extends StatelessWidget {
-  const _StatusLabel({
-    required this.icon,
-    required this.color,
-    required this.label,
-  });
-
-  final IconData icon;
-  final Color color;
-  final String label;
-
-  @override
-  Widget build(BuildContext context) => Row(
-    mainAxisSize: MainAxisSize.min,
-    children: [
-      Icon(icon, size: 18, color: color),
-      const SizedBox(width: 6),
-      Text(label),
-    ],
-  );
-}
-
-class _LegendItem extends StatelessWidget {
-  const _LegendItem(this.color, this.label);
-
-  final Color color;
-  final String label;
-
-  @override
-  Widget build(BuildContext context) => Row(
-    mainAxisSize: MainAxisSize.min,
-    children: [
-      Container(
-        width: 10,
-        height: 10,
-        decoration: BoxDecoration(
-          color: color,
-          borderRadius: BorderRadius.circular(2),
-        ),
-      ),
-      const SizedBox(width: 6),
-      Text(label, style: Theme.of(context).textTheme.bodySmall),
-    ],
-  );
-}
-
-/// A horizontal bar split into segments by fraction, with 2 px gaps.
-class _SegmentedBar extends StatelessWidget {
-  const _SegmentedBar({required this.segments});
-
-  final List<(double, Color)> segments;
-
-  @override
-  Widget build(BuildContext context) {
-    final visible = segments.where((s) => s.$1 > 0.002).toList();
-    return SizedBox(
-      height: 10,
-      child: Row(
-        children: [
-          for (var i = 0; i < visible.length; i++) ...[
-            if (i > 0) const SizedBox(width: 2),
-            Expanded(
-              flex: math.max((visible[i].$1 * 1000).round(), 1),
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  color: visible[i].$2,
-                  borderRadius: BorderRadius.circular(4),
-                ),
-              ),
-            ),
-          ],
-        ],
       ),
     );
   }

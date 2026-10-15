@@ -335,4 +335,277 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get systemTitle => 'System';
+
+  @override
+  String get tabStorage => 'Storage';
+
+  @override
+  String get disksTitle => 'Disks';
+
+  @override
+  String get disksSubtitle => 'Health, temperature and pool membership';
+
+  @override
+  String get disksEmpty => 'No disks';
+
+  @override
+  String get diskUnused => 'Not in a pool';
+
+  @override
+  String diskPool(String pool) {
+    return 'Pool $pool';
+  }
+
+  @override
+  String diskSerial(String serial) {
+    return 'Serial $serial';
+  }
+
+  @override
+  String get diskSsd => 'SSD';
+
+  @override
+  String diskRpm(int rpm) {
+    return '$rpm rpm';
+  }
+
+  @override
+  String get scrubTitle => 'Scrub';
+
+  @override
+  String scrubRunning(String percent) {
+    return 'Scrub running: $percent%';
+  }
+
+  @override
+  String resilverRunning(String percent) {
+    return 'Resilver running: $percent%';
+  }
+
+  @override
+  String scrubPaused(String percent) {
+    return 'Scrub paused at $percent%';
+  }
+
+  @override
+  String scrubFinished(String date, int errors) {
+    String _temp0 = intl.Intl.pluralLogic(
+      errors,
+      locale: localeName,
+      other: '$errors errors',
+      one: '1 error',
+      zero: 'no errors',
+    );
+    return 'Last scrub finished $date with $_temp0';
+  }
+
+  @override
+  String get scrubCanceled => 'Last scrub was stopped';
+
+  @override
+  String get scrubNever => 'No scrub has run yet';
+
+  @override
+  String get scrubStart => 'Start scrub';
+
+  @override
+  String get scrubPause => 'Pause';
+
+  @override
+  String get scrubResume => 'Resume';
+
+  @override
+  String get scrubStop => 'Stop';
+
+  @override
+  String get scrubStarted => 'Scrub started';
+
+  @override
+  String scrubStopTitle(String pool) {
+    return 'Stop the scrub on $pool?';
+  }
+
+  @override
+  String get scrubStopBody =>
+      'Progress is lost and the next scrub starts from the beginning.';
+
+  @override
+  String get topologyTitle => 'Layout';
+
+  @override
+  String get vdevGroupData => 'Data';
+
+  @override
+  String get vdevGroupLog => 'Log';
+
+  @override
+  String get vdevGroupCache => 'Cache';
+
+  @override
+  String get vdevGroupSpare => 'Spare';
+
+  @override
+  String get vdevGroupSpecial => 'Metadata';
+
+  @override
+  String get vdevGroupDedup => 'Dedup';
+
+  @override
+  String vdevErrors(int read, int write, int checksum) {
+    return '$read read, $write write, $checksum checksum errors';
+  }
+
+  @override
+  String poolFree(String free) {
+    return '$free free';
+  }
+
+  @override
+  String get datasetsTitle => 'Datasets';
+
+  @override
+  String get datasetsEmpty => 'No datasets';
+
+  @override
+  String get datasetCreate => 'Create dataset';
+
+  @override
+  String datasetCreated(String name) {
+    return 'Created $name';
+  }
+
+  @override
+  String get datasetParent => 'Parent';
+
+  @override
+  String get datasetNameField => 'Name';
+
+  @override
+  String get datasetNameInvalid => 'Use letters, numbers, - _ . and : only';
+
+  @override
+  String get datasetTypeFilesystem => 'Dataset';
+
+  @override
+  String get datasetTypeVolume => 'Zvol';
+
+  @override
+  String get datasetSizeGib => 'Size (GiB)';
+
+  @override
+  String get datasetSizeInvalid => 'Enter a size above 0';
+
+  @override
+  String get datasetUsed => 'Used';
+
+  @override
+  String get datasetAvailable => 'Available';
+
+  @override
+  String get datasetCompression => 'Compression';
+
+  @override
+  String get datasetCompressRatio => 'Compression ratio';
+
+  @override
+  String get datasetMountpoint => 'Mount point';
+
+  @override
+  String get datasetVolsize => 'Zvol size';
+
+  @override
+  String get datasetEncryption => 'Encryption';
+
+  @override
+  String get datasetEncrypted => 'Encrypted';
+
+  @override
+  String get datasetLocked => 'Encrypted, locked';
+
+  @override
+  String get datasetNotEncrypted => 'Not encrypted';
+
+  @override
+  String get datasetZvol => 'Zvol';
+
+  @override
+  String get datasetDelete => 'Delete dataset';
+
+  @override
+  String datasetDeleteTitle(String name) {
+    return 'Delete $name?';
+  }
+
+  @override
+  String get datasetDeleteBody =>
+      'This permanently destroys the dataset, its child datasets and all their snapshots and data. It cannot be undone.';
+
+  @override
+  String typeNameToConfirm(String name) {
+    return 'Type $name to confirm';
+  }
+
+  @override
+  String datasetDeleted(String name) {
+    return 'Deleted $name';
+  }
+
+  @override
+  String get snapshotsTitle => 'Snapshots';
+
+  @override
+  String get snapshotsEmpty => 'No snapshots';
+
+  @override
+  String get snapshotCreate => 'Create snapshot';
+
+  @override
+  String get snapshotNameField => 'Snapshot name';
+
+  @override
+  String get snapshotRecursive => 'Include child datasets';
+
+  @override
+  String get snapshotCreated => 'Snapshot created';
+
+  @override
+  String get snapshotDelete => 'Delete';
+
+  @override
+  String snapshotDeleteTitle(String name) {
+    return 'Delete snapshot $name?';
+  }
+
+  @override
+  String get snapshotDeleteBody =>
+      'The snapshot is destroyed. Data in the live dataset is not affected.';
+
+  @override
+  String get snapshotDeleted => 'Snapshot deleted';
+
+  @override
+  String get snapshotRollback => 'Roll back';
+
+  @override
+  String snapshotRollbackTitle(String dataset) {
+    return 'Roll back $dataset?';
+  }
+
+  @override
+  String snapshotRollbackBody(String name) {
+    return 'The dataset returns to its state at snapshot $name. All changes made since then are lost, and newer snapshots are destroyed.';
+  }
+
+  @override
+  String snapshotRolledBack(String name) {
+    return 'Rolled back to $name';
+  }
+
+  @override
+  String snapshotSize(String used, String referenced) {
+    return '$used used · $referenced referenced';
+  }
+
+  @override
+  String get create => 'Create';
 }

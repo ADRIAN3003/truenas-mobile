@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import '../../core/models/system.dart';
 import '../../core/session/truenas_session.dart';
 import '../../l10n/generated/app_localizations.dart';
+import '../../shared/theme.dart';
+import '../../shared/ui.dart';
 import '../../shared/viz_colors.dart';
 import '../../shared/widgets.dart';
 import '../sharing/sharing_widgets.dart';
@@ -169,46 +171,56 @@ class _UsersScreenState extends State<UsersScreen>
               return TabBarView(
                 children: [
                   ListView(
-                    padding: const EdgeInsets.only(bottom: 88),
+                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 88),
                     children: [
-                      builtinToggle,
-                      if (users.isEmpty)
-                        Padding(
-                          padding: const EdgeInsets.all(32),
-                          child: Center(child: Text(l10n.usersEmpty)),
-                        ),
-                      for (final user in users)
-                        _UserTile(
-                          user: user,
-                          onLock: (v) => _setLocked(user, v),
-                          onDelete: () => _deleteUser(user),
+                      GroupedCard(children: [builtinToggle]),
+                      const SizedBox(height: 12),
+                      if (users.isEmpty) EmptyCard(l10n.usersEmpty),
+                      if (users.isNotEmpty)
+                        GroupedCard(
+                          indent: 72,
+                          children: [
+                            for (final user in users)
+                              _UserTile(
+                                user: user,
+                                onLock: (v) => _setLocked(user, v),
+                                onDelete: () => _deleteUser(user),
+                              ),
+                          ],
                         ),
                     ],
                   ),
                   ListView(
-                    padding: const EdgeInsets.only(bottom: 88),
+                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 88),
                     children: [
-                      builtinToggle,
-                      if (groups.isEmpty)
-                        Padding(
-                          padding: const EdgeInsets.all(32),
-                          child: Center(child: Text(l10n.groupsEmpty)),
-                        ),
-                      for (final group in groups)
-                        ListTile(
-                          leading: const Icon(Icons.group_outlined),
-                          title: Text(group.name),
-                          subtitle: Text(
-                            'GID ${group.gid} · '
-                            '${l10n.groupMembers(group.members)}',
-                          ),
-                          trailing: group.builtin
-                              ? Text(l10n.userBuiltin)
-                              : IconButton(
-                                  tooltip: l10n.delete,
-                                  icon: const Icon(Icons.delete_outline),
-                                  onPressed: () => _deleteGroup(group),
+                      GroupedCard(children: [builtinToggle]),
+                      const SizedBox(height: 12),
+                      if (groups.isEmpty) EmptyCard(l10n.groupsEmpty),
+                      if (groups.isNotEmpty)
+                        GroupedCard(
+                          indent: 72,
+                          children: [
+                            for (final group in groups)
+                              ListTile(
+                                leading: const IconTile(
+                                  Icons.group_rounded,
+                                  AppPalette.tileTeal,
+                                  size: 40,
                                 ),
+                                title: Text(group.name),
+                                subtitle: Text(
+                                  'GID ${group.gid} · '
+                                  '${l10n.groupMembers(group.members)}',
+                                ),
+                                trailing: group.builtin
+                                    ? Text(l10n.userBuiltin)
+                                    : IconButton(
+                                        tooltip: l10n.delete,
+                                        icon: const Icon(Icons.delete_outline),
+                                        onPressed: () => _deleteGroup(group),
+                                      ),
+                              ),
+                          ],
                         ),
                     ],
                   ),
@@ -242,7 +254,13 @@ class _UserTile extends StatelessWidget {
     final muted = Theme.of(context).colorScheme.onSurfaceVariant;
     return ListTile(
       leading: CircleAvatar(
-        child: Text(user.username.characters.first.toUpperCase()),
+        radius: 20,
+        backgroundColor: AppPalette.tileBlue.withValues(alpha: 0.14),
+        foregroundColor: AppPalette.tileBlue,
+        child: Text(
+          user.username.characters.first.toUpperCase(),
+          style: const TextStyle(fontWeight: FontWeight.w700),
+        ),
       ),
       title: Text(user.username),
       subtitle: Column(

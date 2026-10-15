@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import '../../core/models/sharing.dart';
 import '../../core/session/truenas_session.dart';
 import '../../l10n/generated/app_localizations.dart';
+import '../../shared/ui.dart';
+import '../../shared/theme.dart';
 import '../storage/storage_helpers.dart';
 import 'sharing_widgets.dart';
 
@@ -38,43 +40,48 @@ class _IscsiScreenState extends State<IscsiScreen>
         builder: (data) {
           final (targets, extents) = data;
           return ListView(
-            padding: const EdgeInsets.only(bottom: 24),
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
             children: [
               const _ViewOnlyNote(),
               if (targets.isEmpty && extents.isEmpty)
-                Padding(
-                  padding: const EdgeInsets.all(32),
-                  child: Center(child: Text(l10n.iscsiEmpty)),
-                ),
-              if (targets.isNotEmpty) _Heading(l10n.iscsiTargets),
-              for (final target in targets)
-                ListTile(
-                  leading: const Icon(Icons.adjust),
-                  title: Text(target.name),
-                  subtitle: target.alias == null || target.alias!.isEmpty
-                      ? null
-                      : Text(target.alias!),
-                  trailing: target.mode == null || target.mode == 'ISCSI'
-                      ? null
-                      : Text(target.mode!),
-                ),
-              if (extents.isNotEmpty) _Heading(l10n.iscsiExtents),
-              for (final extent in extents)
-                ListTile(
-                  leading: Icon(
-                    extent.type == 'FILE'
-                        ? Icons.insert_drive_file_outlined
-                        : Icons.storage_outlined,
+                EmptyCard(l10n.iscsiEmpty),
+              ...groupedSection(l10n.iscsiTargets, indent: 72, [
+                for (final target in targets)
+                  ListTile(
+                    leading: const IconTile(
+                      Icons.adjust_rounded,
+                      AppPalette.tilePurple,
+                      size: 40,
+                    ),
+                    title: Text(target.name),
+                    subtitle: target.alias == null || target.alias!.isEmpty
+                        ? null
+                        : Text(target.alias!),
+                    trailing: target.mode == null || target.mode == 'ISCSI'
+                        ? null
+                        : Text(target.mode!),
                   ),
-                  title: Text(extent.name),
-                  subtitle: Text(
-                    [
-                      ?extent.source,
-                      if (!extent.enabled) l10n.shareDisabled,
-                      if (extent.readOnly) l10n.shareReadOnly,
-                    ].join(' · '),
+              ]),
+              ...groupedSection(l10n.iscsiExtents, indent: 72, [
+                for (final extent in extents)
+                  ListTile(
+                    leading: IconTile(
+                      extent.type == 'FILE'
+                          ? Icons.insert_drive_file_rounded
+                          : Icons.storage_rounded,
+                      AppPalette.tileSlate,
+                      size: 40,
+                    ),
+                    title: Text(extent.name),
+                    subtitle: Text(
+                      [
+                        ?extent.source,
+                        if (!extent.enabled) l10n.shareDisabled,
+                        if (extent.readOnly) l10n.shareReadOnly,
+                      ].join(' · '),
+                    ),
                   ),
-                ),
+              ]),
             ],
           );
         },
@@ -109,27 +116,33 @@ class _NvmetScreenState extends State<NvmetScreen>
         error: error,
         onRefresh: load,
         builder: (subsystems) => ListView(
-          padding: const EdgeInsets.only(bottom: 24),
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
           children: [
             const _ViewOnlyNote(),
-            if (subsystems.isEmpty)
-              Padding(
-                padding: const EdgeInsets.all(32),
-                child: Center(child: Text(l10n.nvmetEmpty)),
-              ),
-            for (final subsystem in subsystems)
-              ListTile(
-                leading: const Icon(Icons.memory),
-                title: Text(subsystem.name),
-                subtitle: Text(
-                  [
-                    ?subsystem.nqn,
-                    subsystem.allowAnyHost
-                        ? l10n.nvmetAnyHost
-                        : l10n.nvmetAllowedHosts,
-                  ].join('\n'),
-                ),
-                isThreeLine: subsystem.nqn != null,
+            if (subsystems.isEmpty) EmptyCard(l10n.nvmetEmpty),
+            if (subsystems.isNotEmpty)
+              GroupedCard(
+                indent: 72,
+                children: [
+                  for (final subsystem in subsystems)
+                    ListTile(
+                      leading: const IconTile(
+                        Icons.memory_rounded,
+                        AppPalette.tileOrange,
+                        size: 40,
+                      ),
+                      title: Text(subsystem.name),
+                      subtitle: Text(
+                        [
+                          ?subsystem.nqn,
+                          subsystem.allowAnyHost
+                              ? l10n.nvmetAnyHost
+                              : l10n.nvmetAllowedHosts,
+                        ].join('\n'),
+                      ),
+                      isThreeLine: subsystem.nqn != null,
+                    ),
+                ],
               ),
           ],
         ),
@@ -145,7 +158,7 @@ class _ViewOnlyNote extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+      padding: const EdgeInsets.fromLTRB(4, 12, 4, 0),
       child: Row(
         children: [
           Icon(
@@ -164,16 +177,4 @@ class _ViewOnlyNote extends StatelessWidget {
       ),
     );
   }
-}
-
-class _Heading extends StatelessWidget {
-  const _Heading(this.text);
-
-  final String text;
-
-  @override
-  Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
-    child: Text(text, style: Theme.of(context).textTheme.titleSmall),
-  );
 }

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../core/models/sharing.dart';
 import '../../core/session/truenas_session.dart';
 import '../../l10n/generated/app_localizations.dart';
+import '../../shared/ui.dart';
 import '../../shared/widgets.dart';
 import '../storage/storage_helpers.dart';
 import 'share_dialogs.dart';
@@ -120,7 +121,7 @@ class _NfsSharesScreenState extends State<NfsSharesScreen>
         builder: (data) {
           final (shares, service) = data;
           return ListView(
-            padding: const EdgeInsets.only(bottom: 88),
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 88),
             children: [
               if (service != null && !service.running && shares.isNotEmpty)
                 ServiceStoppedBanner(
@@ -130,28 +131,32 @@ class _NfsSharesScreenState extends State<NfsSharesScreen>
                     await load();
                   },
                 ),
-              if (shares.isEmpty)
-                Padding(
-                  padding: const EdgeInsets.all(32),
-                  child: Center(child: Text(l10n.sharesEmpty)),
-                ),
-              for (final share in shares)
-                ShareTile(
-                  icon: Icons.lan_outlined,
-                  title: share.path,
-                  lines: [
-                    if (share.comment.isNotEmpty) share.comment,
-                    share.networks.isEmpty && share.hosts.isEmpty
-                        ? l10n.nfsAllowedEveryone
-                        : l10n.nfsAllowed(
-                            [...share.networks, ...share.hosts].join(', '),
-                          ),
+              if (shares.isEmpty) EmptyCard(l10n.sharesEmpty),
+              if (shares.isNotEmpty)
+                GroupedCard(
+                  children: [
+                    for (final share in shares)
+                      ShareTile(
+                        icon: Icons.lan_outlined,
+                        title: share.path,
+                        lines: [
+                          if (share.comment.isNotEmpty) share.comment,
+                          share.networks.isEmpty && share.hosts.isEmpty
+                              ? l10n.nfsAllowedEveryone
+                              : l10n.nfsAllowed(
+                                  [
+                                    ...share.networks,
+                                    ...share.hosts,
+                                  ].join(', '),
+                                ),
+                        ],
+                        enabled: share.enabled,
+                        locked: share.locked,
+                        readOnly: share.readOnly,
+                        onToggle: (v) => _update(share, {'enabled': v}),
+                        onTap: () => _edit(share),
+                      ),
                   ],
-                  enabled: share.enabled,
-                  locked: share.locked,
-                  readOnly: share.readOnly,
-                  onToggle: (v) => _update(share, {'enabled': v}),
-                  onTap: () => _edit(share),
                 ),
             ],
           );

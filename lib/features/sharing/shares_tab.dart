@@ -4,6 +4,8 @@ import '../../core/models/sharing.dart';
 import '../../core/session/truenas_session.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../shared/glass.dart';
+import '../../shared/theme.dart';
+import '../../shared/ui.dart';
 import '../storage/storage_helpers.dart';
 import 'block_shares_screen.dart';
 import 'nfs_shares_screen.dart';
@@ -102,87 +104,59 @@ class _SharesTabState extends State<SharesTab>
           const EdgeInsets.fromLTRB(16, 8, 16, 24),
         ),
         children: [
-          _EntryCard(
-            icon: Icons.folder_shared_outlined,
-            title: l10n.smbTitle,
-            subtitle: l10n.sharesCount(o.smb.length),
-            service: o.service('cifs'),
-            onTap: () => _open(() => SmbSharesScreen(session: session)),
-          ),
-          _EntryCard(
-            icon: Icons.lan_outlined,
-            title: l10n.nfsTitle,
-            subtitle: l10n.sharesCount(o.nfs.length),
-            service: o.service('nfs'),
-            onTap: () => _open(() => NfsSharesScreen(session: session)),
-          ),
-          if (o.iscsi case (final targets, final extents))
-            _EntryCard(
-              icon: Icons.adjust,
-              title: l10n.iscsiTitle,
-              subtitle: l10n.iscsiSummary(targets, extents),
-              service: o.service('iscsitarget'),
-              onTap: () => _open(() => IscsiScreen(session: session)),
+          ...groupedSection(l10n.tabShares, indent: 64, [
+            NavRow(
+              icon: Icons.folder_shared_rounded,
+              color: AppPalette.tileBlue,
+              title: l10n.smbTitle,
+              subtitle: l10n.sharesCount(o.smb.length),
+              detail: _state(o.service('cifs')),
+              onTap: () => _open(() => SmbSharesScreen(session: session)),
             ),
-          if (o.nvmet case final count?)
-            _EntryCard(
-              icon: Icons.memory,
-              title: l10n.nvmetTitle,
-              subtitle: l10n.nvmetSummary(count),
-              service: o.service('nvmet'),
-              onTap: () => _open(() => NvmetScreen(session: session)),
+            NavRow(
+              icon: Icons.lan_rounded,
+              color: AppPalette.tileTeal,
+              title: l10n.nfsTitle,
+              subtitle: l10n.sharesCount(o.nfs.length),
+              detail: _state(o.service('nfs')),
+              onTap: () => _open(() => NfsSharesScreen(session: session)),
             ),
-          const SizedBox(height: 8),
-          _EntryCard(
-            icon: Icons.miscellaneous_services_outlined,
-            title: l10n.servicesTitle,
-            subtitle: l10n.servicesSubtitle,
-            onTap: () => _open(() => ServicesScreen(session: session)),
+            if (o.iscsi case (final targets, final extents))
+              NavRow(
+                icon: Icons.adjust_rounded,
+                color: AppPalette.tilePurple,
+                title: l10n.iscsiTitle,
+                subtitle: l10n.iscsiSummary(targets, extents),
+                detail: _state(o.service('iscsitarget')),
+                onTap: () => _open(() => IscsiScreen(session: session)),
+              ),
+            if (o.nvmet case final count?)
+              NavRow(
+                icon: Icons.memory_rounded,
+                color: AppPalette.tileOrange,
+                title: l10n.nvmetTitle,
+                subtitle: l10n.nvmetSummary(count),
+                detail: _state(o.service('nvmet')),
+                onTap: () => _open(() => NvmetScreen(session: session)),
+              ),
+          ]),
+          const SizedBox(height: 20),
+          GroupedCard(
+            children: [
+              NavRow(
+                icon: Icons.miscellaneous_services_rounded,
+                color: AppPalette.tileSlate,
+                title: l10n.servicesTitle,
+                subtitle: l10n.servicesSubtitle,
+                onTap: () => _open(() => ServicesScreen(session: session)),
+              ),
+            ],
           ),
         ],
       ),
     );
   }
-}
 
-class _EntryCard extends StatelessWidget {
-  const _EntryCard({
-    required this.icon,
-    required this.title,
-    required this.subtitle,
-    required this.onTap,
-    this.service,
-  });
-
-  final IconData icon;
-  final String title;
-  final String subtitle;
-  final ServiceEntry? service;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final service = this.service;
-    return Card(
-      margin: const EdgeInsets.only(top: 12),
-      clipBehavior: Clip.antiAlias,
-      child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-        leading: Icon(icon),
-        title: Text(title),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(subtitle),
-            if (service != null) ...[
-              const SizedBox(height: 4),
-              ServiceStateLabel(service: service),
-            ],
-          ],
-        ),
-        trailing: const Icon(Icons.chevron_right),
-        onTap: onTap,
-      ),
-    );
-  }
+  Widget? _state(ServiceEntry? service) =>
+      service == null ? null : ServiceStateLabel(service: service);
 }

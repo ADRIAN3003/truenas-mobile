@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import '../../core/models/api_method.dart';
 import '../../core/session/truenas_session.dart';
 import '../../l10n/generated/app_localizations.dart';
+import '../../shared/theme.dart';
+import '../../shared/ui.dart';
 import '../sharing/sharing_widgets.dart';
 import '../storage/storage_helpers.dart';
 import 'method_screen.dart';
@@ -113,10 +115,13 @@ class _ApiExplorerScreenState extends State<ApiExplorerScreen>
               final name = names[i];
               final list = services[name]!;
               return ListTile(
-                leading: const Icon(Icons.folder_outlined),
+                leading: const IconTile(
+                  Icons.folder_rounded,
+                  AppPalette.tileSlate,
+                ),
                 title: Text(name),
                 subtitle: Text(l10n.explorerMethodCount(list.length)),
-                trailing: const Icon(Icons.chevron_right),
+                trailing: const Chevron(),
                 onTap: () => Navigator.push(
                   context,
                   MaterialPageRoute<void>(
@@ -163,18 +168,18 @@ class MethodTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     return ListTile(
-      leading: Icon(
-        method.job
-            ? Icons.work_history_outlined
-            : method.readOnly
-            ? Icons.visibility_outlined
-            : Icons.edit_outlined,
-      ),
+      leading: method.job
+          ? const SoftIcon(Icons.work_history_rounded, AppPalette.tilePurple)
+          : method.readOnly
+          ? const SoftIcon(Icons.visibility_rounded, AppPalette.tileTeal)
+          : const SoftIcon(Icons.edit_rounded, AppPalette.tileOrange),
       title: Text(short ? method.shortName : method.name),
       subtitle: method.summary.isEmpty
           ? null
           : Text(method.summary, maxLines: 2, overflow: TextOverflow.ellipsis),
-      trailing: method.job ? Text(l10n.explorerJob) : null,
+      trailing: method.job
+          ? StatusPill(label: l10n.explorerJob, tone: StatusTone.info)
+          : null,
       onTap: onTap,
     );
   }

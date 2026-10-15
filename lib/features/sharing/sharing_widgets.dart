@@ -4,6 +4,7 @@ import '../../core/api/sharing_api.dart';
 import '../../core/models/sharing.dart';
 import '../../core/session/truenas_session.dart';
 import '../../l10n/generated/app_localizations.dart';
+import '../../shared/theme.dart';
 import '../../shared/viz_colors.dart';
 import '../../shared/widgets.dart';
 import '../storage/storage_helpers.dart';
@@ -45,34 +46,36 @@ class ServiceStoppedBanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final theme = Theme.of(context);
-    return Card(
-      color: theme.colorScheme.secondaryContainer,
-      margin: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 12, 8, 8),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Icon(Icons.warning_amber, color: VizColors.warning),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(l10n.serviceNotRunning(service.displayName)),
-                ),
-              ],
-            ),
-            Align(
-              alignment: Alignment.centerRight,
-              child: TextButton(
-                onPressed: onStart,
-                child: Text(l10n.serviceStart),
+    final palette = AppPalette.of(context);
+    final (color, background) = palette.tone(StatusTone.warning);
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 6),
+      padding: const EdgeInsets.fromLTRB(14, 12, 8, 8),
+      decoration: BoxDecoration(
+        color: background,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Icon(Icons.warning_rounded, color: color),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(l10n.serviceNotRunning(service.displayName)),
               ),
+            ],
+          ),
+          Align(
+            alignment: Alignment.centerRight,
+            child: TextButton(
+              onPressed: onStart,
+              child: Text(l10n.serviceStart),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

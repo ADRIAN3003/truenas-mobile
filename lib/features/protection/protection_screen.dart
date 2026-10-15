@@ -4,6 +4,8 @@ import 'package:intl/intl.dart';
 import '../../core/models/protection.dart';
 import '../../core/session/truenas_session.dart';
 import '../../l10n/generated/app_localizations.dart';
+import '../../shared/theme.dart';
+import '../../shared/ui.dart';
 import '../../shared/viz_colors.dart';
 import '../../shared/widgets.dart';
 import '../sharing/sharing_widgets.dart';
@@ -120,7 +122,7 @@ class _ProtectionScreenState extends State<ProtectionScreen>
           children: [
             for (final kind in kinds)
               ListTile(
-                leading: Icon(kindIcon(kind)),
+                leading: IconTile(kindIcon(kind), kindColor(kind)),
                 title: Text(kindTitle(l10n, kind)),
                 onTap: () => Navigator.pop(context, kind),
               ),
@@ -157,7 +159,6 @@ class _ProtectionScreenState extends State<ProtectionScreen>
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final theme = Theme.of(context);
     final creatable = [
       for (final kind in data?.keys ?? const <ProtectionKind>[]) kind,
     ];
@@ -175,31 +176,22 @@ class _ProtectionScreenState extends State<ProtectionScreen>
         error: error,
         onRefresh: load,
         builder: (tasks) => ListView(
-          padding: const EdgeInsets.only(bottom: 88),
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 88),
           children: [
-            for (final MapEntry(key: kind, value: list) in tasks.entries) ...[
-              Padding(
-                padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
-                child: Text(
-                  kindTitle(l10n, kind),
-                  style: theme.textTheme.titleSmall,
-                ),
+            for (final MapEntry(key: kind, value: list) in tasks.entries)
+              ...groupedSection(
+                kindTitle(l10n, kind),
+                empty: l10n.protectionEmpty,
+                indent: 72,
+                [
+                  for (final task in list)
+                    _TaskTile(
+                      task: task,
+                      onToggle: (v) => _setEnabled(task, v),
+                      onAction: (a) => _action(task, a),
+                    ),
+                ],
               ),
-              if (list.isEmpty)
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
-                  child: Text(
-                    l10n.protectionEmpty,
-                    style: TextStyle(color: theme.colorScheme.onSurfaceVariant),
-                  ),
-                ),
-              for (final task in list)
-                _TaskTile(
-                  task: task,
-                  onToggle: (v) => _setEnabled(task, v),
-                  onAction: (a) => _action(task, a),
-                ),
-            ],
           ],
         ),
       ),
@@ -216,11 +208,19 @@ String kindTitle(AppLocalizations l10n, ProtectionKind kind) => switch (kind) {
 };
 
 IconData kindIcon(ProtectionKind kind) => switch (kind) {
-  ProtectionKind.snapshot => Icons.photo_camera_outlined,
-  ProtectionKind.replication => Icons.compare_arrows,
-  ProtectionKind.cloudSync => Icons.cloud_sync_outlined,
-  ProtectionKind.cloudBackup => Icons.backup_outlined,
-  ProtectionKind.rsync => Icons.sync_alt,
+  ProtectionKind.snapshot => Icons.photo_camera_rounded,
+  ProtectionKind.replication => Icons.compare_arrows_rounded,
+  ProtectionKind.cloudSync => Icons.cloud_sync_rounded,
+  ProtectionKind.cloudBackup => Icons.backup_rounded,
+  ProtectionKind.rsync => Icons.sync_alt_rounded,
+};
+
+Color kindColor(ProtectionKind kind) => switch (kind) {
+  ProtectionKind.snapshot => AppPalette.tileTeal,
+  ProtectionKind.replication => AppPalette.tilePurple,
+  ProtectionKind.cloudSync => AppPalette.tileBlue,
+  ProtectionKind.cloudBackup => AppPalette.tileOrange,
+  ProtectionKind.rsync => AppPalette.tileGreen,
 };
 
 String keepFor(AppLocalizations l10n, int count, LifetimeUnit unit) =>
@@ -293,7 +293,7 @@ class _TaskTile extends StatelessWidget {
     };
     final lastRun = task.lastRun;
     return ListTile(
-      leading: Icon(kindIcon(task.kind)),
+      leading: IconTile(kindIcon(task.kind), kindColor(task.kind), size: 40),
       title: Text(task.name),
       onTap: task.kind != ProtectionKind.snapshot
           ? () => onAction('edit')

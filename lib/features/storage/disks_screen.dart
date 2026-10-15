@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import '../../core/models/storage.dart';
 import '../../core/session/truenas_session.dart';
 import '../../l10n/generated/app_localizations.dart';
+import '../../shared/theme.dart';
+import '../../shared/ui.dart';
 import '../../shared/formatting.dart';
 import 'storage_helpers.dart';
 
@@ -55,45 +57,45 @@ class _DisksScreenState extends State<DisksScreen> {
                   Center(child: Text(l10n.disksEmpty)),
                 ],
               )
-            : ListView.separated(
-                itemCount: disks.length,
-                separatorBuilder: (_, _) => const Divider(height: 1),
-                itemBuilder: (context, index) {
-                  final disk = disks[index];
-                  final temperature = disk.temperature;
-                  final kind = disk.isSsd
-                      ? l10n.diskSsd
-                      : disk.rotationRate != null
-                      ? l10n.diskRpm(disk.rotationRate!)
-                      : null;
-                  return ListTile(
-                    leading: Icon(
-                      disk.isSsd ? Icons.memory : Icons.album_outlined,
-                    ),
-                    title: Text(
-                      [disk.name, formatBytes(disk.size), ?kind].join(' · '),
-                    ),
-                    subtitle: Text(
-                      [
-                        if (disk.model != null && disk.model!.isNotEmpty)
-                          disk.model!,
-                        if (disk.serial != null && disk.serial!.isNotEmpty)
-                          l10n.diskSerial(disk.serial!),
-                        disk.pool == null
-                            ? l10n.diskUnused
-                            : l10n.diskPool(disk.pool!),
-                      ].join('\n'),
-                    ),
-                    isThreeLine: true,
-                    trailing: temperature == null
-                        ? null
-                        : Text(
-                            l10n.cpuTemperature(temperature.toStringAsFixed(0)),
-                          ),
-                  );
-                },
+            : ListView(
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+                children: [
+                  GroupedCard(
+                    indent: 72,
+                    children: [for (final disk in disks) _tile(l10n, disk)],
+                  ),
+                ],
               ),
       ),
+    );
+  }
+
+  Widget _tile(AppLocalizations l10n, Disk disk) {
+    final temperature = disk.temperature;
+    final kind = disk.isSsd
+        ? l10n.diskSsd
+        : disk.rotationRate != null
+        ? l10n.diskRpm(disk.rotationRate!)
+        : null;
+    return ListTile(
+      leading: IconTile(
+        disk.isSsd ? Icons.memory_rounded : Icons.album_rounded,
+        disk.isSsd ? AppPalette.tileTeal : AppPalette.tileSlate,
+        size: 40,
+      ),
+      title: Text([disk.name, formatBytes(disk.size), ?kind].join(' · ')),
+      subtitle: Text(
+        [
+          if (disk.model != null && disk.model!.isNotEmpty) disk.model!,
+          if (disk.serial != null && disk.serial!.isNotEmpty)
+            l10n.diskSerial(disk.serial!),
+          disk.pool == null ? l10n.diskUnused : l10n.diskPool(disk.pool!),
+        ].join('\n'),
+      ),
+      isThreeLine: true,
+      trailing: temperature == null
+          ? null
+          : Text(l10n.cpuTemperature(temperature.toStringAsFixed(0))),
     );
   }
 }

@@ -2,9 +2,25 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
+import 'theme.dart';
 import 'ui.dart';
+import 'viz_colors.dart';
 
-/// An icon in a status colour followed by a label in normal text colour.
+/// The theme's readable foreground and soft background for a status
+/// colour; the fixed chart status colours map onto the theme's tones.
+(Color, Color) statusColors(BuildContext context, Color color) {
+  final palette = AppPalette.of(context);
+  return switch (color) {
+    VizColors.good => palette.tone(StatusTone.good),
+    VizColors.warning => palette.tone(StatusTone.warning),
+    VizColors.critical => palette.tone(StatusTone.critical),
+    _ => (color, color.withValues(alpha: 0.12)),
+  };
+}
+
+/// A status shown as a tinted pill: an icon and a label in the status
+/// colour. The fixed chart status colours map onto the theme's tones so the
+/// text keeps its contrast in both themes.
 class StatusLabel extends StatelessWidget {
   const StatusLabel({
     super.key,
@@ -18,14 +34,28 @@ class StatusLabel extends StatelessWidget {
   final String label;
 
   @override
-  Widget build(BuildContext context) => Row(
-    mainAxisSize: MainAxisSize.min,
-    children: [
-      Icon(icon, size: 18, color: color),
-      const SizedBox(width: 6),
-      Text(label),
-    ],
-  );
+  Widget build(BuildContext context) {
+    final (foreground, background) = statusColors(context, color);
+    return Container(
+      padding: const EdgeInsets.fromLTRB(6, 3, 10, 3),
+      decoration: BoxDecoration(
+        color: background,
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 15, color: foreground),
+          const SizedBox(width: 5),
+          Text(
+            label,
+            style: Theme.of(context).textTheme.labelMedium
+                ?.copyWith(color: foreground, fontWeight: FontWeight.w600),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 class LegendItem extends StatelessWidget {

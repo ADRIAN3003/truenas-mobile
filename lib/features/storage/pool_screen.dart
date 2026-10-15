@@ -5,6 +5,8 @@ import '../../core/api/storage_api.dart';
 import '../../core/models/storage.dart';
 import '../../core/session/truenas_session.dart';
 import '../../l10n/generated/app_localizations.dart';
+import '../../shared/theme.dart';
+import '../../shared/ui.dart';
 import '../../shared/formatting.dart';
 import '../../shared/viz_colors.dart';
 import '../../shared/widgets.dart';
@@ -83,22 +85,23 @@ class _PoolScreenState extends State<PoolScreen> {
           children: [
             _UsageCard(pool: pool),
             _ScrubCard(pool: pool, onAction: (a) => _scrub(pool, a)),
-            Card(
-              margin: const EdgeInsets.only(top: 12),
-              child: ListTile(
-                leading: const Icon(Icons.folder_outlined),
-                title: Text(l10n.datasetsTitle),
-                trailing: const Icon(Icons.chevron_right),
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute<void>(
-                    builder: (_) => DatasetsScreen(
-                      session: widget.session,
-                      pool: pool.name,
+            GroupedCard(
+              children: [
+                NavRow(
+                  icon: Icons.folder_rounded,
+                  color: AppPalette.tileBlue,
+                  title: l10n.datasetsTitle,
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute<void>(
+                      builder: (_) => DatasetsScreen(
+                        session: widget.session,
+                        pool: pool.name,
+                      ),
                     ),
                   ),
                 ),
-              ),
+              ],
             ),
             _TopologyCard(pool: pool),
           ],
@@ -118,31 +121,51 @@ class _UsageCard extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final colors = VizColors.of(context);
-    final (icon, color) = zfsStatusStyle(pool.status);
+    final percent = (pool.usedFraction * 100).round();
     return Card(
-      margin: const EdgeInsets.only(top: 12),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            StatusLabel(icon: icon, color: color, label: pool.status),
-            if (pool.statusDetail != null && pool.statusDetail!.isNotEmpty) ...[
-              const SizedBox(height: 8),
-              Text(pool.statusDetail!, style: theme.textTheme.bodySmall),
-            ],
-            const SizedBox(height: 16),
-            SegmentedBar(
-              segments: [
-                (pool.usedFraction, colors.series1),
-                (1 - pool.usedFraction, colors.track),
+            Row(
+              children: [
+                RingGauge(
+                  size: 88,
+                  stroke: 9,
+                  segments: [(pool.usedFraction, colors.series1)],
+                  child: Text('$percent%', style: theme.textTheme.titleLarge),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      StatusPill(
+                        label: pool.status,
+                        tone: zfsStatusTone(pool.status),
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        l10n.poolUsage(
+                          formatBytes(pool.allocated),
+                          formatBytes(pool.size),
+                        ),
+                        style: theme.textTheme.titleMedium,
+                      ),
+                      Text(
+                        l10n.poolFree(formatBytes(pool.free)),
+                        style: theme.textTheme.bodySmall,
+                      ),
+                    ],
+                  ),
+                ),
               ],
             ),
-            const SizedBox(height: 8),
-            Text(
-              '${l10n.poolUsage(formatBytes(pool.allocated), formatBytes(pool.size))}'
-              ' · ${l10n.poolFree(formatBytes(pool.free))}',
-            ),
+            if (pool.statusDetail != null && pool.statusDetail!.isNotEmpty) ...[
+              const SizedBox(height: 12),
+              Text(pool.statusDetail!, style: theme.textTheme.bodySmall),
+            ],
           ],
         ),
       ),
@@ -185,7 +208,6 @@ class _ScrubCard extends StatelessWidget {
       );
     }
     return Card(
-      margin: const EdgeInsets.only(top: 12),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -251,7 +273,6 @@ class _TopologyCard extends StatelessWidget {
       'dedup': l10n.vdevGroupDedup,
     };
     return Card(
-      margin: const EdgeInsets.only(top: 12),
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 16),
         child: Column(
@@ -290,7 +311,8 @@ class _TopologyCard extends StatelessWidget {
         dense: true,
         contentPadding: EdgeInsets.only(left: 16.0 + depth * 24, right: 16),
         leading: Icon(
-          isDisk ? Icons.album_outlined : Icons.account_tree_outlined,
+          isDisk ? Icons.album_rounded : Icons.account_tree_rounded,
+          color: AppPalette.of(context).muted,
         ),
         title: Text(isDisk ? (vdev.disk ?? vdev.name) : vdev.type),
         subtitle: vdev.errors > 0

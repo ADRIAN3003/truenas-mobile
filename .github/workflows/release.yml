@@ -64,7 +64,7 @@ jobs:
           cp build/app/outputs/bundle/release/app-release.aab dist/
           for f in dist/*; do mv "$f" "dist/truenas-mobile-$TAG-${f#dist/app-}"; done
           ls -l dist
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: android
           path: dist/*
@@ -90,7 +90,7 @@ jobs:
           cp -R build/ios/iphoneos/Runner.app Payload/
           zip -qry "dist/truenas-mobile-$TAG-unsigned.ipa" Payload
           ls -l dist
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: ios
           path: dist/*.ipa

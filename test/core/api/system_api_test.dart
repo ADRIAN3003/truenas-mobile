@@ -74,6 +74,21 @@ void main() {
     expect(group.members, 1);
   });
 
+  test('groups load on 25.04, sorted by name', () async {
+    await connect(legacy: true);
+    server.groups.insert(0, {
+      'id': 41,
+      'gid': 3001,
+      'group': 'Media',
+      'name': 'Media',
+      'builtin': false,
+      'users': [],
+      'local': true,
+    });
+    final groups = await session.system.groups();
+    expect(groups.map((g) => g.name), ['alice', 'Media']);
+  });
+
   test('creating an API key returns its secret once', () async {
     await connect();
     final key = await session.system.createApiKey('backup', 'alice');

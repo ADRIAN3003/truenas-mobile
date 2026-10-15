@@ -65,15 +65,15 @@ class SystemApi {
   ]);
 
   Future<List<LocalGroup>> groups({bool builtin = false}) async =>
+      // Sorted here: 25.04 can't order by `name`, which it only adds after
+      // reading the database (its column is `group`).
       (await _query('group.query', [
-        [
-          ['local', '=', true],
-          if (!builtin) ['builtin', '=', false],
-        ],
-        {
-          'order_by': ['name'],
-        },
-      ])).map(LocalGroup.fromJson).toList();
+          [
+            ['local', '=', true],
+            if (!builtin) ['builtin', '=', false],
+          ],
+        ])).map(LocalGroup.fromJson).toList()
+        ..sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
 
   Future<void> createGroup(String name) => _client.call('group.create', [
     {'name': name},

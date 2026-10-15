@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/api/workloads_api.dart';
 import '../../core/models/workloads.dart';
 import '../../core/session/truenas_session.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../storage/storage_helpers.dart';
+import 'app_icon.dart';
 import 'workload_widgets.dart';
 
 /// One app: version, upgrade, web interfaces, images and actions.
@@ -91,6 +94,8 @@ class _AppScreenState extends State<AppScreen> {
                   children: [
                     Row(
                       children: [
+                        AppIcon(url: app.iconUrl, size: 48),
+                        const SizedBox(width: 12),
                         Expanded(
                           child: Text(
                             app.title ?? app.name,
@@ -187,7 +192,17 @@ class _AppScreenState extends State<AppScreen> {
               Card(
                 child: Padding(
                   padding: const EdgeInsets.all(16),
-                  child: SelectableText(app.notes!.trim()),
+                  // Catalog notes are Markdown, often with links.
+                  child: MarkdownBody(
+                    data: app.notes!.trim(),
+                    selectable: true,
+                    onTapLink: (_, href, _) {
+                      final uri = href == null ? null : Uri.tryParse(href);
+                      if (uri != null) {
+                        launchUrl(uri, mode: LaunchMode.externalApplication);
+                      }
+                    },
+                  ),
                 ),
               ),
             ],

@@ -1085,5 +1085,283 @@
   "viewOnlyNote": "View only for now. Use the TrueNAS web interface to change these.",
   "@viewOnlyNote": {
     "description": "Note on read-only screens."
+  },
+  "tabApps": "Apps",
+  "@tabApps": {
+    "description": "Bottom navigation tab for apps, VMs and containers."
+  },
+  "tabMore": "More",
+  "@tabMore": {
+    "description": "Bottom navigation tab with further sections."
+  },
+  "appsTitle": "Apps",
+  "@appsTitle": {
+    "description": "Section heading for Docker apps."
+  },
+  "appsEmpty": "No apps installed",
+  "@appsEmpty": {
+    "description": "Shown when no app is installed."
+  },
+  "vmsTitle": "Virtual machines",
+  "@vmsTitle": {
+    "description": "Section heading for VMs."
+  },
+  "vmsEmpty": "No virtual machines",
+  "@vmsEmpty": {
+    "description": "Shown when no VM exists."
+  },
+  "containersTitle": "Containers",
+  "@containersTitle": {
+    "description": "Section heading for containers."
+  },
+  "containersEmpty": "No containers",
+  "@containersEmpty": {
+    "description": "Shown when no container exists."
+  },
+  "stateRunning": "Running",
+  "@stateRunning": {
+    "description": "Workload state."
+  },
+  "stateStopped": "Stopped",
+  "@stateStopped": {
+    "description": "Workload state."
+  },
+  "stateDeploying": "Starting",
+  "@stateDeploying": {
+    "description": "Workload state while it starts or deploys."
+  },
+  "stateStopping": "Stopping",
+  "@stateStopping": {
+    "description": "Workload state."
+  },
+  "stateSuspended": "Paused",
+  "@stateSuspended": {
+    "description": "Workload state for a suspended VM or frozen container."
+  },
+  "stateCrashed": "Crashed",
+  "@stateCrashed": {
+    "description": "Workload state after a failure."
+  },
+  "stateUnknown": "Unknown",
+  "@stateUnknown": {
+    "description": "Workload state the app doesn't recognise."
+  },
+  "actionStart": "Start",
+  "@actionStart": {
+    "description": "Starts an app, VM or container."
+  },
+  "actionStop": "Stop",
+  "@actionStop": {
+    "description": "Stops an app, VM or container."
+  },
+  "actionRestart": "Restart",
+  "@actionRestart": {
+    "description": "Restarts an app, VM or container."
+  },
+  "actionPowerOff": "Power off",
+  "@actionPowerOff": {
+    "description": "Cuts a VM's power."
+  },
+  "actionUpgrade": "Upgrade",
+  "@actionUpgrade": {
+    "description": "Upgrades an app."
+  },
+  "actionDelete": "Delete",
+  "@actionDelete": {
+    "description": "Deletes an app."
+  },
+  "actionStarted": "{name} started",
+  "@actionStarted": {
+    "description": "Snackbar after starting.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "actionStopped": "{name} stopped",
+  "@actionStopped": {
+    "description": "Snackbar after stopping.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "actionRestarted": "{name} restarted",
+  "@actionRestarted": {
+    "description": "Snackbar after restarting.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "actionPoweredOff": "{name} powered off",
+  "@actionPoweredOff": {
+    "description": "Snackbar after powering off a VM.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "actionUpgraded": "{name} upgraded",
+  "@actionUpgraded": {
+    "description": "Snackbar after upgrading an app.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "actionDeleted": "{name} deleted",
+  "@actionDeleted": {
+    "description": "Snackbar after deleting an app.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "stopTitle": "Stop {name}?",
+  "@stopTitle": {
+    "description": "Confirmation title for stopping an app, VM or container.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "stopBody": "It can't be reached until it is started again.",
+  "@stopBody": {
+    "description": "Confirmation body for stopping an app or container."
+  },
+  "vmStopBody": "The guest is asked to shut down. If it hasn't within its shutdown timeout, it is powered off.",
+  "@vmStopBody": {
+    "description": "Confirmation body for stopping a VM."
+  },
+  "restartTitle": "Restart {name}?",
+  "@restartTitle": {
+    "description": "Confirmation title for restarting.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "restartBody": "It is unavailable for a moment while it restarts.",
+  "@restartBody": {
+    "description": "Confirmation body for restarting."
+  },
+  "vmPowerOffTitle": "Power off {name}?",
+  "@vmPowerOffTitle": {
+    "description": "Confirmation title for powering off a VM.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "vmPowerOffBody": "This cuts power immediately, like pulling the plug. Unsaved work inside the VM can be lost.",
+  "@vmPowerOffBody": {
+    "description": "Confirmation body for powering off a VM."
+  },
+  "appUpgradeTitle": "Upgrade {name}?",
+  "@appUpgradeTitle": {
+    "description": "Confirmation title for upgrading an app.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "appUpgradeBody": "{name} goes from {from} to {to}. The app restarts during the upgrade.",
+  "@appUpgradeBody": {
+    "description": "Confirmation body for upgrading an app.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      }
+    }
+  },
+  "appDeleteTitle": "Delete {name}?",
+  "@appDeleteTitle": {
+    "description": "Confirmation title for deleting an app.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "appDeleteBody": "The app and its containers and images are removed. Data in its volumes and host folders is kept.",
+  "@appDeleteBody": {
+    "description": "Confirmation body for deleting an app."
+  },
+  "appUpdateAvailable": "Update available",
+  "@appUpdateAvailable": {
+    "description": "Badge on an app with a newer version."
+  },
+  "appImageUpdates": "Newer images available",
+  "@appImageUpdates": {
+    "description": "Badge on an app with newer container images."
+  },
+  "appVersion": "Version",
+  "@appVersion": {
+    "description": "Label for an app's installed version."
+  },
+  "appLatestVersion": "Latest version",
+  "@appLatestVersion": {
+    "description": "Label for an app's newest version."
+  },
+  "appContainersRunning": "Running containers",
+  "@appContainersRunning": {
+    "description": "Label for an app's container count."
+  },
+  "appImages": "Images",
+  "@appImages": {
+    "description": "Label for an app's container images."
+  },
+  "appPortals": "Web interfaces",
+  "@appPortals": {
+    "description": "Heading for an app's web addresses."
+  },
+  "appCustom": "Custom app",
+  "@appCustom": {
+    "description": "Label for an app installed from a compose file."
+  },
+  "appNotes": "Notes",
+  "@appNotes": {
+    "description": "Heading for an app's notes."
+  },
+  "vmSummary": "{vcpus} vCPU · {memory}",
+  "@vmSummary": {
+    "description": "VM size line.",
+    "placeholders": {
+      "vcpus": {
+        "type": "int"
+      },
+      "memory": {
+        "type": "String"
+      }
+    }
+  },
+  "vmAutostart": "Starts on boot",
+  "@vmAutostart": {
+    "description": "Label for a VM or container that starts on boot."
+  },
+  "containerIsVm": "Incus VM",
+  "@containerIsVm": {
+    "description": "Label for an Incus virtual machine listed among containers."
+  },
+  "copied": "Copied",
+  "@copied": {
+    "description": "Snackbar after copying text."
   }
 }

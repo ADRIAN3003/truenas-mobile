@@ -1401,6 +1401,312 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'View only for now. Use the TrueNAS web interface to change these.'**
   String get viewOnlyNote;
+
+  /// Bottom navigation tab for apps, VMs and containers.
+  ///
+  /// In en, this message translates to:
+  /// **'Apps'**
+  String get tabApps;
+
+  /// Bottom navigation tab with further sections.
+  ///
+  /// In en, this message translates to:
+  /// **'More'**
+  String get tabMore;
+
+  /// Section heading for Docker apps.
+  ///
+  /// In en, this message translates to:
+  /// **'Apps'**
+  String get appsTitle;
+
+  /// Shown when no app is installed.
+  ///
+  /// In en, this message translates to:
+  /// **'No apps installed'**
+  String get appsEmpty;
+
+  /// Section heading for VMs.
+  ///
+  /// In en, this message translates to:
+  /// **'Virtual machines'**
+  String get vmsTitle;
+
+  /// Shown when no VM exists.
+  ///
+  /// In en, this message translates to:
+  /// **'No virtual machines'**
+  String get vmsEmpty;
+
+  /// Section heading for containers.
+  ///
+  /// In en, this message translates to:
+  /// **'Containers'**
+  String get containersTitle;
+
+  /// Shown when no container exists.
+  ///
+  /// In en, this message translates to:
+  /// **'No containers'**
+  String get containersEmpty;
+
+  /// Workload state.
+  ///
+  /// In en, this message translates to:
+  /// **'Running'**
+  String get stateRunning;
+
+  /// Workload state.
+  ///
+  /// In en, this message translates to:
+  /// **'Stopped'**
+  String get stateStopped;
+
+  /// Workload state while it starts or deploys.
+  ///
+  /// In en, this message translates to:
+  /// **'Starting'**
+  String get stateDeploying;
+
+  /// Workload state.
+  ///
+  /// In en, this message translates to:
+  /// **'Stopping'**
+  String get stateStopping;
+
+  /// Workload state for a suspended VM or frozen container.
+  ///
+  /// In en, this message translates to:
+  /// **'Paused'**
+  String get stateSuspended;
+
+  /// Workload state after a failure.
+  ///
+  /// In en, this message translates to:
+  /// **'Crashed'**
+  String get stateCrashed;
+
+  /// Workload state the app doesn't recognise.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown'**
+  String get stateUnknown;
+
+  /// Starts an app, VM or container.
+  ///
+  /// In en, this message translates to:
+  /// **'Start'**
+  String get actionStart;
+
+  /// Stops an app, VM or container.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop'**
+  String get actionStop;
+
+  /// Restarts an app, VM or container.
+  ///
+  /// In en, this message translates to:
+  /// **'Restart'**
+  String get actionRestart;
+
+  /// Cuts a VM's power.
+  ///
+  /// In en, this message translates to:
+  /// **'Power off'**
+  String get actionPowerOff;
+
+  /// Upgrades an app.
+  ///
+  /// In en, this message translates to:
+  /// **'Upgrade'**
+  String get actionUpgrade;
+
+  /// Deletes an app.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get actionDelete;
+
+  /// Snackbar after starting.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} started'**
+  String actionStarted(String name);
+
+  /// Snackbar after stopping.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} stopped'**
+  String actionStopped(String name);
+
+  /// Snackbar after restarting.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} restarted'**
+  String actionRestarted(String name);
+
+  /// Snackbar after powering off a VM.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} powered off'**
+  String actionPoweredOff(String name);
+
+  /// Snackbar after upgrading an app.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} upgraded'**
+  String actionUpgraded(String name);
+
+  /// Snackbar after deleting an app.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} deleted'**
+  String actionDeleted(String name);
+
+  /// Confirmation title for stopping an app, VM or container.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop {name}?'**
+  String stopTitle(String name);
+
+  /// Confirmation body for stopping an app or container.
+  ///
+  /// In en, this message translates to:
+  /// **'It can\'t be reached until it is started again.'**
+  String get stopBody;
+
+  /// Confirmation body for stopping a VM.
+  ///
+  /// In en, this message translates to:
+  /// **'The guest is asked to shut down. If it hasn\'t within its shutdown timeout, it is powered off.'**
+  String get vmStopBody;
+
+  /// Confirmation title for restarting.
+  ///
+  /// In en, this message translates to:
+  /// **'Restart {name}?'**
+  String restartTitle(String name);
+
+  /// Confirmation body for restarting.
+  ///
+  /// In en, this message translates to:
+  /// **'It is unavailable for a moment while it restarts.'**
+  String get restartBody;
+
+  /// Confirmation title for powering off a VM.
+  ///
+  /// In en, this message translates to:
+  /// **'Power off {name}?'**
+  String vmPowerOffTitle(String name);
+
+  /// Confirmation body for powering off a VM.
+  ///
+  /// In en, this message translates to:
+  /// **'This cuts power immediately, like pulling the plug. Unsaved work inside the VM can be lost.'**
+  String get vmPowerOffBody;
+
+  /// Confirmation title for upgrading an app.
+  ///
+  /// In en, this message translates to:
+  /// **'Upgrade {name}?'**
+  String appUpgradeTitle(String name);
+
+  /// Confirmation body for upgrading an app.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} goes from {from} to {to}. The app restarts during the upgrade.'**
+  String appUpgradeBody(String name, String from, String to);
+
+  /// Confirmation title for deleting an app.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete {name}?'**
+  String appDeleteTitle(String name);
+
+  /// Confirmation body for deleting an app.
+  ///
+  /// In en, this message translates to:
+  /// **'The app and its containers and images are removed. Data in its volumes and host folders is kept.'**
+  String get appDeleteBody;
+
+  /// Badge on an app with a newer version.
+  ///
+  /// In en, this message translates to:
+  /// **'Update available'**
+  String get appUpdateAvailable;
+
+  /// Badge on an app with newer container images.
+  ///
+  /// In en, this message translates to:
+  /// **'Newer images available'**
+  String get appImageUpdates;
+
+  /// Label for an app's installed version.
+  ///
+  /// In en, this message translates to:
+  /// **'Version'**
+  String get appVersion;
+
+  /// Label for an app's newest version.
+  ///
+  /// In en, this message translates to:
+  /// **'Latest version'**
+  String get appLatestVersion;
+
+  /// Label for an app's container count.
+  ///
+  /// In en, this message translates to:
+  /// **'Running containers'**
+  String get appContainersRunning;
+
+  /// Label for an app's container images.
+  ///
+  /// In en, this message translates to:
+  /// **'Images'**
+  String get appImages;
+
+  /// Heading for an app's web addresses.
+  ///
+  /// In en, this message translates to:
+  /// **'Web interfaces'**
+  String get appPortals;
+
+  /// Label for an app installed from a compose file.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom app'**
+  String get appCustom;
+
+  /// Heading for an app's notes.
+  ///
+  /// In en, this message translates to:
+  /// **'Notes'**
+  String get appNotes;
+
+  /// VM size line.
+  ///
+  /// In en, this message translates to:
+  /// **'{vcpus} vCPU · {memory}'**
+  String vmSummary(int vcpus, String memory);
+
+  /// Label for a VM or container that starts on boot.
+  ///
+  /// In en, this message translates to:
+  /// **'Starts on boot'**
+  String get vmAutostart;
+
+  /// Label for an Incus virtual machine listed among containers.
+  ///
+  /// In en, this message translates to:
+  /// **'Incus VM'**
+  String get containerIsVm;
+
+  /// Snackbar after copying text.
+  ///
+  /// In en, this message translates to:
+  /// **'Copied'**
+  String get copied;
 }
 
 class _AppLocalizationsDelegate

@@ -7,6 +7,7 @@ import '../api/method_catalog.dart';
 import '../api/sharing_api.dart';
 import '../api/storage_api.dart';
 import '../api/truenas_connection.dart';
+import '../api/workloads_api.dart';
 import '../instances/server_instance.dart';
 import '../models/alert.dart';
 import '../models/job.dart';
@@ -23,6 +24,7 @@ class TrueNasSession {
   late final catalog = MethodCatalog(client);
   late final storage = StorageApi(client, catalog);
   late final sharing = SharingApi(client, catalog);
+  late final workloads = WorkloadsApi(client, catalog);
 
   String get apiVersion => connection.apiVersion;
   JsonRpcClient get client => connection.client;

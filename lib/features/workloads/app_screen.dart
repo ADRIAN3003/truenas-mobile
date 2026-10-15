@@ -1,0 +1,211 @@
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+
+import '../../core/api/workloads_api.dart';
+import '../../core/models/workloads.dart';
+import '../../core/session/truenas_session.dart';
+import '../../l10n/generated/app_localizations.dart';
+import '../storage/storage_helpers.dart';
+import 'workload_widgets.dart';
+
+/// One app: version, upgrade, web interfaces, images and actions.
+class AppScreen extends StatefulWidget {
+  const AppScreen({super.key, required this.session, required this.app});
+
+  final TrueNasSession session;
+  final TrueNasApp app;
+
+  @override
+  State<AppScreen> createState() => _AppScreenState();
+}
+
+class _AppScreenState extends State<AppScreen> {
+  late TrueNasApp _app = widget.app;
+  bool _busy = false;
+
+  Future<void> _reload() async {
+    final apps = await widget.session.workloads.apps();
+    final app = apps.where((a) => a.name == _app.name).firstOrNull;
+    if (!mounted) return;
+    if (app == null) {
+      Navigator.pop(context);
+    } else {
+      setState(() => _app = app);
+    }
+  }
+
+  Future<void> _run(WorkloadAction action) async {
+    final ok = await runWorkloadAction(
+      context,
+      name: _app.name,
+      action: action,
+      upgradeFrom: _app.version,
+      upgradeTo: _app.latestVersion,
+      run: () => widget.session.workloads.appAction(_app.name, action),
+      onConfirmed: () => setState(() => _busy = true),
+    );
+    if (!mounted) return;
+    setState(() => _busy = false);
+    if (ok && action == WorkloadAction.delete) {
+      Navigator.pop(context);
+    } else {
+      await _reload();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    final app = _app;
+    final actions = actionsFor(
+      app.state,
+      supported: [
+        WorkloadAction.start,
+        WorkloadAction.stop,
+        WorkloadAction.restart,
+        if (app.upgradeAvailable) WorkloadAction.upgrade,
+      ],
+    );
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(app.name),
+        actions: [
+          IconButton(
+            tooltip: l10n.actionDelete,
+            icon: const Icon(Icons.delete_outline),
+            onPressed: _busy ? null : () => _run(WorkloadAction.delete),
+          ),
+        ],
+      ),
+      body: RefreshIndicator(
+        onRefresh: _reload,
+        child: ListView(
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+          children: [
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            app.title ?? app.name,
+                            style: theme.textTheme.titleMedium,
+                          ),
+                        ),
+                        WorkloadStateLabel(state: app.state),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    InfoRow(l10n.appVersion, app.version),
+                    if (app.upgradeAvailable && app.latestVersion != null)
+                      InfoRow(l10n.appLatestVersion, app.latestVersion!),
+                    InfoRow(l10n.appContainersRunning, '${app.containers}'),
+                    if (app.customApp) InfoRow(l10n.appCustom, '✓'),
+                    if (app.imageUpdatesAvailable)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 4),
+                        child: Text(
+                          l10n.appImageUpdates,
+                          style: theme.textTheme.bodySmall,
+                        ),
+                      ),
+                    const SizedBox(height: 12),
+                    if (_busy)
+                      const LinearProgressIndicator()
+                    else
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: [
+                          for (final action in actions)
+                            action == WorkloadAction.upgrade
+                                ? FilledButton.icon(
+                                    onPressed: () => _run(action),
+                                    icon: const Icon(Icons.upgrade),
+                                    label: Text(actionLabel(l10n, action)),
+                                  )
+                                : OutlinedButton(
+                                    onPressed: () => _run(action),
+                                    child: Text(actionLabel(l10n, action)),
+                                  ),
+                        ],
+                      ),
+                  ],
+                ),
+              ),
+            ),
+            if (app.portals.isNotEmpty) ...[
+              _Heading(l10n.appPortals),
+              Card(
+                child: Column(
+                  children: [
+                    for (final MapEntry(key: label, value: url)
+                        in app.portals.entries)
+                      ListTile(
+                        leading: const Icon(Icons.open_in_browser),
+                        title: Text(label),
+                        subtitle: SelectableText(url),
+                        trailing: IconButton(
+                          tooltip: MaterialLocalizations.of(context)
+                              .copyButtonLabel,
+                          icon: const Icon(Icons.copy),
+                          onPressed: () async {
+                            await Clipboard.setData(ClipboardData(text: url));
+                            if (!context.mounted) return;
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text(l10n.copied)),
+                            );
+                          },
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            ],
+            if (app.images.isNotEmpty) ...[
+              _Heading(l10n.appImages),
+              Card(
+                child: Column(
+                  children: [
+                    for (final image in app.images)
+                      ListTile(
+                        dense: true,
+                        leading: const Icon(Icons.layers_outlined),
+                        title: Text(image),
+                      ),
+                  ],
+                ),
+              ),
+            ],
+            if (app.notes != null && app.notes!.trim().isNotEmpty) ...[
+              _Heading(l10n.appNotes),
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: SelectableText(app.notes!.trim()),
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _Heading extends StatelessWidget {
+  const _Heading(this.text);
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) => Padding(
+    padding: const EdgeInsets.fromLTRB(4, 20, 4, 8),
+    child: Text(text, style: Theme.of(context).textTheme.titleMedium),
+  );
+}

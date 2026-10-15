@@ -836,5 +836,254 @@
   "create": "Create",
   "@create": {
     "description": "Button that creates something."
+  },
+  "tabShares": "Shares",
+  "@tabShares": {
+    "description": "Bottom navigation tab for shares and services."
+  },
+  "servicesTitle": "Services",
+  "@servicesTitle": {
+    "description": "Title of the services screen."
+  },
+  "servicesSubtitle": "Start, stop, and choose what starts on boot",
+  "@servicesSubtitle": {
+    "description": "Subtitle of the services entry."
+  },
+  "servicesEmpty": "No services",
+  "@servicesEmpty": {
+    "description": "Shown when the server lists no services."
+  },
+  "serviceRunning": "Running",
+  "@serviceRunning": {
+    "description": "Service state label."
+  },
+  "serviceStopped": "Stopped",
+  "@serviceStopped": {
+    "description": "Service state label."
+  },
+  "serviceStart": "Start",
+  "@serviceStart": {
+    "description": "Starts a service."
+  },
+  "serviceStop": "Stop",
+  "@serviceStop": {
+    "description": "Stops a service."
+  },
+  "serviceRestart": "Restart",
+  "@serviceRestart": {
+    "description": "Restarts a service."
+  },
+  "serviceStartOnBoot": "Start on boot",
+  "@serviceStartOnBoot": {
+    "description": "Switch that makes a service start when the server boots."
+  },
+  "serviceStopTitle": "Stop {name}?",
+  "@serviceStopTitle": {
+    "description": "Confirmation title for stopping a service.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "serviceStopBody": "Clients using this service lose access until it is started again.",
+  "@serviceStopBody": {
+    "description": "Confirmation body for stopping a service."
+  },
+  "serviceStartedMessage": "{name} is running",
+  "@serviceStartedMessage": {
+    "description": "Snackbar after starting or restarting a service.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "serviceStoppedMessage": "{name} stopped",
+  "@serviceStoppedMessage": {
+    "description": "Snackbar after stopping a service.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "serviceNotRunning": "The {name} service is stopped, so these shares can't be reached.",
+  "@serviceNotRunning": {
+    "description": "Banner on a share list when its service is not running.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "smbTitle": "SMB shares",
+  "@smbTitle": {
+    "description": "Title of the SMB share list."
+  },
+  "nfsTitle": "NFS shares",
+  "@nfsTitle": {
+    "description": "Title of the NFS share list."
+  },
+  "sharesCount": "{count, plural, =0{No shares} =1{1 share} other{{count} shares}}",
+  "@sharesCount": {
+    "description": "Number of shares of one protocol.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "sharesEmpty": "No shares yet",
+  "@sharesEmpty": {
+    "description": "Shown when a share list is empty."
+  },
+  "shareCreate": "Add share",
+  "@shareCreate": {
+    "description": "Button that creates a share."
+  },
+  "shareEdit": "Edit share",
+  "@shareEdit": {
+    "description": "Title of the share edit dialog."
+  },
+  "shareName": "Share name",
+  "@shareName": {
+    "description": "Field for the SMB share name."
+  },
+  "sharePath": "Folder",
+  "@sharePath": {
+    "description": "Field for the dataset folder a share exports."
+  },
+  "shareComment": "Description",
+  "@shareComment": {
+    "description": "Field for a share's description."
+  },
+  "shareReadOnly": "Read only",
+  "@shareReadOnly": {
+    "description": "Switch that makes a share read only."
+  },
+  "shareBrowsable": "Visible when browsing the network",
+  "@shareBrowsable": {
+    "description": "Switch for SMB share browsability."
+  },
+  "shareEnabled": "Enabled",
+  "@shareEnabled": {
+    "description": "Switch that turns a share on or off."
+  },
+  "shareDisabled": "Disabled",
+  "@shareDisabled": {
+    "description": "Label for a share that is turned off."
+  },
+  "shareLocked": "Dataset locked",
+  "@shareLocked": {
+    "description": "Label for a share whose encrypted dataset is locked."
+  },
+  "shareNoDatasets": "Create a dataset first. A share always points at a dataset's folder.",
+  "@shareNoDatasets": {
+    "description": "Shown when there is no dataset to share."
+  },
+  "shareCreated": "Share added",
+  "@shareCreated": {
+    "description": "Snackbar after creating a share."
+  },
+  "shareSaved": "Share saved",
+  "@shareSaved": {
+    "description": "Snackbar after changing a share."
+  },
+  "shareDelete": "Delete share",
+  "@shareDelete": {
+    "description": "Button that deletes a share."
+  },
+  "shareDeleteTitle": "Delete share {name}?",
+  "@shareDeleteTitle": {
+    "description": "Confirmation title for deleting a share.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "shareDeleteBody": "Clients can no longer reach it. The files in {path} are kept.",
+  "@shareDeleteBody": {
+    "description": "Confirmation body for deleting a share.",
+    "placeholders": {
+      "path": {
+        "type": "String"
+      }
+    }
+  },
+  "shareDeleted": "Share deleted",
+  "@shareDeleted": {
+    "description": "Snackbar after deleting a share."
+  },
+  "nfsAllowedEveryone": "Any host can connect",
+  "@nfsAllowedEveryone": {
+    "description": "NFS export without host or network limits."
+  },
+  "nfsAllowed": "Allowed: {list}",
+  "@nfsAllowed": {
+    "description": "NFS export limited to some hosts or networks.",
+    "placeholders": {
+      "list": {
+        "type": "String"
+      }
+    }
+  },
+  "iscsiTitle": "iSCSI",
+  "@iscsiTitle": {
+    "description": "Title of the iSCSI screen."
+  },
+  "iscsiTargets": "Targets",
+  "@iscsiTargets": {
+    "description": "Section heading for iSCSI targets."
+  },
+  "iscsiExtents": "Extents",
+  "@iscsiExtents": {
+    "description": "Section heading for iSCSI extents."
+  },
+  "iscsiSummary": "Targets: {targets} · Extents: {extents}",
+  "@iscsiSummary": {
+    "description": "Summary of iSCSI configuration.",
+    "placeholders": {
+      "targets": {
+        "type": "int"
+      },
+      "extents": {
+        "type": "int"
+      }
+    }
+  },
+  "iscsiEmpty": "No iSCSI targets",
+  "@iscsiEmpty": {
+    "description": "Shown when no iSCSI target exists."
+  },
+  "nvmetTitle": "NVMe over Fabrics",
+  "@nvmetTitle": {
+    "description": "Title of the NVMe-oF screen."
+  },
+  "nvmetSummary": "Subsystems: {count}",
+  "@nvmetSummary": {
+    "description": "Summary of NVMe-oF configuration.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "nvmetEmpty": "No NVMe-oF subsystems",
+  "@nvmetEmpty": {
+    "description": "Shown when no subsystem exists."
+  },
+  "nvmetAnyHost": "Any host can connect",
+  "@nvmetAnyHost": {
+    "description": "NVMe-oF subsystem open to all hosts."
+  },
+  "nvmetAllowedHosts": "Only allowed hosts can connect",
+  "@nvmetAllowedHosts": {
+    "description": "NVMe-oF subsystem limited to some hosts."
+  },
+  "viewOnlyNote": "View only for now. Use the TrueNAS web interface to change these.",
+  "@viewOnlyNote": {
+    "description": "Note on read-only screens."
   }
 }

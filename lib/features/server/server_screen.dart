@@ -6,6 +6,7 @@ import '../../core/instances/server_instance.dart';
 import '../../core/session/truenas_session.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../shared/connect_dialogs.dart';
+import '../sharing/shares_tab.dart';
 import '../storage/storage_tab.dart';
 import 'alerts_tab.dart';
 import 'dashboard_tab.dart';
@@ -92,9 +93,10 @@ class _ServerScreenState extends ConsumerState<ServerScreen> {
             DashboardTab(
               session: session,
               info: info,
-              onOpenAlerts: () => setState(() => _tab = 2),
+              onOpenAlerts: () => setState(() => _tab = 3),
             ),
             StorageTab(session: session),
+            SharesTab(session: session),
             AlertsTab(session: session),
             JobsTab(session: session),
           ],
@@ -112,6 +114,11 @@ class _ServerScreenState extends ConsumerState<ServerScreen> {
               icon: const Icon(Icons.storage_outlined),
               selectedIcon: const Icon(Icons.storage),
               label: l10n.tabStorage,
+            ),
+            NavigationDestination(
+              icon: const Icon(Icons.folder_shared_outlined),
+              selectedIcon: const Icon(Icons.folder_shared),
+              label: l10n.tabShares,
             ),
             NavigationDestination(
               icon: const Icon(Icons.notifications_outlined),

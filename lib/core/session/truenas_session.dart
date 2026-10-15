@@ -4,6 +4,7 @@ import '../api/certificate_trust.dart';
 import '../api/events.dart';
 import '../api/json_rpc_client.dart';
 import '../api/method_catalog.dart';
+import '../api/sharing_api.dart';
 import '../api/storage_api.dart';
 import '../api/truenas_connection.dart';
 import '../instances/server_instance.dart';
@@ -21,6 +22,7 @@ class TrueNasSession {
 
   late final catalog = MethodCatalog(client);
   late final storage = StorageApi(client, catalog);
+  late final sharing = SharingApi(client, catalog);
 
   String get apiVersion => connection.apiVersion;
   JsonRpcClient get client => connection.client;

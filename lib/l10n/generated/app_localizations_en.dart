@@ -608,4 +608,181 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get create => 'Create';
+
+  @override
+  String get tabShares => 'Shares';
+
+  @override
+  String get servicesTitle => 'Services';
+
+  @override
+  String get servicesSubtitle => 'Start, stop, and choose what starts on boot';
+
+  @override
+  String get servicesEmpty => 'No services';
+
+  @override
+  String get serviceRunning => 'Running';
+
+  @override
+  String get serviceStopped => 'Stopped';
+
+  @override
+  String get serviceStart => 'Start';
+
+  @override
+  String get serviceStop => 'Stop';
+
+  @override
+  String get serviceRestart => 'Restart';
+
+  @override
+  String get serviceStartOnBoot => 'Start on boot';
+
+  @override
+  String serviceStopTitle(String name) {
+    return 'Stop $name?';
+  }
+
+  @override
+  String get serviceStopBody =>
+      'Clients using this service lose access until it is started again.';
+
+  @override
+  String serviceStartedMessage(String name) {
+    return '$name is running';
+  }
+
+  @override
+  String serviceStoppedMessage(String name) {
+    return '$name stopped';
+  }
+
+  @override
+  String serviceNotRunning(String name) {
+    return 'The $name service is stopped, so these shares can\'t be reached.';
+  }
+
+  @override
+  String get smbTitle => 'SMB shares';
+
+  @override
+  String get nfsTitle => 'NFS shares';
+
+  @override
+  String sharesCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count shares',
+      one: '1 share',
+      zero: 'No shares',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get sharesEmpty => 'No shares yet';
+
+  @override
+  String get shareCreate => 'Add share';
+
+  @override
+  String get shareEdit => 'Edit share';
+
+  @override
+  String get shareName => 'Share name';
+
+  @override
+  String get sharePath => 'Folder';
+
+  @override
+  String get shareComment => 'Description';
+
+  @override
+  String get shareReadOnly => 'Read only';
+
+  @override
+  String get shareBrowsable => 'Visible when browsing the network';
+
+  @override
+  String get shareEnabled => 'Enabled';
+
+  @override
+  String get shareDisabled => 'Disabled';
+
+  @override
+  String get shareLocked => 'Dataset locked';
+
+  @override
+  String get shareNoDatasets =>
+      'Create a dataset first. A share always points at a dataset\'s folder.';
+
+  @override
+  String get shareCreated => 'Share added';
+
+  @override
+  String get shareSaved => 'Share saved';
+
+  @override
+  String get shareDelete => 'Delete share';
+
+  @override
+  String shareDeleteTitle(String name) {
+    return 'Delete share $name?';
+  }
+
+  @override
+  String shareDeleteBody(String path) {
+    return 'Clients can no longer reach it. The files in $path are kept.';
+  }
+
+  @override
+  String get shareDeleted => 'Share deleted';
+
+  @override
+  String get nfsAllowedEveryone => 'Any host can connect';
+
+  @override
+  String nfsAllowed(String list) {
+    return 'Allowed: $list';
+  }
+
+  @override
+  String get iscsiTitle => 'iSCSI';
+
+  @override
+  String get iscsiTargets => 'Targets';
+
+  @override
+  String get iscsiExtents => 'Extents';
+
+  @override
+  String iscsiSummary(int targets, int extents) {
+    return 'Targets: $targets · Extents: $extents';
+  }
+
+  @override
+  String get iscsiEmpty => 'No iSCSI targets';
+
+  @override
+  String get nvmetTitle => 'NVMe over Fabrics';
+
+  @override
+  String nvmetSummary(int count) {
+    return 'Subsystems: $count';
+  }
+
+  @override
+  String get nvmetEmpty => 'No NVMe-oF subsystems';
+
+  @override
+  String get nvmetAnyHost => 'Any host can connect';
+
+  @override
+  String get nvmetAllowedHosts => 'Only allowed hosts can connect';
+
+  @override
+  String get viewOnlyNote =>
+      'View only for now. Use the TrueNAS web interface to change these.';
 }

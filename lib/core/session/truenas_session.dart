@@ -3,6 +3,8 @@ import '../api/auth.dart';
 import '../api/certificate_trust.dart';
 import '../api/events.dart';
 import '../api/json_rpc_client.dart';
+import '../api/method_catalog.dart';
+import '../api/storage_api.dart';
 import '../api/truenas_connection.dart';
 import '../instances/server_instance.dart';
 import '../models/alert.dart';
@@ -16,6 +18,9 @@ class TrueNasSession {
 
   final TrueNasConnection connection;
   final Map<String, dynamic>? userInfo;
+
+  late final catalog = MethodCatalog(client);
+  late final storage = StorageApi(client, catalog);
 
   String get apiVersion => connection.apiVersion;
   JsonRpcClient get client => connection.client;

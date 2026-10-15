@@ -657,6 +657,456 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'System'**
   String get systemTitle;
+
+  /// Bottom navigation tab for storage.
+  ///
+  /// In en, this message translates to:
+  /// **'Storage'**
+  String get tabStorage;
+
+  /// Title of the disks screen and its entry.
+  ///
+  /// In en, this message translates to:
+  /// **'Disks'**
+  String get disksTitle;
+
+  /// Subtitle of the disks entry.
+  ///
+  /// In en, this message translates to:
+  /// **'Health, temperature and pool membership'**
+  String get disksSubtitle;
+
+  /// Shown when no disks are reported.
+  ///
+  /// In en, this message translates to:
+  /// **'No disks'**
+  String get disksEmpty;
+
+  /// Shown for disks that do not belong to a pool.
+  ///
+  /// In en, this message translates to:
+  /// **'Not in a pool'**
+  String get diskUnused;
+
+  /// Pool a disk belongs to.
+  ///
+  /// In en, this message translates to:
+  /// **'Pool {pool}'**
+  String diskPool(String pool);
+
+  /// Disk serial number.
+  ///
+  /// In en, this message translates to:
+  /// **'Serial {serial}'**
+  String diskSerial(String serial);
+
+  /// Disk type label for solid-state disks.
+  ///
+  /// In en, this message translates to:
+  /// **'SSD'**
+  String get diskSsd;
+
+  /// Disk rotation rate.
+  ///
+  /// In en, this message translates to:
+  /// **'{rpm} rpm'**
+  String diskRpm(int rpm);
+
+  /// Title of the scrub card.
+  ///
+  /// In en, this message translates to:
+  /// **'Scrub'**
+  String get scrubTitle;
+
+  /// Scrub progress.
+  ///
+  /// In en, this message translates to:
+  /// **'Scrub running: {percent}%'**
+  String scrubRunning(String percent);
+
+  /// Resilver progress.
+  ///
+  /// In en, this message translates to:
+  /// **'Resilver running: {percent}%'**
+  String resilverRunning(String percent);
+
+  /// Paused scrub progress.
+  ///
+  /// In en, this message translates to:
+  /// **'Scrub paused at {percent}%'**
+  String scrubPaused(String percent);
+
+  /// Result of the last scrub.
+  ///
+  /// In en, this message translates to:
+  /// **'Last scrub finished {date} with {errors, plural, =0{no errors} =1{1 error} other{{errors} errors}}'**
+  String scrubFinished(String date, int errors);
+
+  /// Shown when the last scrub was canceled.
+  ///
+  /// In en, this message translates to:
+  /// **'Last scrub was stopped'**
+  String get scrubCanceled;
+
+  /// Shown when the pool has never been scrubbed.
+  ///
+  /// In en, this message translates to:
+  /// **'No scrub has run yet'**
+  String get scrubNever;
+
+  /// Button that starts a scrub.
+  ///
+  /// In en, this message translates to:
+  /// **'Start scrub'**
+  String get scrubStart;
+
+  /// Button that pauses a scrub.
+  ///
+  /// In en, this message translates to:
+  /// **'Pause'**
+  String get scrubPause;
+
+  /// Button that resumes a paused scrub.
+  ///
+  /// In en, this message translates to:
+  /// **'Resume'**
+  String get scrubResume;
+
+  /// Button that stops a scrub.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop'**
+  String get scrubStop;
+
+  /// Snackbar after a scrub starts.
+  ///
+  /// In en, this message translates to:
+  /// **'Scrub started'**
+  String get scrubStarted;
+
+  /// Confirmation title for stopping a scrub.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop the scrub on {pool}?'**
+  String scrubStopTitle(String pool);
+
+  /// Confirmation body for stopping a scrub.
+  ///
+  /// In en, this message translates to:
+  /// **'Progress is lost and the next scrub starts from the beginning.'**
+  String get scrubStopBody;
+
+  /// Title of the pool layout card.
+  ///
+  /// In en, this message translates to:
+  /// **'Layout'**
+  String get topologyTitle;
+
+  /// Pool vdev group name.
+  ///
+  /// In en, this message translates to:
+  /// **'Data'**
+  String get vdevGroupData;
+
+  /// Pool vdev group name.
+  ///
+  /// In en, this message translates to:
+  /// **'Log'**
+  String get vdevGroupLog;
+
+  /// Pool vdev group name.
+  ///
+  /// In en, this message translates to:
+  /// **'Cache'**
+  String get vdevGroupCache;
+
+  /// Pool vdev group name.
+  ///
+  /// In en, this message translates to:
+  /// **'Spare'**
+  String get vdevGroupSpare;
+
+  /// Pool vdev group name.
+  ///
+  /// In en, this message translates to:
+  /// **'Metadata'**
+  String get vdevGroupSpecial;
+
+  /// Pool vdev group name.
+  ///
+  /// In en, this message translates to:
+  /// **'Dedup'**
+  String get vdevGroupDedup;
+
+  /// Error counters of a vdev or disk.
+  ///
+  /// In en, this message translates to:
+  /// **'{read} read, {write} write, {checksum} checksum errors'**
+  String vdevErrors(int read, int write, int checksum);
+
+  /// Free space in a pool.
+  ///
+  /// In en, this message translates to:
+  /// **'{free} free'**
+  String poolFree(String free);
+
+  /// Title of the datasets screen and its entry.
+  ///
+  /// In en, this message translates to:
+  /// **'Datasets'**
+  String get datasetsTitle;
+
+  /// Shown when a pool has no datasets.
+  ///
+  /// In en, this message translates to:
+  /// **'No datasets'**
+  String get datasetsEmpty;
+
+  /// Button and dialog title for creating a dataset.
+  ///
+  /// In en, this message translates to:
+  /// **'Create dataset'**
+  String get datasetCreate;
+
+  /// Snackbar after creating a dataset.
+  ///
+  /// In en, this message translates to:
+  /// **'Created {name}'**
+  String datasetCreated(String name);
+
+  /// Label of the parent dataset dropdown.
+  ///
+  /// In en, this message translates to:
+  /// **'Parent'**
+  String get datasetParent;
+
+  /// Label of the new dataset name field.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get datasetNameField;
+
+  /// Validation error for dataset names.
+  ///
+  /// In en, this message translates to:
+  /// **'Use letters, numbers, - _ . and : only'**
+  String get datasetNameInvalid;
+
+  /// Segment for creating a filesystem dataset.
+  ///
+  /// In en, this message translates to:
+  /// **'Dataset'**
+  String get datasetTypeFilesystem;
+
+  /// Segment for creating a zvol.
+  ///
+  /// In en, this message translates to:
+  /// **'Zvol'**
+  String get datasetTypeVolume;
+
+  /// Label of the zvol size field.
+  ///
+  /// In en, this message translates to:
+  /// **'Size (GiB)'**
+  String get datasetSizeGib;
+
+  /// Validation error for zvol size.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a size above 0'**
+  String get datasetSizeInvalid;
+
+  /// Label for used space.
+  ///
+  /// In en, this message translates to:
+  /// **'Used'**
+  String get datasetUsed;
+
+  /// Label for available space.
+  ///
+  /// In en, this message translates to:
+  /// **'Available'**
+  String get datasetAvailable;
+
+  /// Label for the compression algorithm.
+  ///
+  /// In en, this message translates to:
+  /// **'Compression'**
+  String get datasetCompression;
+
+  /// Label for the compression ratio.
+  ///
+  /// In en, this message translates to:
+  /// **'Compression ratio'**
+  String get datasetCompressRatio;
+
+  /// Label for the mount point.
+  ///
+  /// In en, this message translates to:
+  /// **'Mount point'**
+  String get datasetMountpoint;
+
+  /// Label for the size of a zvol.
+  ///
+  /// In en, this message translates to:
+  /// **'Zvol size'**
+  String get datasetVolsize;
+
+  /// Label for encryption state.
+  ///
+  /// In en, this message translates to:
+  /// **'Encryption'**
+  String get datasetEncryption;
+
+  /// Value when a dataset is encrypted.
+  ///
+  /// In en, this message translates to:
+  /// **'Encrypted'**
+  String get datasetEncrypted;
+
+  /// Value when an encrypted dataset is locked.
+  ///
+  /// In en, this message translates to:
+  /// **'Encrypted, locked'**
+  String get datasetLocked;
+
+  /// Value when a dataset is not encrypted.
+  ///
+  /// In en, this message translates to:
+  /// **'Not encrypted'**
+  String get datasetNotEncrypted;
+
+  /// Label marking a dataset as a zvol.
+  ///
+  /// In en, this message translates to:
+  /// **'Zvol'**
+  String get datasetZvol;
+
+  /// Menu item that deletes a dataset.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete dataset'**
+  String get datasetDelete;
+
+  /// Confirmation title for deleting a dataset.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete {name}?'**
+  String datasetDeleteTitle(String name);
+
+  /// Confirmation body for deleting a dataset.
+  ///
+  /// In en, this message translates to:
+  /// **'This permanently destroys the dataset, its child datasets and all their snapshots and data. It cannot be undone.'**
+  String get datasetDeleteBody;
+
+  /// Hint for the type-to-confirm field.
+  ///
+  /// In en, this message translates to:
+  /// **'Type {name} to confirm'**
+  String typeNameToConfirm(String name);
+
+  /// Snackbar after deleting a dataset.
+  ///
+  /// In en, this message translates to:
+  /// **'Deleted {name}'**
+  String datasetDeleted(String name);
+
+  /// Title of the snapshots section.
+  ///
+  /// In en, this message translates to:
+  /// **'Snapshots'**
+  String get snapshotsTitle;
+
+  /// Shown when a dataset has no snapshots.
+  ///
+  /// In en, this message translates to:
+  /// **'No snapshots'**
+  String get snapshotsEmpty;
+
+  /// Button and dialog title for creating a snapshot.
+  ///
+  /// In en, this message translates to:
+  /// **'Create snapshot'**
+  String get snapshotCreate;
+
+  /// Label of the snapshot name field.
+  ///
+  /// In en, this message translates to:
+  /// **'Snapshot name'**
+  String get snapshotNameField;
+
+  /// Checkbox to snapshot child datasets too.
+  ///
+  /// In en, this message translates to:
+  /// **'Include child datasets'**
+  String get snapshotRecursive;
+
+  /// Snackbar after creating a snapshot.
+  ///
+  /// In en, this message translates to:
+  /// **'Snapshot created'**
+  String get snapshotCreated;
+
+  /// Menu item that deletes a snapshot.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get snapshotDelete;
+
+  /// Confirmation title for deleting a snapshot.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete snapshot {name}?'**
+  String snapshotDeleteTitle(String name);
+
+  /// Confirmation body for deleting a snapshot.
+  ///
+  /// In en, this message translates to:
+  /// **'The snapshot is destroyed. Data in the live dataset is not affected.'**
+  String get snapshotDeleteBody;
+
+  /// Snackbar after deleting a snapshot.
+  ///
+  /// In en, this message translates to:
+  /// **'Snapshot deleted'**
+  String get snapshotDeleted;
+
+  /// Menu item that rolls back to a snapshot.
+  ///
+  /// In en, this message translates to:
+  /// **'Roll back'**
+  String get snapshotRollback;
+
+  /// Confirmation title for rolling back.
+  ///
+  /// In en, this message translates to:
+  /// **'Roll back {dataset}?'**
+  String snapshotRollbackTitle(String dataset);
+
+  /// Confirmation body for rolling back.
+  ///
+  /// In en, this message translates to:
+  /// **'The dataset returns to its state at snapshot {name}. All changes made since then are lost, and newer snapshots are destroyed.'**
+  String snapshotRollbackBody(String name);
+
+  /// Snackbar after rolling back.
+  ///
+  /// In en, this message translates to:
+  /// **'Rolled back to {name}'**
+  String snapshotRolledBack(String name);
+
+  /// Snapshot size line.
+  ///
+  /// In en, this message translates to:
+  /// **'{used} used · {referenced} referenced'**
+  String snapshotSize(String used, String referenced);
+
+  /// Button that creates something.
+  ///
+  /// In en, this message translates to:
+  /// **'Create'**
+  String get create;
 }
 
 class _AppLocalizationsDelegate

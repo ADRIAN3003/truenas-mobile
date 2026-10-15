@@ -1,0 +1,155 @@
+import 'package:flutter/material.dart';
+
+import '../../core/models/storage.dart';
+import '../../core/session/truenas_session.dart';
+import '../../l10n/generated/app_localizations.dart';
+import '../../shared/formatting.dart';
+import '../../shared/viz_colors.dart';
+import '../../shared/widgets.dart';
+import 'disks_screen.dart';
+import 'pool_screen.dart';
+import 'storage_helpers.dart';
+
+/// Pools with health and usage, plus the way into disks.
+class StorageTab extends StatefulWidget {
+  const StorageTab({super.key, required this.session});
+
+  final TrueNasSession session;
+
+  @override
+  State<StorageTab> createState() => _StorageTabState();
+}
+
+class _StorageTabState extends State<StorageTab> {
+  List<PoolDetail>? _pools;
+  Object? _error;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    try {
+      final pools = await widget.session.storage.pools();
+      if (!mounted) return;
+      setState(() {
+        _pools = pools;
+        _error = null;
+      });
+    } catch (error) {
+      if (mounted) setState(() => _error = error);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return AsyncBody<List<PoolDetail>>(
+      value: _pools,
+      error: _error,
+      onRefresh: _load,
+      builder: (pools) => ListView(
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+        children: [
+          if (pools.isEmpty)
+            Padding(
+              padding: const EdgeInsets.all(24),
+              child: Center(child: Text(l10n.poolsEmpty)),
+            ),
+          for (final pool in pools)
+            _PoolCard(
+              pool: pool,
+              onTap: () async {
+                await Navigator.push(
+                  context,
+                  MaterialPageRoute<void>(
+                    builder: (_) =>
+                        PoolScreen(session: widget.session, poolId: pool.id),
+                  ),
+                );
+                _load();
+              },
+            ),
+          const SizedBox(height: 8),
+          Card(
+            child: ListTile(
+              leading: const Icon(Icons.album_outlined),
+              title: Text(l10n.disksTitle),
+              subtitle: Text(l10n.disksSubtitle),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute<void>(
+                  builder: (_) => DisksScreen(session: widget.session),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _PoolCard extends StatelessWidget {
+  const _PoolCard({required this.pool, required this.onTap});
+
+  final PoolDetail pool;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    final colors = VizColors.of(context);
+    final (icon, color) = zfsStatusStyle(pool.status);
+    final scan = pool.scan;
+    return Card(
+      margin: const EdgeInsets.only(top: 12),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(pool.name, style: theme.textTheme.titleMedium),
+                  ),
+                  StatusLabel(icon: icon, color: color, label: pool.status),
+                ],
+              ),
+              const SizedBox(height: 12),
+              SegmentedBar(
+                segments: [
+                  (pool.usedFraction, colors.series1),
+                  (1 - pool.usedFraction, colors.track),
+                ],
+              ),
+              const SizedBox(height: 6),
+              Text(
+                '${l10n.poolUsage(formatBytes(pool.allocated), formatBytes(pool.size))}'
+                ' · ${l10n.poolFree(formatBytes(pool.free))}',
+                style: theme.textTheme.bodySmall,
+              ),
+              if (scan != null && scan.running) ...[
+                const SizedBox(height: 8),
+                Text(
+                  scan.function == 'RESILVER'
+                      ? l10n.resilverRunning(scan.percentage.toStringAsFixed(1))
+                      : l10n.scrubRunning(scan.percentage.toStringAsFixed(1)),
+                  style: theme.textTheme.bodySmall,
+                ),
+              ],
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}

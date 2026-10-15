@@ -21,7 +21,7 @@ jobs:
     name: Build APK and AAB
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           ref: ${{ env.TAG }}
       - uses: actions/setup-java@v5
@@ -73,7 +73,7 @@ jobs:
     name: Build IPA (unsigned)
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           ref: ${{ env.TAG }}
       - uses: subosito/flutter-action@v2

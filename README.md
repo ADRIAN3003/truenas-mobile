@@ -4,23 +4,33 @@ Manage your TrueNAS servers from your phone. TrueNAS Mobile is a Flutter app
 for Android and iOS that talks to the official TrueNAS middleware API
 (JSON-RPC 2.0 over WebSocket) and supports TrueNAS **25.04 and newer**.
 
-> **Status:** early development. See the [implementation plan](docs/PLAN.md)
-> for the roadmap.
+## Features
 
-## Features (planned)
-
-- Multiple saved servers, with a quick switcher and health at a glance
-- Sign in with an API key (recommended) or username, password and 2FA
-- Self-signed certificates with trust-on-first-use pinning
-- Live dashboard: CPU, memory, network, ARC, alerts, pool health
-- Storage: pools, datasets, zvols, snapshots, disks, scrubs
-- Shares: SMB, NFS, iSCSI, NVMe-oF
-- Data protection: snapshot tasks, replication, cloud sync, rsync
-- Apps, virtual machines and containers
-- Users, groups, API keys, certificates, network, services, updates
-- Job progress and notifications for long-running tasks
-- An API explorer that reaches every method the server exposes
-- Multi-language UI (English first, more languages welcome)
+- **Servers:** save as many TrueNAS servers as you like. Sign in with an API
+  key (recommended) or a username, password and 2FA code. Self-signed
+  certificates are pinned on first use.
+- **Dashboard:** live CPU, memory (with ARC), network and pool health, plus
+  system info and an alert summary. Alerts can be dismissed and restored.
+- **Jobs:** running and recent jobs with progress, and abort.
+- **Storage:** pools with layout, scrub start, pause and stop; datasets and
+  zvols (create, delete); snapshots (create, roll back, delete); disks with
+  temperatures.
+- **Data protection:** periodic snapshot, replication, cloud sync, TrueCloud
+  backup and rsync tasks with their last result. Run, stop, enable or
+  disable any of them; add, edit and delete snapshot, replication and cloud
+  sync tasks.
+- **Shares:** SMB and NFS shares (create, edit, delete), services (start,
+  stop, start on boot), and read-only views of iSCSI and NVMe-oF.
+- **Apps and VMs:** Docker apps (start, stop, redeploy, upgrade, delete),
+  virtual machines and containers (start, stop, restart).
+- **System:** users and groups, API keys, network and certificates
+  (read-only), updates and boot environments, reboot and shut down.
+- **Shell:** a terminal on the server, with Esc, Tab, Ctrl+C and arrow keys.
+- **API explorer:** every method the server exposes, with its documentation
+  and a generated form to call it, so anything without its own screen is
+  still reachable.
+- **Tablets:** a navigation rail and a two-column dashboard on wide screens.
+- **Languages:** English, with everything ready for translations.
 
 ## Supported TrueNAS versions
 

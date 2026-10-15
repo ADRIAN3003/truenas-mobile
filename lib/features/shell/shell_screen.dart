@@ -164,18 +164,22 @@ class _ShellScreenState extends State<ShellScreen> {
                       onPressed: () => _key(TerminalKey.keyC, ctrl: true),
                     ),
                     _KeyButton(
+                      label: l10n.shellKeyUp,
                       icon: Icons.keyboard_arrow_up,
                       onPressed: () => _key(TerminalKey.arrowUp),
                     ),
                     _KeyButton(
+                      label: l10n.shellKeyDown,
                       icon: Icons.keyboard_arrow_down,
                       onPressed: () => _key(TerminalKey.arrowDown),
                     ),
                     _KeyButton(
+                      label: l10n.shellKeyLeft,
                       icon: Icons.keyboard_arrow_left,
                       onPressed: () => _key(TerminalKey.arrowLeft),
                     ),
                     _KeyButton(
+                      label: l10n.shellKeyRight,
                       icon: Icons.keyboard_arrow_right,
                       onPressed: () => _key(TerminalKey.arrowRight),
                     ),
@@ -192,17 +196,17 @@ class _ShellScreenState extends State<ShellScreen> {
 
 /// Keys that phone keyboards lack.
 class _KeyButton extends StatelessWidget {
-  const _KeyButton({required this.onPressed, this.label, this.icon});
+  const _KeyButton({required this.onPressed, required this.label, this.icon});
 
   final VoidCallback onPressed;
-  final String? label;
+  final String label;
   final IconData? icon;
 
   @override
   Widget build(BuildContext context) => Padding(
     padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 4),
     child: icon == null
-        ? TextButton(onPressed: onPressed, child: Text(label!))
-        : IconButton(onPressed: onPressed, icon: Icon(icon)),
+        ? TextButton(onPressed: onPressed, child: Text(label))
+        : IconButton(tooltip: label, onPressed: onPressed, icon: Icon(icon)),
   );
 }

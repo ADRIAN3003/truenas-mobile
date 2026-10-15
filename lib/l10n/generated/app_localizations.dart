@@ -2739,6 +2739,330 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Snapshot tasks, replication and cloud sync'**
   String get protectionSubtitle;
+
+  /// Button that opens the choice of task kinds to add.
+  ///
+  /// In en, this message translates to:
+  /// **'Add task'**
+  String get protectionAdd;
+
+  /// Confirmation body for deleting a replication or cloud sync task.
+  ///
+  /// In en, this message translates to:
+  /// **'Data it already copied is kept.'**
+  String get taskDeleteBodyCopies;
+
+  /// Snackbar after saving a task.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved {name}'**
+  String taskSaved(String name);
+
+  /// Editor title.
+  ///
+  /// In en, this message translates to:
+  /// **'New replication task'**
+  String get replicationNew;
+
+  /// Editor title.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit replication task'**
+  String get replicationEdit;
+
+  /// Editor title.
+  ///
+  /// In en, this message translates to:
+  /// **'New cloud sync task'**
+  String get cloudSyncNew;
+
+  /// Editor title.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit cloud sync task'**
+  String get cloudSyncEdit;
+
+  /// Field label.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get taskNameLabel;
+
+  /// Field label.
+  ///
+  /// In en, this message translates to:
+  /// **'Direction'**
+  String get directionLabel;
+
+  /// Replication direction.
+  ///
+  /// In en, this message translates to:
+  /// **'Push: send from this server'**
+  String get replicationPush;
+
+  /// Replication direction.
+  ///
+  /// In en, this message translates to:
+  /// **'Pull: fetch from another server'**
+  String get replicationPull;
+
+  /// Field label for where replication sends to.
+  ///
+  /// In en, this message translates to:
+  /// **'Destination'**
+  String get replicationTransport;
+
+  /// Replication transport.
+  ///
+  /// In en, this message translates to:
+  /// **'Another pool on this server'**
+  String get transportLocal;
+
+  /// Replication transport.
+  ///
+  /// In en, this message translates to:
+  /// **'Another server over SSH'**
+  String get transportSsh;
+
+  /// Replication transport.
+  ///
+  /// In en, this message translates to:
+  /// **'Another server over SSH with netcat'**
+  String get transportNetcat;
+
+  /// Field label.
+  ///
+  /// In en, this message translates to:
+  /// **'SSH connection'**
+  String get replicationSshConnection;
+
+  /// Shown when there is no SSH connection to choose.
+  ///
+  /// In en, this message translates to:
+  /// **'No SSH connections yet. Add one under Credentials in the TrueNAS web interface.'**
+  String get replicationNoSshConnections;
+
+  /// Field label.
+  ///
+  /// In en, this message translates to:
+  /// **'Source datasets'**
+  String get replicationSources;
+
+  /// Helper text.
+  ///
+  /// In en, this message translates to:
+  /// **'Separate several with commas'**
+  String get replicationSourcesHint;
+
+  /// Field label.
+  ///
+  /// In en, this message translates to:
+  /// **'Destination dataset'**
+  String get replicationTarget;
+
+  /// Tooltip of the button that opens the dataset list.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a dataset'**
+  String get pickDataset;
+
+  /// Heading above the snapshot task choices.
+  ///
+  /// In en, this message translates to:
+  /// **'Send snapshots taken by'**
+  String get replicationSnapshotTasks;
+
+  /// Shown when there are no snapshot tasks to bind.
+  ///
+  /// In en, this message translates to:
+  /// **'No periodic snapshot tasks. Snapshots are matched by name instead.'**
+  String get replicationNoSnapshotTasks;
+
+  /// Field label.
+  ///
+  /// In en, this message translates to:
+  /// **'Snapshot name pattern'**
+  String get replicationNamingSchema;
+
+  /// Helper text.
+  ///
+  /// In en, this message translates to:
+  /// **'For example auto-%Y-%m-%d_%H-%M'**
+  String get replicationNamingSchemaHint;
+
+  /// Shown for tasks that match snapshots by regex.
+  ///
+  /// In en, this message translates to:
+  /// **'Snapshots are matched by the pattern {regex}. Change it in the TrueNAS web interface.'**
+  String replicationNameRegex(String regex);
+
+  /// Switch label.
+  ///
+  /// In en, this message translates to:
+  /// **'Run automatically'**
+  String get replicationAuto;
+
+  /// Schedule option for replication bound to snapshot tasks.
+  ///
+  /// In en, this message translates to:
+  /// **'Right after the snapshot task'**
+  String get replicationAfterSnapshots;
+
+  /// Field label.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep snapshots on the destination'**
+  String get replicationRetention;
+
+  /// Retention policy.
+  ///
+  /// In en, this message translates to:
+  /// **'Same as the source'**
+  String get retentionSource;
+
+  /// Retention policy.
+  ///
+  /// In en, this message translates to:
+  /// **'For a set time'**
+  String get retentionCustom;
+
+  /// Retention policy.
+  ///
+  /// In en, this message translates to:
+  /// **'Forever'**
+  String get retentionNone;
+
+  /// Field label.
+  ///
+  /// In en, this message translates to:
+  /// **'Description'**
+  String get cloudSyncDescription;
+
+  /// Field label.
+  ///
+  /// In en, this message translates to:
+  /// **'Cloud credential'**
+  String get cloudSyncCredential;
+
+  /// Shown when there is no cloud credential to choose.
+  ///
+  /// In en, this message translates to:
+  /// **'No cloud credentials yet. Add one under Credentials in the TrueNAS web interface.'**
+  String get cloudSyncNoCredentials;
+
+  /// Field label.
+  ///
+  /// In en, this message translates to:
+  /// **'Bucket'**
+  String get cloudSyncBucket;
+
+  /// Helper text.
+  ///
+  /// In en, this message translates to:
+  /// **'Leave empty for providers without buckets'**
+  String get cloudSyncBucketHint;
+
+  /// Field label.
+  ///
+  /// In en, this message translates to:
+  /// **'Remote folder'**
+  String get cloudSyncFolder;
+
+  /// Field label.
+  ///
+  /// In en, this message translates to:
+  /// **'Local folder'**
+  String get cloudSyncPath;
+
+  /// Helper text.
+  ///
+  /// In en, this message translates to:
+  /// **'A folder under /mnt'**
+  String get cloudSyncPathHint;
+
+  /// Validation message.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a folder under /mnt'**
+  String get cloudSyncPathInvalid;
+
+  /// Cloud sync direction.
+  ///
+  /// In en, this message translates to:
+  /// **'Push: upload to the cloud'**
+  String get cloudSyncPush;
+
+  /// Cloud sync direction.
+  ///
+  /// In en, this message translates to:
+  /// **'Pull: download from the cloud'**
+  String get cloudSyncPull;
+
+  /// Field label.
+  ///
+  /// In en, this message translates to:
+  /// **'Transfer mode'**
+  String get transferModeLabel;
+
+  /// Transfer mode.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy new and changed files'**
+  String get transferCopy;
+
+  /// Transfer mode.
+  ///
+  /// In en, this message translates to:
+  /// **'Mirror, deleting files missing at the source'**
+  String get transferSync;
+
+  /// Transfer mode.
+  ///
+  /// In en, this message translates to:
+  /// **'Move, deleting files from the source'**
+  String get transferMove;
+
+  /// Tooltip of the button that reveals a hidden password or key.
+  ///
+  /// In en, this message translates to:
+  /// **'Show'**
+  String get showSecret;
+
+  /// Tooltip of the button that hides a password or key.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide'**
+  String get hideSecret;
+
+  /// Tooltip of the button that empties the search field.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear search'**
+  String get clearSearch;
+
+  /// Shell key button.
+  ///
+  /// In en, this message translates to:
+  /// **'Arrow up'**
+  String get shellKeyUp;
+
+  /// Shell key button.
+  ///
+  /// In en, this message translates to:
+  /// **'Arrow down'**
+  String get shellKeyDown;
+
+  /// Shell key button.
+  ///
+  /// In en, this message translates to:
+  /// **'Arrow left'**
+  String get shellKeyLeft;
+
+  /// Shell key button.
+  ///
+  /// In en, this message translates to:
+  /// **'Arrow right'**
+  String get shellKeyRight;
 }
 
 class _AppLocalizationsDelegate

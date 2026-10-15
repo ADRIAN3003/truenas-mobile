@@ -1,5 +1,6 @@
 import '../models/json.dart';
 import '../models/protection.dart';
+import '../models/protection_drafts.dart';
 import 'json_rpc_client.dart';
 import 'method_catalog.dart';
 
@@ -62,6 +63,50 @@ class ProtectionApi {
       'enabled': true,
     },
   ]);
+
+  /// SSH connections from the keychain, for remote replication.
+  Future<List<PickOption>> sshCredentials() async {
+    final result = await _client.call('keychaincredential.query', [
+      [
+        ['type', '=', 'SSH_CREDENTIALS'],
+      ],
+    ]) as List<dynamic>;
+    return [
+      for (final e in result.map(asMap))
+        PickOption(asInt(e['id']), (e['name'] ?? '').toString()),
+    ];
+  }
+
+  /// Cloud credentials (S3, B2, Dropbox…), for cloud sync tasks.
+  Future<List<PickOption>> cloudCredentials() async {
+    final result =
+        await _client.call('cloudsync.credentials.query') as List<dynamic>;
+    return [
+      for (final e in result.map(asMap))
+        PickOption(
+          asInt(e['id']),
+          (e['name'] ?? '').toString(),
+          switch (e['provider']) {
+            final Map<String, dynamic> p => (p['type'] ?? '').toString(),
+            final Object p => p.toString(),
+            null => '',
+          },
+        ),
+    ];
+  }
+
+  /// Creates a replication task, or updates the one with [id].
+  Future<void> saveReplication(ReplicationDraft draft, {int? id}) =>
+      _save('replication', draft.toJson(), id);
+
+  /// Creates a cloud sync task, or updates the one with [id].
+  Future<void> saveCloudSync(CloudSyncDraft draft, {int? id}) =>
+      _save('cloudsync', draft.toJson(), id);
+
+  Future<void> _save(String service, Map<String, dynamic> data, int? id) =>
+      id == null
+      ? _client.call('$service.create', [data])
+      : _client.call('$service.update', [id, data]);
 
   /// Deletes a task. Snapshots it already took are kept.
   Future<void> delete(ProtectionTask task) =>

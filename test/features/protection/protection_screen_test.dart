@@ -120,7 +120,9 @@ void main() {
     await tester.pumpWidget(wrap(ProtectionScreen(session: session)));
     await settle(tester);
 
-    await tester.tap(find.text('Add snapshot task'));
+    await tester.tap(find.text('Add task'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Periodic snapshots').last);
     await settle(tester);
     expect(find.text('Every day at midnight'), findsOneWidget);
     await tester.tap(find.text('Create'));
@@ -146,6 +148,153 @@ void main() {
     expect(server.protection['pool.snapshottask']!.map((t) => t['dataset']), [
       'tank',
     ]);
+    await disconnect(tester);
+  });
+
+  Map<String, dynamic> lastCall(String method, [int index = 0]) =>
+      server.calls.lastWhere((c) => c.$1 == method).$2[index]
+          as Map<String, dynamic>;
+
+  Future<void> tapVisible(WidgetTester tester, Finder finder) async {
+    await tester.scrollUntilVisible(
+      finder,
+      200,
+      scrollable: find
+          .descendant(of: find.byType(Form), matching: find.byType(Scrollable))
+          .first,
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(finder);
+    await tester.pumpAndSettle();
+  }
+
+  testWidgets('adds a replication task bound to a snapshot task', (
+    tester,
+  ) async {
+    await connect(tester);
+    await tester.pumpWidget(wrap(ProtectionScreen(session: session)));
+    await settle(tester);
+
+    await tester.tap(find.text('Add task'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Replication').last);
+    await settle(tester);
+    expect(find.text('New replication task'), findsOneWidget);
+
+    await tester.tap(find.text('Save'));
+    await tester.pumpAndSettle();
+    expect(find.text('Required'), findsWidgets);
+    expect(
+      server.calls.map((c) => c.$1),
+      isNot(contains('replication.create')),
+    );
+
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Name'),
+      'to-backup',
+    );
+    await tester.tap(find.byTooltip('Choose a dataset').first);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('tank/media').last);
+    await tester.pumpAndSettle();
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Destination dataset'),
+      'tank/backup',
+    );
+    await tapVisible(tester, find.widgetWithText(FilterChip, 'tank/media'));
+    await tester.ensureVisible(find.text('Right after the snapshot task'));
+    expect(find.text('Snapshot name pattern'), findsNothing);
+
+    await tester.tap(find.text('Save'));
+    await settle(tester);
+    final created = lastCall('replication.create');
+    expect(created['name'], 'to-backup');
+    expect(created['direction'], 'PUSH');
+    expect(created['transport'], 'LOCAL');
+    expect(created['ssh_credentials'], isNull);
+    expect(created['source_datasets'], ['tank/media']);
+    expect(created['target_dataset'], 'tank/backup');
+    expect(created['periodic_snapshot_tasks'], [1]);
+    expect(created['also_include_naming_schema'], isEmpty);
+    expect(created['auto'], isTrue);
+    expect(created['schedule'], isNull);
+    expect(created['retention_policy'], 'SOURCE');
+    expect(find.text('New replication task'), findsNothing);
+    expect(find.text('to-backup'), findsOneWidget);
+    await disconnect(tester);
+  });
+
+  testWidgets('edits a replication task to go over SSH', (tester) async {
+    await connect(tester);
+    await tester.pumpWidget(wrap(ProtectionScreen(session: session)));
+    await settle(tester);
+
+    await tester.tap(find.text('offsite'));
+    await settle(tester);
+    expect(find.text('Edit replication task'), findsOneWidget);
+    expect(find.widgetWithText(TextFormField, 'offsite'), findsOneWidget);
+
+    await tester.tap(find.text('Another pool on this server'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Another server over SSH').last);
+    await tester.pumpAndSettle();
+    await tester.tap(find.byType(DropdownButtonFormField<int>));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('backup-box').last);
+    await tester.pumpAndSettle();
+
+    await tapVisible(tester, find.text('Same as the source'));
+    await tester.tap(find.text('For a set time').last);
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Save'));
+    await settle(tester);
+    final call = server.calls.lastWhere((c) => c.$1 == 'replication.update');
+    expect(call.$2.first, 1);
+    final update = call.$2[1] as Map<String, dynamic>;
+    expect(update['transport'], 'SSH');
+    expect(update['ssh_credentials'], 3);
+    expect(update['also_include_naming_schema'], ['auto-%Y-%m-%d_%H-%M']);
+    expect(update['schedule'], containsPair('hour', '0'));
+    expect(update['retention_policy'], 'CUSTOM');
+    expect(update['lifetime_value'], 2);
+    expect(update['lifetime_unit'], 'WEEK');
+    await disconnect(tester);
+  });
+
+  testWidgets('adds a cloud sync task', (tester) async {
+    await connect(tester);
+    await tester.pumpWidget(wrap(ProtectionScreen(session: session)));
+    await settle(tester);
+
+    await tester.tap(find.text('Add task'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Cloud sync').last);
+    await settle(tester);
+    expect(find.text('New cloud sync task'), findsOneWidget);
+
+    await tester.tap(find.byType(DropdownButtonFormField<int>));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Backblaze (B2)').last);
+    await tester.pumpAndSettle();
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Bucket'),
+      'photos',
+    );
+    await tester.tap(find.byTooltip('Choose a dataset'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('tank/media').last);
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Save'));
+    await settle(tester);
+    final created = lastCall('cloudsync.create');
+    expect(created['credentials'], 1);
+    expect(created['path'], '/mnt/tank/media');
+    expect(created['direction'], 'PUSH');
+    expect(created['transfer_mode'], 'COPY');
+    expect(created['attributes'], {'bucket': 'photos', 'folder': ''});
+    expect(created['schedule'], containsPair('hour', '0'));
     await disconnect(tester);
   });
 }

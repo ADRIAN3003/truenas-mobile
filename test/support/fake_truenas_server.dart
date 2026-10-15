@@ -502,6 +502,18 @@ class FakeTrueNasServer {
                         : ['status', 'run'])
                   'update.$m': <String, dynamic>{},
             };
+          case 'keychaincredential.query':
+            result = [
+              {'id': 3, 'name': 'backup-box', 'type': 'SSH_CREDENTIALS'},
+            ];
+          case 'cloudsync.credentials.query':
+            result = [
+              {
+                'id': 1,
+                'name': 'Backblaze',
+                'provider': {'type': 'B2'},
+              },
+            ];
           case 'service.query':
             result = services;
           case 'service.control':

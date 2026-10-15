@@ -1,0 +1,182 @@
+import 'json.dart';
+
+/// Normalised run state shared by apps, VMs and containers.
+enum WorkloadState {
+  running,
+  stopped,
+  deploying,
+  stopping,
+  suspended,
+  crashed,
+  unknown;
+
+  static WorkloadState parse(Object? value) =>
+      switch (value?.toString().toUpperCase()) {
+        'RUNNING' => running,
+        'STOPPED' => stopped,
+        'DEPLOYING' || 'STARTING' => deploying,
+        'STOPPING' || 'ABORTING' => stopping,
+        'SUSPENDED' || 'FROZEN' || 'FREEZING' => suspended,
+        'CRASHED' || 'ERROR' => crashed,
+        _ => unknown,
+      };
+
+  bool get isUp => this == running || this == deploying;
+}
+
+/// A Docker app from `app.query`.
+class TrueNasApp {
+  const TrueNasApp({
+    required this.name,
+    required this.state,
+    required this.version,
+    required this.upgradeAvailable,
+    required this.imageUpdatesAvailable,
+    required this.customApp,
+    required this.containers,
+    required this.portals,
+    required this.images,
+    this.latestVersion,
+    this.title,
+    this.iconUrl,
+    this.notes,
+  });
+
+  factory TrueNasApp.fromJson(Map<String, dynamic> json) {
+    final metadata = asMap(json['metadata']);
+    final workloads = asMap(json['active_workloads']);
+    return TrueNasApp(
+      name: (json['name'] ?? json['id'] ?? '').toString(),
+      state: WorkloadState.parse(json['state']),
+      version: (json['human_version'] ?? json['version'] ?? '').toString(),
+      latestVersion: json['latest_version'] as String?,
+      upgradeAvailable: json['upgrade_available'] == true,
+      imageUpdatesAvailable: json['image_updates_available'] == true,
+      customApp: json['custom_app'] == true,
+      containers: asInt(workloads['containers']),
+      images: [
+        for (final image in workloads['images'] as List<dynamic>? ?? const [])
+          image.toString(),
+      ],
+      portals: {
+        for (final MapEntry(:key, :value) in asMap(json['portals']).entries)
+          key: value.toString(),
+      },
+      title: metadata['title'] as String?,
+      iconUrl: metadata['icon'] as String?,
+      notes: json['notes'] as String?,
+    );
+  }
+
+  /// The instance name chosen at install, also its id.
+  final String name;
+  final WorkloadState state;
+  final String version;
+  final String? latestVersion;
+  final bool upgradeAvailable;
+  final bool imageUpdatesAvailable;
+  final bool customApp;
+
+  /// Running containers.
+  final int containers;
+  final List<String> images;
+
+  /// Web interfaces by label, e.g. `{"Web UI": "http://nas:30000/"}`.
+  final Map<String, String> portals;
+
+  /// Catalog title, e.g. "Jellyfin".
+  final String? title;
+  final String? iconUrl;
+  final String? notes;
+}
+
+/// A virtual machine from `vm.query`.
+class VirtualMachine {
+  const VirtualMachine({
+    required this.id,
+    required this.name,
+    required this.description,
+    required this.state,
+    required this.vcpus,
+    required this.memoryMib,
+    required this.autostart,
+  });
+
+  factory VirtualMachine.fromJson(Map<String, dynamic> json) {
+    final vcpus = asInt(json['vcpus']);
+    final cores = asInt(json['cores']);
+    final threads = asInt(json['threads']);
+    return VirtualMachine(
+      id: asInt(json['id']),
+      name: (json['name'] ?? '').toString(),
+      description: (json['description'] ?? '').toString(),
+      state: WorkloadState.parse(asMap(json['status'])['state']),
+      vcpus:
+          (vcpus == 0 ? 1 : vcpus) *
+          (cores == 0 ? 1 : cores) *
+          (threads == 0 ? 1 : threads),
+      memoryMib: asInt(json['memory']),
+      autostart: json['autostart'] == true,
+    );
+  }
+
+  final int id;
+  final String name;
+  final String description;
+  final WorkloadState state;
+
+  /// Total virtual CPUs (sockets × cores × threads).
+  final int vcpus;
+  final int memoryMib;
+  final bool autostart;
+}
+
+/// A Linux container: an Incus instance (`virt.instance`, 25.04/25.10) or a
+/// `container` (26 and newer).
+class LinuxContainer {
+  const LinuxContainer({
+    required this.id,
+    required this.name,
+    required this.state,
+    required this.isVm,
+    required this.autostart,
+    this.description,
+  });
+
+  /// From `virt.instance.query`.
+  factory LinuxContainer.fromIncus(Map<String, dynamic> json) {
+    final image = asMap(json['image']);
+    final os = [image['os'], image['release']].whereType<String>().join(' ');
+    return LinuxContainer(
+      id: (json['id'] ?? json['name']).toString(),
+      name: (json['name'] ?? '').toString(),
+      state: WorkloadState.parse(json['status']),
+      isVm: json['type'] == 'VM',
+      autostart: json['autostart'] == true,
+      description: os.isEmpty ? null : os,
+    );
+  }
+
+  /// From `container.query`.
+  factory LinuxContainer.fromContainer(Map<String, dynamic> json) {
+    final description = (json['description'] ?? '').toString();
+    return LinuxContainer(
+      id: asInt(json['id']).toString(),
+      name: (json['name'] ?? '').toString(),
+      state: WorkloadState.parse(asMap(json['status'])['state']),
+      isVm: false,
+      autostart: json['autostart'] == true,
+      description: description.isEmpty ? null : description,
+    );
+  }
+
+  /// A string for Incus, a number (as text) for `container`.
+  final String id;
+  final String name;
+  final WorkloadState state;
+
+  /// Incus could also run VMs; they are listed with containers there.
+  final bool isVm;
+  final bool autostart;
+  final String? description;
+}

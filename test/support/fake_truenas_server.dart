@@ -121,6 +121,65 @@ class FakeTrueNasServer {
     },
   ];
 
+  /// Apps served by `app.query`; actions change their state.
+  final apps = <Map<String, dynamic>>[
+    {
+      'name': 'jellyfin',
+      'id': 'jellyfin',
+      'state': 'RUNNING',
+      'human_version': '10.10.7_1.2.3',
+      'version': '1.2.3',
+      'latest_version': '1.2.4',
+      'upgrade_available': true,
+      'image_updates_available': false,
+      'custom_app': false,
+      'metadata': {'title': 'Jellyfin'},
+      'active_workloads': {
+        'containers': 1,
+        'images': ['jellyfin/jellyfin:10.10.7'],
+      },
+      'portals': {'Web UI': 'http://nas:30013/'},
+      'notes': null,
+    },
+  ];
+
+  /// VMs served by `vm.query`.
+  final vms = <Map<String, dynamic>>[
+    {
+      'id': 1,
+      'name': 'win11',
+      'description': 'Gaming',
+      'vcpus': 1,
+      'cores': 4,
+      'threads': 2,
+      'memory': 8192,
+      'autostart': false,
+      'status': {'state': 'STOPPED', 'pid': null, 'domain_state': 'SHUTOFF'},
+    },
+  ];
+
+  /// Containers: `container.query` rows, or `virt.instance.query` rows
+  /// when [legacy].
+  late final containers = <Map<String, dynamic>>[
+    if (legacy)
+      {
+        'id': 'debian',
+        'name': 'debian',
+        'type': 'CONTAINER',
+        'status': 'RUNNING',
+        'autostart': true,
+        'image': {'os': 'Debian', 'release': 'bookworm'},
+      }
+    else
+      {
+        'id': 3,
+        'name': 'debian',
+        'description': 'Build box',
+        'autostart': true,
+        'status': {'state': 'RUNNING', 'pid': 42, 'domain_state': 'RUNNING'},
+      },
+  ];
+
   final _finishedJobs = <int, Map<String, dynamic>>{};
   var _nextJobId = 100;
 
@@ -206,14 +265,16 @@ class FakeTrueNasServer {
                 'service.control': <String, dynamic>{},
               if (service == 'nvmet.subsys' && !legacy)
                 'nvmet.subsys.query': <String, dynamic>{},
+              if (service == 'container' && !legacy)
+                'container.query': <String, dynamic>{},
+              if (service == 'virt.instance' && legacy)
+                'virt.instance.query': <String, dynamic>{},
             };
           case 'service.query':
             result = services;
           case 'service.control':
             _setServiceState(params[1] as String, params[0] as String);
-            final id = _nextJobId++;
-            _finishedJobs[id] = {'id': id, 'state': 'SUCCESS', 'result': true};
-            result = id;
+            result = _job();
           case 'service.start' || 'service.stop' || 'service.restart':
             _setServiceState(params[0] as String, method.split('.').last);
             result = true;
@@ -259,6 +320,48 @@ class FakeTrueNasServer {
           case 'sharing.nfs.delete':
             nfsShares.removeWhere((s) => s['id'] == params[0]);
             result = true;
+          case 'app.query':
+            result = apps;
+          case 'app.start' || 'app.stop' || 'app.redeploy' || 'app.upgrade':
+            final app = apps.firstWhere((a) => a['name'] == params[0]);
+            app['state'] = method == 'app.stop' ? 'STOPPED' : 'RUNNING';
+            if (method == 'app.upgrade') {
+              app['human_version'] = app['latest_version'];
+              app['upgrade_available'] = false;
+            }
+            result = _job();
+          case 'app.delete':
+            apps.removeWhere((a) => a['name'] == params[0]);
+            result = _job();
+          case 'vm.query':
+            result = vms;
+          case 'vm.start' || 'vm.poweroff':
+            (vms.firstWhere((v) => v['id'] == params[0])['status']
+                as Map)['state'] = method == 'vm.start'
+                ? 'RUNNING'
+                : 'STOPPED';
+            result = method == 'vm.start' ? null : true;
+          case 'vm.stop' || 'vm.restart':
+            (vms.firstWhere((v) => v['id'] == params[0])['status']
+                as Map)['state'] = method == 'vm.stop'
+                ? 'STOPPED'
+                : 'RUNNING';
+            result = _job();
+          case 'container.query' || 'virt.instance.query':
+            result = containers;
+          case 'container.start':
+            (containers.single['status'] as Map)['state'] = 'RUNNING';
+            result = null;
+          case 'container.stop':
+            (containers.single['status'] as Map)['state'] = 'STOPPED';
+            result = _job();
+          case 'virt.instance.start' ||
+              'virt.instance.stop' ||
+              'virt.instance.restart':
+            containers.single['status'] = method.endsWith('stop')
+                ? 'STOPPED'
+                : 'RUNNING';
+            result = _job();
           case 'iscsi.target.query':
             result = [
               {'id': 1, 'name': 'vm', 'alias': 'VM disks', 'mode': 'ISCSI'},
@@ -365,6 +468,13 @@ class FakeTrueNasServer {
     }
     request.response.statusCode = HttpStatus.notFound;
     await request.response.close();
+  }
+
+  /// Records a finished job and returns its id.
+  int _job() {
+    final id = _nextJobId++;
+    _finishedJobs[id] = {'id': id, 'state': 'SUCCESS', 'result': true};
+    return id;
   }
 
   void _setServiceState(String service, String verb) {

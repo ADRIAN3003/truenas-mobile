@@ -8,9 +8,9 @@ import '../../l10n/generated/app_localizations.dart';
 import '../../shared/connect_dialogs.dart';
 import '../sharing/shares_tab.dart';
 import '../storage/storage_tab.dart';
-import 'alerts_tab.dart';
+import '../workloads/apps_tab.dart';
 import 'dashboard_tab.dart';
-import 'jobs_tab.dart';
+import 'more_tab.dart';
 
 /// Connects to one saved server and shows its overview.
 class ServerScreen extends ConsumerStatefulWidget {
@@ -93,12 +93,12 @@ class _ServerScreenState extends ConsumerState<ServerScreen> {
             DashboardTab(
               session: session,
               info: info,
-              onOpenAlerts: () => setState(() => _tab = 3),
+              onOpenAlerts: () => openAlerts(context, session),
             ),
             StorageTab(session: session),
             SharesTab(session: session),
-            AlertsTab(session: session),
-            JobsTab(session: session),
+            AppsTab(session: session),
+            MoreTab(session: session),
           ],
         ),
         bottomNavigationBar: NavigationBar(
@@ -121,14 +121,13 @@ class _ServerScreenState extends ConsumerState<ServerScreen> {
               label: l10n.tabShares,
             ),
             NavigationDestination(
-              icon: const Icon(Icons.notifications_outlined),
-              selectedIcon: const Icon(Icons.notifications),
-              label: l10n.tabAlerts,
+              icon: const Icon(Icons.apps_outlined),
+              selectedIcon: const Icon(Icons.apps),
+              label: l10n.tabApps,
             ),
             NavigationDestination(
-              icon: const Icon(Icons.work_history_outlined),
-              selectedIcon: const Icon(Icons.work_history),
-              label: l10n.tabJobs,
+              icon: const Icon(Icons.more_horiz),
+              label: l10n.tabMore,
             ),
           ],
         ),

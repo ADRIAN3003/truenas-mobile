@@ -785,4 +785,186 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get viewOnlyNote =>
       'View only for now. Use the TrueNAS web interface to change these.';
+
+  @override
+  String get tabApps => 'Apps';
+
+  @override
+  String get tabMore => 'More';
+
+  @override
+  String get appsTitle => 'Apps';
+
+  @override
+  String get appsEmpty => 'No apps installed';
+
+  @override
+  String get vmsTitle => 'Virtual machines';
+
+  @override
+  String get vmsEmpty => 'No virtual machines';
+
+  @override
+  String get containersTitle => 'Containers';
+
+  @override
+  String get containersEmpty => 'No containers';
+
+  @override
+  String get stateRunning => 'Running';
+
+  @override
+  String get stateStopped => 'Stopped';
+
+  @override
+  String get stateDeploying => 'Starting';
+
+  @override
+  String get stateStopping => 'Stopping';
+
+  @override
+  String get stateSuspended => 'Paused';
+
+  @override
+  String get stateCrashed => 'Crashed';
+
+  @override
+  String get stateUnknown => 'Unknown';
+
+  @override
+  String get actionStart => 'Start';
+
+  @override
+  String get actionStop => 'Stop';
+
+  @override
+  String get actionRestart => 'Restart';
+
+  @override
+  String get actionPowerOff => 'Power off';
+
+  @override
+  String get actionUpgrade => 'Upgrade';
+
+  @override
+  String get actionDelete => 'Delete';
+
+  @override
+  String actionStarted(String name) {
+    return '$name started';
+  }
+
+  @override
+  String actionStopped(String name) {
+    return '$name stopped';
+  }
+
+  @override
+  String actionRestarted(String name) {
+    return '$name restarted';
+  }
+
+  @override
+  String actionPoweredOff(String name) {
+    return '$name powered off';
+  }
+
+  @override
+  String actionUpgraded(String name) {
+    return '$name upgraded';
+  }
+
+  @override
+  String actionDeleted(String name) {
+    return '$name deleted';
+  }
+
+  @override
+  String stopTitle(String name) {
+    return 'Stop $name?';
+  }
+
+  @override
+  String get stopBody => 'It can\'t be reached until it is started again.';
+
+  @override
+  String get vmStopBody =>
+      'The guest is asked to shut down. If it hasn\'t within its shutdown timeout, it is powered off.';
+
+  @override
+  String restartTitle(String name) {
+    return 'Restart $name?';
+  }
+
+  @override
+  String get restartBody => 'It is unavailable for a moment while it restarts.';
+
+  @override
+  String vmPowerOffTitle(String name) {
+    return 'Power off $name?';
+  }
+
+  @override
+  String get vmPowerOffBody =>
+      'This cuts power immediately, like pulling the plug. Unsaved work inside the VM can be lost.';
+
+  @override
+  String appUpgradeTitle(String name) {
+    return 'Upgrade $name?';
+  }
+
+  @override
+  String appUpgradeBody(String name, String from, String to) {
+    return '$name goes from $from to $to. The app restarts during the upgrade.';
+  }
+
+  @override
+  String appDeleteTitle(String name) {
+    return 'Delete $name?';
+  }
+
+  @override
+  String get appDeleteBody =>
+      'The app and its containers and images are removed. Data in its volumes and host folders is kept.';
+
+  @override
+  String get appUpdateAvailable => 'Update available';
+
+  @override
+  String get appImageUpdates => 'Newer images available';
+
+  @override
+  String get appVersion => 'Version';
+
+  @override
+  String get appLatestVersion => 'Latest version';
+
+  @override
+  String get appContainersRunning => 'Running containers';
+
+  @override
+  String get appImages => 'Images';
+
+  @override
+  String get appPortals => 'Web interfaces';
+
+  @override
+  String get appCustom => 'Custom app';
+
+  @override
+  String get appNotes => 'Notes';
+
+  @override
+  String vmSummary(int vcpus, String memory) {
+    return '$vcpus vCPU · $memory';
+  }
+
+  @override
+  String get vmAutostart => 'Starts on boot';
+
+  @override
+  String get containerIsVm => 'Incus VM';
+
+  @override
+  String get copied => 'Copied';
 }

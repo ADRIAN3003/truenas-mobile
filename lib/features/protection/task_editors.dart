@@ -620,3 +620,376 @@ class _CloudSyncEditorState extends State<CloudSyncEditor>
     );
   }
 }
+
+typedef _RsyncOptions = ({List<String> datasets, List<PickOption> ssh});
+
+/// Creates an rsync task, or edits [task]. Pops `true` once saved.
+class RsyncEditor extends StatefulWidget {
+  const RsyncEditor({super.key, required this.session, this.task});
+
+  final TrueNasSession session;
+  final ProtectionTask? task;
+
+  @override
+  State<RsyncEditor> createState() => _RsyncEditorState();
+}
+
+class _RsyncEditorState extends State<RsyncEditor>
+    with
+        LoadState<RsyncEditor, _RsyncOptions>,
+        _EditorState<RsyncEditor, _RsyncOptions> {
+  late final _draft = widget.task == null
+      ? RsyncDraft()
+      : RsyncDraft.fromJson(widget.task!.raw);
+  late final _description = TextEditingController(text: _draft.description);
+  late final _path = TextEditingController(text: _draft.path);
+  late final _user = TextEditingController(text: _draft.user);
+  late final _host = TextEditingController(text: _draft.remoteHost);
+  late final _port = TextEditingController(text: '${_draft.remotePort}');
+  late final _module = TextEditingController(text: _draft.remoteModule);
+  late final _remotePath = TextEditingController(text: _draft.remotePath);
+
+  @override
+  Future<_RsyncOptions> fetch() async {
+    final (datasets, ssh) = await (
+      localDatasets(widget.session),
+      widget.session.protection.sshCredentials(),
+    ).wait;
+    return (datasets: datasets, ssh: ssh);
+  }
+
+  @override
+  void dispose() {
+    for (final c in [
+      _description,
+      _path,
+      _user,
+      _host,
+      _port,
+      _module,
+      _remotePath,
+    ]) {
+      c.dispose();
+    }
+    super.dispose();
+  }
+
+  void _save() {
+    _draft
+      ..description = _description.text.trim()
+      ..path = _path.text.trim()
+      ..user = _user.text.trim()
+      ..remoteHost = _host.text.trim()
+      ..remotePort = int.tryParse(_port.text.trim()) ?? 22
+      ..remoteModule = _module.text.trim()
+      ..remotePath = _remotePath.text.trim();
+    save(
+      () => widget.session.protection.saveRsync(_draft, id: widget.task?.id),
+      _draft.description.isEmpty ? _draft.path : _draft.description,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final d = _draft;
+    final manualHost = !d.ssh || d.sshCredentials == null;
+    return scaffold(
+      title: widget.task == null ? l10n.rsyncNew : l10n.rsyncEdit,
+      onSave: _save,
+      fields: (options) => [
+        TextFormField(
+          controller: _description,
+          decoration: InputDecoration(labelText: l10n.cloudSyncDescription),
+        ),
+        _LocalPathField(
+          controller: _path,
+          datasets: options.datasets,
+          label: l10n.cloudSyncPath,
+        ),
+        TextFormField(
+          controller: _user,
+          autocorrect: false,
+          decoration: InputDecoration(
+            labelText: l10n.rsyncUser,
+            helperText: l10n.rsyncUserHint,
+          ),
+          validator: (v) => _required(l10n, v),
+        ),
+        DropdownButtonFormField<bool>(
+          initialValue: d.push,
+          isExpanded: true,
+          decoration: InputDecoration(labelText: l10n.directionLabel),
+          items: [
+            DropdownMenuItem(value: true, child: Text(l10n.rsyncPush)),
+            DropdownMenuItem(value: false, child: Text(l10n.rsyncPull)),
+          ],
+          onChanged: (v) => setState(() => d.push = v!),
+        ),
+        DropdownButtonFormField<bool>(
+          initialValue: d.ssh,
+          isExpanded: true,
+          decoration: InputDecoration(labelText: l10n.rsyncMode),
+          items: [
+            DropdownMenuItem(value: true, child: Text(l10n.rsyncModeSsh)),
+            DropdownMenuItem(value: false, child: Text(l10n.rsyncModeModule)),
+          ],
+          onChanged: (v) => setState(() => d.ssh = v!),
+        ),
+        if (d.ssh)
+          DropdownButtonFormField<int?>(
+            initialValue: options.ssh.any((o) => o.id == d.sshCredentials)
+                ? d.sshCredentials
+                : null,
+            isExpanded: true,
+            decoration: InputDecoration(
+              labelText: l10n.replicationSshConnection,
+            ),
+            items: [
+              DropdownMenuItem(value: null, child: Text(l10n.rsyncManualHost)),
+              for (final o in options.ssh)
+                DropdownMenuItem(value: o.id, child: Text(o.name)),
+            ],
+            onChanged: (v) => setState(() => d.sshCredentials = v),
+          ),
+        if (manualHost)
+          TextFormField(
+            controller: _host,
+            autocorrect: false,
+            keyboardType: TextInputType.url,
+            decoration: InputDecoration(labelText: l10n.rsyncHost),
+            validator: (v) => _required(l10n, v),
+          ),
+        if (d.ssh && manualHost)
+          TextFormField(
+            controller: _port,
+            keyboardType: TextInputType.number,
+            decoration: InputDecoration(labelText: l10n.rsyncPort),
+            validator: (v) => (int.tryParse((v ?? '').trim()) ?? 0) < 1
+                ? l10n.explorerInvalidNumber
+                : null,
+          ),
+        if (!d.ssh)
+          TextFormField(
+            controller: _module,
+            autocorrect: false,
+            decoration: InputDecoration(labelText: l10n.rsyncModule),
+            validator: (v) => _required(l10n, v),
+          ),
+        TextFormField(
+          controller: _remotePath,
+          autocorrect: false,
+          decoration: InputDecoration(labelText: l10n.rsyncRemotePath),
+          validator: d.ssh ? (v) => _required(l10n, v) : null,
+        ),
+        SwitchListTile(
+          contentPadding: EdgeInsets.zero,
+          title: Text(l10n.rsyncDelete),
+          value: d.delete,
+          onChanged: (v) => setState(() => d.delete = v),
+        ),
+        DropdownButtonFormField<Object?>(
+          initialValue: d.schedule,
+          isExpanded: true,
+          decoration: InputDecoration(labelText: l10n.snapshotTaskSchedule),
+          items: _scheduleItems(l10n, d.schedule),
+          onChanged: (v) => setState(() => d.schedule = v!),
+        ),
+      ],
+    );
+  }
+}
+
+typedef _BackupOptions = ({
+  List<String> datasets,
+  List<PickOption> credentials,
+});
+
+/// Creates a TrueCloud backup task, or edits [task]. Pops `true` once saved.
+class CloudBackupEditor extends StatefulWidget {
+  const CloudBackupEditor({super.key, required this.session, this.task});
+
+  final TrueNasSession session;
+  final ProtectionTask? task;
+
+  @override
+  State<CloudBackupEditor> createState() => _CloudBackupEditorState();
+}
+
+class _CloudBackupEditorState extends State<CloudBackupEditor>
+    with
+        LoadState<CloudBackupEditor, _BackupOptions>,
+        _EditorState<CloudBackupEditor, _BackupOptions> {
+  late final _draft = widget.task == null
+      ? CloudBackupDraft()
+      : CloudBackupDraft.fromJson(widget.task!.raw);
+  late final _description = TextEditingController(text: _draft.description);
+  late final _bucket = TextEditingController(text: _draft.bucket);
+  late final _folder = TextEditingController(text: _draft.folder);
+  late final _path = TextEditingController(text: _draft.path);
+  final _password = TextEditingController();
+  late final _keep = TextEditingController(text: '${_draft.keepLast}');
+
+  @override
+  Future<_BackupOptions> fetch() async {
+    final (datasets, credentials) = await (
+      localDatasets(widget.session),
+      widget.session.protection.cloudCredentials(),
+    ).wait;
+    return (datasets: datasets, credentials: credentials);
+  }
+
+  @override
+  void dispose() {
+    for (final c in [_description, _bucket, _folder, _path, _password, _keep]) {
+      c.dispose();
+    }
+    super.dispose();
+  }
+
+  void _save() {
+    _draft
+      ..description = _description.text.trim()
+      ..bucket = _bucket.text.trim()
+      ..folder = _folder.text.trim()
+      ..path = _path.text.trim()
+      ..password = _password.text
+      ..keepLast = int.tryParse(_keep.text.trim()) ?? 1;
+    save(
+      () => widget.session.protection.saveCloudBackup(
+        _draft,
+        id: widget.task?.id,
+      ),
+      _draft.description.isEmpty ? _draft.path : _draft.description,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    final d = _draft;
+    final editing = widget.task != null;
+    return scaffold(
+      title: editing ? l10n.cloudBackupEdit : l10n.cloudBackupNew,
+      onSave: _save,
+      fields: (options) => [
+        TextFormField(
+          controller: _description,
+          decoration: InputDecoration(labelText: l10n.cloudSyncDescription),
+        ),
+        if (options.credentials.isEmpty)
+          Text(
+            l10n.cloudSyncNoCredentials,
+            style: TextStyle(color: theme.colorScheme.error),
+          )
+        else
+          DropdownButtonFormField<int>(
+            initialValue: options.credentials.any((o) => o.id == d.credentials)
+                ? d.credentials
+                : null,
+            isExpanded: true,
+            decoration: InputDecoration(labelText: l10n.cloudSyncCredential),
+            items: [
+              for (final o in options.credentials)
+                DropdownMenuItem(
+                  value: o.id,
+                  child: Text(
+                    o.detail.isEmpty ? o.name : '${o.name} (${o.detail})',
+                  ),
+                ),
+            ],
+            validator: (v) => v == null ? l10n.validationRequired : null,
+            onChanged: (v) => setState(() => d.credentials = v),
+          ),
+        TextFormField(
+          controller: _bucket,
+          autocorrect: false,
+          decoration: InputDecoration(
+            labelText: l10n.cloudSyncBucket,
+            helperText: l10n.cloudSyncBucketHint,
+          ),
+        ),
+        TextFormField(
+          controller: _folder,
+          autocorrect: false,
+          decoration: InputDecoration(labelText: l10n.cloudSyncFolder),
+        ),
+        _LocalPathField(
+          controller: _path,
+          datasets: options.datasets,
+          label: l10n.cloudSyncPath,
+        ),
+        TextFormField(
+          controller: _password,
+          obscureText: true,
+          autocorrect: false,
+          enableSuggestions: false,
+          decoration: InputDecoration(
+            labelText: l10n.cloudBackupPassword,
+            helperText: editing
+                ? l10n.cloudBackupPasswordKeep
+                : l10n.cloudBackupPasswordHint,
+            helperMaxLines: 2,
+          ),
+          validator: editing ? null : (v) => _required(l10n, v),
+        ),
+        TextFormField(
+          controller: _keep,
+          keyboardType: TextInputType.number,
+          decoration: InputDecoration(labelText: l10n.cloudBackupKeepLast),
+          validator: (v) => (int.tryParse((v ?? '').trim()) ?? 0) < 1
+              ? l10n.explorerInvalidNumber
+              : null,
+        ),
+        DropdownButtonFormField<Object?>(
+          initialValue: d.schedule,
+          isExpanded: true,
+          decoration: InputDecoration(labelText: l10n.snapshotTaskSchedule),
+          items: _scheduleItems(l10n, d.schedule),
+          onChanged: (v) => setState(() => d.schedule = v!),
+        ),
+      ],
+    );
+  }
+}
+
+/// A folder under /mnt, typed or picked from the datasets.
+class _LocalPathField extends StatelessWidget {
+  const _LocalPathField({
+    required this.controller,
+    required this.datasets,
+    required this.label,
+  });
+
+  final TextEditingController controller;
+  final List<String> datasets;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return TextFormField(
+      controller: controller,
+      autocorrect: false,
+      decoration: InputDecoration(
+        labelText: label,
+        helperText: l10n.cloudSyncPathHint,
+        suffixIcon: IconButton(
+          tooltip: l10n.pickDataset,
+          icon: const Icon(Icons.list),
+          onPressed: () async {
+            final picked = await _pickDataset(context, datasets);
+            if (picked != null) controller.text = '/mnt/$picked';
+          },
+        ),
+      ),
+      validator: (v) {
+        final path = (v ?? '').trim();
+        return path.startsWith('/mnt/') && path.length > 5
+            ? null
+            : l10n.cloudSyncPathInvalid;
+      },
+    );
+  }
+}

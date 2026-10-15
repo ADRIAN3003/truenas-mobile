@@ -103,6 +103,14 @@ class ProtectionApi {
   Future<void> saveCloudSync(CloudSyncDraft draft, {int? id}) =>
       _save('cloudsync', draft.toJson(), id);
 
+  /// Creates an rsync task, or updates the one with [id].
+  Future<void> saveRsync(RsyncDraft draft, {int? id}) =>
+      _save('rsynctask', draft.toJson(), id);
+
+  /// Creates a TrueCloud backup task, or updates the one with [id].
+  Future<void> saveCloudBackup(CloudBackupDraft draft, {int? id}) =>
+      _save('cloud_backup', draft.toJson(), id);
+
   Future<void> _save(String service, Map<String, dynamic> data, int? id) =>
       id == null
       ? _client.call('$service.create', [data])

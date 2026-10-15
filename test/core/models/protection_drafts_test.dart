@@ -99,4 +99,48 @@ void main() {
       expect(json['schedule'], SnapshotSchedule.hourly.cron);
     });
   });
+
+  group('RsyncDraft', () {
+    test('module mode sends host and module, not SSH settings', () {
+      final json =
+          (RsyncDraft()
+                ..ssh = false
+                ..remoteHost = 'nas2'
+                ..remoteModule = 'data'
+                ..sshCredentials = 3)
+              .toJson();
+      expect(json['mode'], 'MODULE');
+      expect(json['remotehost'], 'nas2');
+      expect(json['remotemodule'], 'data');
+      expect(json['ssh_credentials'], isNull);
+      expect(json['remoteport'], isNull);
+    });
+
+    test('SSH without a saved connection sends host and port', () {
+      final json =
+          (RsyncDraft()
+                ..remoteHost = 'nas2'
+                ..remotePort = 2222)
+              .toJson();
+      expect(json['mode'], 'SSH');
+      expect(json['remotehost'], 'nas2');
+      expect(json['remoteport'], 2222);
+      expect(json['remotemodule'], isNull);
+    });
+  });
+
+  group('CloudBackupDraft', () {
+    test('an empty password keeps the current one', () {
+      final draft = CloudBackupDraft.fromJson({
+        'credentials': {'id': 2},
+        'attributes': {'bucket': 'b', 'folder': 'f'},
+        'path': '/mnt/tank',
+        'keep_last': 30,
+      });
+      expect(draft.toJson().containsKey('password'), isFalse);
+      expect(draft.toJson()['keep_last'], 30);
+      draft.password = 'new';
+      expect(draft.toJson()['password'], 'new');
+    });
+  });
 }

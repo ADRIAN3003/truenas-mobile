@@ -19,10 +19,6 @@ enum ProtectionKind {
     cloudSync || cloudBackup => '$service.sync',
   };
 
-  /// Whether the app can add, edit and delete tasks of this kind.
-  bool get editable =>
-      this == snapshot || this == replication || this == cloudSync;
-
   /// Whether a running task can be stopped from the app.
   bool get abortable => this == cloudSync || this == cloudBackup;
 }

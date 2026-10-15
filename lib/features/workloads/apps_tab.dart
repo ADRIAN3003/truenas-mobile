@@ -161,6 +161,9 @@ class _AppsTabState extends State<AppsTab> with LoadState<AppsTab, _Workloads> {
               trailing: WorkloadMenu(
                 busy: _busy.contains('app:${app.name}'),
                 actions: actionsFor(app.state, supported: _appActions),
+                onShell: app.state == WorkloadState.running
+                    ? () => openAppShell(context, widget.session, app.name)
+                    : null,
                 onSelected: (action) => _run(
                   'app:${app.name}',
                   app.name,
@@ -196,6 +199,14 @@ class _AppsTabState extends State<AppsTab> with LoadState<AppsTab, _Workloads> {
                 trailing: WorkloadMenu(
                   busy: _busy.contains('vm:${vm.id}'),
                   actions: actionsFor(vm.state, supported: _vmActions),
+                  onShell: vm.state == WorkloadState.running
+                      ? () => openShell(
+                          context,
+                          widget.session,
+                          WorkloadsApi.vmShell(vm.id),
+                          vm.name,
+                        )
+                      : null,
                   onSelected: (action) => _run(
                     'vm:${vm.id}',
                     vm.name,
@@ -235,6 +246,18 @@ class _AppsTabState extends State<AppsTab> with LoadState<AppsTab, _Workloads> {
                     container.state,
                     supported: w.containerActions,
                   ),
+                  onShell: container.state == WorkloadState.running
+                      ? () async {
+                          final options = await _api.containerShell(container);
+                          if (!context.mounted) return;
+                          await openShell(
+                            context,
+                            widget.session,
+                            options,
+                            container.name,
+                          );
+                        }
+                      : null,
                   onSelected: (action) => _run(
                     'ct:${container.id}',
                     container.name,

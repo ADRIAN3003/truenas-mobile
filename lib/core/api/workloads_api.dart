@@ -79,6 +79,34 @@ class WorkloadsApi {
     _ => throw UnsupportedError(action.name),
   };
 
+  /// Containers of a running app that a shell can open in, as id → name.
+  Future<Map<String, String>> appShellContainers(String app) async {
+    final choices = asMap(
+      await _client.call('app.container_console_choices', [app]),
+    );
+    return {
+      for (final MapEntry(:key, :value) in choices.entries)
+        key: switch (value) {
+          final Map<String, dynamic> v =>
+            (v['service_name'] ?? v['image'] ?? key).toString(),
+          _ => value.toString(),
+        },
+    };
+  }
+
+  /// Shell options for an app container, a VM console or a container.
+  static Map<String, Object?> appShell(String app, String containerId) => {
+    'app_name': app,
+    'container_id': containerId,
+  };
+
+  static Map<String, Object?> vmShell(int id) => {'vm_id': id};
+
+  Future<Map<String, Object?>> containerShell(LinuxContainer c) async =>
+      await containerBackend() == ContainerBackend.containers
+      ? {'container_id': int.parse(c.id)}
+      : {'virt_instance_id': c.id};
+
   Future<ContainerBackend> containerBackend() async =>
       _backend ??= await _catalog.has('container.query')
       ? ContainerBackend.containers

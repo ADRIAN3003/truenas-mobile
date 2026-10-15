@@ -3063,6 +3063,144 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Arrow right'**
   String get shellKeyRight;
+
+  /// Snackbar when an app has no container for a shell.
+  ///
+  /// In en, this message translates to:
+  /// **'This app has no running containers to open a shell in.'**
+  String get shellNoContainers;
+
+  /// Title of the dialog that picks an app container.
+  ///
+  /// In en, this message translates to:
+  /// **'Open a shell in'**
+  String get shellPickContainer;
+
+  /// Editor title.
+  ///
+  /// In en, this message translates to:
+  /// **'New rsync task'**
+  String get rsyncNew;
+
+  /// Editor title.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit rsync task'**
+  String get rsyncEdit;
+
+  /// Field label.
+  ///
+  /// In en, this message translates to:
+  /// **'Run as user'**
+  String get rsyncUser;
+
+  /// Helper text.
+  ///
+  /// In en, this message translates to:
+  /// **'A local user; over SSH without a saved connection, it needs its own SSH key'**
+  String get rsyncUserHint;
+
+  /// Rsync direction.
+  ///
+  /// In en, this message translates to:
+  /// **'Push: copy to the remote host'**
+  String get rsyncPush;
+
+  /// Rsync direction.
+  ///
+  /// In en, this message translates to:
+  /// **'Pull: copy from the remote host'**
+  String get rsyncPull;
+
+  /// Field label for the rsync mode.
+  ///
+  /// In en, this message translates to:
+  /// **'Connect with'**
+  String get rsyncMode;
+
+  /// Rsync mode.
+  ///
+  /// In en, this message translates to:
+  /// **'SSH'**
+  String get rsyncModeSsh;
+
+  /// Rsync mode.
+  ///
+  /// In en, this message translates to:
+  /// **'Rsync daemon module'**
+  String get rsyncModeModule;
+
+  /// Dropdown entry for typing the SSH host by hand.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a host instead'**
+  String get rsyncManualHost;
+
+  /// Field label.
+  ///
+  /// In en, this message translates to:
+  /// **'Remote host'**
+  String get rsyncHost;
+
+  /// Field label.
+  ///
+  /// In en, this message translates to:
+  /// **'SSH port'**
+  String get rsyncPort;
+
+  /// Field label.
+  ///
+  /// In en, this message translates to:
+  /// **'Module name'**
+  String get rsyncModule;
+
+  /// Field label.
+  ///
+  /// In en, this message translates to:
+  /// **'Remote path'**
+  String get rsyncRemotePath;
+
+  /// Switch label.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete files missing at the source'**
+  String get rsyncDelete;
+
+  /// Editor title.
+  ///
+  /// In en, this message translates to:
+  /// **'New TrueCloud backup task'**
+  String get cloudBackupNew;
+
+  /// Editor title.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit TrueCloud backup task'**
+  String get cloudBackupEdit;
+
+  /// Field label.
+  ///
+  /// In en, this message translates to:
+  /// **'Repository password'**
+  String get cloudBackupPassword;
+
+  /// Helper text when creating.
+  ///
+  /// In en, this message translates to:
+  /// **'Encrypts the backups. Keep it safe: without it they can\'t be restored.'**
+  String get cloudBackupPasswordHint;
+
+  /// Helper text when editing.
+  ///
+  /// In en, this message translates to:
+  /// **'Leave empty to keep the current password'**
+  String get cloudBackupPasswordKeep;
+
+  /// Field label.
+  ///
+  /// In en, this message translates to:
+  /// **'Backups to keep'**
+  String get cloudBackupKeepLast;
 }
 
 class _AppLocalizationsDelegate

@@ -41,6 +41,7 @@ void main() {
       ProtectionKind.snapshot,
       ProtectionKind.replication,
       ProtectionKind.cloudSync,
+      ProtectionKind.rsync,
     ]);
   });
 

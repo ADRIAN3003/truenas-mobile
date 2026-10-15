@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:truenas_mobile/core/api/events.dart';
 import 'package:truenas_mobile/core/instances/server_instance.dart';
 import 'package:truenas_mobile/core/session/truenas_session.dart';
 
@@ -90,5 +91,68 @@ void main() {
     );
     addTearDown(session.close);
     expect(updated.pinnedFingerprint, testCertFingerprint);
+  });
+
+  group('after the connection drops', () {
+    Future<TrueNasSession> signIn() async {
+      server.requireLogin = true;
+      final (session, _) = await connectToInstance(
+        instance(),
+        confirmCertificate: neverTrust,
+        askOtp: noOtp,
+      );
+      addTearDown(session.close);
+      return session;
+    }
+
+    int logins() => server.calls.where((c) => c.$1 == 'auth.login_ex').length;
+
+    test('the next call reconnects and signs in again', () async {
+      final session = await signIn();
+      await server.dropConnections();
+      await pumpEventQueue();
+      expect((await session.systemInfo())['version'], '25.10.7');
+      expect(logins(), 2);
+      expect(server.connectedPaths, hasLength(2));
+    });
+
+    test('ensureAlive reconnects a dead socket and keeps a live one', () async {
+      final session = await signIn();
+      await session.ensureAlive();
+      expect(logins(), 1);
+      await server.dropConnections();
+      await pumpEventQueue();
+      await session.ensureAlive();
+      expect(logins(), 2);
+    });
+
+    test('event subscriptions are renewed on the new connection', () async {
+      final session = await signIn();
+      final updates = <CollectionUpdate>[];
+      final sub = session.client
+          .subscribe('reporting.realtime')
+          .listen(updates.add);
+      addTearDown(sub.cancel);
+      await pumpEventQueue();
+      expect(updates, hasLength(1));
+      await server.dropConnections();
+      await pumpEventQueue();
+      await session.ensureAlive();
+      await pumpEventQueue();
+      expect(server.subscriptions, [
+        'reporting.realtime',
+        'reporting.realtime',
+      ]);
+      expect(updates, hasLength(2));
+    });
+
+    test('opens the shell at the path the TrueNAS web server serves', () async {
+      final session = await signIn();
+      await server.dropConnections();
+      await pumpEventQueue();
+      final shell = await session.openShell();
+      addTearDown(shell.close);
+      expect(shell.id, 'shell-1');
+    });
   });
 }

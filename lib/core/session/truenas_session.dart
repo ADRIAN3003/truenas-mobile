@@ -6,6 +6,7 @@ import '../api/explorer_api.dart';
 import '../api/json_rpc_client.dart';
 import '../api/method_catalog.dart';
 import '../api/protection_api.dart';
+import '../api/reconnecting_client.dart';
 import '../api/sharing_api.dart';
 import '../api/shell_session.dart';
 import '../api/storage_api.dart';
@@ -19,11 +20,33 @@ import '../models/pool_summary.dart';
 import '../models/realtime_stats.dart';
 
 /// A signed-in connection to one server.
+///
+/// It survives the socket: when the phone drops the connection (in the
+/// background, or with the screen locked), the next call reconnects and
+/// signs in again with the saved credentials.
 class TrueNasSession {
-  TrueNasSession(this.connection, this.userInfo);
+  TrueNasSession(
+    TrueNasConnection connection,
+    this.userInfo, {
+    Future<TrueNasConnection> Function()? reconnect,
+  }) : _connection = connection {
+    client = reconnect == null
+        ? connection.client
+        : ReconnectingJsonRpcClient(connection.client, () async {
+            final next = await reconnect();
+            _connection = next;
+            return next.client;
+          });
+  }
 
-  final TrueNasConnection connection;
+  TrueNasConnection _connection;
   final Map<String, dynamic>? userInfo;
+
+  /// The connection in use right now; it changes after a reconnect.
+  TrueNasConnection get connection => _connection;
+
+  /// Stays the same across reconnects.
+  late final JsonRpcClient client;
 
   late final catalog = MethodCatalog(client);
   late final storage = StorageApi(client, catalog);
@@ -38,12 +61,21 @@ class TrueNasSession {
   Future<ShellSession> openShell({Map<String, Object?> options = const {}}) =>
       ShellSession.open(
         client,
-        () => connection.openSocket('/_shell/'),
+        () => connection.openSocket(shellPath),
         options: options,
       );
 
   String get apiVersion => connection.apiVersion;
-  JsonRpcClient get client => connection.client;
+
+  /// Fires after the session reconnected, so screens can reload.
+  Stream<void> get reconnected => client.reconnected;
+
+  /// Checks the connection still works, reconnecting if it does not. Called
+  /// when the app comes back to the foreground.
+  Future<void> ensureAlive() async {
+    final client = this.client;
+    if (client is ReconnectingJsonRpcClient) await client.ensureAlive();
+  }
 
   Future<Map<String, dynamic>> systemInfo() async =>
       (await client.call('system.info')) as Map<String, dynamic>;
@@ -94,8 +126,13 @@ class TrueNasSession {
 
   Future<void> abortJob(int id) => client.call('core.job_abort', [id]);
 
-  Future<void> close() => connection.close();
+  Future<void> close() => client.close();
 }
+
+/// The terminal WebSocket as the TrueNAS web server exposes it. nginx on
+/// the NAS forwards it to the middleware's `/_shell`, which is not reachable
+/// from outside, so behind a reverse proxy only this path works.
+const shellPath = '/websocket/shell/';
 
 /// Thrown when the user cancels a certificate or 2FA prompt.
 class ConnectCancelled implements Exception {
@@ -158,12 +195,47 @@ Future<(TrueNasSession, ServerInstance)> connectToInstance(
     switch (outcome) {
       case LoginSucceeded(:final userInfo):
         current = current.copyWith(lastApiVersion: connection.apiVersion);
-        return (TrueNasSession(connection, userInfo), current);
+        final saved = current;
+        return (
+          TrueNasSession(
+            connection,
+            userInfo,
+            reconnect: () => _reconnect(saved, askOtp),
+          ),
+          current,
+        );
       case LoginFailed(:final reason):
         throw LoginRejected(reason);
       case LoginNeedsOtp():
         throw const ApiException('Unexpected 2FA state');
     }
+  } catch (_) {
+    await connection.close();
+    rethrow;
+  }
+}
+
+/// Opens a new connection to [instance] and signs in again, for a session
+/// whose socket was dropped. The certificate must still match the pinned
+/// one; a changed certificate needs the user and fails here.
+Future<TrueNasConnection> _reconnect(
+  ServerInstance instance,
+  AskOtp askOtp,
+) async {
+  final connection = await TrueNasConnection.open(
+    instance.address,
+    pinnedFingerprint: instance.pinnedFingerprint,
+  );
+  try {
+    final auth = Authenticator(connection.client);
+    var outcome = await auth.login(instance.credentials);
+    while (outcome is LoginNeedsOtp) {
+      final code = await askOtp();
+      if (code == null) throw const ConnectCancelled();
+      outcome = await auth.submitOtp(code);
+    }
+    if (outcome case LoginFailed(:final reason)) throw LoginRejected(reason);
+    return connection;
   } catch (_) {
     await connection.close();
     rethrow;

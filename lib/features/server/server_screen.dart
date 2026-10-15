@@ -26,7 +26,8 @@ class ServerScreen extends ConsumerStatefulWidget {
   ConsumerState<ServerScreen> createState() => _ServerScreenState();
 }
 
-class _ServerScreenState extends ConsumerState<ServerScreen> {
+class _ServerScreenState extends ConsumerState<ServerScreen>
+    with WidgetsBindingObserver {
   TrueNasSession? _session;
   Map<String, dynamic>? _info;
   Object? _error;
@@ -41,11 +42,23 @@ class _ServerScreenState extends ConsumerState<ServerScreen> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     WidgetsBinding.instance.addPostFrameCallback((_) => _connect());
   }
 
   @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    // The phone may have closed the socket while the app was away; reconnect
+    // now rather than on the next tap, so live data resumes by itself.
+    if (state == AppLifecycleState.resumed) {
+      // A failed attempt is retried by the next call.
+      _session?.ensureAlive().catchError((_) {});
+    }
+  }
+
+  @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _session?.close();
     super.dispose();
   }

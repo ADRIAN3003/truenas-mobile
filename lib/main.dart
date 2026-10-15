@@ -7,5 +7,5 @@ import 'shared/glass.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await warmUpGlass();
-  runApp(const ProviderScope(child: TrueNasMobileApp()));
+  runApp(ProviderScope(child: wrapForGlass(const TrueNasMobileApp())));
 }

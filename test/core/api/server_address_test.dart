@@ -24,7 +24,15 @@ void main() {
   test('uses wss for https', () {
     expect(
       ServerAddress.tryParse('nas.local')!.webSocketUri('current').toString(),
-      'wss://nas.local/api/current',
+      'wss://nas.local:443/api/current',
+    );
+  });
+
+  test('spells out the default port for sockets', () {
+    final address = ServerAddress.tryParse('https://truenas.example.com')!;
+    expect(
+      address.socketUri('/websocket/shell/').toString(),
+      'wss://truenas.example.com:443/websocket/shell/',
     );
   });
 

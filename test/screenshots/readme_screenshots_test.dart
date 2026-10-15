@@ -12,6 +12,7 @@ import 'package:truenas_mobile/core/instances/instances_provider.dart';
 import 'package:truenas_mobile/core/instances/server_instance.dart';
 import 'package:truenas_mobile/features/instances/instances_screen.dart';
 import 'package:truenas_mobile/l10n/generated/app_localizations.dart';
+import 'package:truenas_mobile/shared/theme.dart';
 
 import '../support/fake_truenas_server.dart';
 import '../support/memory_store.dart';
@@ -110,9 +111,8 @@ void main() {
             debugShowCheckedModeBanner: false,
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
-            theme: ThemeData(
-              colorSchemeSeed: const Color(0xFF0095D5),
-              brightness: brightness,
+            theme: buildAppTheme(
+              brightness,
               fontFamilyFallback: const ['Fallback'],
             ),
             home: const InstancesScreen(),

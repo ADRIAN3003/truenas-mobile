@@ -103,11 +103,11 @@ class _JobsTabState extends State<JobsTab> {
     if (jobs == null) {
       return Center(
         child: _error == null
-            ? const CircularProgressIndicator()
+            ? const CircularProgressIndicator.adaptive()
             : Text(describeConnectError(l10n, _error!)),
       );
     }
-    return RefreshIndicator(
+    return RefreshIndicator.adaptive(
       onRefresh: _load,
       child: jobs.isEmpty
           ? ListView(

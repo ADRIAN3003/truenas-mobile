@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'features/instances/instances_screen.dart';
 import 'l10n/generated/app_localizations.dart';
-
-/// Brand-neutral seed colour; dynamic colour replaces it where available.
-const _seedColor = Color(0xFF0095D5);
+import 'shared/theme.dart';
 
 class TrueNasMobileApp extends StatelessWidget {
   const TrueNasMobileApp({super.key});
@@ -16,14 +14,8 @@ class TrueNasMobileApp extends StatelessWidget {
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorSchemeSeed: _seedColor,
-        brightness: Brightness.light,
-      ),
-      darkTheme: ThemeData(
-        colorSchemeSeed: _seedColor,
-        brightness: Brightness.dark,
-      ),
+      theme: buildAppTheme(Brightness.light),
+      darkTheme: buildAppTheme(Brightness.dark),
       home: const InstancesScreen(),
     );
   }

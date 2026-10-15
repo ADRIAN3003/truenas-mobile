@@ -5,6 +5,9 @@ import '../../core/instances/instances_provider.dart';
 import '../../core/instances/server_instance.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../server/server_screen.dart';
+import '../../shared/theme.dart';
+import '../../shared/ui.dart';
+import '../../shared/widgets.dart';
 import 'server_form_screen.dart';
 
 /// Home screen listing saved TrueNAS servers.
@@ -19,13 +22,14 @@ class InstancesScreen extends ConsumerWidget {
       appBar: AppBar(title: Text(l10n.serversTitle)),
       body: switch (instances) {
         AsyncData(:final value) when value.isEmpty => const _EmptyState(),
-        AsyncData(:final value) => ListView.builder(
-          padding: const EdgeInsets.only(bottom: 96),
-          itemCount: value.length,
-          itemBuilder: (context, index) => _ServerTile(value[index]),
+        AsyncData(:final value) => ListView(
+          padding: const EdgeInsets.fromLTRB(16, 4, 16, 96),
+          children: [
+            GroupedCard(children: [for (final i in value) _ServerTile(i)]),
+          ],
         ),
         AsyncError(:final error) => Center(child: Text(error.toString())),
-        _ => const Center(child: CircularProgressIndicator()),
+        _ => const Center(child: CircularProgressIndicator.adaptive()),
       },
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => Navigator.push(
@@ -47,17 +51,13 @@ class _ServerTile extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
-    final theme = Theme.of(context);
     final subtitle = [
       instance.url,
       if (instance.lastApiVersion != null) 'API ${instance.lastApiVersion}',
     ].join(' · ');
     return ListTile(
-      leading: CircleAvatar(
-        backgroundColor: theme.colorScheme.primaryContainer,
-        foregroundColor: theme.colorScheme.onPrimaryContainer,
-        child: const Icon(Icons.dns_outlined),
-      ),
+      contentPadding: const EdgeInsets.fromLTRB(16, 4, 4, 4),
+      leading: const IconTile(Icons.dns_rounded, AppPalette.tileBlue, size: 40),
       title: Text(instance.name),
       subtitle: Text(subtitle, maxLines: 1, overflow: TextOverflow.ellipsis),
       onTap: () => Navigator.push(
@@ -75,24 +75,15 @@ class _ServerTile extends ConsumerWidget {
                 ),
               );
             case _Action.delete:
-              final confirmed = await showDialog<bool>(
-                context: context,
-                builder: (context) => AlertDialog(
-                  title: Text(l10n.deleteServerTitle(instance.name)),
-                  content: Text(l10n.deleteServerBody),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.pop(context, false),
-                      child: Text(l10n.cancel),
-                    ),
-                    FilledButton(
-                      onPressed: () => Navigator.pop(context, true),
-                      child: Text(l10n.delete),
-                    ),
-                  ],
-                ),
+              final confirmed = await confirmAction(
+                context,
+                title: l10n.deleteServerTitle(instance.name),
+                body: l10n.deleteServerBody,
+                confirmLabel: l10n.delete,
+                cancelLabel: l10n.cancel,
+                destructive: true,
               );
-              if (confirmed ?? false) {
+              if (confirmed) {
                 await ref.read(instancesProvider.notifier).remove(instance.id);
               }
           }
@@ -121,11 +112,7 @@ class _EmptyState extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              Icons.dns_outlined,
-              size: 72,
-              color: theme.colorScheme.primary,
-            ),
+            const IconTile(Icons.dns_rounded, AppPalette.tileBlue, size: 72),
             const SizedBox(height: 16),
             Text(l10n.serversEmptyTitle, style: theme.textTheme.headlineSmall),
             const SizedBox(height: 8),

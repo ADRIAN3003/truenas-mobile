@@ -80,6 +80,7 @@ void main() {
       'Updates',
       'Alerts',
     ]) {
+      await tester.scrollUntilVisible(find.text(label), 100);
       expect(find.text(label), findsOneWidget);
     }
     await tester.scrollUntilVisible(find.text('Shut down server'), 100);

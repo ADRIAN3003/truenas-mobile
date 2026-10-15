@@ -78,8 +78,9 @@ void main() {
     expect(find.text('nas'), findsOneWidget);
     expect(find.text('24%'), findsOneWidget);
     expect(find.text('41 °C'), findsOneWidget);
-    expect(find.text('12.0 GiB of 32.0 GiB used'), findsOneWidget);
-    expect(find.text('In 1.0 Mb/s'), findsOneWidget);
+    expect(find.text('12.0 GiB of 32.0 GiB'), findsOneWidget);
+    await tester.scrollUntilVisible(find.text('1.0 Mb/s'), 200);
+    expect(find.text('In'), findsOneWidget);
     await tester.scrollUntilVisible(find.text('tank'), 200);
     expect(find.text('tank'), findsOneWidget);
     expect(find.text('1 critical'), findsOneWidget);

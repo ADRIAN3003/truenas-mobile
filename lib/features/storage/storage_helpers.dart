@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../l10n/generated/app_localizations.dart';
 import '../../shared/connect_dialogs.dart';
+import '../../shared/theme.dart';
 import '../../shared/viz_colors.dart';
 
 /// Runs [action], shows [success] or the error in a snackbar, and returns
@@ -34,6 +35,13 @@ Future<bool> runWithFeedback(
   _ => (Icons.error, VizColors.critical),
 };
 
+/// Status pill tone for a ZFS status.
+StatusTone zfsStatusTone(String status) => switch (status) {
+  'ONLINE' => StatusTone.good,
+  'DEGRADED' => StatusTone.warning,
+  _ => StatusTone.critical,
+};
+
 /// A loading / error / content switch with pull to refresh.
 class AsyncBody<T> extends StatelessWidget {
   const AsyncBody({
@@ -53,7 +61,10 @@ class AsyncBody<T> extends StatelessWidget {
   Widget build(BuildContext context) {
     final value = this.value;
     if (value != null) {
-      return RefreshIndicator(onRefresh: onRefresh, child: builder(value));
+      return RefreshIndicator.adaptive(
+        onRefresh: onRefresh,
+        child: builder(value),
+      );
     }
     if (error != null) {
       return Center(
@@ -76,7 +87,7 @@ class AsyncBody<T> extends StatelessWidget {
         ),
       );
     }
-    return const Center(child: CircularProgressIndicator());
+    return const Center(child: CircularProgressIndicator.adaptive());
   }
 }
 

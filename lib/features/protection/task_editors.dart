@@ -313,7 +313,7 @@ class _ReplicationEditorState extends State<ReplicationEditor>
           ),
           validator: (v) => _required(l10n, v),
         ),
-        SwitchListTile(
+        SwitchListTile.adaptive(
           contentPadding: EdgeInsets.zero,
           title: Text(l10n.snapshotTaskRecursive),
           value: d.recursive,
@@ -355,7 +355,7 @@ class _ReplicationEditorState extends State<ReplicationEditor>
               validator: (v) => _required(l10n, v),
             ),
         ],
-        SwitchListTile(
+        SwitchListTile.adaptive(
           contentPadding: EdgeInsets.zero,
           title: Text(l10n.replicationAuto),
           value: d.auto,
@@ -782,7 +782,7 @@ class _RsyncEditorState extends State<RsyncEditor>
           decoration: InputDecoration(labelText: l10n.rsyncRemotePath),
           validator: d.ssh ? (v) => _required(l10n, v) : null,
         ),
-        SwitchListTile(
+        SwitchListTile.adaptive(
           contentPadding: EdgeInsets.zero,
           title: Text(l10n.rsyncDelete),
           value: d.delete,

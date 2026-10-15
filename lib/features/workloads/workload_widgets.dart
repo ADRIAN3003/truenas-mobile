@@ -184,7 +184,7 @@ class WorkloadMenu extends StatelessWidget {
         padding: EdgeInsets.all(14),
         child: SizedBox.square(
           dimension: 20,
-          child: CircularProgressIndicator(strokeWidth: 2),
+          child: CircularProgressIndicator.adaptive(strokeWidth: 2),
         ),
       );
     }

@@ -517,5 +517,6 @@
   "cloudBackupPassword": "Tároló jelszava",
   "cloudBackupPasswordHint": "Ez titkosítja a mentéseket. Őrizd meg: nélküle nem állíthatók vissza.",
   "cloudBackupPasswordKeep": "Hagyd üresen a jelenlegi jelszó megtartásához",
-  "cloudBackupKeepLast": "Megőrzött mentések száma"
+  "cloudBackupKeepLast": "Megőrzött mentések száma",
+  "dashboardConnected": "Csatlakozva"
 }

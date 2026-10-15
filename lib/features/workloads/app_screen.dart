@@ -81,7 +81,7 @@ class _AppScreenState extends State<AppScreen> {
           ),
         ],
       ),
-      body: RefreshIndicator(
+      body: RefreshIndicator.adaptive(
         onRefresh: _reload,
         child: ListView(
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),

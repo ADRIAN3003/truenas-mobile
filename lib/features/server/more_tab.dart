@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../../core/session/truenas_session.dart';
 import '../../l10n/generated/app_localizations.dart';
+import '../../shared/theme.dart';
+import '../../shared/ui.dart';
 import '../../shared/widgets.dart';
 import '../storage/storage_helpers.dart';
 import '../explorer/api_explorer_screen.dart';
@@ -67,90 +69,120 @@ class MoreTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final theme = Theme.of(context);
-    Widget header(String text) => Padding(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
-      child: Text(text, style: theme.textTheme.titleSmall),
+    final palette = AppPalette.of(context);
+    Widget entry(
+      IconData icon,
+      Color color,
+      String title,
+      Widget Function() screen,
+    ) => NavRow(
+      icon: icon,
+      color: color,
+      title: title,
+      onTap: () => _open(context, screen()),
     );
-    Widget entry(IconData icon, String title, Widget Function() screen) =>
-        ListTile(
-          leading: Icon(icon),
-          title: Text(title),
-          trailing: const Icon(Icons.chevron_right),
-          onTap: () => _open(context, screen()),
-        );
     return ListView(
-      padding: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
       children: [
-        header(l10n.moreAccounts),
-        entry(
-          Icons.people_outline,
-          l10n.usersTitle,
-          () => UsersScreen(session: session),
+        SectionHeader(l10n.moreAccounts),
+        GroupedCard(
+          children: [
+            entry(
+              Icons.people_rounded,
+              AppPalette.tileBlue,
+              l10n.usersTitle,
+              () => UsersScreen(session: session),
+            ),
+            entry(
+              Icons.key_rounded,
+              AppPalette.tileOrange,
+              l10n.apiKeysTitle,
+              () => ApiKeysScreen(session: session),
+            ),
+          ],
         ),
-        entry(
-          Icons.key_outlined,
-          l10n.apiKeysTitle,
-          () => ApiKeysScreen(session: session),
+        SectionHeader(l10n.moreSystem),
+        GroupedCard(
+          children: [
+            entry(
+              Icons.lan_rounded,
+              AppPalette.tileTeal,
+              l10n.networkTitle,
+              () => NetworkScreen(session: session),
+            ),
+            entry(
+              Icons.verified_rounded,
+              AppPalette.tileGreen,
+              l10n.certificatesTitle,
+              () => CertificatesScreen(session: session),
+            ),
+            entry(
+              Icons.system_update_rounded,
+              AppPalette.tilePurple,
+              l10n.updatesTitle,
+              () => UpdatesScreen(session: session),
+            ),
+          ],
         ),
-        header(l10n.moreSystem),
-        entry(
-          Icons.lan_outlined,
-          l10n.networkTitle,
-          () => NetworkScreen(session: session),
+        SectionHeader(l10n.moreTools),
+        GroupedCard(
+          children: [
+            entry(
+              Icons.terminal_rounded,
+              AppPalette.tileSlate,
+              l10n.shellTitle,
+              () => ShellScreen(session: session),
+            ),
+            entry(
+              Icons.api_rounded,
+              AppPalette.tileBlue,
+              l10n.explorerTitle,
+              () => ApiExplorerScreen(session: session),
+            ),
+          ],
         ),
-        entry(
-          Icons.verified_outlined,
-          l10n.certificatesTitle,
-          () => CertificatesScreen(session: session),
+        SectionHeader(l10n.moreActivity),
+        GroupedCard(
+          children: [
+            NavRow(
+              icon: Icons.notifications_rounded,
+              color: AppPalette.tileRed,
+              title: l10n.tabAlerts,
+              onTap: () => openAlerts(context, session),
+            ),
+            entry(
+              Icons.work_history_rounded,
+              AppPalette.tileTeal,
+              l10n.tabJobs,
+              () => Scaffold(
+                appBar: AppBar(title: Text(l10n.tabJobs)),
+                body: JobsTab(session: session),
+              ),
+            ),
+          ],
         ),
-        entry(
-          Icons.system_update_outlined,
-          l10n.updatesTitle,
-          () => UpdatesScreen(session: session),
-        ),
-        header(l10n.moreTools),
-        entry(
-          Icons.terminal,
-          l10n.shellTitle,
-          () => ShellScreen(session: session),
-        ),
-        entry(
-          Icons.api,
-          l10n.explorerTitle,
-          () => ApiExplorerScreen(session: session),
-        ),
-        header(l10n.moreActivity),
-        ListTile(
-          leading: const Icon(Icons.notifications_outlined),
-          title: Text(l10n.tabAlerts),
-          trailing: const Icon(Icons.chevron_right),
-          onTap: () => openAlerts(context, session),
-        ),
-        entry(
-          Icons.work_history_outlined,
-          l10n.tabJobs,
-          () => Scaffold(
-            appBar: AppBar(title: Text(l10n.tabJobs)),
-            body: JobsTab(session: session),
-          ),
-        ),
-        const Divider(height: 32),
-        ListTile(
-          leading: const Icon(Icons.restart_alt),
-          title: Text(l10n.powerReboot),
-          onTap: () => _power(context, reboot: true),
-        ),
-        ListTile(
-          leading: Icon(
-            Icons.power_settings_new,
-            color: theme.colorScheme.error,
-          ),
-          title: Text(
-            l10n.powerShutdown,
-            style: TextStyle(color: theme.colorScheme.error),
-          ),
-          onTap: () => _power(context, reboot: false),
+        const SizedBox(height: 20),
+        GroupedCard(
+          children: [
+            NavRow(
+              icon: Icons.restart_alt_rounded,
+              color: AppPalette.tileOrange,
+              title: l10n.powerReboot,
+              trailing: const SizedBox.shrink(),
+              onTap: () => _power(context, reboot: true),
+            ),
+            ListTile(
+              leading: const IconTile(
+                Icons.power_settings_new_rounded,
+                AppPalette.tileRed,
+              ),
+              title: Text(
+                l10n.powerShutdown,
+                style: TextStyle(color: palette.critical),
+              ),
+              onTap: () => _power(context, reboot: false),
+            ),
+          ],
         ),
       ],
     );

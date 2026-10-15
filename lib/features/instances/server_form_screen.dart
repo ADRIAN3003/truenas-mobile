@@ -208,7 +208,7 @@ class _ServerFormScreenState extends ConsumerState<ServerFormScreen> {
               icon: _testing
                   ? const SizedBox.square(
                       dimension: 18,
-                      child: CircularProgressIndicator(strokeWidth: 2),
+                      child: CircularProgressIndicator.adaptive(strokeWidth: 2),
                     )
                   : const Icon(Icons.wifi_tethering),
               label: Text(l10n.testConnection),

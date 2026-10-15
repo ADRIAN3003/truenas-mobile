@@ -339,7 +339,7 @@ class _TaskTile extends StatelessWidget {
         children: [
           Semantics(
             label: l10n.taskEnabled,
-            child: Switch(value: task.enabled, onChanged: onToggle),
+            child: Switch.adaptive(value: task.enabled, onChanged: onToggle),
           ),
           PopupMenuButton<String>(
             onSelected: onAction,
@@ -425,7 +425,7 @@ class _NewSnapshotTaskDialogState extends State<_NewSnapshotTaskDialog> {
                     ],
                     onChanged: (d) => setState(() => _dataset = d),
                   ),
-                  SwitchListTile(
+                  SwitchListTile.adaptive(
                     contentPadding: EdgeInsets.zero,
                     title: Text(l10n.snapshotTaskRecursive),
                     value: _recursive,

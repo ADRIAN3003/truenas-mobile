@@ -1866,4 +1866,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get cloudBackupKeepLast => 'Backups to keep';
+
+  @override
+  String get dashboardConnected => 'Connected';
 }

@@ -2,6 +2,8 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
+import 'ui.dart';
+
 /// An icon in a status colour followed by a label in normal text colour.
 class StatusLabel extends StatelessWidget {
   const StatusLabel({
@@ -52,15 +54,16 @@ class LegendItem extends StatelessWidget {
 
 /// A horizontal bar split into segments by fraction, with 2 px gaps.
 class SegmentedBar extends StatelessWidget {
-  const SegmentedBar({super.key, required this.segments});
+  const SegmentedBar({super.key, required this.segments, this.height = 10});
 
   final List<(double, Color)> segments;
+  final double height;
 
   @override
   Widget build(BuildContext context) {
     final visible = segments.where((s) => s.$1 > 0.002).toList();
     return SizedBox(
-      height: 10,
+      height: height,
       child: Row(
         children: [
           for (var i = 0; i < visible.length; i++) ...[
@@ -70,7 +73,7 @@ class SegmentedBar extends StatelessWidget {
               child: DecoratedBox(
                 decoration: BoxDecoration(
                   color: visible[i].$2,
-                  borderRadius: BorderRadius.circular(4),
+                  borderRadius: BorderRadius.circular(height / 2),
                 ),
               ),
             ),
@@ -95,45 +98,46 @@ Future<bool> confirmAction(
   bool destructive = false,
 }) async {
   final controller = TextEditingController();
-  final confirmed = await showDialog<bool>(
+  final confirmed = await showAdaptiveDialog<bool>(
     context: context,
     builder: (context) => StatefulBuilder(
       builder: (context, setState) {
-        final theme = Theme.of(context);
         final enabled =
             typeToConfirm == null || controller.text.trim() == typeToConfirm;
-        return AlertDialog(
+        return AlertDialog.adaptive(
           title: Text(title),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(body),
-              if (typeToConfirm != null) ...[
-                const SizedBox(height: 16),
-                TextField(
-                  controller: controller,
-                  autocorrect: false,
-                  decoration: InputDecoration(labelText: typeToConfirmHint),
-                  onChanged: (_) => setState(() {}),
-                ),
+          // Material keeps the text field working inside a Cupertino dialog.
+          content: Material(
+            type: MaterialType.transparency,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(body),
+                if (typeToConfirm != null) ...[
+                  const SizedBox(height: 16),
+                  TextField(
+                    controller: controller,
+                    autocorrect: false,
+                    decoration: InputDecoration(labelText: typeToConfirmHint),
+                    onChanged: (_) => setState(() {}),
+                  ),
+                ],
               ],
-            ],
+            ),
           ),
           actions: [
-            TextButton(
+            dialogAction(
+              context,
+              label: cancelLabel,
               onPressed: () => Navigator.pop(context, false),
-              child: Text(cancelLabel),
             ),
-            FilledButton(
-              style: destructive
-                  ? FilledButton.styleFrom(
-                      backgroundColor: theme.colorScheme.error,
-                      foregroundColor: theme.colorScheme.onError,
-                    )
-                  : null,
+            dialogAction(
+              context,
+              label: confirmLabel,
+              primary: !destructive,
+              destructive: destructive,
               onPressed: enabled ? () => Navigator.pop(context, true) : null,
-              child: Text(confirmLabel),
             ),
           ],
         );

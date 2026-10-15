@@ -82,7 +82,7 @@ class _AlertsTabState extends State<AlertsTab> {
     if (alerts == null) {
       return Center(
         child: _error == null
-            ? const CircularProgressIndicator()
+            ? const CircularProgressIndicator.adaptive()
             : Text(describeConnectError(l10n, _error!)),
       );
     }
@@ -93,7 +93,7 @@ class _AlertsTabState extends State<AlertsTab> {
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
       child: Text(text, style: theme.textTheme.titleSmall),
     );
-    return RefreshIndicator(
+    return RefreshIndicator.adaptive(
       onRefresh: _load,
       child: ListView(
         padding: const EdgeInsets.only(bottom: 24),

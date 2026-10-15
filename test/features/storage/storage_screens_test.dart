@@ -136,13 +136,7 @@ void main() {
     await tester.pumpAndSettle();
     final confirm = find.widgetWithText(FilledButton, 'Delete');
     expect(tester.widget<FilledButton>(confirm).onPressed, isNull);
-    await tester.enterText(
-      find.descendant(
-        of: find.byType(AlertDialog),
-        matching: find.byType(TextField),
-      ),
-      'tank/media',
-    );
+    await tester.enterText(find.byType(TextField).last, 'tank/media');
     await tester.pump();
     expect(tester.widget<FilledButton>(confirm).onPressed, isNotNull);
     await disconnect(tester);

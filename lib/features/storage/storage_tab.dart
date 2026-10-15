@@ -4,8 +4,9 @@ import '../../core/models/storage.dart';
 import '../../core/session/truenas_session.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../shared/formatting.dart';
+import '../../shared/theme.dart';
+import '../../shared/ui.dart';
 import '../../shared/viz_colors.dart';
-import '../../shared/widgets.dart';
 import '../protection/protection_screen.dart';
 import 'disks_screen.dart';
 import 'pool_screen.dart';
@@ -73,34 +74,34 @@ class _StorageTabState extends State<StorageTab> {
                 _load();
               },
             ),
-          const SizedBox(height: 8),
-          Card(
-            child: ListTile(
-              leading: const Icon(Icons.album_outlined),
-              title: Text(l10n.disksTitle),
-              subtitle: Text(l10n.disksSubtitle),
-              trailing: const Icon(Icons.chevron_right),
-              onTap: () => Navigator.push(
-                context,
-                MaterialPageRoute<void>(
-                  builder: (_) => DisksScreen(session: widget.session),
+          const SizedBox(height: 6),
+          GroupedCard(
+            children: [
+              NavRow(
+                icon: Icons.album_rounded,
+                color: AppPalette.tileSlate,
+                title: l10n.disksTitle,
+                subtitle: l10n.disksSubtitle,
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute<void>(
+                    builder: (_) => DisksScreen(session: widget.session),
+                  ),
                 ),
               ),
-            ),
-          ),
-          Card(
-            child: ListTile(
-              leading: const Icon(Icons.shield_outlined),
-              title: Text(l10n.protectionTitle),
-              subtitle: Text(l10n.protectionSubtitle),
-              trailing: const Icon(Icons.chevron_right),
-              onTap: () => Navigator.push(
-                context,
-                MaterialPageRoute<void>(
-                  builder: (_) => ProtectionScreen(session: widget.session),
+              NavRow(
+                icon: Icons.shield_rounded,
+                color: AppPalette.tileGreen,
+                title: l10n.protectionTitle,
+                subtitle: l10n.protectionSubtitle,
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute<void>(
+                    builder: (_) => ProtectionScreen(session: widget.session),
+                  ),
                 ),
               ),
-            ),
+            ],
           ),
         ],
       ),
@@ -119,48 +120,70 @@ class _PoolCard extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final colors = VizColors.of(context);
-    final (icon, color) = zfsStatusStyle(pool.status);
     final scan = pool.scan;
+    final percent = (pool.usedFraction * 100).round();
     return Card(
-      margin: const EdgeInsets.only(top: 12),
-      clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: onTap,
         child: Padding(
           padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          child: Row(
             children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: Text(pool.name, style: theme.textTheme.titleMedium),
-                  ),
-                  StatusLabel(icon: icon, color: color, label: pool.status),
-                ],
+              RingGauge(
+                size: 76,
+                stroke: 8,
+                segments: [(pool.usedFraction, colors.series1)],
+                child: Text('$percent%', style: theme.textTheme.titleMedium),
               ),
-              const SizedBox(height: 12),
-              SegmentedBar(
-                segments: [
-                  (pool.usedFraction, colors.series1),
-                  (1 - pool.usedFraction, colors.track),
-                ],
-              ),
-              const SizedBox(height: 6),
-              Text(
-                '${l10n.poolUsage(formatBytes(pool.allocated), formatBytes(pool.size))}'
-                ' · ${l10n.poolFree(formatBytes(pool.free))}',
-                style: theme.textTheme.bodySmall,
-              ),
-              if (scan != null && scan.running) ...[
-                const SizedBox(height: 8),
-                Text(
-                  scan.function == 'RESILVER'
-                      ? l10n.resilverRunning(scan.percentage.toStringAsFixed(1))
-                      : l10n.scrubRunning(scan.percentage.toStringAsFixed(1)),
-                  style: theme.textTheme.bodySmall,
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            pool.name,
+                            style: theme.textTheme.titleMedium,
+                          ),
+                        ),
+                        StatusPill(
+                          label: pool.status,
+                          tone: zfsStatusTone(pool.status),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      l10n.poolUsage(
+                        formatBytes(pool.allocated),
+                        formatBytes(pool.size),
+                      ),
+                      style: theme.textTheme.bodyMedium,
+                    ),
+                    Text(
+                      l10n.poolFree(formatBytes(pool.free)),
+                      style: theme.textTheme.bodySmall,
+                    ),
+                    if (scan != null && scan.running) ...[
+                      const SizedBox(height: 8),
+                      Text(
+                        scan.function == 'RESILVER'
+                            ? l10n.resilverRunning(
+                                scan.percentage.toStringAsFixed(1),
+                              )
+                            : l10n.scrubRunning(
+                                scan.percentage.toStringAsFixed(1),
+                              ),
+                        style: theme.textTheme.bodySmall,
+                      ),
+                    ],
+                  ],
                 ),
-              ],
+              ),
+              const SizedBox(width: 4),
+              const Chevron(),
             ],
           ),
         ),

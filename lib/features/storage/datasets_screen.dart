@@ -437,7 +437,7 @@ class _DatasetScreenState extends State<DatasetScreen> {
         icon: const Icon(Icons.add_a_photo_outlined),
         label: Text(l10n.snapshotCreate),
       ),
-      body: RefreshIndicator(
+      body: RefreshIndicator.adaptive(
         onRefresh: _load,
         child: ListView(
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 88),
@@ -491,7 +491,7 @@ class _DatasetScreenState extends State<DatasetScreen> {
             if (snapshots == null && _error == null)
               const Padding(
                 padding: EdgeInsets.all(24),
-                child: Center(child: CircularProgressIndicator()),
+                child: Center(child: CircularProgressIndicator.adaptive()),
               )
             else if (snapshots == null)
               AsyncBody<List<Snapshot>>(

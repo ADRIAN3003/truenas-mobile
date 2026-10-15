@@ -1863,4 +1863,7 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get cloudBackupKeepLast => 'Megőrzött mentések száma';
+
+  @override
+  String get dashboardConnected => 'Csatlakozva';
 }

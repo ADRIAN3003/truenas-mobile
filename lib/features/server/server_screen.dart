@@ -89,11 +89,19 @@ class _ServerScreenState extends ConsumerState<ServerScreen> {
     final info = _info;
     if (session != null && info != null) {
       final destinations = [
-        (Icons.dashboard_outlined, Icons.dashboard, l10n.tabDashboard),
-        (Icons.storage_outlined, Icons.storage, l10n.tabStorage),
-        (Icons.folder_shared_outlined, Icons.folder_shared, l10n.tabShares),
-        (Icons.apps_outlined, Icons.apps, l10n.tabApps),
-        (Icons.more_horiz, Icons.more_horiz, l10n.tabMore),
+        (
+          Icons.space_dashboard_outlined,
+          Icons.space_dashboard_rounded,
+          l10n.tabDashboard,
+        ),
+        (Icons.storage_outlined, Icons.storage_rounded, l10n.tabStorage),
+        (
+          Icons.folder_shared_outlined,
+          Icons.folder_shared_rounded,
+          l10n.tabShares,
+        ),
+        (Icons.widgets_outlined, Icons.widgets_rounded, l10n.tabApps),
+        (Icons.more_horiz_rounded, Icons.more_horiz_rounded, l10n.tabMore),
       ];
       final body = IndexedStack(
         index: _tab,
@@ -135,7 +143,10 @@ class _ServerScreenState extends ConsumerState<ServerScreen> {
                       ),
                   ],
                 ),
-                const VerticalDivider(width: 1),
+                VerticalDivider(
+                  width: 1,
+                  color: Theme.of(context).colorScheme.outlineVariant,
+                ),
                 Expanded(child: body),
               ],
             ),
@@ -145,17 +156,26 @@ class _ServerScreenState extends ConsumerState<ServerScreen> {
       return Scaffold(
         appBar: AppBar(title: Text(instance?.name ?? '')),
         body: body,
-        bottomNavigationBar: NavigationBar(
-          selectedIndex: _tab,
-          onDestinationSelected: select,
-          destinations: [
-            for (final (icon, selected, label) in destinations)
-              NavigationDestination(
-                icon: Icon(icon),
-                selectedIcon: Icon(selected),
-                label: label,
+        bottomNavigationBar: DecoratedBox(
+          decoration: BoxDecoration(
+            border: Border(
+              top: BorderSide(
+                color: Theme.of(context).colorScheme.outlineVariant,
               ),
-          ],
+            ),
+          ),
+          child: NavigationBar(
+            selectedIndex: _tab,
+            onDestinationSelected: select,
+            destinations: [
+              for (final (icon, selected, label) in destinations)
+                NavigationDestination(
+                  icon: Icon(icon),
+                  selectedIcon: Icon(selected),
+                  label: label,
+                ),
+            ],
+          ),
         ),
       );
     }
@@ -170,7 +190,7 @@ class _ServerScreenState extends ConsumerState<ServerScreen> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const CircularProgressIndicator(),
+                  const CircularProgressIndicator.adaptive(),
                   const SizedBox(height: 16),
                   Text(l10n.connecting),
                 ],

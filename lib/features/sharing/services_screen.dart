@@ -132,7 +132,7 @@ class _ServiceTile extends StatelessWidget {
                   padding: EdgeInsets.all(12),
                   child: SizedBox.square(
                     dimension: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2),
+                    child: CircularProgressIndicator.adaptive(strokeWidth: 2),
                   ),
                 )
               else
@@ -170,7 +170,7 @@ class _ServiceTile extends StatelessWidget {
                   ),
                 ),
               ),
-              Switch(
+              Switch.adaptive(
                 value: service.enable,
                 onChanged: busy ? null : onAutostart,
               ),

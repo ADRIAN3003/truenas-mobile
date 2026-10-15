@@ -3205,6 +3205,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Backups to keep'**
   String get cloudBackupKeepLast;
+
+  /// Shown on the dashboard header while the app is connected to the server
+  ///
+  /// In en, this message translates to:
+  /// **'Connected'**
+  String get dashboardConnected;
 }
 
 class _AppLocalizationsDelegate

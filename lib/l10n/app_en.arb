@@ -2584,5 +2584,9 @@
   "cloudBackupKeepLast": "Backups to keep",
   "@cloudBackupKeepLast": {
     "description": "Field label."
+  },
+  "dashboardConnected": "Connected",
+  "@dashboardConnected": {
+    "description": "Shown on the dashboard header while the app is connected to the server"
   }
 }

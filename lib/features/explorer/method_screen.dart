@@ -161,7 +161,9 @@ class _MethodScreenState extends State<MethodScreen> {
                 icon: _running
                     ? const SizedBox.square(
                         dimension: 18,
-                        child: CircularProgressIndicator(strokeWidth: 2),
+                        child: CircularProgressIndicator.adaptive(
+                          strokeWidth: 2,
+                        ),
                       )
                     : const Icon(Icons.play_arrow),
                 label: Text(l10n.explorerRun),
@@ -280,7 +282,7 @@ class _ParamField extends StatelessWidget {
         ? param.name
         : '${param.name} (${l10n.explorerOptional})';
     final Widget field = switch (param.kind) {
-      ParamKind.boolean => SwitchListTile(
+      ParamKind.boolean => SwitchListTile.adaptive(
         contentPadding: EdgeInsets.zero,
         title: Text(label),
         value: input.boolValue,

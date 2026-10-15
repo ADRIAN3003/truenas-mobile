@@ -4,6 +4,15 @@ Manage your TrueNAS servers from your phone. TrueNAS Mobile is a Flutter app
 for Android and iOS that talks to the official TrueNAS middleware API
 (JSON-RPC 2.0 over WebSocket) and supports TrueNAS **25.04 and newer**.
 
+<p>
+  <img src="docs/screenshots/servers.png" width="200" alt="Server list">
+  <img src="docs/screenshots/dashboard.png" width="200" alt="Dashboard">
+  <img src="docs/screenshots/storage.png" width="200" alt="Storage">
+  <img src="docs/screenshots/apps.png" width="200" alt="Apps, VMs and containers">
+  <img src="docs/screenshots/more.png" width="200" alt="More, dark theme">
+  <img src="docs/screenshots/protection.png" width="200" alt="Data protection, dark theme">
+</p>
+
 ## Features
 
 - **Servers:** save as many TrueNAS servers as you like. Sign in with an API
@@ -17,12 +26,11 @@ for Android and iOS that talks to the official TrueNAS middleware API
   temperatures.
 - **Data protection:** periodic snapshot, replication, cloud sync, TrueCloud
   backup and rsync tasks with their last result. Run, stop, enable or
-  disable any of them; add, edit and delete snapshot, replication and cloud
-  sync tasks.
+  disable any of them, and add, edit or delete every kind.
 - **Shares:** SMB and NFS shares (create, edit, delete), services (start,
   stop, start on boot), and read-only views of iSCSI and NVMe-oF.
 - **Apps and VMs:** Docker apps (start, stop, redeploy, upgrade, delete),
-  virtual machines and containers (start, stop, restart).
+  virtual machines and containers (start, stop, restart), each with a shell.
 - **System:** users and groups, API keys, network and certificates
   (read-only), updates and boot environments, reboot and shut down.
 - **Shell:** a terminal on the server, with Esc, Tab, Ctrl+C and arrow keys.
@@ -98,6 +106,15 @@ the template. To add a language:
    `app_de.arb`), set `"@@locale"` and translate the values.
 2. Add the locale to `CFBundleLocalizations` in `ios/Runner/Info.plist`.
 3. Run `flutter gen-l10n` (it also runs automatically on build).
+
+## Screenshots
+
+The screenshots in [`docs/screenshots/`](docs/screenshots/) are rendered from
+the test suite's fake server. To regenerate them:
+
+```sh
+SCREENSHOTS=1 flutter test test/screenshots --update-goldens
+```
 
 ## Contributing
 

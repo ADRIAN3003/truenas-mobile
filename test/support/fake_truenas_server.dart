@@ -70,6 +70,9 @@ class FakeTrueNasServer {
     _snapshot('tank/media@auto-2', 1760100000000),
   ];
 
+  /// Pools served by `pool.query`.
+  List<Map<String, dynamic>> pools = [samplePool];
+
   /// Behave like 25.04: no `service.control`, no NVMe-oF, SMB `ro` field.
   bool legacy = false;
 
@@ -852,7 +855,7 @@ class FakeTrueNasServer {
           case 'test.job':
             result = _job();
           case 'pool.query':
-            result = [samplePool];
+            result = pools;
           case 'pool.scrub.scrub':
             result = 12;
           case 'pool.dataset.query':

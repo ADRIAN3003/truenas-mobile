@@ -1,0 +1,47 @@
+name: Feature request
+description: Suggest a new screen, action or improvement.
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What would you like to do?
+      description: Describe the task or problem, not only the solution.
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: How should it work?
+      description: What you'd like the app to show or do.
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Dashboard and alerts
+        - Storage
+        - Data protection
+        - Shares and services
+        - Apps, VMs and containers
+        - System (users, network, updates)
+        - Shell
+        - API explorer
+        - Servers and sign-in
+        - Look and feel
+        - Other
+  - type: input
+    id: api-method
+    attributes:
+      label: TrueNAS API method
+      description: Optional. If you know the middleware method behind it, for example pool.scrub.run.
+  - type: input
+    id: truenas-version
+    attributes:
+      label: TrueNAS version you use
+      placeholder: 25.10.1
+  - type: textarea
+    id: extra
+    attributes:
+      label: Anything else
+      description: Screenshots of the TrueNAS web UI, workarounds, links.

@@ -1,0 +1,88 @@
+name: Bug report
+description: Something in the app doesn't work as expected.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug. Please remove server
+        addresses, API keys, passwords and other secrets from anything you
+        paste here.
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: What did you see, and what did you expect to see instead?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Open the server
+        2. Go to Storage
+        3. Tap ...
+    validations:
+      required: true
+  - type: input
+    id: app-version
+    attributes:
+      label: App version
+      description: The GitHub release you installed.
+      placeholder: v0.1.0
+    validations:
+      required: true
+  - type: dropdown
+    id: truenas-version
+    attributes:
+      label: TrueNAS version
+      options:
+        - 25.04 (Fangtooth)
+        - 25.10 (Goldeye)
+        - 26.x
+        - Newer / nightly
+        - Other (say below)
+    validations:
+      required: true
+  - type: input
+    id: truenas-build
+    attributes:
+      label: Exact TrueNAS build
+      description: Optional. From the TrueNAS dashboard, for example 25.10.1.
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Platform
+      options:
+        - Android
+        - iOS
+        - iPadOS
+    validations:
+      required: true
+  - type: input
+    id: device
+    attributes:
+      label: Device and OS version
+      placeholder: Pixel 8, Android 16 / iPhone 15, iOS 26.1
+    validations:
+      required: true
+  - type: dropdown
+    id: auth
+    attributes:
+      label: Sign-in method
+      options:
+        - API key
+        - Username and password
+        - Username, password and 2FA
+  - type: textarea
+    id: logs
+    attributes:
+      label: Error messages or logs
+      description: Any error text shown in the app. Remove secrets first.
+      render: text
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots
+      description: Drag images here if they help explain the problem.

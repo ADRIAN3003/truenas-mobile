@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: TrueNAS server problems
+    url: https://forums.truenas.com/
+    about: Problems with TrueNAS itself (not this app) belong on the TrueNAS forums.
+  - name: TrueNAS API reference
+    url: https://api.truenas.com/
+    about: Documentation for the JSON-RPC middleware API the app uses.

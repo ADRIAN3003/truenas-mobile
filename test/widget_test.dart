@@ -23,6 +23,15 @@ void main() {
     expect(find.text('Add server'), findsOneWidget);
   });
 
+  testWidgets('follows a Hungarian device language', (tester) async {
+    tester.platformDispatcher.localesTestValue = const [Locale('hu', 'HU')];
+    addTearDown(tester.platformDispatcher.clearLocalesTestValue);
+    await tester.pumpWidget(_app(MemoryStore()));
+    await tester.pumpAndSettle();
+    expect(find.text('Még nincs szerver'), findsOneWidget);
+    expect(find.text('Szerver hozzáadása'), findsOneWidget);
+  });
+
   testWidgets('lists saved servers', (tester) async {
     final store = MemoryStore();
     await InstanceRepository(store).save([

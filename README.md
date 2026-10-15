@@ -30,7 +30,7 @@ for Android and iOS that talks to the official TrueNAS middleware API
   and a generated form to call it, so anything without its own screen is
   still reachable.
 - **Tablets:** a navigation rail and a two-column dashboard on wide screens.
-- **Languages:** English, with everything ready for translations.
+- **Languages:** English and Hungarian, following the device language.
 
 ## Supported TrueNAS versions
 
@@ -90,12 +90,12 @@ Without them, release APKs are signed with the debug key.
 
 ## Translations
 
-The app is built for multiple languages, with English as the base. All UI
+The app ships in English and Hungarian, with English as the base. All UI
 text lives in ARB files under [`lib/l10n/`](lib/l10n/), and `app_en.arb` is
 the template. To add a language:
 
 1. Copy `lib/l10n/app_en.arb` to `app_<locale>.arb` (for example
-   `app_hu.arb`), set `"@@locale"` and translate the values.
+   `app_de.arb`), set `"@@locale"` and translate the values.
 2. Add the locale to `CFBundleLocalizations` in `ios/Runner/Info.plist`.
 3. Run `flutter gen-l10n` (it also runs automatically on build).
 

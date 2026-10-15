@@ -408,6 +408,13 @@ class FakeTrueNasServer {
   Future<void> close() => _server.close(force: true);
 
   Future<void> _handle(HttpRequest request) async {
+    if (request.uri.path.startsWith('/icons/')) {
+      // A 1×1 PNG, standing in for app catalog icons.
+      request.response.headers.contentType = ContentType('image', 'png');
+      request.response.add(base64Decode(_pixelPng));
+      await request.response.close();
+      return;
+    }
     if (request.uri.path == '/api/versions') {
       if (versions == null) {
         request.response.statusCode = HttpStatus.notFound;
@@ -658,6 +665,22 @@ class FakeTrueNasServer {
             users.removeWhere((u) => u['id'] == params.first);
             result = true;
           case 'group.query':
+            // 25.04 orders in the database, where the column is `group`.
+            final options = params.length > 1 ? asMapOrEmpty(params[1]) : {};
+            if (legacy && '${options['order_by']}'.contains('name')) {
+              socket.add(
+                jsonEncode({
+                  'jsonrpc': '2.0',
+                  'id': message['id'],
+                  'error': {
+                    'code': -32001,
+                    'message': 'Method call error',
+                    'data': {'reason': "'name'"},
+                  },
+                }),
+              );
+              return;
+            }
             result = groups;
           case 'group.create':
             groups.add({
@@ -1109,3 +1132,9 @@ const sampleRealtimeStats = {
   'zfs': {},
   'pools': {},
 };
+
+Map<String, dynamic> asMapOrEmpty(Object? value) =>
+    value is Map<String, dynamic> ? value : const {};
+
+const _pixelPng =
+    'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==';

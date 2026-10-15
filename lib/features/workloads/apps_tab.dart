@@ -9,6 +9,7 @@ import '../../shared/viz_colors.dart';
 import '../../shared/widgets.dart';
 import '../sharing/sharing_widgets.dart';
 import '../storage/storage_helpers.dart';
+import 'app_icon.dart';
 import 'app_screen.dart';
 import 'workload_widgets.dart';
 
@@ -129,7 +130,7 @@ class _AppsTabState extends State<AppsTab> with LoadState<AppsTab, _Workloads> {
           if (w.apps.isEmpty) _Empty(l10n.appsEmpty),
           for (final app in w.apps)
             ListTile(
-              leading: const Icon(Icons.apps),
+              leading: AppIcon(url: app.iconUrl),
               title: Text(app.name),
               subtitle: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,

@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:truenas_mobile/core/instances/server_instance.dart';
 import 'package:truenas_mobile/core/session/truenas_session.dart';
@@ -120,5 +121,42 @@ void main() {
     expect(server.apps.single['upgrade_available'], isFalse);
     expect(find.widgetWithText(FilledButton, 'Upgrade'), findsNothing);
     await disconnect(tester);
+  });
+
+  testWidgets('apps show their catalog icon and Markdown notes', (
+    tester,
+  ) async {
+    await connect(tester);
+    final icon = 'http://127.0.0.1:${server.port}/icons/icon.png';
+    final app = server.apps.firstWhere((a) => a['name'] == 'jellyfin');
+    app['metadata'] = {'title': 'Jellyfin', 'icon': icon};
+    app['notes'] =
+        '# Jellyfin\n\nSign in as **admin** at [the web UI](https://nas/).';
+    await tester.pumpWidget(wrap(AppsTab(session: session)));
+    await settle(tester);
+
+    bool showsIcon(Widget w) =>
+        w is Image &&
+        w.image is NetworkImage &&
+        (w.image as NetworkImage).url == icon;
+    expect(find.byWidgetPredicate(showsIcon), findsOneWidget);
+
+    await tester.tap(find.text('jellyfin'));
+    await settle(tester);
+    expect(find.byWidgetPredicate(showsIcon), findsWidgets);
+    await tester.scrollUntilVisible(
+      find.byType(MarkdownBody),
+      200,
+      scrollable: find.byType(Scrollable).last,
+    );
+    expect(find.byType(MarkdownBody), findsOneWidget);
+    expect(find.textContaining('**'), findsNothing);
+    expect(
+      find.textContaining('the web UI', findRichText: true),
+      findsOneWidget,
+    );
+    await disconnect(tester);
+    // Let the icon download's idle HTTP connection time out.
+    await tester.pump(const Duration(seconds: 16));
   });
 }

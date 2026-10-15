@@ -6,15 +6,7 @@ Manage your TrueNAS servers from your phone. TrueNAS Mobile is a Flutter app
 for Android and iOS that talks to the official TrueNAS middleware API
 (JSON-RPC 2.0 over WebSocket) and supports TrueNAS **25.04 and newer**.
 
-<p>
-  <img src="docs/screenshots/servers.png" width="200" alt="Server list">
-  <img src="docs/screenshots/dashboard.png" width="200" alt="Dashboard">
-  <img src="docs/screenshots/dashboard_ios.png" width="200" alt="Dashboard on iOS with the liquid glass tab bar">
-  <img src="docs/screenshots/storage.png" width="200" alt="Storage">
-  <img src="docs/screenshots/apps.png" width="200" alt="Apps, VMs and containers">
-  <img src="docs/screenshots/more.png" width="200" alt="More, dark theme">
-  <img src="docs/screenshots/protection.png" width="200" alt="Data protection, dark theme">
-</p>
+![Server list, dashboard on Android and iOS, storage, apps, and the More and data protection screens in the dark theme](docs/screenshots/overview.png)
 
 ## Features
 
@@ -118,6 +110,9 @@ the test suite's fake server. To regenerate them:
 ```sh
 SCREENSHOTS=1 flutter test test/screenshots --update-goldens
 ```
+
+The same run also lays them out in `overview.png`, the single image at the
+top of this README, so it scales to the screen on phones.
 
 ## Contributing
 

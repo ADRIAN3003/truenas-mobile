@@ -88,11 +88,10 @@ class SectionHeader extends StatelessWidget {
       children: [
         Expanded(
           child: Text(
-            title.toUpperCase(),
-            style: Theme.of(context).textTheme.labelMedium?.copyWith(
+            title,
+            style: Theme.of(context).textTheme.titleSmall?.copyWith(
               color: AppPalette.of(context).muted,
               fontWeight: FontWeight.w700,
-              letterSpacing: 0.8,
             ),
           ),
         ),
@@ -131,6 +130,7 @@ class NavRow extends StatelessWidget {
     required this.color,
     required this.title,
     this.subtitle,
+    this.detail,
     this.trailing,
     this.onTap,
   });
@@ -139,6 +139,9 @@ class NavRow extends StatelessWidget {
   final Color color;
   final String title;
   final String? subtitle;
+
+  /// Extra content under the subtitle, such as a status pill.
+  final Widget? detail;
   final Widget? trailing;
   final VoidCallback? onTap;
 
@@ -146,7 +149,16 @@ class NavRow extends StatelessWidget {
   Widget build(BuildContext context) => ListTile(
     leading: IconTile(icon, color),
     title: Text(title),
-    subtitle: subtitle == null ? null : Text(subtitle!),
+    subtitle: detail == null
+        ? (subtitle == null ? null : Text(subtitle!))
+        : Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (subtitle != null) Text(subtitle!),
+              const SizedBox(height: 6),
+              detail!,
+            ],
+          ),
     trailing: trailing ?? (onTap == null ? null : const Chevron()),
     onTap: onTap,
   );
@@ -253,5 +265,55 @@ Widget dialogAction(
         : null,
     onPressed: onPressed,
     child: Text(label),
+  );
+}
+
+/// Muted text on a card, for an empty section.
+class EmptyCard extends StatelessWidget {
+  const EmptyCard(this.text, {super.key});
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) => Card(
+    child: Padding(
+      padding: const EdgeInsets.all(16),
+      child: Text(text, style: TextStyle(color: AppPalette.of(context).muted)),
+    ),
+  );
+}
+
+/// A headed section of rows on one card, or [empty] when there are none.
+List<Widget> groupedSection(
+  String title,
+  List<Widget> rows, {
+  String? empty,
+  Widget? trailing,
+  double indent = 16,
+}) => [
+  SectionHeader(title, trailing: trailing),
+  if (rows.isEmpty && empty != null)
+    EmptyCard(empty)
+  else if (rows.isNotEmpty)
+    GroupedCard(indent: indent, children: rows),
+];
+
+/// A glyph in [color] on a soft tint of it, for status-coloured rows.
+class SoftIcon extends StatelessWidget {
+  const SoftIcon(this.icon, this.color, {super.key, this.semanticLabel});
+
+  final IconData icon;
+  final Color color;
+  final String? semanticLabel;
+
+  @override
+  Widget build(BuildContext context) => Container(
+    width: 40,
+    height: 40,
+    decoration: BoxDecoration(
+      color: color.withValues(alpha: 0.14),
+      borderRadius: BorderRadius.circular(11),
+    ),
+    child: Icon(icon, size: 22, color: color, semanticLabel: semanticLabel),
   );
 }

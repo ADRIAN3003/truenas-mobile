@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../../l10n/generated/app_localizations.dart';
+import '../../shared/ui.dart';
+import '../../shared/theme.dart';
 import '../../shared/viz_colors.dart';
 import '../../shared/widgets.dart';
 import 'sharing_widgets.dart';
@@ -32,7 +34,7 @@ class ShareTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     return ListTile(
-      leading: Icon(icon),
+      leading: IconTile(icon, AppPalette.tileBlue, size: 40),
       title: Text(title),
       subtitle: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

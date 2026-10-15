@@ -4,6 +4,7 @@ import '../../core/api/sharing_api.dart';
 import '../../core/models/sharing.dart';
 import '../../core/session/truenas_session.dart';
 import '../../l10n/generated/app_localizations.dart';
+import '../../shared/ui.dart';
 import '../../shared/widgets.dart';
 import '../storage/storage_helpers.dart';
 import 'sharing_widgets.dart';
@@ -77,20 +78,22 @@ class _ServicesScreenState extends State<ServicesScreen>
                   Center(child: Text(l10n.servicesEmpty)),
                 ],
               )
-            : ListView.separated(
-                padding: const EdgeInsets.only(bottom: 24),
-                itemCount: services.length,
-                separatorBuilder: (_, _) => const Divider(height: 1),
-                itemBuilder: (context, index) {
-                  final service = services[index];
-                  final busy = _busy.contains(service.service);
-                  return _ServiceTile(
-                    service: service,
-                    busy: busy,
-                    onAction: (action) => _control(service, action),
-                    onAutostart: (v) => _autostart(service, v),
-                  );
-                },
+            : ListView(
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+                children: [
+                  GroupedCard(
+                    indent: 16,
+                    children: [
+                      for (final service in services)
+                        _ServiceTile(
+                          service: service,
+                          busy: _busy.contains(service.service),
+                          onAction: (action) => _control(service, action),
+                          onAutostart: (v) => _autostart(service, v),
+                        ),
+                    ],
+                  ),
+                ],
               ),
       ),
     );
@@ -124,7 +127,7 @@ class _ServiceTile extends StatelessWidget {
               Expanded(
                 child: Text(
                   service.displayName,
-                  style: theme.textTheme.titleMedium,
+                  style: theme.textTheme.titleSmall,
                 ),
               ),
               if (busy)

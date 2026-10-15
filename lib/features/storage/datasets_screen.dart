@@ -4,6 +4,8 @@ import 'package:intl/intl.dart';
 import '../../core/models/storage.dart';
 import '../../core/session/truenas_session.dart';
 import '../../l10n/generated/app_localizations.dart';
+import '../../shared/theme.dart';
+import '../../shared/ui.dart';
 import '../../shared/formatting.dart';
 import '../../shared/widgets.dart';
 import 'storage_helpers.dart';
@@ -100,23 +102,23 @@ class _DatasetsScreenState extends State<DatasetsScreen> {
         onRefresh: _load,
         builder: (datasets) => datasets.isEmpty
             ? ListView(
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 88),
+                children: [EmptyCard(l10n.datasetsEmpty)],
+              )
+            : ListView(
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 88),
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.all(32),
-                    child: Center(child: Text(l10n.datasetsEmpty)),
+                  GroupedCard(
+                    indent: 16,
+                    children: [
+                      for (final dataset in datasets)
+                        _DatasetTile(
+                          dataset: dataset,
+                          onTap: () => _open(dataset),
+                        ),
+                    ],
                   ),
                 ],
-              )
-            : ListView.builder(
-                padding: const EdgeInsets.only(bottom: 88),
-                itemCount: datasets.length,
-                itemBuilder: (context, index) {
-                  final dataset = datasets[index];
-                  return _DatasetTile(
-                    dataset: dataset,
-                    onTap: () => _open(dataset),
-                  );
-                },
               ),
       ),
     );
@@ -137,8 +139,9 @@ class _DatasetTile extends StatelessWidget {
         left: 16.0 + dataset.depth * 20,
         right: 16,
       ),
-      leading: Icon(
-        dataset.isVolume ? Icons.storage_outlined : Icons.folder_outlined,
+      leading: SoftIcon(
+        dataset.isVolume ? Icons.storage_rounded : Icons.folder_rounded,
+        dataset.isVolume ? AppPalette.tilePurple : AppPalette.tileBlue,
       ),
       title: Text(dataset.isRoot ? dataset.id : dataset.shortName),
       subtitle: Text(
@@ -481,13 +484,7 @@ class _DatasetScreenState extends State<DatasetScreen> {
                 ),
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(4, 20, 4, 8),
-              child: Text(
-                l10n.snapshotsTitle,
-                style: theme.textTheme.titleMedium,
-              ),
-            ),
+            SectionHeader(l10n.snapshotsTitle),
             if (snapshots == null && _error == null)
               const Padding(
                 padding: EdgeInsets.all(24),
@@ -501,49 +498,48 @@ class _DatasetScreenState extends State<DatasetScreen> {
                 builder: (_) => const SizedBox.shrink(),
               )
             else if (snapshots.isEmpty)
-              Padding(
-                padding: const EdgeInsets.all(24),
-                child: Center(child: Text(l10n.snapshotsEmpty)),
-              )
+              EmptyCard(l10n.snapshotsEmpty)
             else
-              Card(
-                child: Column(
-                  children: [
-                    for (final snapshot in snapshots)
-                      ListTile(
-                        leading: const Icon(Icons.photo_camera_outlined),
-                        title: Text(snapshot.name),
-                        subtitle: Text(
-                          [
-                            if (snapshot.created != null)
-                              DateFormat.yMMMd(locale)
-                                  .add_Hm()
-                                  .format(snapshot.created!),
-                            l10n.snapshotSize(
-                              formatBytes(snapshot.used),
-                              formatBytes(snapshot.referenced),
-                            ),
-                          ].join('\n'),
-                        ),
-                        isThreeLine: snapshot.created != null,
-                        trailing: PopupMenuButton<String>(
-                          onSelected: (action) => action == 'rollback'
-                              ? _rollback(snapshot)
-                              : _deleteSnapshot(snapshot),
-                          itemBuilder: (_) => [
-                            PopupMenuItem(
-                              value: 'rollback',
-                              child: Text(l10n.snapshotRollback),
-                            ),
-                            PopupMenuItem(
-                              value: 'delete',
-                              child: Text(l10n.snapshotDelete),
-                            ),
-                          ],
-                        ),
+              GroupedCard(
+                indent: 72,
+                children: [
+                  for (final snapshot in snapshots)
+                    ListTile(
+                      leading: const SoftIcon(
+                        Icons.photo_camera_rounded,
+                        AppPalette.tileTeal,
                       ),
-                  ],
-                ),
+                      title: Text(snapshot.name),
+                      subtitle: Text(
+                        [
+                          if (snapshot.created != null)
+                            DateFormat.yMMMd(locale)
+                                .add_Hm()
+                                .format(snapshot.created!),
+                          l10n.snapshotSize(
+                            formatBytes(snapshot.used),
+                            formatBytes(snapshot.referenced),
+                          ),
+                        ].join('\n'),
+                      ),
+                      isThreeLine: snapshot.created != null,
+                      trailing: PopupMenuButton<String>(
+                        onSelected: (action) => action == 'rollback'
+                            ? _rollback(snapshot)
+                            : _deleteSnapshot(snapshot),
+                        itemBuilder: (_) => [
+                          PopupMenuItem(
+                            value: 'rollback',
+                            child: Text(l10n.snapshotRollback),
+                          ),
+                          PopupMenuItem(
+                            value: 'delete',
+                            child: Text(l10n.snapshotDelete),
+                          ),
+                        ],
+                      ),
+                    ),
+                ],
               ),
           ],
         ),

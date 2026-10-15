@@ -7,6 +7,8 @@ import '../../core/api/workloads_api.dart';
 import '../../core/models/workloads.dart';
 import '../../core/session/truenas_session.dart';
 import '../../l10n/generated/app_localizations.dart';
+import '../../shared/theme.dart';
+import '../../shared/ui.dart';
 import '../storage/storage_helpers.dart';
 import 'app_icon.dart';
 import 'workload_widgets.dart';
@@ -155,50 +157,55 @@ class _AppScreenState extends State<AppScreen> {
               ),
             ),
             if (app.portals.isNotEmpty) ...[
-              _Heading(l10n.appPortals),
-              Card(
-                child: Column(
-                  children: [
-                    for (final MapEntry(key: label, value: url)
-                        in app.portals.entries)
-                      ListTile(
-                        leading: const Icon(Icons.open_in_browser),
-                        title: Text(label),
-                        subtitle: SelectableText(url),
-                        trailing: IconButton(
-                          tooltip: MaterialLocalizations.of(context)
-                              .copyButtonLabel,
-                          icon: const Icon(Icons.copy),
-                          onPressed: () async {
-                            await Clipboard.setData(ClipboardData(text: url));
-                            if (!context.mounted) return;
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text(l10n.copied)),
-                            );
-                          },
-                        ),
+              SectionHeader(l10n.appPortals),
+              GroupedCard(
+                indent: 72,
+                children: [
+                  for (final MapEntry(key: label, value: url)
+                      in app.portals.entries)
+                    ListTile(
+                      leading: const IconTile(
+                        Icons.open_in_browser_rounded,
+                        AppPalette.tileBlue,
+                        size: 40,
                       ),
-                  ],
-                ),
+                      title: Text(label),
+                      subtitle: SelectableText(url),
+                      trailing: IconButton(
+                        tooltip: MaterialLocalizations.of(context)
+                            .copyButtonLabel,
+                        icon: const Icon(Icons.copy),
+                        onPressed: () async {
+                          await Clipboard.setData(ClipboardData(text: url));
+                          if (!context.mounted) return;
+                          ScaffoldMessenger.of(
+                            context,
+                          ).showSnackBar(SnackBar(content: Text(l10n.copied)));
+                        },
+                      ),
+                    ),
+                ],
               ),
             ],
             if (app.images.isNotEmpty) ...[
-              _Heading(l10n.appImages),
-              Card(
-                child: Column(
-                  children: [
-                    for (final image in app.images)
-                      ListTile(
-                        dense: true,
-                        leading: const Icon(Icons.layers_outlined),
-                        title: Text(image),
+              SectionHeader(l10n.appImages),
+              GroupedCard(
+                indent: 56,
+                children: [
+                  for (final image in app.images)
+                    ListTile(
+                      dense: true,
+                      leading: Icon(
+                        Icons.layers_rounded,
+                        color: AppPalette.of(context).muted,
                       ),
-                  ],
-                ),
+                      title: Text(image),
+                    ),
+                ],
               ),
             ],
             if (app.notes != null && app.notes!.trim().isNotEmpty) ...[
-              _Heading(l10n.appNotes),
+              SectionHeader(l10n.appNotes),
               Card(
                 child: Padding(
                   padding: const EdgeInsets.all(16),
@@ -221,16 +228,4 @@ class _AppScreenState extends State<AppScreen> {
       ),
     );
   }
-}
-
-class _Heading extends StatelessWidget {
-  const _Heading(this.text);
-
-  final String text;
-
-  @override
-  Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.fromLTRB(4, 20, 4, 8),
-    child: Text(text, style: Theme.of(context).textTheme.titleMedium),
-  );
 }

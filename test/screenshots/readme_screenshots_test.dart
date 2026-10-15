@@ -2,6 +2,7 @@
 // runs; regenerate with:
 //   SCREENSHOTS=1 flutter test test/screenshots --update-goldens
 import 'dart:io';
+import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -216,6 +217,66 @@ void main() {
     await shot(tester, 'protection');
     await close(tester);
   });
+
+  // One picture of every screenshot for the README: phones and the GitHub
+  // app ignore image widths, so separate images stack in a narrow column.
+  testWidgets('overview', skip: _skip, (tester) async {
+    await tester.runAsync(_composeOverview);
+  });
+}
+
+/// Lays the screenshots out in two rows on one transparent image.
+Future<void> _composeOverview() async {
+  const rows = [
+    ['servers', 'dashboard', 'dashboard_ios', 'storage'],
+    ['apps', 'more', 'protection'],
+  ];
+  const tileWidth = 420.0;
+  const tileHeight = tileWidth * 2340 / 1080;
+  const gap = 32.0;
+  const width = 4 * tileWidth + 3 * gap;
+  const height = 2 * tileHeight + gap;
+  final recorder = ui.PictureRecorder();
+  final canvas = Canvas(recorder);
+  for (var r = 0; r < rows.length; r++) {
+    final row = rows[r];
+    var x = (width - (row.length * tileWidth + (row.length - 1) * gap)) / 2;
+    final y = r * (tileHeight + gap);
+    for (final name in row) {
+      final bytes = await File('docs/screenshots/$name.png').readAsBytes();
+      final codec = await ui.instantiateImageCodec(bytes);
+      final image = (await codec.getNextFrame()).image;
+      final tile = RRect.fromRectAndRadius(
+        Rect.fromLTWH(x, y, tileWidth, tileHeight),
+        const Radius.circular(36),
+      );
+      canvas
+        ..save()
+        ..clipRRect(tile)
+        ..drawImageRect(
+          image,
+          Offset.zero & Size(image.width.toDouble(), image.height.toDouble()),
+          tile.outerRect,
+          Paint()..filterQuality = FilterQuality.high,
+        )
+        ..restore()
+        ..drawRRect(
+          tile.deflate(1),
+          Paint()
+            ..style = PaintingStyle.stroke
+            ..strokeWidth = 2
+            ..color = const Color(0x33808080),
+        );
+      x += tileWidth + gap;
+    }
+  }
+  final image = await recorder.endRecording().toImage(
+    width.round(),
+    height.round(),
+  );
+  final png = await image.toByteData(format: ui.ImageByteFormat.png);
+  await File('docs/screenshots/overview.png')
+      .writeAsBytes(png!.buffer.asUint8List());
 }
 
 const _tib = 1 << 40;

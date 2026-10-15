@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
+import '../../shared/theme.dart';
+import '../../shared/ui.dart';
+
 /// An app's catalog icon, or a generic icon when it has none or it can't
 /// be loaded.
 class AppIcon extends StatelessWidget {
@@ -12,9 +15,10 @@ class AppIcon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final url = this.url;
-    final fallback = SizedBox.square(
-      dimension: size,
-      child: Icon(Icons.apps, size: size * 0.6),
+    final fallback = IconTile(
+      Icons.widgets_rounded,
+      AppPalette.tileBlue,
+      size: size,
     );
     if (url == null || url.isEmpty) return fallback;
     final image = Uri.tryParse(url)?.path.toLowerCase().endsWith('.svg') == true

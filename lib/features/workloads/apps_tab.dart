@@ -5,6 +5,8 @@ import '../../core/models/workloads.dart';
 import '../../core/session/truenas_session.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../shared/glass.dart';
+import '../../shared/theme.dart';
+import '../../shared/ui.dart';
 import '../../shared/formatting.dart';
 import '../../shared/viz_colors.dart';
 import '../../shared/widgets.dart';
@@ -125,179 +127,169 @@ class _AppsTabState extends State<AppsTab> with LoadState<AppsTab, _Workloads> {
       error: error,
       onRefresh: load,
       builder: (w) => ListView(
-        padding: ChromeInsets.pad(context, const EdgeInsets.only(bottom: 24)),
+        padding: ChromeInsets.pad(
+          context,
+          const EdgeInsets.fromLTRB(16, 0, 16, 24),
+        ),
         children: [
-          _Heading(l10n.appsTitle),
-          if (w.apps.isEmpty) _Empty(l10n.appsEmpty),
-          for (final app in w.apps)
-            ListTile(
-              leading: AppIcon(url: app.iconUrl),
-              title: Text(app.name),
-              subtitle: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    [
-                      if (app.title != null && app.title != app.name)
-                        app.title!,
-                      app.version,
-                    ].join(' · '),
-                  ),
-                  const SizedBox(height: 4),
-                  Wrap(
-                    spacing: 12,
-                    runSpacing: 4,
-                    children: [
-                      WorkloadStateLabel(state: app.state),
-                      if (app.upgradeAvailable)
-                        StatusLabel(
-                          icon: Icons.upgrade,
-                          color: VizColors.of(context).series1,
-                          label: l10n.appUpdateAvailable,
-                        ),
-                    ],
-                  ),
-                ],
-              ),
-              trailing: WorkloadMenu(
-                busy: _busy.contains('app:${app.name}'),
-                actions: actionsFor(app.state, supported: _appActions),
-                onShell: app.state == WorkloadState.running
-                    ? () => openAppShell(context, widget.session, app.name)
-                    : null,
-                onSelected: (action) => _run(
-                  'app:${app.name}',
-                  app.name,
-                  action,
-                  () => _api.appAction(app.name, action),
-                ),
-              ),
-              onTap: () => _openApp(app),
-            ),
-          if (w.vms case final vms?) ...[
-            _Heading(l10n.vmsTitle),
-            if (vms.isEmpty) _Empty(l10n.vmsEmpty),
-            for (final vm in vms)
+          ...groupedSection(l10n.appsTitle, empty: l10n.appsEmpty, [
+            for (final app in w.apps)
               ListTile(
-                leading: const Icon(Icons.computer),
-                title: Text(vm.name),
+                leading: AppIcon(url: app.iconUrl),
+                title: Text(app.name),
                 subtitle: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       [
-                        l10n.vmSummary(
-                          vm.vcpus,
-                          formatBytes(vm.memoryMib * 1024 * 1024),
-                        ),
-                        if (vm.description.isNotEmpty) vm.description,
-                      ].join('\n'),
+                        if (app.title != null && app.title != app.name)
+                          app.title!,
+                        app.version,
+                      ].join(' · '),
                     ),
                     const SizedBox(height: 4),
-                    WorkloadStateLabel(state: vm.state),
+                    Wrap(
+                      spacing: 12,
+                      runSpacing: 4,
+                      children: [
+                        WorkloadStateLabel(state: app.state),
+                        if (app.upgradeAvailable)
+                          StatusLabel(
+                            icon: Icons.upgrade,
+                            color: VizColors.of(context).series1,
+                            label: l10n.appUpdateAvailable,
+                          ),
+                      ],
+                    ),
                   ],
                 ),
                 trailing: WorkloadMenu(
-                  busy: _busy.contains('vm:${vm.id}'),
-                  actions: actionsFor(vm.state, supported: _vmActions),
-                  onShell: vm.state == WorkloadState.running
-                      ? () => openShell(
-                          context,
-                          widget.session,
-                          WorkloadsApi.vmShell(vm.id),
-                          vm.name,
-                        )
+                  busy: _busy.contains('app:${app.name}'),
+                  actions: actionsFor(app.state, supported: _appActions),
+                  onShell: app.state == WorkloadState.running
+                      ? () => openAppShell(context, widget.session, app.name)
                       : null,
                   onSelected: (action) => _run(
-                    'vm:${vm.id}',
-                    vm.name,
+                    'app:${app.name}',
+                    app.name,
                     action,
-                    () => _api.vmAction(vm.id, action),
-                    isVm: true,
+                    () => _api.appAction(app.name, action),
                   ),
                 ),
+                onTap: () => _openApp(app),
               ),
-          ],
-          if (w.containers case final containers?) ...[
-            _Heading(l10n.containersTitle),
-            if (containers.isEmpty) _Empty(l10n.containersEmpty),
-            for (final container in containers)
-              ListTile(
-                leading: Icon(
-                  container.isVm ? Icons.computer : Icons.inventory_2_outlined,
-                ),
-                title: Text(container.name),
-                subtitle: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    if (container.isVm || container.description != null)
+          ]),
+          if (w.vms case final vms?)
+            ...groupedSection(l10n.vmsTitle, empty: l10n.vmsEmpty, [
+              for (final vm in vms)
+                ListTile(
+                  leading: const IconTile(
+                    Icons.computer_rounded,
+                    AppPalette.tilePurple,
+                    size: 40,
+                  ),
+                  title: Text(vm.name),
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
                       Text(
                         [
-                          if (container.isVm) l10n.containerIsVm,
-                          ?container.description,
-                        ].join(' · '),
+                          l10n.vmSummary(
+                            vm.vcpus,
+                            formatBytes(vm.memoryMib * 1024 * 1024),
+                          ),
+                          if (vm.description.isNotEmpty) vm.description,
+                        ].join('\n'),
                       ),
-                    const SizedBox(height: 4),
-                    WorkloadStateLabel(state: container.state),
-                  ],
-                ),
-                trailing: WorkloadMenu(
-                  busy: _busy.contains('ct:${container.id}'),
-                  actions: actionsFor(
-                    container.state,
-                    supported: w.containerActions,
+                      const SizedBox(height: 4),
+                      WorkloadStateLabel(state: vm.state),
+                    ],
                   ),
-                  onShell: container.state == WorkloadState.running
-                      ? () async {
-                          final options = await _api.containerShell(container);
-                          if (!context.mounted) return;
-                          await openShell(
+                  trailing: WorkloadMenu(
+                    busy: _busy.contains('vm:${vm.id}'),
+                    actions: actionsFor(vm.state, supported: _vmActions),
+                    onShell: vm.state == WorkloadState.running
+                        ? () => openShell(
                             context,
                             widget.session,
-                            options,
-                            container.name,
-                          );
-                        }
-                      : null,
-                  onSelected: (action) => _run(
-                    'ct:${container.id}',
-                    container.name,
-                    action,
-                    () => _api.containerAction(container, action),
-                    isVm: container.isVm,
+                            WorkloadsApi.vmShell(vm.id),
+                            vm.name,
+                          )
+                        : null,
+                    onSelected: (action) => _run(
+                      'vm:${vm.id}',
+                      vm.name,
+                      action,
+                      () => _api.vmAction(vm.id, action),
+                      isVm: true,
+                    ),
                   ),
                 ),
-              ),
-          ],
+            ]),
+          if (w.containers case final containers?)
+            ...groupedSection(
+              l10n.containersTitle,
+              empty: l10n.containersEmpty,
+              [
+                for (final container in containers)
+                  ListTile(
+                    leading: IconTile(
+                      container.isVm
+                          ? Icons.computer_rounded
+                          : Icons.inventory_2_rounded,
+                      container.isVm
+                          ? AppPalette.tilePurple
+                          : AppPalette.tileTeal,
+                      size: 40,
+                    ),
+                    title: Text(container.name),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (container.isVm || container.description != null)
+                          Text(
+                            [
+                              if (container.isVm) l10n.containerIsVm,
+                              ?container.description,
+                            ].join(' · '),
+                          ),
+                        const SizedBox(height: 4),
+                        WorkloadStateLabel(state: container.state),
+                      ],
+                    ),
+                    trailing: WorkloadMenu(
+                      busy: _busy.contains('ct:${container.id}'),
+                      actions: actionsFor(
+                        container.state,
+                        supported: w.containerActions,
+                      ),
+                      onShell: container.state == WorkloadState.running
+                          ? () async {
+                              final options = await _api.containerShell(
+                                container,
+                              );
+                              if (!context.mounted) return;
+                              await openShell(
+                                context,
+                                widget.session,
+                                options,
+                                container.name,
+                              );
+                            }
+                          : null,
+                      onSelected: (action) => _run(
+                        'ct:${container.id}',
+                        container.name,
+                        action,
+                        () => _api.containerAction(container, action),
+                        isVm: container.isVm,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
         ],
       ),
     );
   }
-}
-
-class _Heading extends StatelessWidget {
-  const _Heading(this.text);
-
-  final String text;
-
-  @override
-  Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.fromLTRB(16, 20, 16, 4),
-    child: Text(text, style: Theme.of(context).textTheme.titleMedium),
-  );
-}
-
-class _Empty extends StatelessWidget {
-  const _Empty(this.text);
-
-  final String text;
-
-  @override
-  Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-    child: Text(
-      text,
-      style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
-    ),
-  );
 }

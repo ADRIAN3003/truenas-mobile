@@ -6,6 +6,8 @@ import '../../core/models/system.dart';
 import '../../core/session/truenas_session.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../shared/formatting.dart';
+import '../../shared/theme.dart';
+import '../../shared/ui.dart';
 import '../../shared/viz_colors.dart';
 import '../../shared/widgets.dart';
 import '../sharing/sharing_widgets.dart';
@@ -94,7 +96,6 @@ class _UpdatesScreenState extends State<UpdatesScreen>
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final theme = Theme.of(context);
     return Scaffold(
       appBar: AppBar(title: Text(l10n.updatesTitle)),
       body: AsyncBody<_UpdatesData>(
@@ -104,25 +105,20 @@ class _UpdatesScreenState extends State<UpdatesScreen>
         builder: (data) {
           final (version, update, envs) = data;
           return ListView(
-            padding: const EdgeInsets.only(bottom: 16),
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
             children: [
               _UpdateCard(
                 version: version,
                 update: update,
                 onInstall: () => _install(update),
               ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
-                child: Text(
-                  l10n.bootEnvsTitle,
-                  style: theme.textTheme.titleSmall,
-                ),
-              ),
-              for (final env in envs)
-                _BootEnvTile(
-                  env: env,
-                  onAction: (action) => _bootEnvAction(env, action),
-                ),
+              ...groupedSection(l10n.bootEnvsTitle, indent: 72, [
+                for (final env in envs)
+                  _BootEnvTile(
+                    env: env,
+                    onAction: (action) => _bootEnvAction(env, action),
+                  ),
+              ]),
             ],
           );
         },
@@ -166,7 +162,6 @@ class _UpdateCard extends StatelessWidget {
     };
     final notes = update.releaseNotesUrl;
     return Card(
-      margin: const EdgeInsets.fromLTRB(16, 16, 16, 0),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -180,7 +175,7 @@ class _UpdateCard extends StatelessWidget {
             const SizedBox(height: 8),
             Row(
               children: [
-                Icon(icon, color: color),
+                SoftIcon(icon, statusColors(context, color).$1),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(status, style: theme.textTheme.titleMedium),
@@ -232,7 +227,11 @@ class _BootEnvTile extends StatelessWidget {
     final muted = Theme.of(context).colorScheme.onSurfaceVariant;
     final canDelete = !env.active && !env.activated;
     return ListTile(
-      leading: const Icon(Icons.history),
+      leading: IconTile(
+        Icons.history_rounded,
+        env.active ? AppPalette.tileGreen : AppPalette.tileSlate,
+        size: 40,
+      ),
       title: Text(env.id),
       subtitle: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

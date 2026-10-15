@@ -6,6 +6,9 @@ import 'package:intl/intl.dart';
 import '../../core/models/alert.dart';
 import '../../core/session/truenas_session.dart';
 import '../../l10n/generated/app_localizations.dart';
+import '../../shared/theme.dart';
+import '../../shared/ui.dart';
+import '../../shared/widgets.dart';
 import '../../shared/connect_dialogs.dart';
 import '../../shared/viz_colors.dart';
 
@@ -88,25 +91,25 @@ class _AlertsTabState extends State<AlertsTab> {
     }
     final active = alerts.where((a) => !a.dismissed).toList();
     final dismissed = alerts.where((a) => a.dismissed).toList();
-    final theme = Theme.of(context);
-    Widget heading(String text) => Padding(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
-      child: Text(text, style: theme.textTheme.titleSmall),
-    );
     return RefreshIndicator.adaptive(
       onRefresh: _load,
       child: ListView(
-        padding: const EdgeInsets.only(bottom: 24),
+        padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
         children: [
-          heading(l10n.alertsActive),
-          if (active.isEmpty)
-            ListTile(
-              leading: const Icon(Icons.check_circle, color: VizColors.good),
-              title: Text(l10n.alertsNone),
-            ),
-          for (final alert in active) _AlertTile(alert, onToggle: _toggle),
-          if (dismissed.isNotEmpty) heading(l10n.alertsDismissed),
-          for (final alert in dismissed) _AlertTile(alert, onToggle: _toggle),
+          ...groupedSection(l10n.alertsActive, indent: 72, [
+            if (active.isEmpty)
+              ListTile(
+                leading: SoftIcon(
+                  Icons.check_circle_rounded,
+                  AppPalette.of(context).good,
+                ),
+                title: Text(l10n.alertsNone),
+              ),
+            for (final alert in active) _AlertTile(alert, onToggle: _toggle),
+          ]),
+          ...groupedSection(l10n.alertsDismissed, indent: 72, [
+            for (final alert in dismissed) _AlertTile(alert, onToggle: _toggle),
+          ]),
         ],
       ),
     );
@@ -149,7 +152,11 @@ class _AlertTile extends StatelessWidget {
     return Opacity(
       opacity: alert.dismissed ? 0.6 : 1,
       child: ListTile(
-        leading: Icon(icon, color: color, semanticLabel: label),
+        leading: SoftIcon(
+          icon,
+          statusColors(context, color).$1,
+          semanticLabel: label,
+        ),
         title: Text(alert.plainMessage),
         subtitle: Text(meta),
         isThreeLine: alert.plainMessage.length > 60,

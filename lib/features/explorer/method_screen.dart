@@ -6,6 +6,8 @@ import 'package:flutter/services.dart';
 import '../../core/models/api_method.dart';
 import '../../core/session/truenas_session.dart';
 import '../../l10n/generated/app_localizations.dart';
+import '../../shared/theme.dart';
+import '../../shared/ui.dart';
 import '../../shared/viz_colors.dart';
 import '../../shared/widgets.dart';
 import '../../shared/connect_dialogs.dart';
@@ -116,17 +118,17 @@ class _MethodScreenState extends State<MethodScreen> {
               runSpacing: 4,
               children: [
                 if (_method.job)
-                  Chip(
-                    avatar: const Icon(Icons.work_history_outlined, size: 18),
-                    label: Text(l10n.explorerJob),
-                  ),
+                  StatusPill(label: l10n.explorerJob, tone: StatusTone.info),
                 if (_method.readOnly)
-                  Chip(
-                    avatar: const Icon(Icons.visibility_outlined, size: 18),
-                    label: Text(l10n.explorerReadOnly),
+                  StatusPill(
+                    label: l10n.explorerReadOnly,
+                    tone: StatusTone.good,
                   ),
                 if (_method.noAuthRequired)
-                  Chip(label: Text(l10n.explorerNoAuth)),
+                  StatusPill(
+                    label: l10n.explorerNoAuth,
+                    tone: StatusTone.warning,
+                  ),
               ],
             ),
             if (_method.description.isNotEmpty) ...[
@@ -140,8 +142,7 @@ class _MethodScreenState extends State<MethodScreen> {
                 style: theme.textTheme.bodySmall,
               ),
             ],
-            const SizedBox(height: 16),
-            Text(l10n.explorerParameters, style: theme.textTheme.titleMedium),
+            SectionHeader(l10n.explorerParameters),
             if (_inputs.isEmpty)
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 8),
@@ -386,7 +387,7 @@ class _JsonBlock extends StatelessWidget {
         : text;
     return Card(
       margin: EdgeInsets.zero,
-      color: theme.colorScheme.surfaceContainerHighest,
+      color: AppPalette.of(context).cardRaised,
       child: Padding(
         padding: const EdgeInsets.fromLTRB(12, 4, 4, 12),
         child: Column(

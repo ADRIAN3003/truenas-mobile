@@ -5,6 +5,8 @@ import 'package:intl/intl.dart';
 import '../../core/models/system.dart';
 import '../../core/session/truenas_session.dart';
 import '../../l10n/generated/app_localizations.dart';
+import '../../shared/theme.dart';
+import '../../shared/ui.dart';
 import '../../shared/viz_colors.dart';
 import '../../shared/widgets.dart';
 import '../sharing/sharing_widgets.dart';
@@ -95,49 +97,55 @@ class _ApiKeysScreenState extends State<ApiKeysScreen>
         error: error,
         onRefresh: load,
         builder: (keys) => ListView(
-          padding: const EdgeInsets.only(bottom: 88),
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, 88),
           children: [
-            if (keys.isEmpty)
-              Padding(
-                padding: const EdgeInsets.all(32),
-                child: Center(child: Text(l10n.apiKeysEmpty)),
-              ),
-            for (final key in keys)
-              ListTile(
-                leading: const Icon(Icons.key_outlined),
-                title: Text(key.name),
-                subtitle: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      [
-                        ?key.username,
-                        if (key.createdAt case final created?)
-                          l10n.apiKeyCreatedOn(
-                            DateFormat.yMMMd(locale).format(created),
-                          ),
-                        if (key.expiresAt case final expires?)
-                          l10n.apiKeyExpires(
-                            DateFormat.yMMMd(locale).format(expires),
-                          ),
-                      ].join(' · '),
-                    ),
-                    if (key.revoked)
-                      Padding(
-                        padding: const EdgeInsets.only(top: 4),
-                        child: StatusLabel(
-                          icon: Icons.block,
-                          color: VizColors.critical,
-                          label: l10n.apiKeyRevoked,
-                        ),
+            if (keys.isEmpty) EmptyCard(l10n.apiKeysEmpty),
+            if (keys.isNotEmpty)
+              GroupedCard(
+                indent: 72,
+                children: [
+                  for (final key in keys)
+                    ListTile(
+                      leading: const IconTile(
+                        Icons.key_rounded,
+                        AppPalette.tileOrange,
+                        size: 40,
                       ),
-                  ],
-                ),
-                trailing: IconButton(
-                  tooltip: l10n.delete,
-                  icon: const Icon(Icons.delete_outline),
-                  onPressed: () => _delete(key),
-                ),
+                      title: Text(key.name),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            [
+                              ?key.username,
+                              if (key.createdAt case final created?)
+                                l10n.apiKeyCreatedOn(
+                                  DateFormat.yMMMd(locale).format(created),
+                                ),
+                              if (key.expiresAt case final expires?)
+                                l10n.apiKeyExpires(
+                                  DateFormat.yMMMd(locale).format(expires),
+                                ),
+                            ].join(' · '),
+                          ),
+                          if (key.revoked)
+                            Padding(
+                              padding: const EdgeInsets.only(top: 4),
+                              child: StatusLabel(
+                                icon: Icons.block,
+                                color: VizColors.critical,
+                                label: l10n.apiKeyRevoked,
+                              ),
+                            ),
+                        ],
+                      ),
+                      trailing: IconButton(
+                        tooltip: l10n.delete,
+                        icon: const Icon(Icons.delete_outline),
+                        onPressed: () => _delete(key),
+                      ),
+                    ),
+                ],
               ),
           ],
         ),

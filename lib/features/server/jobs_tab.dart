@@ -7,6 +7,8 @@ import '../../core/api/events.dart';
 import '../../core/models/job.dart';
 import '../../core/session/truenas_session.dart';
 import '../../l10n/generated/app_localizations.dart';
+import '../../shared/ui.dart';
+import '../../shared/widgets.dart';
 import '../../shared/connect_dialogs.dart';
 import '../../shared/viz_colors.dart';
 
@@ -69,24 +71,15 @@ class _JobsTabState extends State<JobsTab> {
   Future<void> _abort(TrueNasJob job) async {
     final l10n = AppLocalizations.of(context);
     final messenger = ScaffoldMessenger.of(context);
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(l10n.jobAbortTitle),
-        content: Text(job.title),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: Text(l10n.cancel),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: Text(l10n.jobAbort),
-          ),
-        ],
-      ),
+    final confirmed = await confirmAction(
+      context,
+      title: l10n.jobAbortTitle,
+      body: job.title,
+      confirmLabel: l10n.jobAbort,
+      cancelLabel: l10n.cancel,
+      destructive: true,
     );
-    if (confirmed != true) return;
+    if (!confirmed) return;
     try {
       await widget.session.abortJob(job.id);
     } catch (error) {
@@ -116,12 +109,16 @@ class _JobsTabState extends State<JobsTab> {
                 Center(child: Text(l10n.jobsEmpty)),
               ],
             )
-          : ListView.separated(
-              padding: const EdgeInsets.only(bottom: 24),
-              itemCount: jobs.length,
-              separatorBuilder: (_, _) => const Divider(height: 1),
-              itemBuilder: (context, index) =>
-                  _JobTile(jobs[index], onAbort: _abort),
+          : ListView(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+              children: [
+                GroupedCard(
+                  indent: 72,
+                  children: [
+                    for (final job in jobs) _JobTile(job, onAbort: _abort),
+                  ],
+                ),
+              ],
             ),
     );
   }
@@ -168,7 +165,11 @@ class _JobTile extends StatelessWidget {
     ].join(' · ');
     final percent = job.percent;
     return ListTile(
-      leading: Icon(icon, color: color, semanticLabel: label),
+      leading: SoftIcon(
+        icon,
+        statusColors(context, color).$1,
+        semanticLabel: label,
+      ),
       title: Text(job.title, maxLines: 2, overflow: TextOverflow.ellipsis),
       subtitle: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

@@ -40,6 +40,7 @@ class _DashboardTabState extends State<DashboardTab> {
   final _history = <RealtimeStats>[];
   StreamSubscription<RealtimeStats>? _realtime;
   StreamSubscription<Object?>? _alertChanges;
+  StreamSubscription<void>? _reconnects;
   List<PoolSummary>? _pools;
   List<TrueNasAlert>? _alerts;
 
@@ -57,6 +58,8 @@ class _DashboardTabState extends State<DashboardTab> {
       (_) => _loadAlerts(),
       onError: (_) {},
     );
+    // Pools and alerts may have changed while the connection was down.
+    _reconnects = widget.session.reconnected.listen((_) => _refresh());
     _refresh();
   }
 
@@ -64,6 +67,7 @@ class _DashboardTabState extends State<DashboardTab> {
   void dispose() {
     _realtime?.cancel();
     _alertChanges?.cancel();
+    _reconnects?.cancel();
     super.dispose();
   }
 

@@ -38,6 +38,10 @@ class JsonRpcClient {
 
   bool get isClosed => _closed;
 
+  /// Fires after a dropped connection was restored and signed in again, so
+  /// event subscriptions can be renewed. A plain socket never reconnects.
+  Stream<void> get reconnected => const Stream.empty();
+
   /// Calls [method] with positional [params] and returns its `result`.
   Future<Object?> call(String method, [List<Object?> params = const []]) {
     if (_closed) {

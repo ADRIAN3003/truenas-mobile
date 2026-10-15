@@ -257,7 +257,7 @@ class FakeTrueNasServer {
   /// Version offered by the update check, or null when up to date.
   String? availableUpdate = '25.10.8';
 
-  /// Token handed out by `auth.generate_token` and accepted by `/_shell/`.
+  /// Token handed out by `auth.generate_token` and accepted by `/websocket/shell/`.
   String shellToken = 'shell-token';
   List<dynamic>? shellTokenParams;
 
@@ -429,6 +429,20 @@ class FakeTrueNasServer {
   /// Paths of WebSocket connections, e.g. `/api/v25.10.5`.
   final connectedPaths = <String>[];
 
+  /// Refuse calls other than `auth.*` before login, like the middleware.
+  bool requireLogin = false;
+
+  final _apiSockets = <WebSocket>[];
+
+  /// Closes every API connection, as a phone does to a backgrounded app.
+  Future<void> dropConnections() async {
+    final sockets = [..._apiSockets];
+    _apiSockets.clear();
+    for (final socket in sockets) {
+      await socket.close();
+    }
+  }
+
   int get port => _server.port;
 
   Future<void> close() => _server.close(force: true);
@@ -454,7 +468,9 @@ class FakeTrueNasServer {
         WebSocketTransformer.isUpgradeRequest(request)) {
       connectedPaths.add(request.uri.path);
       final socket = await WebSocketTransformer.upgrade(request);
+      _apiSockets.add(socket);
       var awaitingOtp = false;
+      var signedIn = false;
       void notify(String collection, String msg, Object? fields) => socket.add(
         jsonEncode({
           'jsonrpc': '2.0',
@@ -473,6 +489,24 @@ class FakeTrueNasServer {
         Object? result;
         final method = message['method'] as String;
         calls.add((method, params));
+        if (requireLogin && !signedIn && !method.startsWith('auth.login')) {
+          socket.add(
+            jsonEncode({
+              'jsonrpc': '2.0',
+              'id': message['id'],
+              'error': {
+                'code': -32001,
+                'message': 'Method call error',
+                'data': {
+                  'error': 207,
+                  'errname': 'ENOTAUTHENTICATED',
+                  'reason': 'Not authenticated',
+                },
+              },
+            }),
+          );
+          return;
+        }
         if (method.startsWith('$snapshotService.')) {
           result = _snapshotCall(method.split('.').last, params);
         }
@@ -496,13 +530,15 @@ class FakeTrueNasServer {
               awaitingOtp = true;
               result = {'response_type': 'OTP_REQUIRED', 'username': username};
             } else {
+              signedIn = true;
               result = _success();
             }
           case 'auth.login_ex_continue':
             final data = params.first as Map<String, dynamic>;
-            result = awaitingOtp && data['otp_token'] == otp
-                ? _success()
-                : {'response_type': 'AUTH_ERR'};
+            signedIn = awaitingOtp && data['otp_token'] == otp;
+            result = signedIn ? _success() : {'response_type': 'AUTH_ERR'};
+          case 'auth.me':
+            result = {'pw_name': username};
           case 'system.info':
             result = {'hostname': 'nas', 'version': '25.10.7'};
           case 'core.subscribe':
@@ -934,7 +970,7 @@ class FakeTrueNasServer {
       });
       return;
     }
-    if (request.uri.path == '/_shell/' &&
+    if (request.uri.path == '/websocket/shell/' &&
         WebSocketTransformer.isUpgradeRequest(request)) {
       final socket = await WebSocketTransformer.upgrade(request);
       var connected = false;

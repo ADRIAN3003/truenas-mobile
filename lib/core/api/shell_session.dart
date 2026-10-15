@@ -7,8 +7,8 @@ import 'package:stream_channel/stream_channel.dart';
 import 'api_exception.dart';
 import 'json_rpc_client.dart';
 
-/// A terminal on the server through the `/_shell/` WebSocket, the same one
-/// the web UI uses.
+/// A terminal on the server through the `/websocket/shell/` WebSocket, the
+/// same one the web UI uses.
 ///
 /// The protocol: get a one-time token with `auth.generate_token`, open the
 /// socket, send `{"token": ..., "options": {...}}`, and wait for
@@ -25,7 +25,7 @@ class ShellSession {
   /// The server's id for this shell, used for resizing.
   final String id;
 
-  /// Connects using [openSocket] (the session's `openSocket('/_shell/')`).
+  /// Connects using [openSocket] (the session's `openSocket(shellPath)`).
   /// [options] picks something other than the host shell, e.g.
   /// `{'vm_id': 1}`.
   static Future<ShellSession> open(

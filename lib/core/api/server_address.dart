@@ -36,12 +36,19 @@ class ServerAddress {
   Uri get versionsUri => uri.replace(path: '/api/versions');
 
   /// `wss://host[:port]/api/<version>`
-  Uri webSocketUri(String apiVersion) =>
-      uri.replace(scheme: isSecure ? 'wss' : 'ws', path: '/api/$apiVersion');
+  Uri webSocketUri(String apiVersion) => socketUri('/api/$apiVersion');
 
-  /// A WebSocket on this server at [path], e.g. `wss://host/_shell/`.
-  Uri socketUri(String path) =>
-      uri.replace(scheme: isSecure ? 'wss' : 'ws', path: path);
+  /// A WebSocket on this server at [path], e.g.
+  /// `wss://host/websocket/shell/`.
+  ///
+  /// The port is spelled out: Dart knows no default port for `wss`, so a
+  /// copied `https` address without one would otherwise read as port 0.
+  Uri socketUri(String path) => Uri(
+    scheme: isSecure ? 'wss' : 'ws',
+    host: uri.host,
+    port: uri.port,
+    path: path,
+  );
 
   /// The address as stored and shown, e.g. `https://nas.local:8443`.
   @override

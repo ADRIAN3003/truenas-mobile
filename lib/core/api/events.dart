@@ -31,12 +31,22 @@ class CollectionUpdate {
 extension EventSubscriptions on JsonRpcClient {
   /// Subscribes to [event] (e.g. `reporting.realtime` or `alert.list`) with
   /// `core.subscribe` while the stream has a listener, and unsubscribes with
-  /// `core.unsubscribe` when it is cancelled.
+  /// `core.unsubscribe` when it is cancelled. Subscribes again after the
+  /// client reconnects.
   Stream<CollectionUpdate> subscribe(String event) {
     final collection = event.split(':').first;
     late final StreamController<CollectionUpdate> controller;
     StreamSubscription<JsonRpcNotification>? notifications;
+    StreamSubscription<void>? reconnects;
     Future<Object?>? subscription;
+
+    void start() {
+      subscription = call('core.subscribe', [event]);
+      subscription!.catchError((Object error) {
+        controller.addError(error);
+        return null;
+      });
+    }
 
     controller = StreamController<CollectionUpdate>(
       onListen: () {
@@ -49,14 +59,13 @@ extension EventSubscriptions on JsonRpcClient {
           final update = CollectionUpdate.fromJson(params);
           if (update.collection == collection) controller.add(update);
         }, onDone: controller.close);
-        subscription = call('core.subscribe', [event]);
-        subscription!.catchError((Object error) {
-          controller.addError(error);
-          return null;
-        });
+        start();
+        // A new connection has no subscriptions: ask again.
+        reconnects = reconnected.listen((_) => start());
       },
       onCancel: () async {
         await notifications?.cancel();
+        await reconnects?.cancel();
         final id = await subscription?.catchError((_) => null);
         if (id != null && !isClosed) {
           await call('core.unsubscribe', [id]).catchError((_) => null);

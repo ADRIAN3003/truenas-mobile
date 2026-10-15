@@ -59,7 +59,8 @@ lib/
 Packages (pinned in `pubspec.yaml`): `flutter_riverpod` (state), `go_router`,
 `web_socket_channel`, `http`, `flutter_secure_storage` (credentials),
 `freezed` + `json_serializable` (models), `fl_chart`, `xterm`,
-`dynamic_color`, `local_auth` (biometric unlock), `intl`.
+`dynamic_color`, `local_auth` (biometric unlock), `flutter_localizations` +
+`intl` (all UI strings come from ARB files, English is the template).
 
 ### Multiple instances
 - Each instance stores name, URL, auth type, credentials (secure storage only),
@@ -131,15 +132,17 @@ any point after milestone 2.
 ## 5. Open questions (defaults used until answered)
 
 1. **License**: MIT (default), Apache-2.0, or GPL-3.0?
-2. **App name and ID**: "TrueNAS" is an iXsystems trademark, so for a public
-   store listing a name like "NAS Manager for TrueNAS" is safer. Default name
-   *TrueNAS Mobile* with ID `io.github.adrian3003.truenasmobile`.
+2. **App name**: "TrueNAS" is an iXsystems trademark, so for a public store
+   listing a name like "NAS Manager for TrueNAS" is safer. Default name
+   *TrueNAS Mobile*. App ID decided: `hu.adrian.truenas_mobile` on Android,
+   `hu.adrian.truenasMobile` on iOS (iOS bundle IDs cannot contain `_`).
 3. **iOS signing**: unsigned IPA (default) or do you have an Apple Developer account?
 4. **Android signing**: generate a release keystore and add it as secrets
    (default: debug-signed until you add them).
 5. **Distribution**: GitHub Releases only (default), or also Play Store / F-Droid / App Store?
 6. **Oldest version**: 25.04 (default); 24.10 is nearly free to add because
    newer servers still serve the `v24_10` API.
-7. **Languages**: English only at first (default, i18n-ready), add Hungarian?
+7. **Languages** (decided): multi-language via Flutter `gen-l10n` and ARB files
+   in `lib/l10n/`, English first; more languages are added as `app_<locale>.arb`.
 8. **Self-signed certificates**: trust on first use with fingerprint pinning (default).
 9. **Auth**: API key recommended, username + password + 2FA also supported (default both).

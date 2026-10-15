@@ -20,6 +20,7 @@ for Android and iOS that talks to the official TrueNAS middleware API
 - Users, groups, API keys, certificates, network, services, updates
 - Job progress and notifications for long-running tasks
 - An API explorer that reaches every method the server exposes
+- Multi-language UI (English first, more languages welcome)
 
 ## Supported TrueNAS versions
 
@@ -76,6 +77,17 @@ To sign Android releases, add these repository secrets:
 | `ANDROID_STORE_PASSWORD` | keystore password |
 
 Without them, release APKs are signed with the debug key.
+
+## Translations
+
+The app is built for multiple languages, with English as the base. All UI
+text lives in ARB files under [`lib/l10n/`](lib/l10n/), and `app_en.arb` is
+the template. To add a language:
+
+1. Copy `lib/l10n/app_en.arb` to `app_<locale>.arb` (for example
+   `app_hu.arb`), set `"@@locale"` and translate the values.
+2. Add the locale to `CFBundleLocalizations` in `ios/Runner/Info.plist`.
+3. Run `flutter gen-l10n` (it also runs automatically on build).
 
 ## Contributing
 

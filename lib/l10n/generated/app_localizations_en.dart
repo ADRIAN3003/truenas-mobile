@@ -1314,4 +1314,115 @@ class AppLocalizationsEn extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get moreTools => 'Tools';
+
+  @override
+  String get explorerTitle => 'API explorer';
+
+  @override
+  String get explorerSearch => 'Search methods';
+
+  @override
+  String get explorerNoMatches => 'No methods match.';
+
+  @override
+  String explorerMethodCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count methods',
+      one: '1 method',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get explorerJob => 'Job';
+
+  @override
+  String get explorerReadOnly => 'Read-only';
+
+  @override
+  String get explorerNoAuth => 'No sign-in needed';
+
+  @override
+  String explorerRoles(String roles) {
+    return 'Roles: $roles';
+  }
+
+  @override
+  String get explorerParameters => 'Parameters';
+
+  @override
+  String get explorerNoParameters => 'This method takes no parameters.';
+
+  @override
+  String get explorerSendParam => 'Send';
+
+  @override
+  String get explorerOptional => 'optional';
+
+  @override
+  String explorerInvalidJson(String reason) {
+    return 'Not valid JSON: $reason';
+  }
+
+  @override
+  String get explorerInvalidNumber => 'Enter a number';
+
+  @override
+  String get explorerRun => 'Run';
+
+  @override
+  String explorerRunTitle(String method) {
+    return 'Run $method?';
+  }
+
+  @override
+  String get explorerRunBody =>
+      'This method can change settings or data on the server.';
+
+  @override
+  String get explorerResult => 'Result';
+
+  @override
+  String explorerJobRunning(int id) {
+    return 'Running as job $id…';
+  }
+
+  @override
+  String get explorerReturns => 'Returns';
+
+  @override
+  String get explorerFileTransfer =>
+      'This method transfers a file, which the explorer can\'t do yet.';
+
+  @override
+  String get explorerCopied => 'Copied to clipboard';
+
+  @override
+  String get explorerUnset => 'Not set';
+
+  @override
+  String get shellTitle => 'Shell';
+
+  @override
+  String get shellConnecting => 'Opening a shell…';
+
+  @override
+  String get shellClosed => 'The shell has ended.';
+
+  @override
+  String get shellReconnect => 'Start a new shell';
+
+  @override
+  String get shellKeyCtrlC => 'Ctrl+C';
+
+  @override
+  String get shellKeyEsc => 'Esc';
+
+  @override
+  String get shellKeyTab => 'Tab';
 }

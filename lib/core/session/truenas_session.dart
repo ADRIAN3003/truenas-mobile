@@ -2,9 +2,11 @@ import '../api/api_exception.dart';
 import '../api/auth.dart';
 import '../api/certificate_trust.dart';
 import '../api/events.dart';
+import '../api/explorer_api.dart';
 import '../api/json_rpc_client.dart';
 import '../api/method_catalog.dart';
 import '../api/sharing_api.dart';
+import '../api/shell_session.dart';
 import '../api/storage_api.dart';
 import '../api/system_api.dart';
 import '../api/truenas_connection.dart';
@@ -27,6 +29,16 @@ class TrueNasSession {
   late final sharing = SharingApi(client, catalog);
   late final workloads = WorkloadsApi(client, catalog);
   late final system = SystemApi(client, catalog);
+  late final explorer = ExplorerApi(client);
+
+  /// Opens a terminal: the host shell by default, or a VM, app or container
+  /// console through [options].
+  Future<ShellSession> openShell({Map<String, Object?> options = const {}}) =>
+      ShellSession.open(
+        client,
+        () => connection.openSocket('/_shell/'),
+        options: options,
+      );
 
   String get apiVersion => connection.apiVersion;
   JsonRpcClient get client => connection.client;

@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:web_socket_channel/io.dart';
+import 'package:web_socket_channel/web_socket_channel.dart';
 
 import 'api_exception.dart';
 import 'api_version.dart';
@@ -22,7 +23,7 @@ class UnsupportedServerException implements Exception {
 
 /// An open, not yet authenticated, JSON-RPC connection to a TrueNAS server.
 class TrueNasConnection {
-  TrueNasConnection._(this.address, this.apiVersion, this.client);
+  TrueNasConnection._(this.address, this.apiVersion, this.client, this._tls);
 
   final ServerAddress address;
 
@@ -30,6 +31,22 @@ class TrueNasConnection {
   /// did not list its versions.
   final String apiVersion;
   final JsonRpcClient client;
+  final PinningHttpClientFactory _tls;
+
+  /// Opens another WebSocket on the same server, with the same certificate
+  /// checks, e.g. `/_shell/` for the terminal.
+  Future<WebSocketChannel> openSocket(
+    String path, {
+    Duration timeout = const Duration(seconds: 20),
+  }) async {
+    final channel = IOWebSocketChannel.connect(
+      address.socketUri(path),
+      customClient: _tls.create(),
+      pingInterval: const Duration(seconds: 30),
+    );
+    await channel.ready.timeout(timeout);
+    return channel;
+  }
 
   /// Picks the newest supported API version and opens its WebSocket.
   ///
@@ -51,7 +68,7 @@ class TrueNasConnection {
         pingInterval: const Duration(seconds: 30),
       );
       await channel.ready.timeout(timeout);
-      return TrueNasConnection._(address, version, JsonRpcClient(channel));
+      return TrueNasConnection._(address, version, JsonRpcClient(channel), tls);
     } on UnsupportedServerException {
       rethrow;
     } on ApiException {

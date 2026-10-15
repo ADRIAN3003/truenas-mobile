@@ -2271,6 +2271,192 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{count, plural, =0{No members} =1{1 member} other{{count} members}}'**
   String groupMembers(int count);
+
+  /// Section header in the More tab.
+  ///
+  /// In en, this message translates to:
+  /// **'Tools'**
+  String get moreTools;
+
+  /// API explorer screen title.
+  ///
+  /// In en, this message translates to:
+  /// **'API explorer'**
+  String get explorerTitle;
+
+  /// Search field hint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search methods'**
+  String get explorerSearch;
+
+  /// Shown when the search finds nothing.
+  ///
+  /// In en, this message translates to:
+  /// **'No methods match.'**
+  String get explorerNoMatches;
+
+  /// Number of methods in a namespace.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 method} other{{count} methods}}'**
+  String explorerMethodCount(int count);
+
+  /// Badge for methods that run as a job.
+  ///
+  /// In en, this message translates to:
+  /// **'Job'**
+  String get explorerJob;
+
+  /// Badge for methods that don't change anything.
+  ///
+  /// In en, this message translates to:
+  /// **'Read-only'**
+  String get explorerReadOnly;
+
+  /// Badge for methods that work without signing in.
+  ///
+  /// In en, this message translates to:
+  /// **'No sign-in needed'**
+  String get explorerNoAuth;
+
+  /// Roles allowed to call the method.
+  ///
+  /// In en, this message translates to:
+  /// **'Roles: {roles}'**
+  String explorerRoles(String roles);
+
+  /// Section header.
+  ///
+  /// In en, this message translates to:
+  /// **'Parameters'**
+  String get explorerParameters;
+
+  /// Shown when there are no parameters.
+  ///
+  /// In en, this message translates to:
+  /// **'This method takes no parameters.'**
+  String get explorerNoParameters;
+
+  /// Checkbox to include an optional parameter.
+  ///
+  /// In en, this message translates to:
+  /// **'Send'**
+  String get explorerSendParam;
+
+  /// Label for an optional parameter.
+  ///
+  /// In en, this message translates to:
+  /// **'optional'**
+  String get explorerOptional;
+
+  /// Validation message for JSON fields.
+  ///
+  /// In en, this message translates to:
+  /// **'Not valid JSON: {reason}'**
+  String explorerInvalidJson(String reason);
+
+  /// Validation message.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a number'**
+  String get explorerInvalidNumber;
+
+  /// Button that calls the method.
+  ///
+  /// In en, this message translates to:
+  /// **'Run'**
+  String get explorerRun;
+
+  /// Confirmation title before calling a method that may change things.
+  ///
+  /// In en, this message translates to:
+  /// **'Run {method}?'**
+  String explorerRunTitle(String method);
+
+  /// Confirmation body.
+  ///
+  /// In en, this message translates to:
+  /// **'This method can change settings or data on the server.'**
+  String get explorerRunBody;
+
+  /// Section header.
+  ///
+  /// In en, this message translates to:
+  /// **'Result'**
+  String get explorerResult;
+
+  /// Shown while a job runs.
+  ///
+  /// In en, this message translates to:
+  /// **'Running as job {id}…'**
+  String explorerJobRunning(int id);
+
+  /// Section header for the result schema.
+  ///
+  /// In en, this message translates to:
+  /// **'Returns'**
+  String get explorerReturns;
+
+  /// Shown for upload/download methods.
+  ///
+  /// In en, this message translates to:
+  /// **'This method transfers a file, which the explorer can\'t do yet.'**
+  String get explorerFileTransfer;
+
+  /// Snackbar.
+  ///
+  /// In en, this message translates to:
+  /// **'Copied to clipboard'**
+  String get explorerCopied;
+
+  /// Dropdown entry for leaving a value null.
+  ///
+  /// In en, this message translates to:
+  /// **'Not set'**
+  String get explorerUnset;
+
+  /// Shell screen title.
+  ///
+  /// In en, this message translates to:
+  /// **'Shell'**
+  String get shellTitle;
+
+  /// Shown while the shell starts.
+  ///
+  /// In en, this message translates to:
+  /// **'Opening a shell…'**
+  String get shellConnecting;
+
+  /// Shown when the server closes the shell.
+  ///
+  /// In en, this message translates to:
+  /// **'The shell has ended.'**
+  String get shellClosed;
+
+  /// Button.
+  ///
+  /// In en, this message translates to:
+  /// **'Start a new shell'**
+  String get shellReconnect;
+
+  /// Key button that sends an interrupt.
+  ///
+  /// In en, this message translates to:
+  /// **'Ctrl+C'**
+  String get shellKeyCtrlC;
+
+  /// Key button.
+  ///
+  /// In en, this message translates to:
+  /// **'Esc'**
+  String get shellKeyEsc;
+
+  /// Key button.
+  ///
+  /// In en, this message translates to:
+  /// **'Tab'**
+  String get shellKeyTab;
 }
 
 class _AppLocalizationsDelegate

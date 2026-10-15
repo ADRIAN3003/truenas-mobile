@@ -2457,6 +2457,288 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Tab'**
   String get shellKeyTab;
+
+  /// Data protection screen title and More tab entry.
+  ///
+  /// In en, this message translates to:
+  /// **'Data protection'**
+  String get protectionTitle;
+
+  /// Shown under a section with no tasks.
+  ///
+  /// In en, this message translates to:
+  /// **'No tasks yet.'**
+  String get protectionEmpty;
+
+  /// Section header.
+  ///
+  /// In en, this message translates to:
+  /// **'Periodic snapshots'**
+  String get protectionSnapshots;
+
+  /// Section header.
+  ///
+  /// In en, this message translates to:
+  /// **'Replication'**
+  String get protectionReplication;
+
+  /// Section header.
+  ///
+  /// In en, this message translates to:
+  /// **'Cloud sync'**
+  String get protectionCloudSync;
+
+  /// Section header.
+  ///
+  /// In en, this message translates to:
+  /// **'TrueCloud backup'**
+  String get protectionCloudBackup;
+
+  /// Section header.
+  ///
+  /// In en, this message translates to:
+  /// **'Rsync'**
+  String get protectionRsync;
+
+  /// Task status.
+  ///
+  /// In en, this message translates to:
+  /// **'Not run yet'**
+  String get taskNever;
+
+  /// Task status.
+  ///
+  /// In en, this message translates to:
+  /// **'Waiting'**
+  String get taskWaiting;
+
+  /// Task status.
+  ///
+  /// In en, this message translates to:
+  /// **'Running'**
+  String get taskRunning;
+
+  /// Task status with progress.
+  ///
+  /// In en, this message translates to:
+  /// **'Running · {percent}%'**
+  String taskRunningPercent(int percent);
+
+  /// Task status.
+  ///
+  /// In en, this message translates to:
+  /// **'Succeeded'**
+  String get taskSuccess;
+
+  /// Task status.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed'**
+  String get taskFailed;
+
+  /// Task status.
+  ///
+  /// In en, this message translates to:
+  /// **'On hold'**
+  String get taskHeld;
+
+  /// When the task last ran.
+  ///
+  /// In en, this message translates to:
+  /// **'Last run {date}'**
+  String taskLastRun(String date);
+
+  /// Accessibility label for the task enable switch.
+  ///
+  /// In en, this message translates to:
+  /// **'Enabled'**
+  String get taskEnabled;
+
+  /// Menu action.
+  ///
+  /// In en, this message translates to:
+  /// **'Run now'**
+  String get taskRunNow;
+
+  /// Menu action for a running cloud task.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop'**
+  String get taskStop;
+
+  /// Snackbar.
+  ///
+  /// In en, this message translates to:
+  /// **'Started {name}'**
+  String taskStarted(String name);
+
+  /// Snackbar.
+  ///
+  /// In en, this message translates to:
+  /// **'Stopped {name}'**
+  String taskStopped(String name);
+
+  /// Snackbar.
+  ///
+  /// In en, this message translates to:
+  /// **'Enabled {name}'**
+  String taskEnabledMessage(String name);
+
+  /// Snackbar.
+  ///
+  /// In en, this message translates to:
+  /// **'Disabled {name}'**
+  String taskDisabledMessage(String name);
+
+  /// Confirmation title.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete the task for {name}?'**
+  String taskDeleteTitle(String name);
+
+  /// Confirmation body for deleting a snapshot task.
+  ///
+  /// In en, this message translates to:
+  /// **'Snapshots it already took are kept.'**
+  String get taskDeleteBody;
+
+  /// Snackbar.
+  ///
+  /// In en, this message translates to:
+  /// **'Task deleted'**
+  String get taskDeleted;
+
+  /// Button.
+  ///
+  /// In en, this message translates to:
+  /// **'Add snapshot task'**
+  String get snapshotTaskCreate;
+
+  /// Snackbar.
+  ///
+  /// In en, this message translates to:
+  /// **'Added a snapshot task for {name}'**
+  String snapshotTaskCreated(String name);
+
+  /// Field label.
+  ///
+  /// In en, this message translates to:
+  /// **'Dataset'**
+  String get snapshotTaskDataset;
+
+  /// Switch label.
+  ///
+  /// In en, this message translates to:
+  /// **'Include child datasets'**
+  String get snapshotTaskRecursive;
+
+  /// Field label.
+  ///
+  /// In en, this message translates to:
+  /// **'How often'**
+  String get snapshotTaskSchedule;
+
+  /// Field label.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep for'**
+  String get snapshotTaskKeepFor;
+
+  /// Schedule.
+  ///
+  /// In en, this message translates to:
+  /// **'Every hour'**
+  String get scheduleHourly;
+
+  /// Schedule.
+  ///
+  /// In en, this message translates to:
+  /// **'Every day at midnight'**
+  String get scheduleDaily;
+
+  /// Schedule.
+  ///
+  /// In en, this message translates to:
+  /// **'Every Sunday at midnight'**
+  String get scheduleWeekly;
+
+  /// Schedule that matches no preset.
+  ///
+  /// In en, this message translates to:
+  /// **'Cron: {cron}'**
+  String scheduleCustom(String cron);
+
+  /// Detail for recursive tasks.
+  ///
+  /// In en, this message translates to:
+  /// **'with child datasets'**
+  String get snapshotTaskRecursiveLabel;
+
+  /// Retention.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Keep 1 hour} other{Keep {count} hours}}'**
+  String keepHours(int count);
+
+  /// Retention.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Keep 1 day} other{Keep {count} days}}'**
+  String keepDays(int count);
+
+  /// Retention.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Keep 1 week} other{Keep {count} weeks}}'**
+  String keepWeeks(int count);
+
+  /// Retention.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Keep 1 month} other{Keep {count} months}}'**
+  String keepMonths(int count);
+
+  /// Retention.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Keep 1 year} other{Keep {count} years}}'**
+  String keepYears(int count);
+
+  /// Lifetime unit.
+  ///
+  /// In en, this message translates to:
+  /// **'Hours'**
+  String get unitHours;
+
+  /// Lifetime unit.
+  ///
+  /// In en, this message translates to:
+  /// **'Days'**
+  String get unitDays;
+
+  /// Lifetime unit.
+  ///
+  /// In en, this message translates to:
+  /// **'Weeks'**
+  String get unitWeeks;
+
+  /// Lifetime unit.
+  ///
+  /// In en, this message translates to:
+  /// **'Months'**
+  String get unitMonths;
+
+  /// Lifetime unit.
+  ///
+  /// In en, this message translates to:
+  /// **'Years'**
+  String get unitYears;
+
+  /// Subtitle of the data protection entry in the Storage tab.
+  ///
+  /// In en, this message translates to:
+  /// **'Snapshot tasks, replication and cloud sync'**
+  String get protectionSubtitle;
 }
 
 class _AppLocalizationsDelegate

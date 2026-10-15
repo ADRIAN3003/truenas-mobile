@@ -6,6 +6,7 @@ import '../../l10n/generated/app_localizations.dart';
 import '../../shared/formatting.dart';
 import '../../shared/viz_colors.dart';
 import '../../shared/widgets.dart';
+import '../protection/protection_screen.dart';
 import 'disks_screen.dart';
 import 'pool_screen.dart';
 import 'storage_helpers.dart';
@@ -83,6 +84,20 @@ class _StorageTabState extends State<StorageTab> {
                 context,
                 MaterialPageRoute<void>(
                   builder: (_) => DisksScreen(session: widget.session),
+                ),
+              ),
+            ),
+          ),
+          Card(
+            child: ListTile(
+              leading: const Icon(Icons.shield_outlined),
+              title: Text(l10n.protectionTitle),
+              subtitle: Text(l10n.protectionSubtitle),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute<void>(
+                  builder: (_) => ProtectionScreen(session: widget.session),
                 ),
               ),
             ),

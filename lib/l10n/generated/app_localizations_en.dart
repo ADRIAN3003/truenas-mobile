@@ -1425,4 +1425,203 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get shellKeyTab => 'Tab';
+
+  @override
+  String get protectionTitle => 'Data protection';
+
+  @override
+  String get protectionEmpty => 'No tasks yet.';
+
+  @override
+  String get protectionSnapshots => 'Periodic snapshots';
+
+  @override
+  String get protectionReplication => 'Replication';
+
+  @override
+  String get protectionCloudSync => 'Cloud sync';
+
+  @override
+  String get protectionCloudBackup => 'TrueCloud backup';
+
+  @override
+  String get protectionRsync => 'Rsync';
+
+  @override
+  String get taskNever => 'Not run yet';
+
+  @override
+  String get taskWaiting => 'Waiting';
+
+  @override
+  String get taskRunning => 'Running';
+
+  @override
+  String taskRunningPercent(int percent) {
+    return 'Running · $percent%';
+  }
+
+  @override
+  String get taskSuccess => 'Succeeded';
+
+  @override
+  String get taskFailed => 'Failed';
+
+  @override
+  String get taskHeld => 'On hold';
+
+  @override
+  String taskLastRun(String date) {
+    return 'Last run $date';
+  }
+
+  @override
+  String get taskEnabled => 'Enabled';
+
+  @override
+  String get taskRunNow => 'Run now';
+
+  @override
+  String get taskStop => 'Stop';
+
+  @override
+  String taskStarted(String name) {
+    return 'Started $name';
+  }
+
+  @override
+  String taskStopped(String name) {
+    return 'Stopped $name';
+  }
+
+  @override
+  String taskEnabledMessage(String name) {
+    return 'Enabled $name';
+  }
+
+  @override
+  String taskDisabledMessage(String name) {
+    return 'Disabled $name';
+  }
+
+  @override
+  String taskDeleteTitle(String name) {
+    return 'Delete the task for $name?';
+  }
+
+  @override
+  String get taskDeleteBody => 'Snapshots it already took are kept.';
+
+  @override
+  String get taskDeleted => 'Task deleted';
+
+  @override
+  String get snapshotTaskCreate => 'Add snapshot task';
+
+  @override
+  String snapshotTaskCreated(String name) {
+    return 'Added a snapshot task for $name';
+  }
+
+  @override
+  String get snapshotTaskDataset => 'Dataset';
+
+  @override
+  String get snapshotTaskRecursive => 'Include child datasets';
+
+  @override
+  String get snapshotTaskSchedule => 'How often';
+
+  @override
+  String get snapshotTaskKeepFor => 'Keep for';
+
+  @override
+  String get scheduleHourly => 'Every hour';
+
+  @override
+  String get scheduleDaily => 'Every day at midnight';
+
+  @override
+  String get scheduleWeekly => 'Every Sunday at midnight';
+
+  @override
+  String scheduleCustom(String cron) {
+    return 'Cron: $cron';
+  }
+
+  @override
+  String get snapshotTaskRecursiveLabel => 'with child datasets';
+
+  @override
+  String keepHours(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Keep $count hours',
+      one: 'Keep 1 hour',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String keepDays(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Keep $count days',
+      one: 'Keep 1 day',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String keepWeeks(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Keep $count weeks',
+      one: 'Keep 1 week',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String keepMonths(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Keep $count months',
+      one: 'Keep 1 month',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String keepYears(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Keep $count years',
+      one: 'Keep 1 year',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get unitHours => 'Hours';
+
+  @override
+  String get unitDays => 'Days';
+
+  @override
+  String get unitWeeks => 'Weeks';
+
+  @override
+  String get unitMonths => 'Months';
+
+  @override
+  String get unitYears => 'Years';
+
+  @override
+  String get protectionSubtitle => 'Snapshot tasks, replication and cloud sync';
 }

@@ -234,12 +234,200 @@
   "@infoSignedInAs": {
     "description": "Label for the signed-in user."
   },
-  "serverOverviewNote": "More management screens are coming in the next milestones.",
-  "@serverOverviewNote": {
-    "description": "Note at the bottom of the server overview."
-  },
   "errorCancelled": "Connection cancelled.",
   "@errorCancelled": {
     "description": "Shown when the user cancels a certificate or 2FA prompt."
+  },
+  "tabDashboard": "Dashboard",
+  "@tabDashboard": {
+    "description": "Bottom navigation tab for the dashboard."
+  },
+  "tabAlerts": "Alerts",
+  "@tabAlerts": {
+    "description": "Bottom navigation tab for alerts."
+  },
+  "tabJobs": "Jobs",
+  "@tabJobs": {
+    "description": "Bottom navigation tab for background jobs."
+  },
+  "cpuTitle": "CPU",
+  "@cpuTitle": {
+    "description": "Title of the CPU usage card."
+  },
+  "cpuTemperature": "{temp} °C",
+  "@cpuTemperature": {
+    "description": "CPU temperature value.",
+    "placeholders": {
+      "temp": {
+        "type": "String"
+      }
+    }
+  },
+  "memoryTitle": "Memory",
+  "@memoryTitle": {
+    "description": "Title of the memory card."
+  },
+  "memoryUsedOf": "{used} of {total} used",
+  "@memoryUsedOf": {
+    "description": "Memory usage summary.",
+    "placeholders": {
+      "used": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "memoryServices": "Services",
+  "@memoryServices": {
+    "description": "Legend label for memory used by services and apps."
+  },
+  "memoryArc": "ZFS cache",
+  "@memoryArc": {
+    "description": "Legend label for memory used by the ZFS ARC cache."
+  },
+  "memoryFree": "Free",
+  "@memoryFree": {
+    "description": "Legend label for free memory."
+  },
+  "networkTitle": "Network",
+  "@networkTitle": {
+    "description": "Title of the network throughput card."
+  },
+  "networkIn": "In",
+  "@networkIn": {
+    "description": "Legend label for received traffic."
+  },
+  "networkOut": "Out",
+  "@networkOut": {
+    "description": "Legend label for sent traffic."
+  },
+  "poolsTitle": "Pools",
+  "@poolsTitle": {
+    "description": "Title of the storage pools card."
+  },
+  "poolsEmpty": "No pools",
+  "@poolsEmpty": {
+    "description": "Shown when the server has no storage pools."
+  },
+  "poolUsage": "{used} of {total}",
+  "@poolUsage": {
+    "description": "Pool usage summary.",
+    "placeholders": {
+      "used": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "alertsTitle": "Alerts",
+  "@alertsTitle": {
+    "description": "Title of the alerts summary card."
+  },
+  "alertsNone": "No active alerts",
+  "@alertsNone": {
+    "description": "Shown when there are no active alerts."
+  },
+  "alertsCritical": "{count, plural, =1{1 critical} other{{count} critical}}",
+  "@alertsCritical": {
+    "description": "Number of critical alerts.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "alertsWarning": "{count, plural, =1{1 warning} other{{count} warnings}}",
+  "@alertsWarning": {
+    "description": "Number of warning alerts.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "alertsInfo": "{count, plural, =1{1 notice} other{{count} notices}}",
+  "@alertsInfo": {
+    "description": "Number of informational alerts.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "alertsActive": "Active",
+  "@alertsActive": {
+    "description": "Heading for alerts that are not dismissed."
+  },
+  "alertsDismissed": "Dismissed",
+  "@alertsDismissed": {
+    "description": "Heading for dismissed alerts."
+  },
+  "alertDismiss": "Dismiss",
+  "@alertDismiss": {
+    "description": "Action that dismisses an alert."
+  },
+  "alertRestore": "Restore",
+  "@alertRestore": {
+    "description": "Action that restores a dismissed alert."
+  },
+  "levelCritical": "Critical",
+  "@levelCritical": {
+    "description": "Label for critical alert level."
+  },
+  "levelWarning": "Warning",
+  "@levelWarning": {
+    "description": "Label for warning alert level."
+  },
+  "levelInfo": "Info",
+  "@levelInfo": {
+    "description": "Label for informational alert level."
+  },
+  "jobsEmpty": "No recent jobs",
+  "@jobsEmpty": {
+    "description": "Shown when there are no jobs."
+  },
+  "jobAbort": "Abort",
+  "@jobAbort": {
+    "description": "Action that aborts a running job."
+  },
+  "jobAbortTitle": "Abort this job?",
+  "@jobAbortTitle": {
+    "description": "Title of the abort confirmation dialog."
+  },
+  "jobStateWaiting": "Waiting",
+  "@jobStateWaiting": {
+    "description": "Job state label."
+  },
+  "jobStateRunning": "Running",
+  "@jobStateRunning": {
+    "description": "Job state label."
+  },
+  "jobStateSuccess": "Succeeded",
+  "@jobStateSuccess": {
+    "description": "Job state label."
+  },
+  "jobStateFailed": "Failed",
+  "@jobStateFailed": {
+    "description": "Job state label."
+  },
+  "jobStateAborted": "Aborted",
+  "@jobStateAborted": {
+    "description": "Job state label."
+  },
+  "close": "Close",
+  "@close": {
+    "description": "Button that closes a dialog."
+  },
+  "liveWaiting": "Waiting for live data…",
+  "@liveWaiting": {
+    "description": "Shown until the first live statistics sample arrives."
+  },
+  "systemTitle": "System",
+  "@systemTitle": {
+    "description": "Title of the system information card."
   }
 }

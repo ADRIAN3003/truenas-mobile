@@ -1,9 +1,14 @@
 import '../api/api_exception.dart';
 import '../api/auth.dart';
 import '../api/certificate_trust.dart';
+import '../api/events.dart';
 import '../api/json_rpc_client.dart';
 import '../api/truenas_connection.dart';
 import '../instances/server_instance.dart';
+import '../models/alert.dart';
+import '../models/job.dart';
+import '../models/pool_summary.dart';
+import '../models/realtime_stats.dart';
 
 /// A signed-in connection to one server.
 class TrueNasSession {
@@ -17,6 +22,52 @@ class TrueNasSession {
 
   Future<Map<String, dynamic>> systemInfo() async =>
       (await client.call('system.info')) as Map<String, dynamic>;
+
+  /// Live CPU, memory, network and ARC statistics, every 2 seconds.
+  Stream<RealtimeStats> realtimeStats() => client
+      .subscribe('reporting.realtime')
+      .where((update) => update.fields != null)
+      .map((update) => RealtimeStats.fromJson(update.fields!));
+
+  Future<List<PoolSummary>> pools() async {
+    final result = await client.call('pool.query') as List<dynamic>;
+    return result
+        .map((e) => PoolSummary.fromJson(e as Map<String, dynamic>))
+        .toList();
+  }
+
+  Future<List<TrueNasAlert>> alerts() async {
+    final result = await client.call('alert.list') as List<dynamic>;
+    return result
+        .map((e) => TrueNasAlert.fromJson(e as Map<String, dynamic>))
+        .toList();
+  }
+
+  /// Fires whenever an alert is added, changed or removed.
+  Stream<CollectionUpdate> alertChanges() => client.subscribe('alert.list');
+
+  Future<void> dismissAlert(String id) => client.call('alert.dismiss', [id]);
+
+  Future<void> restoreAlert(String id) => client.call('alert.restore', [id]);
+
+  /// The most recent jobs, newest first.
+  Future<List<TrueNasJob>> jobs({int limit = 50}) async {
+    final result = await client.call('core.get_jobs', [
+      [],
+      {
+        'order_by': ['-id'],
+        'limit': limit,
+      },
+    ]) as List<dynamic>;
+    return result
+        .map((e) => TrueNasJob.fromJson(e as Map<String, dynamic>))
+        .toList();
+  }
+
+  /// Job additions and progress updates.
+  Stream<CollectionUpdate> jobChanges() => client.subscribe('core.get_jobs');
+
+  Future<void> abortJob(int id) => client.call('core.job_abort', [id]);
 
   Future<void> close() => connection.close();
 }

@@ -187,9 +187,152 @@ class AppLocalizationsEn extends AppLocalizations {
   String get infoSignedInAs => 'Signed in as';
 
   @override
-  String get serverOverviewNote =>
-      'More management screens are coming in the next milestones.';
+  String get errorCancelled => 'Connection cancelled.';
 
   @override
-  String get errorCancelled => 'Connection cancelled.';
+  String get tabDashboard => 'Dashboard';
+
+  @override
+  String get tabAlerts => 'Alerts';
+
+  @override
+  String get tabJobs => 'Jobs';
+
+  @override
+  String get cpuTitle => 'CPU';
+
+  @override
+  String cpuTemperature(String temp) {
+    return '$temp °C';
+  }
+
+  @override
+  String get memoryTitle => 'Memory';
+
+  @override
+  String memoryUsedOf(String used, String total) {
+    return '$used of $total used';
+  }
+
+  @override
+  String get memoryServices => 'Services';
+
+  @override
+  String get memoryArc => 'ZFS cache';
+
+  @override
+  String get memoryFree => 'Free';
+
+  @override
+  String get networkTitle => 'Network';
+
+  @override
+  String get networkIn => 'In';
+
+  @override
+  String get networkOut => 'Out';
+
+  @override
+  String get poolsTitle => 'Pools';
+
+  @override
+  String get poolsEmpty => 'No pools';
+
+  @override
+  String poolUsage(String used, String total) {
+    return '$used of $total';
+  }
+
+  @override
+  String get alertsTitle => 'Alerts';
+
+  @override
+  String get alertsNone => 'No active alerts';
+
+  @override
+  String alertsCritical(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count critical',
+      one: '1 critical',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String alertsWarning(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count warnings',
+      one: '1 warning',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String alertsInfo(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count notices',
+      one: '1 notice',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get alertsActive => 'Active';
+
+  @override
+  String get alertsDismissed => 'Dismissed';
+
+  @override
+  String get alertDismiss => 'Dismiss';
+
+  @override
+  String get alertRestore => 'Restore';
+
+  @override
+  String get levelCritical => 'Critical';
+
+  @override
+  String get levelWarning => 'Warning';
+
+  @override
+  String get levelInfo => 'Info';
+
+  @override
+  String get jobsEmpty => 'No recent jobs';
+
+  @override
+  String get jobAbort => 'Abort';
+
+  @override
+  String get jobAbortTitle => 'Abort this job?';
+
+  @override
+  String get jobStateWaiting => 'Waiting';
+
+  @override
+  String get jobStateRunning => 'Running';
+
+  @override
+  String get jobStateSuccess => 'Succeeded';
+
+  @override
+  String get jobStateFailed => 'Failed';
+
+  @override
+  String get jobStateAborted => 'Aborted';
+
+  @override
+  String get close => 'Close';
+
+  @override
+  String get liveWaiting => 'Waiting for live data…';
+
+  @override
+  String get systemTitle => 'System';
 }

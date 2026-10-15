@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../core/session/truenas_session.dart';
 import '../../l10n/generated/app_localizations.dart';
+import '../../shared/glass.dart';
 import '../../shared/theme.dart';
 import '../../shared/ui.dart';
 import '../../shared/widgets.dart';
@@ -82,7 +83,10 @@ class MoreTab extends StatelessWidget {
       onTap: () => _open(context, screen()),
     );
     return ListView(
-      padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+      padding: ChromeInsets.pad(
+        context,
+        const EdgeInsets.fromLTRB(16, 0, 16, 24),
+      ),
       children: [
         SectionHeader(l10n.moreAccounts),
         GroupedCard(

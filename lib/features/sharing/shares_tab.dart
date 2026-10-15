@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../core/models/sharing.dart';
 import '../../core/session/truenas_session.dart';
 import '../../l10n/generated/app_localizations.dart';
+import '../../shared/glass.dart';
 import '../storage/storage_helpers.dart';
 import 'block_shares_screen.dart';
 import 'nfs_shares_screen.dart';
@@ -96,7 +97,10 @@ class _SharesTabState extends State<SharesTab>
       error: error,
       onRefresh: load,
       builder: (o) => ListView(
-        padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+        padding: ChromeInsets.pad(
+          context,
+          const EdgeInsets.fromLTRB(16, 8, 16, 24),
+        ),
         children: [
           _EntryCard(
             icon: Icons.folder_shared_outlined,

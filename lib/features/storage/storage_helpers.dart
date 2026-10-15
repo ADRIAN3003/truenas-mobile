@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../l10n/generated/app_localizations.dart';
 import '../../shared/connect_dialogs.dart';
+import '../../shared/glass.dart';
 import '../../shared/theme.dart';
 import '../../shared/viz_colors.dart';
 
@@ -62,6 +63,7 @@ class AsyncBody<T> extends StatelessWidget {
     final value = this.value;
     if (value != null) {
       return RefreshIndicator.adaptive(
+        edgeOffset: ChromeInsets.of(context).top,
         onRefresh: onRefresh,
         child: builder(value),
       );

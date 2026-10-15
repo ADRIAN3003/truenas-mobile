@@ -41,10 +41,27 @@ void main() {
 
   setUpAll(() async {
     if (_skip) return;
-    await _loadFont('Roboto', [
-      for (final weight in ['Regular', 'Medium', 'Bold'])
-        '$_materialFonts/Roboto-$weight.ttf',
-    ]);
+    // iOS themes ask for San Francisco by these names; Roboto stands in.
+    for (final family in [
+      'Roboto',
+      'CupertinoSystemText',
+      'CupertinoSystemDisplay',
+    ]) {
+      await _loadFont(family, [
+        for (final weight in ['Regular', 'Medium', 'Bold'])
+          '$_materialFonts/Roboto-$weight.ttf',
+      ]);
+    }
+    final pubCache =
+        Platform.environment['PUB_CACHE'] ??
+        '${Platform.environment['HOME']}/.pub-cache';
+    final cupertinoIcons =
+        '$pubCache/hosted/pub.dev/cupertino_icons-2.0.0/assets/CupertinoIcons.ttf';
+    if (File(cupertinoIcons).existsSync()) {
+      await _loadFont('packages/cupertino_icons/CupertinoIcons', [
+        cupertinoIcons,
+      ]);
+    }
     await _loadFont('MaterialIcons', [
       '$_materialFonts/MaterialIcons-Regular.otf',
     ]);
@@ -64,9 +81,19 @@ void main() {
     }
   }
 
-  Future<void> open(WidgetTester tester, Brightness brightness) async {
+  Future<void> open(
+    WidgetTester tester,
+    Brightness brightness, {
+    TargetPlatform platform = TargetPlatform.android,
+  }) async {
     debugDisableShadows = false;
-    tester.view.physicalSize = const Size(1080, 2340);
+    if (platform == TargetPlatform.iOS) {
+      // An iPhone with a Dynamic Island and a home indicator.
+      tester.view.physicalSize = const Size(1179, 2556);
+      tester.view.padding = const FakeViewPadding(top: 177, bottom: 102);
+    } else {
+      tester.view.physicalSize = const Size(1080, 2340);
+    }
     tester.view.devicePixelRatio = 3;
     addTearDown(tester.view.reset);
     await tester.runAsync(() async {
@@ -113,6 +140,7 @@ void main() {
             supportedLocales: AppLocalizations.supportedLocales,
             theme: buildAppTheme(
               brightness,
+              platform: platform,
               fontFamilyFallback: const ['Fallback'],
             ),
             home: const InstancesScreen(),
@@ -166,6 +194,15 @@ void main() {
     await shot(tester, 'storage');
     await tap(tester, 'Apps');
     await shot(tester, 'apps');
+    await close(tester);
+  });
+
+  // The test renderer has no Impeller, so the glass draws its frosted
+  // fallback here; on a phone it refracts the content behind it.
+  testWidgets('ios', skip: _skip, (tester) async {
+    await open(tester, Brightness.light, platform: TargetPlatform.iOS);
+    await openServer(tester);
+    await shot(tester, 'dashboard_ios');
     await close(tester);
   });
 

@@ -4,6 +4,7 @@ import '../../core/api/workloads_api.dart';
 import '../../core/models/workloads.dart';
 import '../../core/session/truenas_session.dart';
 import '../../l10n/generated/app_localizations.dart';
+import '../../shared/glass.dart';
 import '../../shared/formatting.dart';
 import '../../shared/viz_colors.dart';
 import '../../shared/widgets.dart';
@@ -124,7 +125,7 @@ class _AppsTabState extends State<AppsTab> with LoadState<AppsTab, _Workloads> {
       error: error,
       onRefresh: load,
       builder: (w) => ListView(
-        padding: const EdgeInsets.only(bottom: 24),
+        padding: ChromeInsets.pad(context, const EdgeInsets.only(bottom: 24)),
         children: [
           _Heading(l10n.appsTitle),
           if (w.apps.isEmpty) _Empty(l10n.appsEmpty),

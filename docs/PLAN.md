@@ -134,8 +134,8 @@ any point after milestone 2.
 1. **License**: MIT (default), Apache-2.0, or GPL-3.0?
 2. **App name**: "TrueNAS" is an iXsystems trademark, so for a public store
    listing a name like "NAS Manager for TrueNAS" is safer. Default name
-   *TrueNAS Mobile*. App ID decided: `hu.adrian.truenas_mobile` on Android,
-   `hu.adrian.truenasMobile` on iOS (iOS bundle IDs cannot contain `_`).
+   *TrueNAS Mobile*. App ID decided: `hu.adrian.truenasmobile` on both platforms (Android
+   IDs cannot contain `-`, iOS bundle IDs cannot contain `_`).
 3. **iOS signing**: unsigned IPA (default) or do you have an Apple Developer account?
 4. **Android signing**: generate a release keystore and add it as secrets
    (default: debug-signed until you add them).

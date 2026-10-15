@@ -1,4 +1,4 @@
-package hu.adrian.truenas_mobile
+package hu.adrian.truenasmobile
 
 import io.flutter.embedding.android.FlutterActivity
 

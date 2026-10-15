@@ -378,6 +378,7 @@ class _NewUserDialogState extends State<_NewUserDialog> {
                 decoration: InputDecoration(
                   labelText: l10n.userPassword,
                   suffixIcon: IconButton(
+                    tooltip: _obscure ? l10n.showSecret : l10n.hideSecret,
                     icon: Icon(
                       _obscure ? Icons.visibility : Icons.visibility_off,
                     ),

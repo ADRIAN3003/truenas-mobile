@@ -12,6 +12,9 @@ import '../workloads/apps_tab.dart';
 import 'dashboard_tab.dart';
 import 'more_tab.dart';
 
+/// Window width from which the server screen uses a navigation rail.
+const railBreakpoint = 600.0;
+
 /// Connects to one saved server and shows its overview.
 class ServerScreen extends ConsumerStatefulWidget {
   const ServerScreen(this.instanceId, {super.key});
@@ -85,50 +88,73 @@ class _ServerScreenState extends ConsumerState<ServerScreen> {
     final session = _session;
     final info = _info;
     if (session != null && info != null) {
+      final destinations = [
+        (Icons.dashboard_outlined, Icons.dashboard, l10n.tabDashboard),
+        (Icons.storage_outlined, Icons.storage, l10n.tabStorage),
+        (Icons.folder_shared_outlined, Icons.folder_shared, l10n.tabShares),
+        (Icons.apps_outlined, Icons.apps, l10n.tabApps),
+        (Icons.more_horiz, Icons.more_horiz, l10n.tabMore),
+      ];
+      final body = IndexedStack(
+        index: _tab,
+        children: [
+          DashboardTab(
+            session: session,
+            info: info,
+            onOpenAlerts: () => openAlerts(context, session),
+          ),
+          StorageTab(session: session),
+          SharesTab(session: session),
+          AppsTab(session: session),
+          MoreTab(session: session, serverName: instance?.name ?? ''),
+        ],
+      );
+      void select(int index) => setState(() => _tab = index);
+      final width = MediaQuery.sizeOf(context).width;
+      // Tablets and landscape phones get a side rail instead of a bottom bar.
+      if (width >= railBreakpoint) {
+        return Scaffold(
+          appBar: AppBar(title: Text(instance?.name ?? '')),
+          body: SafeArea(
+            top: false,
+            child: Row(
+              children: [
+                NavigationRail(
+                  selectedIndex: _tab,
+                  onDestinationSelected: select,
+                  extended: width >= 1200,
+                  labelType: width >= 1200
+                      ? NavigationRailLabelType.none
+                      : NavigationRailLabelType.all,
+                  destinations: [
+                    for (final (icon, selected, label) in destinations)
+                      NavigationRailDestination(
+                        icon: Icon(icon),
+                        selectedIcon: Icon(selected),
+                        label: Text(label),
+                      ),
+                  ],
+                ),
+                const VerticalDivider(width: 1),
+                Expanded(child: body),
+              ],
+            ),
+          ),
+        );
+      }
       return Scaffold(
         appBar: AppBar(title: Text(instance?.name ?? '')),
-        body: IndexedStack(
-          index: _tab,
-          children: [
-            DashboardTab(
-              session: session,
-              info: info,
-              onOpenAlerts: () => openAlerts(context, session),
-            ),
-            StorageTab(session: session),
-            SharesTab(session: session),
-            AppsTab(session: session),
-            MoreTab(session: session, serverName: instance?.name ?? ''),
-          ],
-        ),
+        body: body,
         bottomNavigationBar: NavigationBar(
           selectedIndex: _tab,
-          onDestinationSelected: (index) => setState(() => _tab = index),
+          onDestinationSelected: select,
           destinations: [
-            NavigationDestination(
-              icon: const Icon(Icons.dashboard_outlined),
-              selectedIcon: const Icon(Icons.dashboard),
-              label: l10n.tabDashboard,
-            ),
-            NavigationDestination(
-              icon: const Icon(Icons.storage_outlined),
-              selectedIcon: const Icon(Icons.storage),
-              label: l10n.tabStorage,
-            ),
-            NavigationDestination(
-              icon: const Icon(Icons.folder_shared_outlined),
-              selectedIcon: const Icon(Icons.folder_shared),
-              label: l10n.tabShares,
-            ),
-            NavigationDestination(
-              icon: const Icon(Icons.apps_outlined),
-              selectedIcon: const Icon(Icons.apps),
-              label: l10n.tabApps,
-            ),
-            NavigationDestination(
-              icon: const Icon(Icons.more_horiz),
-              label: l10n.tabMore,
-            ),
+            for (final (icon, selected, label) in destinations)
+              NavigationDestination(
+                icon: Icon(icon),
+                selectedIcon: Icon(selected),
+                label: label,
+              ),
           ],
         ),
       );

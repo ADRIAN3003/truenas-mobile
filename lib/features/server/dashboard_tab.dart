@@ -85,23 +85,39 @@ class _DashboardTabState extends State<DashboardTab> {
   @override
   Widget build(BuildContext context) {
     final latest = _history.isEmpty ? null : _history.last;
-    return RefreshIndicator(
-      onRefresh: _refresh,
-      child: ListView(
-        padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
-        children: [
-          _SystemCard(info: widget.info, session: widget.session),
-          if (_alerts != null)
-            _AlertsSummaryCard(alerts: _alerts!, onTap: widget.onOpenAlerts),
-          if (latest == null)
-            const _WaitingCard()
-          else ...[
+    final system = [
+      _SystemCard(info: widget.info, session: widget.session),
+      if (_alerts != null)
+        _AlertsSummaryCard(alerts: _alerts!, onTap: widget.onOpenAlerts),
+    ];
+    final live = latest == null
+        ? [const _WaitingCard()]
+        : [
             _CpuCard(history: _history),
             _MemoryCard(stats: latest),
             _NetworkCard(history: _history),
-          ],
-          if (_pools != null) _PoolsCard(pools: _pools!),
-        ],
+          ];
+    final pools = [if (_pools != null) _PoolsCard(pools: _pools!)];
+    return RefreshIndicator(
+      onRefresh: _refresh,
+      child: LayoutBuilder(
+        builder: (context, constraints) => ListView(
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+          children: constraints.maxWidth < 840
+              ? [...system, ...live, ...pools]
+              // Two columns on wide screens: system and pools beside the
+              // live charts.
+              : [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(child: Column(children: [...system, ...pools])),
+                      const SizedBox(width: 16),
+                      Expanded(child: Column(children: live)),
+                    ],
+                  ),
+                ],
+        ),
       ),
     );
   }
@@ -207,7 +223,7 @@ class _WaitingCard extends StatelessWidget {
           child: CircularProgressIndicator(strokeWidth: 2),
         ),
         const SizedBox(width: 12),
-        Text(AppLocalizations.of(context).liveWaiting),
+        Expanded(child: Text(AppLocalizations.of(context).liveWaiting)),
       ],
     ),
   );
@@ -516,47 +532,50 @@ class _Sparkline extends StatelessWidget {
     final peak = series
         .expand((s) => s.values)
         .fold<double>(0, (a, b) => math.max(a, b));
-    return SizedBox(
-      height: 72,
-      child: LineChart(
-        duration: Duration.zero,
-        LineChartData(
-          minX: 0,
-          maxX: (_historyLength - 1).toDouble(),
-          minY: 0,
-          maxY: maxY ?? (peak <= 0 ? 1 : peak * 1.15),
-          gridData: const FlGridData(show: false),
-          borderData: FlBorderData(show: false),
-          titlesData: const FlTitlesData(show: false),
-          lineTouchData: LineTouchData(
-            touchTooltipData: LineTouchTooltipData(
-              getTooltipColor: (_) => theme.colorScheme.inverseSurface,
-              getTooltipItems: (spots) => [
-                for (final spot in spots)
-                  LineTooltipItem(
-                    '${series[spot.barIndex].name} ${formatValue(spot.y)}',
-                    TextStyle(color: theme.colorScheme.onInverseSurface),
-                  ),
-              ],
-            ),
-          ),
-          lineBarsData: [
-            for (final s in series)
-              LineChartBarData(
-                spots: [
-                  for (var i = 0; i < s.values.length; i++)
-                    FlSpot(
-                      (_historyLength - s.values.length + i).toDouble(),
-                      s.values[i],
+    // The values are also shown as text, so screen readers skip the chart.
+    return ExcludeSemantics(
+      child: SizedBox(
+        height: 72,
+        child: LineChart(
+          duration: Duration.zero,
+          LineChartData(
+            minX: 0,
+            maxX: (_historyLength - 1).toDouble(),
+            minY: 0,
+            maxY: maxY ?? (peak <= 0 ? 1 : peak * 1.15),
+            gridData: const FlGridData(show: false),
+            borderData: FlBorderData(show: false),
+            titlesData: const FlTitlesData(show: false),
+            lineTouchData: LineTouchData(
+              touchTooltipData: LineTouchTooltipData(
+                getTooltipColor: (_) => theme.colorScheme.inverseSurface,
+                getTooltipItems: (spots) => [
+                  for (final spot in spots)
+                    LineTooltipItem(
+                      '${series[spot.barIndex].name} ${formatValue(spot.y)}',
+                      TextStyle(color: theme.colorScheme.onInverseSurface),
                     ),
                 ],
-                color: s.color,
-                barWidth: 2,
-                isCurved: true,
-                preventCurveOverShooting: true,
-                dotData: const FlDotData(show: false),
               ),
-          ],
+            ),
+            lineBarsData: [
+              for (final s in series)
+                LineChartBarData(
+                  spots: [
+                    for (var i = 0; i < s.values.length; i++)
+                      FlSpot(
+                        (_historyLength - s.values.length + i).toDouble(),
+                        s.values[i],
+                      ),
+                  ],
+                  color: s.color,
+                  barWidth: 2,
+                  isCurved: true,
+                  preventCurveOverShooting: true,
+                  dotData: const FlDotData(show: false),
+                ),
+            ],
+          ),
         ),
       ),
     );

@@ -57,6 +57,7 @@ class _ApiExplorerScreenState extends State<ApiExplorerScreen>
               trailing: [
                 if (_query.isNotEmpty)
                   IconButton(
+                    tooltip: l10n.clearSearch,
                     icon: const Icon(Icons.clear),
                     onPressed: () {
                       _search.clear();

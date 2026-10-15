@@ -19,6 +19,10 @@ enum ProtectionKind {
     cloudSync || cloudBackup => '$service.sync',
   };
 
+  /// Whether the app can add, edit and delete tasks of this kind.
+  bool get editable =>
+      this == snapshot || this == replication || this == cloudSync;
+
   /// Whether a running task can be stopped from the app.
   bool get abortable => this == cloudSync || this == cloudBackup;
 }
@@ -60,6 +64,7 @@ class ProtectionTask {
     this.lifetimeValue,
     this.lifetimeUnit,
     this.schedule,
+    this.raw = const {},
   });
 
   factory ProtectionTask.fromJson(
@@ -120,6 +125,7 @@ class ProtectionTask {
           .where((u) => u.name.toUpperCase() == json['lifetime_unit'])
           .firstOrNull,
       schedule: _schedule(asMap(json['schedule'])),
+      raw: json,
     );
   }
 
@@ -144,6 +150,9 @@ class ProtectionTask {
 
   /// A preset when the cron matches one, otherwise the cron text.
   final Object? schedule;
+
+  /// The task as the server sent it, for editing.
+  final Map<String, dynamic> raw;
 }
 
 /// A preset schedule for new periodic snapshot tasks.
@@ -159,6 +168,9 @@ enum SnapshotSchedule {
 
 /// Lifetime units accepted by `pool.snapshottask`.
 enum LifetimeUnit { hour, day, week, month, year }
+
+/// Reads a cron object as a [SnapshotSchedule] preset or cron text.
+Object? parseSchedule(Map<String, dynamic> s) => _schedule(s);
 
 Object? _schedule(Map<String, dynamic> s) {
   if (s.isEmpty) return null;

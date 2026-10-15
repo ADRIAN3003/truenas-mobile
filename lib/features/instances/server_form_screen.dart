@@ -191,6 +191,7 @@ class _ServerFormScreenState extends ConsumerState<ServerFormScreen> {
                 helperText: isApiKey ? l10n.fieldApiKeyHelp : null,
                 helperMaxLines: 2,
                 suffixIcon: IconButton(
+                  tooltip: _obscure ? l10n.showSecret : l10n.hideSecret,
                   icon: Icon(
                     _obscure ? Icons.visibility : Icons.visibility_off,
                   ),

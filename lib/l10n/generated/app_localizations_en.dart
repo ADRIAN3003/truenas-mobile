@@ -1624,4 +1624,173 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get protectionSubtitle => 'Snapshot tasks, replication and cloud sync';
+
+  @override
+  String get protectionAdd => 'Add task';
+
+  @override
+  String get taskDeleteBodyCopies => 'Data it already copied is kept.';
+
+  @override
+  String taskSaved(String name) {
+    return 'Saved $name';
+  }
+
+  @override
+  String get replicationNew => 'New replication task';
+
+  @override
+  String get replicationEdit => 'Edit replication task';
+
+  @override
+  String get cloudSyncNew => 'New cloud sync task';
+
+  @override
+  String get cloudSyncEdit => 'Edit cloud sync task';
+
+  @override
+  String get taskNameLabel => 'Name';
+
+  @override
+  String get directionLabel => 'Direction';
+
+  @override
+  String get replicationPush => 'Push: send from this server';
+
+  @override
+  String get replicationPull => 'Pull: fetch from another server';
+
+  @override
+  String get replicationTransport => 'Destination';
+
+  @override
+  String get transportLocal => 'Another pool on this server';
+
+  @override
+  String get transportSsh => 'Another server over SSH';
+
+  @override
+  String get transportNetcat => 'Another server over SSH with netcat';
+
+  @override
+  String get replicationSshConnection => 'SSH connection';
+
+  @override
+  String get replicationNoSshConnections =>
+      'No SSH connections yet. Add one under Credentials in the TrueNAS web interface.';
+
+  @override
+  String get replicationSources => 'Source datasets';
+
+  @override
+  String get replicationSourcesHint => 'Separate several with commas';
+
+  @override
+  String get replicationTarget => 'Destination dataset';
+
+  @override
+  String get pickDataset => 'Choose a dataset';
+
+  @override
+  String get replicationSnapshotTasks => 'Send snapshots taken by';
+
+  @override
+  String get replicationNoSnapshotTasks =>
+      'No periodic snapshot tasks. Snapshots are matched by name instead.';
+
+  @override
+  String get replicationNamingSchema => 'Snapshot name pattern';
+
+  @override
+  String get replicationNamingSchemaHint => 'For example auto-%Y-%m-%d_%H-%M';
+
+  @override
+  String replicationNameRegex(String regex) {
+    return 'Snapshots are matched by the pattern $regex. Change it in the TrueNAS web interface.';
+  }
+
+  @override
+  String get replicationAuto => 'Run automatically';
+
+  @override
+  String get replicationAfterSnapshots => 'Right after the snapshot task';
+
+  @override
+  String get replicationRetention => 'Keep snapshots on the destination';
+
+  @override
+  String get retentionSource => 'Same as the source';
+
+  @override
+  String get retentionCustom => 'For a set time';
+
+  @override
+  String get retentionNone => 'Forever';
+
+  @override
+  String get cloudSyncDescription => 'Description';
+
+  @override
+  String get cloudSyncCredential => 'Cloud credential';
+
+  @override
+  String get cloudSyncNoCredentials =>
+      'No cloud credentials yet. Add one under Credentials in the TrueNAS web interface.';
+
+  @override
+  String get cloudSyncBucket => 'Bucket';
+
+  @override
+  String get cloudSyncBucketHint => 'Leave empty for providers without buckets';
+
+  @override
+  String get cloudSyncFolder => 'Remote folder';
+
+  @override
+  String get cloudSyncPath => 'Local folder';
+
+  @override
+  String get cloudSyncPathHint => 'A folder under /mnt';
+
+  @override
+  String get cloudSyncPathInvalid => 'Choose a folder under /mnt';
+
+  @override
+  String get cloudSyncPush => 'Push: upload to the cloud';
+
+  @override
+  String get cloudSyncPull => 'Pull: download from the cloud';
+
+  @override
+  String get transferModeLabel => 'Transfer mode';
+
+  @override
+  String get transferCopy => 'Copy new and changed files';
+
+  @override
+  String get transferSync => 'Mirror, deleting files missing at the source';
+
+  @override
+  String get transferMove => 'Move, deleting files from the source';
+
+  @override
+  String get showSecret => 'Show';
+
+  @override
+  String get hideSecret => 'Hide';
+
+  @override
+  String get clearSearch => 'Clear search';
+
+  @override
+  String get shellKeyUp => 'Arrow up';
+
+  @override
+  String get shellKeyDown => 'Arrow down';
+
+  @override
+  String get shellKeyLeft => 'Arrow left';
+
+  @override
+  String get shellKeyRight => 'Arrow right';
 }

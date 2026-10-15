@@ -2266,5 +2266,231 @@
   "protectionSubtitle": "Snapshot tasks, replication and cloud sync",
   "@protectionSubtitle": {
     "description": "Subtitle of the data protection entry in the Storage tab."
+  },
+  "protectionAdd": "Add task",
+  "@protectionAdd": {
+    "description": "Button that opens the choice of task kinds to add."
+  },
+  "taskDeleteBodyCopies": "Data it already copied is kept.",
+  "@taskDeleteBodyCopies": {
+    "description": "Confirmation body for deleting a replication or cloud sync task."
+  },
+  "taskSaved": "Saved {name}",
+  "@taskSaved": {
+    "description": "Snackbar after saving a task.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "replicationNew": "New replication task",
+  "@replicationNew": {
+    "description": "Editor title."
+  },
+  "replicationEdit": "Edit replication task",
+  "@replicationEdit": {
+    "description": "Editor title."
+  },
+  "cloudSyncNew": "New cloud sync task",
+  "@cloudSyncNew": {
+    "description": "Editor title."
+  },
+  "cloudSyncEdit": "Edit cloud sync task",
+  "@cloudSyncEdit": {
+    "description": "Editor title."
+  },
+  "taskNameLabel": "Name",
+  "@taskNameLabel": {
+    "description": "Field label."
+  },
+  "directionLabel": "Direction",
+  "@directionLabel": {
+    "description": "Field label."
+  },
+  "replicationPush": "Push: send from this server",
+  "@replicationPush": {
+    "description": "Replication direction."
+  },
+  "replicationPull": "Pull: fetch from another server",
+  "@replicationPull": {
+    "description": "Replication direction."
+  },
+  "replicationTransport": "Destination",
+  "@replicationTransport": {
+    "description": "Field label for where replication sends to."
+  },
+  "transportLocal": "Another pool on this server",
+  "@transportLocal": {
+    "description": "Replication transport."
+  },
+  "transportSsh": "Another server over SSH",
+  "@transportSsh": {
+    "description": "Replication transport."
+  },
+  "transportNetcat": "Another server over SSH with netcat",
+  "@transportNetcat": {
+    "description": "Replication transport."
+  },
+  "replicationSshConnection": "SSH connection",
+  "@replicationSshConnection": {
+    "description": "Field label."
+  },
+  "replicationNoSshConnections": "No SSH connections yet. Add one under Credentials in the TrueNAS web interface.",
+  "@replicationNoSshConnections": {
+    "description": "Shown when there is no SSH connection to choose."
+  },
+  "replicationSources": "Source datasets",
+  "@replicationSources": {
+    "description": "Field label."
+  },
+  "replicationSourcesHint": "Separate several with commas",
+  "@replicationSourcesHint": {
+    "description": "Helper text."
+  },
+  "replicationTarget": "Destination dataset",
+  "@replicationTarget": {
+    "description": "Field label."
+  },
+  "pickDataset": "Choose a dataset",
+  "@pickDataset": {
+    "description": "Tooltip of the button that opens the dataset list."
+  },
+  "replicationSnapshotTasks": "Send snapshots taken by",
+  "@replicationSnapshotTasks": {
+    "description": "Heading above the snapshot task choices."
+  },
+  "replicationNoSnapshotTasks": "No periodic snapshot tasks. Snapshots are matched by name instead.",
+  "@replicationNoSnapshotTasks": {
+    "description": "Shown when there are no snapshot tasks to bind."
+  },
+  "replicationNamingSchema": "Snapshot name pattern",
+  "@replicationNamingSchema": {
+    "description": "Field label."
+  },
+  "replicationNamingSchemaHint": "For example auto-%Y-%m-%d_%H-%M",
+  "@replicationNamingSchemaHint": {
+    "description": "Helper text."
+  },
+  "replicationNameRegex": "Snapshots are matched by the pattern {regex}. Change it in the TrueNAS web interface.",
+  "@replicationNameRegex": {
+    "description": "Shown for tasks that match snapshots by regex.",
+    "placeholders": {
+      "regex": {
+        "type": "String"
+      }
+    }
+  },
+  "replicationAuto": "Run automatically",
+  "@replicationAuto": {
+    "description": "Switch label."
+  },
+  "replicationAfterSnapshots": "Right after the snapshot task",
+  "@replicationAfterSnapshots": {
+    "description": "Schedule option for replication bound to snapshot tasks."
+  },
+  "replicationRetention": "Keep snapshots on the destination",
+  "@replicationRetention": {
+    "description": "Field label."
+  },
+  "retentionSource": "Same as the source",
+  "@retentionSource": {
+    "description": "Retention policy."
+  },
+  "retentionCustom": "For a set time",
+  "@retentionCustom": {
+    "description": "Retention policy."
+  },
+  "retentionNone": "Forever",
+  "@retentionNone": {
+    "description": "Retention policy."
+  },
+  "cloudSyncDescription": "Description",
+  "@cloudSyncDescription": {
+    "description": "Field label."
+  },
+  "cloudSyncCredential": "Cloud credential",
+  "@cloudSyncCredential": {
+    "description": "Field label."
+  },
+  "cloudSyncNoCredentials": "No cloud credentials yet. Add one under Credentials in the TrueNAS web interface.",
+  "@cloudSyncNoCredentials": {
+    "description": "Shown when there is no cloud credential to choose."
+  },
+  "cloudSyncBucket": "Bucket",
+  "@cloudSyncBucket": {
+    "description": "Field label."
+  },
+  "cloudSyncBucketHint": "Leave empty for providers without buckets",
+  "@cloudSyncBucketHint": {
+    "description": "Helper text."
+  },
+  "cloudSyncFolder": "Remote folder",
+  "@cloudSyncFolder": {
+    "description": "Field label."
+  },
+  "cloudSyncPath": "Local folder",
+  "@cloudSyncPath": {
+    "description": "Field label."
+  },
+  "cloudSyncPathHint": "A folder under /mnt",
+  "@cloudSyncPathHint": {
+    "description": "Helper text."
+  },
+  "cloudSyncPathInvalid": "Choose a folder under /mnt",
+  "@cloudSyncPathInvalid": {
+    "description": "Validation message."
+  },
+  "cloudSyncPush": "Push: upload to the cloud",
+  "@cloudSyncPush": {
+    "description": "Cloud sync direction."
+  },
+  "cloudSyncPull": "Pull: download from the cloud",
+  "@cloudSyncPull": {
+    "description": "Cloud sync direction."
+  },
+  "transferModeLabel": "Transfer mode",
+  "@transferModeLabel": {
+    "description": "Field label."
+  },
+  "transferCopy": "Copy new and changed files",
+  "@transferCopy": {
+    "description": "Transfer mode."
+  },
+  "transferSync": "Mirror, deleting files missing at the source",
+  "@transferSync": {
+    "description": "Transfer mode."
+  },
+  "transferMove": "Move, deleting files from the source",
+  "@transferMove": {
+    "description": "Transfer mode."
+  },
+  "showSecret": "Show",
+  "@showSecret": {
+    "description": "Tooltip of the button that reveals a hidden password or key."
+  },
+  "hideSecret": "Hide",
+  "@hideSecret": {
+    "description": "Tooltip of the button that hides a password or key."
+  },
+  "clearSearch": "Clear search",
+  "@clearSearch": {
+    "description": "Tooltip of the button that empties the search field."
+  },
+  "shellKeyUp": "Arrow up",
+  "@shellKeyUp": {
+    "description": "Shell key button."
+  },
+  "shellKeyDown": "Arrow down",
+  "@shellKeyDown": {
+    "description": "Shell key button."
+  },
+  "shellKeyLeft": "Arrow left",
+  "@shellKeyLeft": {
+    "description": "Shell key button."
+  },
+  "shellKeyRight": "Arrow right",
+  "@shellKeyRight": {
+    "description": "Shell key button."
   }
 }

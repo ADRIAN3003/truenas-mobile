@@ -8,12 +8,13 @@ import '../../shared/viz_colors.dart';
 import '../../shared/widgets.dart';
 import '../sharing/sharing_widgets.dart';
 import '../storage/storage_helpers.dart';
+import 'task_editors.dart';
 
 typedef _Tasks = Map<ProtectionKind, List<ProtectionTask>>;
 
 /// Periodic snapshots, replication, cloud sync, cloud backup and rsync
-/// tasks: their last result, enable/disable, run now, and adding snapshot
-/// tasks.
+/// tasks: their last result, enable/disable, run now, and adding or
+/// editing snapshot, replication and cloud sync tasks.
 class ProtectionScreen extends StatefulWidget {
   const ProtectionScreen({super.key, required this.session});
 
@@ -57,11 +58,16 @@ class _ProtectionScreenState extends State<ProtectionScreen>
           () => _session.protection.abort(task),
           success: l10n.taskStopped(task.name),
         );
+      case 'edit':
+        await _edit(task.kind, task);
+        return;
       case 'delete':
         final confirmed = await confirmAction(
           context,
           title: l10n.taskDeleteTitle(task.name),
-          body: l10n.taskDeleteBody,
+          body: task.kind == ProtectionKind.snapshot
+              ? l10n.taskDeleteBody
+              : l10n.taskDeleteBodyCopies,
           confirmLabel: l10n.delete,
           cancelLabel: l10n.cancel,
           destructive: true,
@@ -76,14 +82,45 @@ class _ProtectionScreenState extends State<ProtectionScreen>
     if (mounted) await load();
   }
 
+  /// Opens the editor for a new task of [kind], or for [task].
+  Future<void> _edit(ProtectionKind kind, [ProtectionTask? task]) async {
+    if (kind == ProtectionKind.snapshot) return _createSnapshotTask();
+    final saved = await Navigator.push<bool>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => kind == ProtectionKind.replication
+            ? ReplicationEditor(session: _session, task: task)
+            : CloudSyncEditor(session: _session, task: task),
+      ),
+    );
+    if (saved == true && mounted) await load();
+  }
+
+  Future<void> _add(List<ProtectionKind> kinds) async {
+    final l10n = AppLocalizations.of(context);
+    final kind = await showModalBottomSheet<ProtectionKind>(
+      context: context,
+      showDragHandle: true,
+      builder: (context) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            for (final kind in kinds)
+              ListTile(
+                leading: Icon(kindIcon(kind)),
+                title: Text(kindTitle(l10n, kind)),
+                onTap: () => Navigator.pop(context, kind),
+              ),
+          ],
+        ),
+      ),
+    );
+    if (kind != null && mounted) await _edit(kind);
+  }
+
   Future<void> _createSnapshotTask() async {
     final l10n = AppLocalizations.of(context);
-    final datasets = <String>[];
-    for (final pool in await _session.storage.pools()) {
-      for (final d in await _session.storage.datasets(pool.name)) {
-        datasets.add(d.id);
-      }
-    }
+    final datasets = await localDatasets(_session);
     if (!mounted) return;
     final request = await showDialog<_NewSnapshotTask>(
       context: context,
@@ -108,14 +145,17 @@ class _ProtectionScreenState extends State<ProtectionScreen>
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
-    final canCreate = data?.containsKey(ProtectionKind.snapshot) ?? false;
+    final creatable = [
+      for (final kind in data?.keys ?? const <ProtectionKind>[])
+        if (kind.editable) kind,
+    ];
     return Scaffold(
       appBar: AppBar(title: Text(l10n.protectionTitle)),
-      floatingActionButton: canCreate
+      floatingActionButton: creatable.isNotEmpty
           ? FloatingActionButton.extended(
-              onPressed: _createSnapshotTask,
+              onPressed: () => _add(creatable),
               icon: const Icon(Icons.add),
-              label: Text(l10n.snapshotTaskCreate),
+              label: Text(l10n.protectionAdd),
             )
           : null,
       body: AsyncBody<_Tasks>(
@@ -161,6 +201,14 @@ String kindTitle(AppLocalizations l10n, ProtectionKind kind) => switch (kind) {
   ProtectionKind.cloudSync => l10n.protectionCloudSync,
   ProtectionKind.cloudBackup => l10n.protectionCloudBackup,
   ProtectionKind.rsync => l10n.protectionRsync,
+};
+
+IconData kindIcon(ProtectionKind kind) => switch (kind) {
+  ProtectionKind.snapshot => Icons.photo_camera_outlined,
+  ProtectionKind.replication => Icons.compare_arrows,
+  ProtectionKind.cloudSync => Icons.cloud_sync_outlined,
+  ProtectionKind.cloudBackup => Icons.backup_outlined,
+  ProtectionKind.rsync => Icons.sync_alt,
 };
 
 String keepFor(AppLocalizations l10n, int count, LifetimeUnit unit) =>
@@ -233,14 +281,11 @@ class _TaskTile extends StatelessWidget {
     };
     final lastRun = task.lastRun;
     return ListTile(
-      leading: Icon(switch (task.kind) {
-        ProtectionKind.snapshot => Icons.photo_camera_outlined,
-        ProtectionKind.replication => Icons.compare_arrows,
-        ProtectionKind.cloudSync => Icons.cloud_sync_outlined,
-        ProtectionKind.cloudBackup => Icons.backup_outlined,
-        ProtectionKind.rsync => Icons.sync_alt,
-      }),
+      leading: Icon(kindIcon(task.kind)),
       title: Text(task.name),
+      onTap: task.kind.editable && task.kind != ProtectionKind.snapshot
+          ? () => onAction('edit')
+          : null,
       subtitle: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -291,7 +336,9 @@ class _TaskTile extends StatelessWidget {
                 PopupMenuItem(value: 'stop', child: Text(l10n.taskStop))
               else if (!running)
                 PopupMenuItem(value: 'run', child: Text(l10n.taskRunNow)),
-              if (task.kind == ProtectionKind.snapshot)
+              if (task.kind.editable && task.kind != ProtectionKind.snapshot)
+                PopupMenuItem(value: 'edit', child: Text(l10n.edit)),
+              if (task.kind.editable)
                 PopupMenuItem(value: 'delete', child: Text(l10n.delete)),
             ],
           ),

@@ -1,0 +1,23 @@
+{
+  "@@locale": "en",
+  "appTitle": "TrueNAS Mobile",
+  "@appTitle": {
+    "description": "Application name shown in the task switcher and title bar."
+  },
+  "serversTitle": "Servers",
+  "@serversTitle": {
+    "description": "Title of the home screen that lists saved TrueNAS servers."
+  },
+  "serversEmptyTitle": "No servers yet",
+  "@serversEmptyTitle": {
+    "description": "Headline shown when no servers have been added."
+  },
+  "serversEmptyBody": "Add a TrueNAS server (25.04 or newer) to start managing it.",
+  "@serversEmptyBody": {
+    "description": "Explanation shown when no servers have been added."
+  },
+  "addServer": "Add server",
+  "@addServer": {
+    "description": "Button that opens the form for adding a TrueNAS server."
+  }
+}

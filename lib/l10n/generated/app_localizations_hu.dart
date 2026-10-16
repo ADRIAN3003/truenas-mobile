@@ -2145,4 +2145,59 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get appUpdateOpenSettings => 'Beállítások megnyitása';
+
+  @override
+  String appsUpdatesAvailable(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count alkalmazáshoz van frissítés',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get appsUpdateAll => 'Összes frissítése';
+
+  @override
+  String appsUpdateAllTitle(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count alkalmazás frissítése?',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get appsUpdateAllBody =>
+      'Az alkalmazások egymás után frissülnek, és mindegyik újraindul a frissítés közben.';
+
+  @override
+  String appsUpdateAllProgress(String name, int current, int total) {
+    return '$name frissítése ($current/$total)';
+  }
+
+  @override
+  String appsUpdateAllDone(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count alkalmazás frissítve',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String appsUpdateAllPartial(int done, int total, String failed) {
+    return '$done/$total alkalmazás frissítve. Nem frissült: $failed';
+  }
+
+  @override
+  String get settingsLanguageSystemHint =>
+      'Megnyitja az alkalmazás nyelvi oldalát a telefon beállításaiban';
+
+  @override
+  String get settingsLanguageOpenFailed =>
+      'Nem sikerült megnyitni a telefon beállításait.';
 }

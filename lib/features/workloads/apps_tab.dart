@@ -5,6 +5,7 @@ import '../../core/models/workloads.dart';
 import '../../core/session/truenas_session.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../shared/glass.dart';
+import '../../shared/haptics.dart';
 import '../../shared/theme.dart';
 import '../../shared/ui.dart';
 import '../../shared/formatting.dart';
@@ -14,6 +15,7 @@ import '../sharing/sharing_widgets.dart';
 import '../storage/storage_helpers.dart';
 import 'app_icon.dart';
 import 'app_screen.dart';
+import 'update_all_apps.dart';
 import 'workload_widgets.dart';
 
 class _Workloads {
@@ -59,6 +61,10 @@ class AppsTab extends StatefulWidget {
 class _AppsTabState extends State<AppsTab> with LoadState<AppsTab, _Workloads> {
   /// Keys (`app:x`, `vm:1`, `ct:x`) of workloads with an action in flight.
   final _busy = <String>{};
+
+  /// Set while "Update all" runs: how many apps are done, of how many, and
+  /// which one is being updated now.
+  UpdateAllProgress? _updateAll;
 
   WorkloadsApi get _api => widget.session.workloads;
 
@@ -109,6 +115,57 @@ class _AppsTabState extends State<AppsTab> with LoadState<AppsTab, _Workloads> {
     if (mounted) setState(() => _busy.remove(key));
   }
 
+  /// Updates [apps] one after another (the server runs one upgrade job per
+  /// app), after listing them for the user to confirm. An app that fails does
+  /// not stop the rest.
+  Future<void> _upgradeAll(List<TrueNasApp> apps) async {
+    final l10n = AppLocalizations.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    final confirmed = await confirmAction(
+      context,
+      title: l10n.appsUpdateAllTitle(apps.length),
+      body: l10n.appsUpdateAllBody,
+      details: UpdateAllList(apps: apps),
+      confirmLabel: l10n.appsUpdateAll,
+      cancelLabel: l10n.cancel,
+    );
+    if (!confirmed || !mounted) return;
+    final failed = <String>[];
+    var done = 0;
+    for (final app in apps) {
+      // The server screen was closed: the jobs already started carry on there.
+      if (!mounted) return;
+      setState(() {
+        _busy.add('app:${app.name}');
+        _updateAll = (done: done, total: apps.length, name: app.name);
+      });
+      try {
+        await _api.appAction(app.name, WorkloadAction.upgrade);
+        done++;
+      } catch (_) {
+        failed.add(app.name);
+      }
+      if (mounted) setState(() => _busy.remove('app:${app.name}'));
+    }
+    if (!mounted) return;
+    setState(() => _updateAll = null);
+    if (failed.isEmpty) {
+      Haptics.confirm();
+    } else {
+      Haptics.warning();
+    }
+    messenger.showSnackBar(
+      SnackBar(
+        content: Text(
+          failed.isEmpty
+              ? l10n.appsUpdateAllDone(done)
+              : l10n.appsUpdateAllPartial(done, apps.length, failed.join(', ')),
+        ),
+      ),
+    );
+    await load();
+  }
+
   Future<void> _openApp(TrueNasApp app) async {
     await Navigator.push(
       context,
@@ -132,6 +189,15 @@ class _AppsTabState extends State<AppsTab> with LoadState<AppsTab, _Workloads> {
           const EdgeInsets.fromLTRB(16, 0, 16, 24),
         ),
         children: [
+          if (appsWithUpdates(w.apps) case final updates
+              when updates.isNotEmpty || _updateAll != null) ...[
+            UpdateAllCard(
+              count: _updateAll?.total ?? updates.length,
+              progress: _updateAll,
+              onPressed: () => _upgradeAll(updates),
+            ),
+            const SizedBox(height: 8),
+          ],
           ...groupedSection(l10n.appsTitle, empty: l10n.appsEmpty, [
             for (final app in w.apps)
               ListTile(

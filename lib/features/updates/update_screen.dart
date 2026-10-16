@@ -72,7 +72,8 @@ class _UpdateScreenState extends ConsumerState<UpdateScreen> {
         children: [
           _StatusCard(data: data, onInstall: _install),
           if (shown.isNotEmpty) SectionHeader(l10n.appUpdateWhatsNew),
-          for (final release in shown) _NotesCard(release),
+          for (final (i, release) in shown.indexed)
+            _NotesCard(release, expanded: i == 0),
           if (data.releases.isNotEmpty) ...[
             const SizedBox(height: 16),
             GroupedCard(
@@ -132,7 +133,8 @@ class _ReleaseNotesScreenState extends ConsumerState<ReleaseNotesScreen> {
             physics: const AlwaysScrollableScrollPhysics(),
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
             children: [
-              for (final release in data.releases) _NotesCard(release),
+              for (final (i, release) in data.releases.indexed)
+                _NotesCard(release, expanded: i == 0),
             ],
           ),
         ),
@@ -398,11 +400,13 @@ class _Progress extends ConsumerWidget {
   }
 }
 
-/// One release: its name, date and notes (Markdown).
+/// One release: its name, date and notes (Markdown). Only the latest release
+/// starts open ([expanded]); the older ones fold away until tapped.
 class _NotesCard extends StatelessWidget {
-  const _NotesCard(this.release);
+  const _NotesCard(this.release, {required this.expanded});
 
   final ReleaseInfo release;
+  final bool expanded;
 
   @override
   Widget build(BuildContext context) {
@@ -412,23 +416,33 @@ class _NotesCard extends StatelessWidget {
     final date = release.publishedAt;
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              release.name,
-              style: theme.textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w700,
-              ),
+      clipBehavior: Clip.antiAlias,
+      // No divider lines above and below the open notes.
+      child: Theme(
+        data: theme.copyWith(dividerColor: Colors.transparent),
+        child: ExpansionTile(
+          // Keyed by release, so a refresh keeps what the user opened.
+          key: ValueKey<String>(release.tag),
+          initiallyExpanded: expanded,
+          shape: const Border(),
+          collapsedShape: const Border(),
+          tilePadding: const EdgeInsets.symmetric(horizontal: 16),
+          childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+          expandedCrossAxisAlignment: CrossAxisAlignment.start,
+          expandedAlignment: Alignment.topLeft,
+          title: Text(
+            release.name,
+            style: theme.textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.w700,
             ),
-            if (date != null)
-              Text(
-                l10n.appUpdateReleased(date.toLocal()),
-                style: theme.textTheme.bodySmall?.copyWith(color: muted),
-              ),
-            const SizedBox(height: 12),
+          ),
+          subtitle: date == null
+              ? null
+              : Text(
+                  l10n.appUpdateReleased(date.toLocal()),
+                  style: theme.textTheme.bodySmall?.copyWith(color: muted),
+                ),
+          children: [
             if (release.notes.isEmpty)
               Text(
                 l10n.appUpdateNoNotes,

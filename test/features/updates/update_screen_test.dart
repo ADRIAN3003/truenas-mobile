@@ -219,12 +219,43 @@ void main() {
     variant: TargetPlatformVariant.only(TargetPlatform.iOS),
   );
 
-  testWidgets('the release notes screen lists every release', (tester) async {
+  testWidgets('older release notes are collapsed until tapped', (tester) async {
     await open(tester, newer, screen: const ReleaseNotesScreen());
+    // Every release is listed, but only the latest shows its notes.
     expect(find.text('v0.1.4'), findsOneWidget);
     expect(find.text('v0.1.3'), findsOneWidget);
+    expect(find.textContaining('update checking'), findsOneWidget);
+    expect(find.textContaining('Old notes'), findsNothing);
+
+    await tester.tap(find.text('v0.1.3'));
+    await tester.pumpAndSettle();
     expect(find.textContaining('Old notes'), findsOneWidget);
     expect(find.textContaining('update checking'), findsOneWidget);
+
+    // The latest can be folded away too.
+    await tester.tap(find.text('v0.1.4'));
+    await tester.pumpAndSettle();
+    expect(find.textContaining('update checking'), findsNothing);
+    expect(find.textContaining('Old notes'), findsOneWidget);
+  });
+
+  testWidgets('the update screen opens only the latest of several newer ones', (
+    tester,
+  ) async {
+    await open(
+      tester,
+      FakeGitHub([
+        releaseJson('v0.1.3', body: 'Installed notes'),
+        releaseJson('v0.1.4', body: 'Middle notes'),
+        releaseJson('v0.1.5', body: 'Newest notes'),
+      ]),
+    );
+    expect(find.textContaining('Newest notes'), findsOneWidget);
+    expect(find.text('v0.1.4'), findsOneWidget);
+    expect(find.textContaining('Middle notes'), findsNothing);
+    await tester.tap(find.text('v0.1.4'));
+    await tester.pumpAndSettle();
+    expect(find.textContaining('Middle notes'), findsOneWidget);
   });
 
   testWidgets('a release without notes says so', (tester) async {

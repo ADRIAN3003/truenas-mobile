@@ -3679,6 +3679,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Open settings'**
   String get appUpdateOpenSettings;
+
+  /// Headline of the card at the top of the apps list when some apps have newer versions.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 app has an update} other{{count} apps have updates}}'**
+  String appsUpdatesAvailable(int count);
+
+  /// Button that updates every app that has a newer version.
+  ///
+  /// In en, this message translates to:
+  /// **'Update all'**
+  String get appsUpdateAll;
+
+  /// Title of the confirmation before updating every app with an update.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Update 1 app?} other{Update {count} apps?}}'**
+  String appsUpdateAllTitle(int count);
+
+  /// Explains what Update all does, above the list of apps.
+  ///
+  /// In en, this message translates to:
+  /// **'These apps are updated one after another, and each restarts while it updates.'**
+  String get appsUpdateAllBody;
+
+  /// Progress line while Update all runs.
+  ///
+  /// In en, this message translates to:
+  /// **'Updating {name} ({current} of {total})'**
+  String appsUpdateAllProgress(String name, int current, int total);
+
+  /// Snackbar after every app was updated.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 app updated} other{{count} apps updated}}'**
+  String appsUpdateAllDone(int count);
+
+  /// Snackbar when some apps could not be updated.
+  ///
+  /// In en, this message translates to:
+  /// **'{done} of {total} apps updated. Not updated: {failed}'**
+  String appsUpdateAllPartial(int done, int total, String failed);
+
+  /// Subtitle of the Language row when the language is chosen in the system settings.
+  ///
+  /// In en, this message translates to:
+  /// **'Opens this app\'s language page in your phone\'s settings'**
+  String get settingsLanguageSystemHint;
+
+  /// Snackbar when the system language page could not be opened.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not open your phone\'s settings.'**
+  String get settingsLanguageOpenFailed;
 }
 
 class _AppLocalizationsDelegate

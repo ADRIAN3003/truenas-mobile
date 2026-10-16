@@ -75,13 +75,16 @@ README covers what the app does; this file covers how to work on it.
   directly: on iOS they are liquid glass like the system's on iOS 26, which
   Flutter's own Cupertino dialogs are not.
   Dialog buttons come from `dialogAction` (same file), never a bare
-  `TextButton`/`FilledButton`. Keep the glass of dialogs, sheets, menus and
-  the tab bar plain: no `glassColor`, tint or custom colours on the glass
-  itself (they looked wrong on a device, and a coloured tab bar label is
-  drawn twice, which clipped the selected "D"). The dialog *buttons* on iOS
-  are solid capsules like the system's alert on iOS 26/27: the primary one
-  filled with the accent colour, the rest neutral grey, a destructive label
-  red.
+  `TextButton`/`FilledButton`. Keep the glass of dialogs, menus and the tab
+  bar plain: no `glassColor`, tint or custom colours on the glass itself (they
+  looked wrong on a device). The one colour on the tab bar is the selected
+  tab's icon and label in the accent colour; the package draws a selected
+  tab a second time, 15% larger and heavier, which clipped the "D" of
+  Dashboard, so `glass.dart` sets `magnification: 1` and equal label weights.
+  Bottom sheets (`showAppSheet`) are opaque, not glass: a see-through sheet
+  over a list was unreadable. The dialog *buttons* on iOS are solid capsules
+  like the system's alert on iOS 26/27: the primary one filled with the
+  accent colour, the rest neutral grey, a destructive label red.
 - Haptics go through `lib/shared/haptics.dart` (switched off by
   `Haptics.enabled`, which the settings notifier keeps in step). Use
   `AppRefreshIndicator`, `AppSwitch` and `AppSwitchTile` (in `ui.dart`)
@@ -94,6 +97,15 @@ README covers what the app does; this file covers how to work on it.
   tolerates old or damaged data), a row in
   `lib/features/settings/settings_screen.dart` and both ARB files. The shell
   screen reads them, so widget tests that pump it need a `ProviderScope`.
+- Language is chosen on the phone's own page for the app where there is one:
+  iOS Settings, and "App languages" on Android 13+ (`locales_config.xml`,
+  `android:localeConfig`, `Info.plist` `CFBundleLocalizations`). There the
+  settings row only opens that page (`SystemLanguage`,
+  `systemLanguagePageProvider`) and the stored `language` is ignored. Android
+  12 and older, and tests, keep the in-app picker. A new language goes in the
+  ARB files, `locales_config.xml` and `Info.plist`.
+- Apps tab "Update all" upgrades the apps with updates one after another
+  (`app.upgrade` is a job per app), after listing them in a confirmation.
 - Android release APKs must be signed with a fixed key, or Android refuses
   to install one over another ("app not updated"). `release.yml` signs with
   the four `ANDROID_*` secrets; `tools/make-android-keystore.sh` makes them.

@@ -152,17 +152,28 @@ void main() {
     await close(tester);
   });
 
-  testWidgets('the glass tab bar is plain: no tint, no colours of ours', (
+  testWidgets('the glass tab bar is plain, but the selected tab is accent', (
     tester,
   ) async {
     await open(tester, const Size(400, 800), platform: TargetPlatform.iOS);
     final bar = tester.widget<lg.GlassTabBar>(find.byType(lg.GlassTabBar));
+    final accent = Theme.of(tester.element(find.byType(lg.GlassTabBar)))
+        .colorScheme
+        .primary;
+    // No tint and no colours on the glass or the unselected tabs.
     expect(bar.settings, isNull);
     expect(bar.indicatorColor, isNull);
-    expect(bar.selectedIconColor, isNull);
     expect(bar.unselectedIconColor, isNull);
-    expect(bar.selectedLabelColor, isNull);
     expect(bar.unselectedLabelColor, isNull);
+    // The selected one is the accent colour only, and not drawn larger or
+    // heavier than the rest (that clipped a half-coloured "D").
+    expect(bar.selectedIconColor, accent);
+    expect(bar.selectedLabelColor, accent);
+    expect(bar.magnification, 1);
+    expect(
+      bar.selectedLabelStyle?.fontWeight,
+      bar.unselectedLabelStyle?.fontWeight,
+    );
     await close(tester);
   });
 

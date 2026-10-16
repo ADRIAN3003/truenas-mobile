@@ -53,6 +53,30 @@ class MainActivity : FlutterActivity() {
                     result.error("failed", e.message, null)
                 }
             }
+        // Android 13 and newer have a language page for each app.
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, LANGUAGE_CHANNEL)
+            .setMethodCallHandler { call, result ->
+                try {
+                    val supported = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
+                    when (call.method) {
+                        "supported" -> result.success(supported)
+                        "open" -> {
+                            if (supported) {
+                                startActivity(
+                                    Intent(
+                                        Settings.ACTION_APP_LOCALE_SETTINGS,
+                                        Uri.parse("package:$packageName"),
+                                    )
+                                )
+                            }
+                            result.success(null)
+                        }
+                        else -> result.notImplemented()
+                    }
+                } catch (e: Exception) {
+                    result.error("failed", e.message, null)
+                }
+            }
     }
 
     private fun updatesDirectory() = File(cacheDir, "updates")
@@ -71,5 +95,6 @@ class MainActivity : FlutterActivity() {
 
     companion object {
         private const val CHANNEL = "hu.adrian.truenasmobile/installer"
+        private const val LANGUAGE_CHANNEL = "hu.adrian.truenasmobile/language"
     }
 }

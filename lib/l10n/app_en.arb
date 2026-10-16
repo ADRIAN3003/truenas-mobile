@@ -2954,5 +2954,78 @@
   "appUpdateOpenSettings": "Open settings",
   "@appUpdateOpenSettings": {
     "description": "Button that opens Android's page for allowing installs from this app."
+  },
+  "appsUpdatesAvailable": "{count, plural, =1{1 app has an update} other{{count} apps have updates}}",
+  "@appsUpdatesAvailable": {
+    "description": "Headline of the card at the top of the apps list when some apps have newer versions.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "appsUpdateAll": "Update all",
+  "@appsUpdateAll": {
+    "description": "Button that updates every app that has a newer version."
+  },
+  "appsUpdateAllTitle": "{count, plural, =1{Update 1 app?} other{Update {count} apps?}}",
+  "@appsUpdateAllTitle": {
+    "description": "Title of the confirmation before updating every app with an update.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "appsUpdateAllBody": "These apps are updated one after another, and each restarts while it updates.",
+  "@appsUpdateAllBody": {
+    "description": "Explains what Update all does, above the list of apps."
+  },
+  "appsUpdateAllProgress": "Updating {name} ({current} of {total})",
+  "@appsUpdateAllProgress": {
+    "description": "Progress line while Update all runs.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "appsUpdateAllDone": "{count, plural, =1{1 app updated} other{{count} apps updated}}",
+  "@appsUpdateAllDone": {
+    "description": "Snackbar after every app was updated.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "appsUpdateAllPartial": "{done} of {total} apps updated. Not updated: {failed}",
+  "@appsUpdateAllPartial": {
+    "description": "Snackbar when some apps could not be updated.",
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      },
+      "failed": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsLanguageSystemHint": "Opens this app's language page in your phone's settings",
+  "@settingsLanguageSystemHint": {
+    "description": "Subtitle of the Language row when the language is chosen in the system settings."
+  },
+  "settingsLanguageOpenFailed": "Could not open your phone's settings.",
+  "@settingsLanguageOpenFailed": {
+    "description": "Snackbar when the system language page could not be opened."
   }
 }

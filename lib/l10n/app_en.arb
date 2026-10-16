@@ -2609,5 +2609,43 @@
         "type": "String"
       }
     }
+  },
+  "serversCount": "{count, plural, =1{1 server} other{{count} servers}}",
+  "@serversCount": {
+    "description": "Under the title of the server list: how many servers are saved.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "shellPaste": "Paste",
+  "@shellPaste": {
+    "description": "Button in the shell that types the clipboard into the terminal."
+  },
+  "shellCopied": "Copied to clipboard",
+  "@shellCopied": {
+    "description": "Shown after the selected terminal text was copied."
+  },
+  "leaveServerTitle": "Disconnect from {name}?",
+  "@leaveServerTitle": {
+    "description": "Title of the dialog shown when leaving an open server for the server list.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "leaveServerBody": "You will return to your servers and this connection will be closed, along with any shell or other screen open on it.",
+  "@leaveServerBody": {
+    "description": "Body of the dialog shown when leaving an open server for the server list."
+  },
+  "leaveServerConfirm": "Disconnect",
+  "@leaveServerConfirm": {
+    "description": "Button that closes the open server and returns to the server list."
+  },
+  "leaveServerStay": "Stay",
+  "@leaveServerStay": {
+    "description": "Button that keeps the server open."
   }
 }

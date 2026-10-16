@@ -6,7 +6,6 @@ import 'dialogs.dart';
 import 'glass.dart';
 import 'haptics.dart';
 import 'theme.dart';
-import 'ui.dart';
 import 'viz_colors.dart';
 
 /// The theme's readable foreground and soft background for a status
@@ -169,7 +168,7 @@ Future<bool> confirmAction(
             dialogAction(
               context,
               label: confirmLabel,
-              primary: !destructive,
+              primary: true,
               destructive: destructive,
               onPressed: enabled ? () => Navigator.pop(context, true) : null,
             ),

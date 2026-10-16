@@ -32,8 +32,9 @@ void main() {
     await openConfirm(tester, TargetPlatform.iOS);
     expect(find.byType(GlassDialogPanel), findsOneWidget);
     expect(find.byType(AlertDialog), findsNothing);
-    expect(find.widgetWithText(FilledButton, 'Delete'), findsOneWidget);
-    expect(find.widgetWithText(TextButton, 'Cancel'), findsOneWidget);
+    expect(find.widgetWithText(GlassDialogButton, 'Delete'), findsOneWidget);
+    expect(find.widgetWithText(GlassDialogButton, 'Cancel'), findsOneWidget);
+    expect(find.byType(FilledButton), findsNothing);
   });
 
   testWidgets('confirmations use a Material dialog on Android', (tester) async {
@@ -41,6 +42,7 @@ void main() {
     expect(find.byType(GlassDialogPanel), findsNothing);
     expect(find.byType(AlertDialog), findsOneWidget);
     expect(find.widgetWithText(FilledButton, 'Delete'), findsOneWidget);
+    expect(find.widgetWithText(TextButton, 'Cancel'), findsOneWidget);
   });
 
   test('both themes carry the app palette', () {

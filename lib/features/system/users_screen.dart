@@ -418,11 +418,17 @@ class _NewUserDialogState extends State<_NewUserDialog> {
         ),
       ),
       actions: [
-        TextButton(
+        dialogAction(
+          context,
+          label: l10n.cancel,
           onPressed: () => Navigator.pop(context),
-          child: Text(l10n.cancel),
         ),
-        FilledButton(onPressed: _submit, child: Text(l10n.create)),
+        dialogAction(
+          context,
+          label: l10n.create,
+          primary: true,
+          onPressed: _submit,
+        ),
       ],
     );
   }
@@ -477,11 +483,17 @@ class _NameDialogState extends State<_NameDialog> {
         ),
       ),
       actions: [
-        TextButton(
+        dialogAction(
+          context,
+          label: l10n.cancel,
           onPressed: () => Navigator.pop(context),
-          child: Text(l10n.cancel),
         ),
-        FilledButton(onPressed: _submit, child: Text(l10n.create)),
+        dialogAction(
+          context,
+          label: l10n.create,
+          primary: true,
+          onPressed: _submit,
+        ),
       ],
     );
   }

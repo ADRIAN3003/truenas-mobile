@@ -69,13 +69,16 @@ Future<bool> confirmCertificateDialog(
         ),
       ),
       actions: [
-        TextButton(
+        dialogAction(
+          context,
+          label: l10n.cancel,
           onPressed: () => Navigator.pop(context, false),
-          child: Text(l10n.cancel),
         ),
-        FilledButton(
+        dialogAction(
+          context,
+          label: l10n.trust,
+          primary: true,
           onPressed: () => Navigator.pop(context, true),
-          child: Text(l10n.trust),
         ),
       ],
     ),
@@ -109,13 +112,16 @@ Future<String?> askOtpDialog(BuildContext context) {
         ],
       ),
       actions: [
-        TextButton(
+        dialogAction(
+          context,
+          label: l10n.cancel,
           onPressed: () => Navigator.pop(context),
-          child: Text(l10n.cancel),
         ),
-        FilledButton(
+        dialogAction(
+          context,
+          label: l10n.otpSubmit,
+          primary: true,
           onPressed: () => Navigator.pop(context, controller.text),
-          child: Text(l10n.otpSubmit),
         ),
       ],
     ),

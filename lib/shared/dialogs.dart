@@ -44,6 +44,58 @@ class AppDialog extends StatelessWidget {
         );
 }
 
+/// A dialog button: plain text on Android ([primary] filled, [destructive]
+/// red), a plain glass capsule on iOS ([primary] bold, [destructive] red).
+/// Disabled when [onPressed] is null.
+Widget dialogAction(
+  BuildContext context, {
+  required String label,
+  required VoidCallback? onPressed,
+  IconData? icon,
+  bool primary = false,
+  bool destructive = false,
+}) {
+  if (useGlassChrome(context)) {
+    return GlassDialogButton(
+      label: label,
+      icon: icon,
+      onPressed: onPressed,
+      primary: primary,
+      destructive: destructive,
+    );
+  }
+  final scheme = Theme.of(context).colorScheme;
+  final text = Text(label);
+  final graphic = icon == null ? null : Icon(icon);
+  if (primary) {
+    final style = destructive
+        ? FilledButton.styleFrom(
+            backgroundColor: scheme.error,
+            foregroundColor: scheme.onError,
+          )
+        : null;
+    return graphic == null
+        ? FilledButton(style: style, onPressed: onPressed, child: text)
+        : FilledButton.icon(
+            style: style,
+            onPressed: onPressed,
+            icon: graphic,
+            label: text,
+          );
+  }
+  final style = destructive
+      ? TextButton.styleFrom(foregroundColor: scheme.error)
+      : null;
+  return graphic == null
+      ? TextButton(style: style, onPressed: onPressed, child: text)
+      : TextButton.icon(
+          style: style,
+          onPressed: onPressed,
+          icon: graphic,
+          label: text,
+        );
+}
+
 /// Shows an [AppDialog] (or anything else built by [builder]) with the
 /// platform's transition and barrier.
 Future<T?> showAppDialog<T>({

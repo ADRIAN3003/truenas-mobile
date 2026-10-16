@@ -210,9 +210,10 @@ class _JobTile extends StatelessWidget {
                   child: SelectableText(job.error!),
                 ),
                 actions: [
-                  TextButton(
+                  dialogAction(
+                    context,
+                    label: l10n.close,
                     onPressed: () => Navigator.pop(context),
-                    child: Text(l10n.close),
                   ),
                 ],
               ),

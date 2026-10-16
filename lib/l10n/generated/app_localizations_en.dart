@@ -1885,4 +1885,36 @@ class AppLocalizationsEn extends AppLocalizations {
   String shellFallback(String shell) {
     return 'That shell is not in this container. Trying $shell instead.';
   }
+
+  @override
+  String serversCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count servers',
+      one: '1 server',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get shellPaste => 'Paste';
+
+  @override
+  String get shellCopied => 'Copied to clipboard';
+
+  @override
+  String leaveServerTitle(String name) {
+    return 'Disconnect from $name?';
+  }
+
+  @override
+  String get leaveServerBody =>
+      'You will return to your servers and this connection will be closed, along with any shell or other screen open on it.';
+
+  @override
+  String get leaveServerConfirm => 'Disconnect';
+
+  @override
+  String get leaveServerStay => 'Stay';
 }

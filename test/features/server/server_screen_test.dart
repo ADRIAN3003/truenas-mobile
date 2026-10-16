@@ -33,6 +33,8 @@ void main() {
     WidgetTester tester,
     Size size, {
     TargetPlatform platform = TargetPlatform.android,
+    bool fromList = false,
+    String? url,
   }) async {
     tester.view.physicalSize = size;
     tester.view.devicePixelRatio = 1;
@@ -44,7 +46,7 @@ void main() {
         ServerInstance(
           id: '1',
           name: 'Home',
-          url: 'http://127.0.0.1:${server.port}',
+          url: url ?? 'http://127.0.0.1:${server.port}',
           authMethod: AuthMethod.password,
           username: 'truenas_admin',
           secret: 'secret',
@@ -69,11 +71,35 @@ void main() {
             theme: buildAppTheme(Brightness.light, platform: platform),
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
-            home: const ServerScreen('1'),
+            home: fromList
+                ? Builder(
+                    builder: (context) => Scaffold(
+                      body: Center(
+                        child: TextButton(
+                          onPressed: () => Navigator.push(
+                            context,
+                            MaterialPageRoute<void>(
+                              builder: (_) => const ServerScreen('1'),
+                            ),
+                          ),
+                          child: const Text('servers'),
+                        ),
+                      ),
+                    ),
+                  )
+                : const ServerScreen('1'),
           ),
         ),
       ),
     );
+    if (fromList) {
+      await tester.runAsync(() async {
+        await tester.tap(find.text('servers'));
+        await tester.pump();
+      });
+      // Let the page slide in.
+      await tester.pump(const Duration(seconds: 1));
+    }
     await settle(tester);
   }
 
@@ -119,5 +145,63 @@ void main() {
       1,
     );
     await close(tester);
+  });
+
+  group('going back to the server list', () {
+    testWidgets('asks before closing an open server', (tester) async {
+      await open(tester, const Size(400, 800), fromList: true);
+      expect(find.byType(NavigationBar), findsOneWidget);
+
+      await tester.tap(find.byType(BackButton));
+      await tester.pumpAndSettle();
+      expect(find.text('Disconnect from Home?'), findsOneWidget);
+
+      // Staying keeps the server open.
+      await tester.tap(find.text('Stay'));
+      await tester.pumpAndSettle();
+      expect(find.text('Disconnect from Home?'), findsNothing);
+      expect(find.byType(NavigationBar), findsOneWidget);
+
+      await tester.tap(find.byType(BackButton));
+      await tester.pumpAndSettle();
+      await tester.runAsync(() async {
+        await tester.tap(find.text('Disconnect'));
+        await tester.pump();
+      });
+      await tester.pump(const Duration(seconds: 1));
+      expect(find.byType(NavigationBar), findsNothing);
+      expect(find.text('servers'), findsOneWidget);
+      await close(tester);
+    });
+
+    testWidgets('asks on iOS too, with a glass dialog', (tester) async {
+      await open(
+        tester,
+        const Size(400, 800),
+        platform: TargetPlatform.iOS,
+        fromList: true,
+      );
+      await tester.tap(find.byType(BackButton));
+      await tester.pumpAndSettle();
+      expect(find.byType(GlassDialogPanel), findsOneWidget);
+      expect(find.text('Disconnect from Home?'), findsOneWidget);
+      await close(tester);
+    });
+
+    testWidgets('does not ask when nothing is open yet', (tester) async {
+      // Nothing listens here, so connecting fails and the error is shown.
+      await open(
+        tester,
+        const Size(400, 800),
+        fromList: true,
+        url: 'http://127.0.0.1:1',
+      );
+      expect(find.byType(NavigationBar), findsNothing);
+      await tester.tap(find.byType(BackButton));
+      await tester.pumpAndSettle();
+      expect(find.text('Disconnect from Home?'), findsNothing);
+      expect(find.text('servers'), findsOneWidget);
+      await close(tester);
+    });
   });
 }

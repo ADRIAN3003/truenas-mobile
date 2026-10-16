@@ -1882,4 +1882,36 @@ class AppLocalizationsHu extends AppLocalizations {
   String shellFallback(String shell) {
     return 'Ez a shell nincs a konténerben. Helyette ezt próbálom: $shell.';
   }
+
+  @override
+  String serversCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count szerver',
+      one: '1 szerver',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get shellPaste => 'Beillesztés';
+
+  @override
+  String get shellCopied => 'Vágólapra másolva';
+
+  @override
+  String leaveServerTitle(String name) {
+    return 'Lecsatlakozol erről: $name?';
+  }
+
+  @override
+  String get leaveServerBody =>
+      'Visszalépsz a szerverekhez, és ez a kapcsolat bezárul, vele együtt a rajta nyitott shellek és képernyők is.';
+
+  @override
+  String get leaveServerConfirm => 'Lecsatlakozás';
+
+  @override
+  String get leaveServerStay => 'Maradok';
 }

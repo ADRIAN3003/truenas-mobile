@@ -74,6 +74,11 @@ README covers what the app does; this file covers how to work on it.
   `AlertDialog`, `showDialog`, `showModalBottomSheet` or `PopupMenuButton`
   directly: on iOS they are liquid glass like the system's on iOS 26, which
   Flutter's own Cupertino dialogs are not.
+  Dialog buttons come from `dialogAction` (same file), never a bare
+  `TextButton`/`FilledButton`. Keep the glass of dialogs, sheets and menus
+  plain: no `glassColor`, tint or filled/coloured capsules of our own (they
+  looked wrong on a device); only a destructive label is red and a primary
+  one bold.
 - Haptics go through `lib/shared/haptics.dart`. Use `AppRefreshIndicator`,
   `AppSwitch` and `AppSwitchTile` (in `ui.dart`) instead of the bare Material
   widgets so pull to refresh and switches tick; the Material switch makes no

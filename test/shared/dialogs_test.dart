@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:liquid_glass_widgets/liquid_glass_widgets.dart' as lg;
 import 'package:truenas_mobile/shared/dialogs.dart';
 import 'package:truenas_mobile/shared/glass.dart';
 import 'package:truenas_mobile/shared/theme.dart';
@@ -47,13 +48,16 @@ void main() {
                 title: const Text('Trust it?'),
                 content: const Text('A new certificate.'),
                 actions: [
-                  TextButton(
+                  dialogAction(
+                    context,
+                    label: 'Cancel',
                     onPressed: () => Navigator.pop(context, 'no'),
-                    child: const Text('Cancel'),
                   ),
-                  FilledButton(
+                  dialogAction(
+                    context,
+                    label: 'Trust',
+                    primary: true,
                     onPressed: () => Navigator.pop(context, 'yes'),
-                    child: const Text('Trust'),
                   ),
                 ],
               ),
@@ -86,7 +90,7 @@ void main() {
           title: const Text('Pick'),
           actions: [
             for (final label in ['One', 'Two', 'Three'])
-              TextButton(onPressed: () {}, child: Text(label)),
+              dialogAction(context, label: label, onPressed: () {}),
           ],
         ),
       );
@@ -113,7 +117,7 @@ void main() {
                 ListTile(dense: true, title: Text('tank/dataset$i')),
             ],
           ),
-          actions: [TextButton(onPressed: () {}, child: const Text('Close'))],
+          actions: [dialogAction(context, label: 'Close', onPressed: () {})],
         ),
       );
       expect(tester.takeException(), isNull);
@@ -127,6 +131,63 @@ void main() {
       await tester.drag(find.text('tank/dataset3'), const Offset(0, -3000));
       await tester.pumpAndSettle();
       expect(tester.getTopLeft(find.text('tank/dataset59')).dy, lessThan(700));
+    }, variant: ios);
+
+    testWidgets('the glass is plain: no tint, no filled or coloured buttons', (
+      tester,
+    ) async {
+      await open(
+        tester,
+        (context) => AppDialog(
+          title: const Text('Restart?'),
+          content: const Text('Services stop for a moment.'),
+          actions: [
+            dialogAction(context, label: 'Cancel', onPressed: () {}),
+            dialogAction(
+              context,
+              label: 'Restart',
+              primary: true,
+              destructive: true,
+              onPressed: () {},
+            ),
+          ],
+        ),
+      );
+      final card = tester.widget<lg.GlassCard>(find.byType(lg.GlassCard));
+      expect(card.settings, isNull);
+      expect(
+        find.descendant(
+          of: find.byType(GlassDialogPanel),
+          matching: find.byWidgetPredicate(
+            (w) => w is FilledButton || w is TextButton || w is OutlinedButton,
+          ),
+        ),
+        findsNothing,
+      );
+      TextStyle labelStyle(String label) =>
+          DefaultTextStyle.of(tester.element(find.text(label))).style;
+      // Only the destructive label is coloured, only the primary one is bold.
+      expect(labelStyle('Restart').color, isNot(labelStyle('Cancel').color));
+      expect(labelStyle('Restart').fontWeight, FontWeight.w700);
+      expect(labelStyle('Cancel').fontWeight, isNot(FontWeight.w700));
+    }, variant: ios);
+
+    testWidgets('a button without a handler is disabled', (tester) async {
+      var taps = 0;
+      await open(
+        tester,
+        (context) => AppDialog(
+          title: const Text('New dataset'),
+          actions: [
+            dialogAction(context, label: 'Create', onPressed: null),
+            dialogAction(context, label: 'Cancel', onPressed: () => taps++),
+          ],
+        ),
+      );
+      await tester.tap(find.text('Create'));
+      await tester.pumpAndSettle();
+      expect(taps, 0);
+      expect(find.byType(GlassDialogPanel), findsOneWidget);
     }, variant: ios);
 
     testWidgets('text fields work inside the panel', (tester) async {

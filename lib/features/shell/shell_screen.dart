@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:xterm/xterm.dart';
 
 import '../../core/api/shell_session.dart';
@@ -46,6 +47,7 @@ final _missingShell = RegExp(
 
 class _ShellScreenState extends State<ShellScreen> {
   final _terminal = Terminal(maxLines: 10000);
+  final _selection = TerminalController();
   final _focus = FocusNode();
   ShellSession? _shell;
   StreamSubscription<String>? _output;
@@ -76,6 +78,7 @@ class _ShellScreenState extends State<ShellScreen> {
   void dispose() {
     _output?.cancel();
     _shell?.close();
+    _selection.dispose();
     _focus.dispose();
     super.dispose();
   }
@@ -171,6 +174,35 @@ class _ShellScreenState extends State<ShellScreen> {
     await _connect();
   }
 
+  /// Copies the selected text (long press, then drag to extend) and clears
+  /// the selection.
+  Future<void> _copy() async {
+    final range = _selection.selection;
+    if (range == null) return;
+    final text = _terminal.buffer.getText(range);
+    if (text.isEmpty) return;
+    final messenger = ScaffoldMessenger.of(context);
+    final message = AppLocalizations.of(context).shellCopied;
+    await Clipboard.setData(ClipboardData(text: text));
+    _selection.clearSelection();
+    Haptics.confirm();
+    messenger
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text(message)));
+  }
+
+  /// Types the clipboard into the shell, as a paste when the program asks
+  /// for bracketed paste.
+  Future<void> _paste() async {
+    final data = await Clipboard.getData(Clipboard.kTextPlain);
+    final text = data?.text;
+    if (text == null || text.isEmpty || !mounted) return;
+    Haptics.selection();
+    // Line breaks are Enter keys in a terminal.
+    _terminal.paste(text.replaceAll(RegExp(r'\r?\n'), '\r'));
+    _focus.requestFocus();
+  }
+
   void _key(TerminalKey key, {bool ctrl = false}) {
     Haptics.selection();
     _terminal.keyInput(key, ctrl: ctrl);
@@ -206,6 +238,7 @@ class _ShellScreenState extends State<ShellScreen> {
             Expanded(
               child: TerminalView(
                 _terminal,
+                controller: _selection,
                 focusNode: _focus,
                 autofocus: true,
                 readOnly: _status != _Status.connected,
@@ -220,6 +253,23 @@ class _ShellScreenState extends State<ShellScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 4),
                 child: Row(
                   children: [
+                    ListenableBuilder(
+                      listenable: _selection,
+                      builder: (context, _) => _KeyButton(
+                        label: l10n.copy,
+                        icon: Icons.copy_rounded,
+                        onPressed: _selection.selection == null ? null : _copy,
+                      ),
+                    ),
+                    _KeyButton(
+                      label: l10n.shellPaste,
+                      icon: Icons.content_paste_rounded,
+                      onPressed: _status == _Status.connected ? _paste : null,
+                    ),
+                    const SizedBox(
+                      height: 24,
+                      child: VerticalDivider(width: 12),
+                    ),
                     _KeyButton(
                       label: l10n.shellKeyEsc,
                       onPressed: () => _key(TerminalKey.escape),
@@ -267,7 +317,7 @@ class _ShellScreenState extends State<ShellScreen> {
 class _KeyButton extends StatelessWidget {
   const _KeyButton({required this.onPressed, required this.label, this.icon});
 
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
   final String label;
   final IconData? icon;
 

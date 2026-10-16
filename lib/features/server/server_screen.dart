@@ -8,6 +8,7 @@ import '../../l10n/generated/app_localizations.dart';
 import '../../shared/connect_dialogs.dart';
 import '../../shared/glass.dart';
 import '../../shared/haptics.dart';
+import '../../shared/widgets.dart';
 import '../sharing/shares_tab.dart';
 import '../storage/storage_tab.dart';
 import '../workloads/apps_tab.dart';
@@ -96,8 +97,30 @@ class _ServerScreenState extends ConsumerState<ServerScreen>
     }
   }
 
+  /// Asks before closing an open server, whose shells and live views end with
+  /// it. Going back from the connecting or error screen needs no question.
+  Future<void> _confirmLeave() async {
+    final l10n = AppLocalizations.of(context);
+    final leave = await confirmAction(
+      context,
+      title: l10n.leaveServerTitle(_instance?.name ?? ''),
+      body: l10n.leaveServerBody,
+      confirmLabel: l10n.leaveServerConfirm,
+      cancelLabel: l10n.leaveServerStay,
+    );
+    if (leave && mounted) Navigator.pop(context);
+  }
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) => PopScope(
+    canPop: _session == null || _info == null,
+    onPopInvokedWithResult: (didPop, _) {
+      if (!didPop) _confirmLeave();
+    },
+    child: _screen(context),
+  );
+
+  Widget _screen(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final instance = _instance;
     final session = _session;

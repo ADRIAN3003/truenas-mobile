@@ -48,7 +48,38 @@ void main() {
     await tester.pumpWidget(_app(store));
     await tester.pumpAndSettle();
     expect(find.text('Home NAS'), findsOneWidget);
-    expect(find.text('https://nas.local · API v25.10.5'), findsOneWidget);
+    // The address without scheme, then what the card knows about the server.
+    expect(find.text('nas.local'), findsOneWidget);
+    expect(find.text('1 server'), findsOneWidget);
+    expect(find.text('HTTPS'), findsOneWidget);
+    expect(find.text('API v25.10.5'), findsOneWidget);
+    expect(find.text('API key'), findsOneWidget);
+  });
+
+  testWidgets('a long name and address fit a narrow phone', (tester) async {
+    tester.view.physicalSize = const Size(320, 640);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    final store = MemoryStore();
+    await InstanceRepository(store).save([
+      const ServerInstance(
+        id: 'a',
+        name: 'Backup server in the garage, second floor',
+        url: 'https://truenas.very-long-hostname.home.example.com:8443',
+        authMethod: AuthMethod.password,
+        username: 'truenas_admin',
+        secret: 'pw',
+        lastApiVersion: 'v25.10.5',
+      ),
+    ]);
+    await tester.pumpWidget(_app(store));
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
+    expect(
+      find.text('truenas.very-long-hostname.home.example.com:8443'),
+      findsOneWidget,
+    );
+    expect(find.text('Password'), findsOneWidget);
   });
 
   testWidgets('adds a server from the form', (tester) async {
@@ -74,7 +105,7 @@ void main() {
     await tester.enterText(find.byKey(const Key('address')), 'nas.local');
     await tester.tap(find.text('Save'));
     await tester.pumpAndSettle();
-    expect(find.text('nas.local'), findsOneWidget);
+    expect(find.text('1 server'), findsOneWidget);
     final saved = await InstanceRepository(store).load();
     expect(saved.single.url, 'https://nas.local');
     expect(saved.single.username, 'truenas_admin');

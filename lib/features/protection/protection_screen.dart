@@ -487,18 +487,21 @@ class _NewSnapshotTaskDialogState extends State<_NewSnapshotTaskDialog> {
               ),
             ),
       actions: [
-        TextButton(
+        dialogAction(
+          context,
+          label: l10n.cancel,
           onPressed: () => Navigator.pop(context),
-          child: Text(l10n.cancel),
         ),
-        FilledButton(
+        dialogAction(
+          context,
+          label: l10n.create,
+          primary: true,
           onPressed: dataset == null || keep == null || keep < 1
               ? null
               : () => Navigator.pop(
                   context,
                   _NewSnapshotTask(dataset, _recursive, _schedule, keep, _unit),
                 ),
-          child: Text(l10n.create),
         ),
       ],
     );

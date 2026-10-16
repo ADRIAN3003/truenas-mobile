@@ -179,17 +179,6 @@ Widget wrapForGlass(Widget app) => lg.LiquidGlassWidgets.wrap(
   brightnessResolver: Theme.maybeBrightnessOf,
 );
 
-/// Glass for floating panels (dialogs, sheets, menus): frosted enough that
-/// text on it keeps its contrast over whatever is behind.
-lg.LiquidGlassSettings glassPanelSettings(BuildContext context) {
-  final dark = Theme.of(context).brightness == Brightness.dark;
-  return lg.LiquidGlassSettings(
-    glassColor: dark ? const Color(0xCC1A2333) : const Color(0xD9FFFFFF),
-    blur: 18,
-    thickness: 24,
-  );
-}
-
 /// Shows [builder]'s dialog the way iOS does: a dimmed barrier and a panel
 /// that scales in.
 Future<T?> showGlassDialog<T>({
@@ -203,8 +192,11 @@ Future<T?> showGlassDialog<T>({
 );
 
 /// An iOS 26 alert on liquid glass: an optional [icon], a centred [title],
-/// scrolling [content], and [actions] as capsules, side by side when there
-/// are two or fewer and stacked otherwise.
+/// scrolling [content], and [actions] ([GlassDialogButton]s), side by side
+/// when there are two or fewer and stacked otherwise.
+///
+/// The glass is left plain: no tint, rim or button colours of our own, so it
+/// looks like the system's.
 class GlassDialogPanel extends StatelessWidget {
   const GlassDialogPanel({
     super.key,
@@ -224,23 +216,6 @@ class GlassDialogPanel extends StatelessWidget {
     final theme = Theme.of(context);
     final text = theme.textTheme;
     final scheme = theme.colorScheme;
-    // Buttons become capsules; the Material buttons the callers pass in keep
-    // their own colours (a destructive one stays red).
-    final capsule = ButtonStyle(
-      minimumSize: const WidgetStatePropertyAll(Size(0, 46)),
-      shape: const WidgetStatePropertyAll(StadiumBorder()),
-    );
-    final buttons = theme.copyWith(
-      textButtonTheme: TextButtonThemeData(
-        style: capsule.merge(
-          TextButton.styleFrom(
-            backgroundColor: scheme.onSurface.withValues(alpha: 0.08),
-          ),
-        ),
-      ),
-      filledButtonTheme: FilledButtonThemeData(style: capsule),
-      outlinedButtonTheme: OutlinedButtonThemeData(style: capsule),
-    );
     return SafeArea(
       child: AnimatedPadding(
         // Keep the panel above the keyboard.
@@ -258,7 +233,6 @@ class GlassDialogPanel extends StatelessWidget {
               type: MaterialType.transparency,
               child: lg.GlassCard(
                 useOwnLayer: true,
-                settings: glassPanelSettings(context),
                 shape: const lg.LiquidRoundedSuperellipse(borderRadius: 34),
                 padding: const EdgeInsets.fromLTRB(20, 22, 20, 16),
                 child: Column(
@@ -299,34 +273,93 @@ class GlassDialogPanel extends StatelessWidget {
                     if (actions.isNotEmpty)
                       Padding(
                         padding: const EdgeInsets.only(top: 18),
-                        child: Theme(
-                          data: buttons,
-                          child: actions.length <= 2
-                              ? Row(
-                                  children: [
-                                    for (final (i, action) in actions.indexed)
-                                      Expanded(
-                                        child: Padding(
-                                          padding: EdgeInsetsDirectional.only(
-                                            start: i == 0 ? 0 : 8,
-                                          ),
-                                          child: action,
+                        child: actions.length <= 2
+                            ? Row(
+                                children: [
+                                  for (final (i, action) in actions.indexed)
+                                    Expanded(
+                                      child: Padding(
+                                        padding: EdgeInsetsDirectional.only(
+                                          start: i == 0 ? 0 : 8,
                                         ),
+                                        child: action,
                                       ),
-                                  ],
-                                )
-                              : Column(
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.stretch,
-                                  spacing: 8,
-                                  children: actions,
-                                ),
-                        ),
+                                    ),
+                                ],
+                              )
+                            : Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                spacing: 8,
+                                children: actions,
+                              ),
                       ),
                   ],
                 ),
               ),
             ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// A button of a [GlassDialogPanel]: a plain glass capsule with a text label.
+/// [primary] makes the label bold and [destructive] makes it red; nothing is
+/// filled or tinted.
+class GlassDialogButton extends StatelessWidget {
+  const GlassDialogButton({
+    super.key,
+    required this.label,
+    required this.onPressed,
+    this.icon,
+    this.primary = false,
+    this.destructive = false,
+  });
+
+  final String label;
+
+  /// Null disables the button.
+  final VoidCallback? onPressed;
+  final IconData? icon;
+  final bool primary;
+  final bool destructive;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final dark = theme.brightness == Brightness.dark;
+    final color = destructive
+        ? (dark ? const Color(0xFFFF453A) : const Color(0xFFFF3B30))
+        : theme.colorScheme.onSurface;
+    return lg.GlassButton.custom(
+      label: label,
+      onTap: onPressed ?? () {},
+      enabled: onPressed != null,
+      useOwnLayer: true,
+      height: 46,
+      shape: const lg.LiquidRoundedSuperellipse(borderRadius: 23),
+      child: DefaultTextStyle.merge(
+        style: TextStyle(
+          fontSize: 16,
+          fontWeight: primary ? FontWeight.w700 : FontWeight.w500,
+          color: color,
+        ),
+        child: IconTheme.merge(
+          data: IconThemeData(color: color, size: 18),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            spacing: 6,
+            children: [
+              if (icon != null) Icon(icon),
+              Flexible(
+                child: Text(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
           ),
         ),
       ),
@@ -340,7 +373,6 @@ Future<T?> showGlassSheet<T>({
   required WidgetBuilder builder,
 }) => lg.GlassSheet.show<T>(
   context: context,
-  settings: glassPanelSettings(context),
   builder: (context) =>
       Material(type: MaterialType.transparency, child: builder(context)),
 );
@@ -368,7 +400,6 @@ class GlassPopupMenu<T> extends StatelessWidget {
     menuWidth: 220,
     autoAdjustToScreen: true,
     menuPadding: const EdgeInsets.all(12),
-    settings: glassPanelSettings(context),
     triggerBuilder: (context, toggle) => IconButton(
       tooltip: tooltip ?? MaterialLocalizations.of(context).showMenuTooltip,
       onPressed: enabled ? toggle : null,

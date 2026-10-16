@@ -522,5 +522,12 @@
   "fieldPasswordKeep": "Hagyd üresen a mentett jelszó megtartásához, vagy írj be egy újat a lecseréléséhez.",
   "fieldApiKeyKeep": "Hagyd üresen a mentett API-kulcs megtartásához, vagy illessz be egy újat a lecseréléséhez.",
   "tabSharesShort": "Megosztás",
-  "shellFallback": "Ez a shell nincs a konténerben. Helyette ezt próbálom: {shell}."
+  "shellFallback": "Ez a shell nincs a konténerben. Helyette ezt próbálom: {shell}.",
+  "serversCount": "{count, plural, =1{1 szerver} other{{count} szerver}}",
+  "shellPaste": "Beillesztés",
+  "shellCopied": "Vágólapra másolva",
+  "leaveServerTitle": "Lecsatlakozol erről: {name}?",
+  "leaveServerBody": "Visszalépsz a szerverekhez, és ez a kapcsolat bezárul, vele együtt a rajta nyitott shellek és képernyők is.",
+  "leaveServerConfirm": "Lecsatlakozás",
+  "leaveServerStay": "Maradok"
 }

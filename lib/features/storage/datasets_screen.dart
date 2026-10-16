@@ -283,11 +283,17 @@ class _CreateDatasetDialogState extends State<_CreateDatasetDialog> {
         ),
       ),
       actions: [
-        TextButton(
+        dialogAction(
+          context,
+          label: l10n.cancel,
           onPressed: () => Navigator.pop(context),
-          child: Text(l10n.cancel),
         ),
-        FilledButton(onPressed: _submit, child: Text(l10n.create)),
+        dialogAction(
+          context,
+          label: l10n.create,
+          primary: true,
+          onPressed: _submit,
+        ),
       ],
     );
   }
@@ -596,16 +602,19 @@ class _CreateSnapshotDialogState extends State<_CreateSnapshotDialog> {
         ),
       ),
       actions: [
-        TextButton(
+        dialogAction(
+          context,
+          label: l10n.cancel,
           onPressed: () => Navigator.pop(context),
-          child: Text(l10n.cancel),
         ),
-        FilledButton(
+        dialogAction(
+          context,
+          label: l10n.create,
+          primary: true,
           onPressed: () {
             if (!_formKey.currentState!.validate()) return;
             Navigator.pop(context, (_name.text.trim(), _recursive));
           },
-          child: Text(l10n.create),
         ),
       ],
     );

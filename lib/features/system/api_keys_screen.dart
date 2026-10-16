@@ -209,15 +209,18 @@ class _NewKeyDialogState extends State<_NewKeyDialog> {
         ],
       ),
       actions: [
-        TextButton(
+        dialogAction(
+          context,
+          label: l10n.cancel,
           onPressed: () => Navigator.pop(context),
-          child: Text(l10n.cancel),
         ),
-        FilledButton(
+        dialogAction(
+          context,
+          label: l10n.create,
+          primary: true,
           onPressed: name.isEmpty || user == null
               ? null
               : () => Navigator.pop(context, (name, user)),
-          child: Text(l10n.create),
         ),
       ],
     );
@@ -249,17 +252,20 @@ class _KeyCreatedDialog extends StatelessWidget {
         ],
       ),
       actions: [
-        TextButton.icon(
-          icon: const Icon(Icons.copy),
-          label: Text(l10n.copy),
+        dialogAction(
+          context,
+          icon: Icons.copy,
+          label: l10n.copy,
           onPressed: () async {
             await Clipboard.setData(ClipboardData(text: secret));
             messenger.showSnackBar(SnackBar(content: Text(l10n.apiKeyCopied)));
           },
         ),
-        FilledButton(
+        dialogAction(
+          context,
+          label: l10n.done,
+          primary: true,
           onPressed: () => Navigator.pop(context),
-          child: Text(l10n.done),
         ),
       ],
     );

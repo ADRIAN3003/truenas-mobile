@@ -432,30 +432,6 @@ class _RingPainter extends CustomPainter {
       !_sameSegments(old.segments, segments);
 }
 
-/// A dialog button. On iOS the glass dialog restyles it as a capsule.
-Widget dialogAction(
-  BuildContext context, {
-  required String label,
-  required VoidCallback? onPressed,
-  bool primary = false,
-  bool destructive = false,
-}) {
-  if (!primary && !destructive) {
-    return TextButton(onPressed: onPressed, child: Text(label));
-  }
-  final scheme = Theme.of(context).colorScheme;
-  return FilledButton(
-    style: destructive
-        ? FilledButton.styleFrom(
-            backgroundColor: scheme.error,
-            foregroundColor: scheme.onError,
-          )
-        : null,
-    onPressed: onPressed,
-    child: Text(label),
-  );
-}
-
 /// Muted text on a card, for an empty section.
 class EmptyCard extends StatelessWidget {
   const EmptyCard(this.text, {super.key});

@@ -3235,6 +3235,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'That shell is not in this container. Trying {shell} instead.'**
   String shellFallback(String shell);
+
+  /// Under the title of the server list: how many servers are saved.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 server} other{{count} servers}}'**
+  String serversCount(int count);
+
+  /// Button in the shell that types the clipboard into the terminal.
+  ///
+  /// In en, this message translates to:
+  /// **'Paste'**
+  String get shellPaste;
+
+  /// Shown after the selected terminal text was copied.
+  ///
+  /// In en, this message translates to:
+  /// **'Copied to clipboard'**
+  String get shellCopied;
+
+  /// Title of the dialog shown when leaving an open server for the server list.
+  ///
+  /// In en, this message translates to:
+  /// **'Disconnect from {name}?'**
+  String leaveServerTitle(String name);
+
+  /// Body of the dialog shown when leaving an open server for the server list.
+  ///
+  /// In en, this message translates to:
+  /// **'You will return to your servers and this connection will be closed, along with any shell or other screen open on it.'**
+  String get leaveServerBody;
+
+  /// Button that closes the open server and returns to the server list.
+  ///
+  /// In en, this message translates to:
+  /// **'Disconnect'**
+  String get leaveServerConfirm;
+
+  /// Button that keeps the server open.
+  ///
+  /// In en, this message translates to:
+  /// **'Stay'**
+  String get leaveServerStay;
 }
 
 class _AppLocalizationsDelegate

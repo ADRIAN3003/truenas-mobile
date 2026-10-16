@@ -185,12 +185,16 @@ class _NewShareDialogState extends State<NewShareDialog> {
               ),
             ),
       actions: [
-        TextButton(
+        dialogAction(
+          context,
+          label: path == null ? l10n.close : l10n.cancel,
           onPressed: () => Navigator.pop(context),
-          child: Text(path == null ? l10n.close : l10n.cancel),
         ),
         if (path != null)
-          FilledButton(
+          dialogAction(
+            context,
+            label: l10n.create,
+            primary: true,
             onPressed: () {
               if (!_formKey.currentState!.validate()) return;
               Navigator.pop(
@@ -203,7 +207,6 @@ class _NewShareDialogState extends State<NewShareDialog> {
                 ),
               );
             },
-            child: Text(l10n.create),
           ),
       ],
     );
@@ -272,7 +275,6 @@ class _ShareEditDialogState extends State<ShareEditDialog> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final theme = Theme.of(context);
     return AppDialog(
       title: Text(widget.title, overflow: TextOverflow.ellipsis),
       content: SingleChildScrollView(
@@ -307,17 +309,22 @@ class _ShareEditDialogState extends State<ShareEditDialog> {
         ),
       ),
       actions: [
-        TextButton(
-          style: TextButton.styleFrom(foregroundColor: theme.colorScheme.error),
+        dialogAction(
+          context,
+          label: l10n.shareDelete,
+          destructive: true,
           onPressed: () =>
               Navigator.pop(context, const ShareEditResult.delete()),
-          child: Text(l10n.shareDelete),
         ),
-        TextButton(
+        dialogAction(
+          context,
+          label: l10n.cancel,
           onPressed: () => Navigator.pop(context),
-          child: Text(l10n.cancel),
         ),
-        FilledButton(
+        dialogAction(
+          context,
+          label: l10n.save,
+          primary: true,
           onPressed: () => Navigator.pop(
             context,
             ShareEditResult(
@@ -327,7 +334,6 @@ class _ShareEditDialogState extends State<ShareEditDialog> {
               browsable: _browsable,
             ),
           ),
-          child: Text(l10n.save),
         ),
       ],
     );

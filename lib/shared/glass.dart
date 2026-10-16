@@ -65,13 +65,12 @@ class GlassTabBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final palette = AppPalette.of(context);
-    final dark = Theme.of(context).brightness == Brightness.dark;
-    final primary = Theme.of(context).colorScheme.primary;
     final width = math.min(MediaQuery.sizeOf(context).width - 24, 440.0);
-    final unselected = palette.text.withValues(alpha: 0.75);
-    // Tab labels stay at their size, like the system tab bar; the capsule
-    // has no room to grow.
+    // Plain glass: no tint and no colours of our own, so labels and icons
+    // keep one colour whether a tab is selected or not (a selected label is
+    // drawn a second time under the pill, and where it was wider than the
+    // pill that showed as a half-coloured letter). Tab labels stay at their
+    // size, like the system tab bar; the capsule has no room to grow.
     return Align(
       alignment: Alignment.bottomCenter,
       child: SafeArea(
@@ -88,20 +87,6 @@ class GlassTabBar extends StatelessWidget {
                 iconSize: 22,
                 selectedIndex: selectedIndex,
                 onTabSelected: onSelected,
-                // A light frost in light mode, smoked glass in dark mode, so
-                // the labels keep their contrast over any content.
-                settings: lg.LiquidGlassSettings(
-                  glassColor: dark
-                      ? const Color(0x801A2333)
-                      : const Color(0xB3FFFFFF),
-                  blur: 8,
-                  thickness: 24,
-                ),
-                indicatorColor: primary.withValues(alpha: dark ? 0.22 : 0.14),
-                selectedIconColor: primary,
-                selectedLabelColor: primary,
-                unselectedIconColor: unselected,
-                unselectedLabelColor: unselected,
                 tabs: [
                   for (final (icon, selected, label) in destinations)
                     lg.GlassTab(
@@ -304,9 +289,10 @@ class GlassDialogPanel extends StatelessWidget {
   }
 }
 
-/// A button of a [GlassDialogPanel]: a plain glass capsule with a text label.
-/// [primary] makes the label bold and [destructive] makes it red; nothing is
-/// filled or tinted.
+/// A button of a [GlassDialogPanel]: a solid capsule with a text label, like
+/// the buttons of the system's alerts. The main action ([primary]) is filled
+/// with the accent colour; the rest are a neutral grey. A [destructive] label
+/// is red. Nothing is see-through, so every button stands out on the glass.
 class GlassDialogButton extends StatelessWidget {
   const GlassDialogButton({
     super.key,
@@ -328,38 +314,57 @@ class GlassDialogButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
     final dark = theme.brightness == Brightness.dark;
-    final color = destructive
-        ? (dark ? const Color(0xFFFF453A) : const Color(0xFFFF3B30))
-        : theme.colorScheme.onSurface;
-    return lg.GlassButton.custom(
-      label: label,
-      onTap: onPressed ?? () {},
-      enabled: onPressed != null,
-      useOwnLayer: true,
-      height: 46,
-      shape: const lg.LiquidRoundedSuperellipse(borderRadius: 23),
-      child: DefaultTextStyle.merge(
-        style: TextStyle(
-          fontSize: 16,
-          fontWeight: primary ? FontWeight.w700 : FontWeight.w500,
-          color: color,
-        ),
-        child: IconTheme.merge(
-          data: IconThemeData(color: color, size: 18),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            spacing: 6,
-            children: [
-              if (icon != null) Icon(icon),
-              Flexible(
-                child: Text(
-                  label,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+    // A destructive action is never filled: the label alone warns.
+    final filled = primary && !destructive;
+    final background = filled
+        ? scheme.primary
+        : scheme.onSurface.withValues(alpha: dark ? 0.22 : 0.12);
+    final foreground = filled
+        ? scheme.onPrimary
+        : destructive
+        ? (dark ? const Color(0xFFFF6961) : const Color(0xFFE5271B))
+        : scheme.onSurface;
+    return Opacity(
+      opacity: onPressed == null ? 0.4 : 1,
+      child: Material(
+        color: background,
+        shape: const StadiumBorder(),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: onPressed,
+          child: SizedBox(
+            height: 46,
+            child: Center(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                child: DefaultTextStyle.merge(
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: primary ? FontWeight.w700 : FontWeight.w500,
+                    color: foreground,
+                  ),
+                  child: IconTheme.merge(
+                    data: IconThemeData(color: foreground, size: 18),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      spacing: 6,
+                      children: [
+                        if (icon != null) Icon(icon),
+                        Flexible(
+                          child: Text(
+                            label,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ),
-            ],
+            ),
           ),
         ),
       ),

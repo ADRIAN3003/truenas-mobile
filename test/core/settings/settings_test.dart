@@ -1,0 +1,78 @@
+import 'package:flutter_test/flutter_test.dart';
+import 'package:truenas_mobile/core/settings/app_settings.dart';
+
+import '../../support/memory_store.dart';
+
+void main() {
+  test('defaults follow the device and keep every helper on', () {
+    const settings = AppSettings();
+    expect(settings.theme, ThemeChoice.system);
+    expect(settings.language, isNull);
+    expect(settings.haptics, isTrue);
+    expect(settings.confirmLeave, isTrue);
+    expect(settings.shellFontSize, 13);
+    expect(settings.shellExtraKeys, isTrue);
+  });
+
+  test('settings round-trip through JSON', () {
+    const settings = AppSettings(
+      theme: ThemeChoice.dark,
+      language: 'hu',
+      haptics: false,
+      confirmLeave: false,
+      shellFontSize: 16,
+      shellExtraKeys: false,
+    );
+    final back = AppSettings.fromJson(settings.toJson());
+    expect(back.theme, ThemeChoice.dark);
+    expect(back.language, 'hu');
+    expect(back.haptics, isFalse);
+    expect(back.confirmLeave, isFalse);
+    expect(back.shellFontSize, 16);
+    expect(back.shellExtraKeys, isFalse);
+  });
+
+  test('unknown or missing values fall back to the defaults', () {
+    final settings = AppSettings.fromJson({
+      'theme': 'sepia',
+      'language': 'xx',
+      'shellFontSize': 400,
+    });
+    expect(settings.theme, ThemeChoice.system);
+    expect(settings.language, isNull);
+    expect(settings.haptics, isTrue);
+    expect(settings.shellFontSize, AppSettings.maxShellFontSize);
+    expect(
+      AppSettings.fromJson({'shellFontSize': 1}).shellFontSize,
+      AppSettings.minShellFontSize,
+    );
+  });
+
+  test('copyWith can set the language back to the device', () {
+    const settings = AppSettings(language: 'hu');
+    expect(settings.copyWith(haptics: false).language, 'hu');
+    expect(settings.copyWith(language: () => null).language, isNull);
+  });
+
+  group('SettingsRepository', () {
+    test('nothing saved gives the defaults', () async {
+      final settings = await SettingsRepository(MemoryStore()).load();
+      expect(settings.theme, ThemeChoice.system);
+    });
+
+    test('saves and loads', () async {
+      final repository = SettingsRepository(MemoryStore());
+      await repository.save(const AppSettings(language: 'en', haptics: false));
+      final loaded = await repository.load();
+      expect(loaded.language, 'en');
+      expect(loaded.haptics, isFalse);
+    });
+
+    test('a damaged document gives the defaults instead of failing', () async {
+      final store = MemoryStore();
+      store.values['settings.v1'] = '{not json';
+      final settings = await SettingsRepository(store).load();
+      expect(settings.haptics, isTrue);
+    });
+  });
+}

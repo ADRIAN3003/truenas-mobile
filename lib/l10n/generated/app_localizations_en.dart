@@ -1917,4 +1917,98 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get leaveServerStay => 'Stay';
+
+  @override
+  String get settingsTitle => 'App settings';
+
+  @override
+  String get settingsAppearance => 'Appearance';
+
+  @override
+  String get settingsTheme => 'Theme';
+
+  @override
+  String get settingsSystemDefault => 'Same as device';
+
+  @override
+  String get themeLight => 'Light';
+
+  @override
+  String get themeDark => 'Dark';
+
+  @override
+  String get settingsLanguage => 'Language';
+
+  @override
+  String get settingsGeneral => 'General';
+
+  @override
+  String get settingsHaptics => 'Haptic feedback';
+
+  @override
+  String get settingsHapticsHint =>
+      'Small taps when you refresh, switch tabs or confirm';
+
+  @override
+  String get settingsConfirmLeave => 'Ask before closing';
+
+  @override
+  String get settingsConfirmLeaveHint =>
+      'Confirm before leaving an open server or shell';
+
+  @override
+  String get settingsShell => 'Shell';
+
+  @override
+  String get settingsShellFontSize => 'Font size';
+
+  @override
+  String get settingsShellKeys => 'Extra keys';
+
+  @override
+  String get settingsShellKeysHint =>
+      'Esc, Tab, Ctrl+C and arrows under the terminal';
+
+  @override
+  String get settingsSecurity => 'Security';
+
+  @override
+  String get settingsCertificates => 'Trusted certificates';
+
+  @override
+  String get settingsCertificatesEmpty =>
+      'No certificates are trusted. A self-signed certificate you accept for a server will show up here.';
+
+  @override
+  String get settingsCertificateForget => 'Forget';
+
+  @override
+  String settingsCertificateForgetTitle(String name) {
+    return 'Forget the certificate of $name?';
+  }
+
+  @override
+  String get settingsCertificateForgetBody =>
+      'You will be asked whether to trust it again the next time you connect.';
+
+  @override
+  String get settingsAbout => 'About';
+
+  @override
+  String get settingsVersion => 'Version';
+
+  @override
+  String get settingsLicences => 'Open-source licences';
+
+  @override
+  String get settingsSource => 'Source code';
+
+  @override
+  String get shellLeaveTitle => 'Close the shell?';
+
+  @override
+  String get shellLeaveBody => 'Anything running in it stops.';
+
+  @override
+  String get shellLeaveConfirm => 'Close shell';
 }

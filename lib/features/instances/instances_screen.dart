@@ -11,6 +11,7 @@ import '../../shared/theme.dart';
 import '../../shared/ui.dart';
 import '../../shared/widgets.dart';
 import '../server/server_screen.dart';
+import '../settings/settings_screen.dart';
 import 'server_form_screen.dart';
 
 /// Widest the list grows on tablets, so cards stay readable.
@@ -32,6 +33,14 @@ class InstancesScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         actions: [
+          IconButton(
+            tooltip: l10n.settingsTitle,
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute<void>(builder: (_) => const SettingsScreen()),
+            ),
+            icon: const Icon(Icons.settings_outlined),
+          ),
           if (instances.value?.isNotEmpty ?? false)
             IconButton(
               tooltip: l10n.addServer,

@@ -41,7 +41,7 @@ jobs:
           STORE_PASSWORD: ${{ secrets.ANDROID_STORE_PASSWORD }}
         run: |
           if [ -z "$KEYSTORE_BASE64" ]; then
-            echo "::warning::No signing secrets set; release APKs use the debug key."
+            echo "::warning::No signing secrets set; release APKs use a throw-away debug key and cannot update an installed app. See tools/make-android-keystore.sh."
             exit 0
           fi
           echo "$KEYSTORE_BASE64" | base64 -d > android/app/upload-keystore.jks

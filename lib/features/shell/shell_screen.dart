@@ -3,16 +3,19 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:xterm/xterm.dart';
 
 import '../../core/api/shell_session.dart';
 import '../../core/session/truenas_session.dart';
+import '../../core/settings/settings_provider.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../shared/connect_dialogs.dart';
 import '../../shared/haptics.dart';
+import '../../shared/widgets.dart';
 
 /// A terminal on the server, like System → Shell in the web UI.
-class ShellScreen extends StatefulWidget {
+class ShellScreen extends ConsumerStatefulWidget {
   const ShellScreen({
     super.key,
     required this.session,
@@ -33,7 +36,7 @@ class ShellScreen extends StatefulWidget {
   final List<String> fallbackCommands;
 
   @override
-  State<ShellScreen> createState() => _ShellScreenState();
+  ConsumerState<ShellScreen> createState() => _ShellScreenState();
 }
 
 enum _Status { connecting, connected, closed }
@@ -45,7 +48,7 @@ final _missingShell = RegExp(
   caseSensitive: false,
 );
 
-class _ShellScreenState extends State<ShellScreen> {
+class _ShellScreenState extends ConsumerState<ShellScreen> {
   final _terminal = Terminal(maxLines: 10000);
   final _selection = TerminalController();
   final _focus = FocusNode();
@@ -203,6 +206,21 @@ class _ShellScreenState extends State<ShellScreen> {
     _focus.requestFocus();
   }
 
+  /// Asks before closing a running shell, which ends whatever is running in
+  /// it. A shell that has already ended can be left without a question.
+  Future<void> _confirmLeave() async {
+    final l10n = AppLocalizations.of(context);
+    final leave = await confirmAction(
+      context,
+      title: l10n.shellLeaveTitle,
+      body: l10n.shellLeaveBody,
+      confirmLabel: l10n.shellLeaveConfirm,
+      cancelLabel: l10n.leaveServerStay,
+      destructive: true,
+    );
+    if (leave && mounted) Navigator.pop(context);
+  }
+
   void _key(TerminalKey key, {bool ctrl = false}) {
     Haptics.selection();
     _terminal.keyInput(key, ctrl: ctrl);
@@ -214,99 +232,110 @@ class _ShellScreenState extends State<ShellScreen> {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final error = _error;
-    return Scaffold(
-      appBar: AppBar(title: Text(widget.title ?? l10n.shellTitle)),
-      body: SafeArea(
-        child: Column(
-          children: [
-            if (_status == _Status.connecting)
-              const LinearProgressIndicator()
-            else if (_status == _Status.closed)
-              MaterialBanner(
-                content: Text(
-                  error == null
-                      ? l10n.shellClosed
-                      : describeConnectError(l10n, error),
-                ),
-                actions: [
-                  TextButton(
-                    onPressed: _restart,
-                    child: Text(l10n.shellReconnect),
+    final settings = ref.watch(settingsProvider);
+    return PopScope(
+      canPop: !settings.confirmLeave || _status != _Status.connected,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) _confirmLeave();
+      },
+      child: Scaffold(
+        appBar: AppBar(title: Text(widget.title ?? l10n.shellTitle)),
+        body: SafeArea(
+          child: Column(
+            children: [
+              if (_status == _Status.connecting)
+                const LinearProgressIndicator()
+              else if (_status == _Status.closed)
+                MaterialBanner(
+                  content: Text(
+                    error == null
+                        ? l10n.shellClosed
+                        : describeConnectError(l10n, error),
                   ),
-                ],
-              ),
-            Expanded(
-              child: TerminalView(
-                _terminal,
-                controller: _selection,
-                focusNode: _focus,
-                autofocus: true,
-                readOnly: _status != _Status.connected,
-                textStyle: const TerminalStyle(fontSize: 13),
-                padding: const EdgeInsets.all(4),
-              ),
-            ),
-            Material(
-              color: theme.colorScheme.surfaceContainer,
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: 4),
-                child: Row(
-                  children: [
-                    ListenableBuilder(
-                      listenable: _selection,
-                      builder: (context, _) => _KeyButton(
-                        label: l10n.copy,
-                        icon: Icons.copy_rounded,
-                        onPressed: _selection.selection == null ? null : _copy,
-                      ),
-                    ),
-                    _KeyButton(
-                      label: l10n.shellPaste,
-                      icon: Icons.content_paste_rounded,
-                      onPressed: _status == _Status.connected ? _paste : null,
-                    ),
-                    const SizedBox(
-                      height: 24,
-                      child: VerticalDivider(width: 12),
-                    ),
-                    _KeyButton(
-                      label: l10n.shellKeyEsc,
-                      onPressed: () => _key(TerminalKey.escape),
-                    ),
-                    _KeyButton(
-                      label: l10n.shellKeyTab,
-                      onPressed: () => _key(TerminalKey.tab),
-                    ),
-                    _KeyButton(
-                      label: l10n.shellKeyCtrlC,
-                      onPressed: () => _key(TerminalKey.keyC, ctrl: true),
-                    ),
-                    _KeyButton(
-                      label: l10n.shellKeyUp,
-                      icon: Icons.keyboard_arrow_up,
-                      onPressed: () => _key(TerminalKey.arrowUp),
-                    ),
-                    _KeyButton(
-                      label: l10n.shellKeyDown,
-                      icon: Icons.keyboard_arrow_down,
-                      onPressed: () => _key(TerminalKey.arrowDown),
-                    ),
-                    _KeyButton(
-                      label: l10n.shellKeyLeft,
-                      icon: Icons.keyboard_arrow_left,
-                      onPressed: () => _key(TerminalKey.arrowLeft),
-                    ),
-                    _KeyButton(
-                      label: l10n.shellKeyRight,
-                      icon: Icons.keyboard_arrow_right,
-                      onPressed: () => _key(TerminalKey.arrowRight),
+                  actions: [
+                    TextButton(
+                      onPressed: _restart,
+                      child: Text(l10n.shellReconnect),
                     ),
                   ],
                 ),
+              Expanded(
+                child: TerminalView(
+                  _terminal,
+                  controller: _selection,
+                  focusNode: _focus,
+                  autofocus: true,
+                  readOnly: _status != _Status.connected,
+                  textStyle: TerminalStyle(fontSize: settings.shellFontSize),
+                  padding: const EdgeInsets.all(4),
+                ),
               ),
-            ),
-          ],
+              Material(
+                color: theme.colorScheme.surfaceContainer,
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                  child: Row(
+                    children: [
+                      ListenableBuilder(
+                        listenable: _selection,
+                        builder: (context, _) => _KeyButton(
+                          label: l10n.copy,
+                          icon: Icons.copy_rounded,
+                          onPressed: _selection.selection == null
+                              ? null
+                              : _copy,
+                        ),
+                      ),
+                      _KeyButton(
+                        label: l10n.shellPaste,
+                        icon: Icons.content_paste_rounded,
+                        onPressed: _status == _Status.connected ? _paste : null,
+                      ),
+                      if (settings.shellExtraKeys) ...[
+                        const SizedBox(
+                          height: 24,
+                          child: VerticalDivider(width: 12),
+                        ),
+                        _KeyButton(
+                          label: l10n.shellKeyEsc,
+                          onPressed: () => _key(TerminalKey.escape),
+                        ),
+                        _KeyButton(
+                          label: l10n.shellKeyTab,
+                          onPressed: () => _key(TerminalKey.tab),
+                        ),
+                        _KeyButton(
+                          label: l10n.shellKeyCtrlC,
+                          onPressed: () => _key(TerminalKey.keyC, ctrl: true),
+                        ),
+                        _KeyButton(
+                          label: l10n.shellKeyUp,
+                          icon: Icons.keyboard_arrow_up,
+                          onPressed: () => _key(TerminalKey.arrowUp),
+                        ),
+                        _KeyButton(
+                          label: l10n.shellKeyDown,
+                          icon: Icons.keyboard_arrow_down,
+                          onPressed: () => _key(TerminalKey.arrowDown),
+                        ),
+                        _KeyButton(
+                          label: l10n.shellKeyLeft,
+                          icon: Icons.keyboard_arrow_left,
+                          onPressed: () => _key(TerminalKey.arrowLeft),
+                        ),
+                        _KeyButton(
+                          label: l10n.shellKeyRight,
+                          icon: Icons.keyboard_arrow_right,
+                          onPressed: () => _key(TerminalKey.arrowRight),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

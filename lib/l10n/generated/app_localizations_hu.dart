@@ -1914,4 +1914,98 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get leaveServerStay => 'Maradok';
+
+  @override
+  String get settingsTitle => 'Alkalmazás beállításai';
+
+  @override
+  String get settingsAppearance => 'Megjelenés';
+
+  @override
+  String get settingsTheme => 'Téma';
+
+  @override
+  String get settingsSystemDefault => 'Mint az eszköz';
+
+  @override
+  String get themeLight => 'Világos';
+
+  @override
+  String get themeDark => 'Sötét';
+
+  @override
+  String get settingsLanguage => 'Nyelv';
+
+  @override
+  String get settingsGeneral => 'Általános';
+
+  @override
+  String get settingsHaptics => 'Rezgő visszajelzés';
+
+  @override
+  String get settingsHapticsHint =>
+      'Apró rezgések frissítéskor, fülváltáskor és megerősítéskor';
+
+  @override
+  String get settingsConfirmLeave => 'Rákérdezés bezárás előtt';
+
+  @override
+  String get settingsConfirmLeaveHint =>
+      'Megerősítést kér, mielőtt kilépsz egy megnyitott szerverből vagy shellből';
+
+  @override
+  String get settingsShell => 'Shell';
+
+  @override
+  String get settingsShellFontSize => 'Betűméret';
+
+  @override
+  String get settingsShellKeys => 'Extra billentyűk';
+
+  @override
+  String get settingsShellKeysHint =>
+      'Esc, Tab, Ctrl+C és nyilak a terminál alatt';
+
+  @override
+  String get settingsSecurity => 'Biztonság';
+
+  @override
+  String get settingsCertificates => 'Megbízható tanúsítványok';
+
+  @override
+  String get settingsCertificatesEmpty =>
+      'Nincs megbízhatónak jelölt tanúsítvány. Az önaláírt tanúsítvány, amelyet egy szerverhez elfogadsz, itt fog megjelenni.';
+
+  @override
+  String get settingsCertificateForget => 'Elfelejtés';
+
+  @override
+  String settingsCertificateForgetTitle(String name) {
+    return 'Elfeledteted ennek a tanúsítványát: $name?';
+  }
+
+  @override
+  String get settingsCertificateForgetBody =>
+      'A következő csatlakozáskor újra megkérdezzük, megbízol-e benne.';
+
+  @override
+  String get settingsAbout => 'Névjegy';
+
+  @override
+  String get settingsVersion => 'Verzió';
+
+  @override
+  String get settingsLicences => 'Nyílt forráskódú licencek';
+
+  @override
+  String get settingsSource => 'Forráskód';
+
+  @override
+  String get shellLeaveTitle => 'Bezárod a shellt?';
+
+  @override
+  String get shellLeaveBody => 'Ami benne fut, az leáll.';
+
+  @override
+  String get shellLeaveConfirm => 'Shell bezárása';
 }

@@ -2647,5 +2647,126 @@
   "leaveServerStay": "Stay",
   "@leaveServerStay": {
     "description": "Button that keeps the server open."
+  },
+  "settingsTitle": "App settings",
+  "@settingsTitle": {
+    "description": "Title of the screen with the app's own settings."
+  },
+  "settingsAppearance": "Appearance",
+  "@settingsAppearance": {
+    "description": "Settings section for theme and language."
+  },
+  "settingsTheme": "Theme",
+  "@settingsTheme": {
+    "description": "Setting: light, dark or like the device."
+  },
+  "settingsSystemDefault": "Same as device",
+  "@settingsSystemDefault": {
+    "description": "Choice that follows the phone's own setting."
+  },
+  "themeLight": "Light",
+  "@themeLight": {
+    "description": "Theme choice."
+  },
+  "themeDark": "Dark",
+  "@themeDark": {
+    "description": "Theme choice."
+  },
+  "settingsLanguage": "Language",
+  "@settingsLanguage": {
+    "description": "Setting: the language of the app."
+  },
+  "settingsGeneral": "General",
+  "@settingsGeneral": {
+    "description": "Settings section for behaviour."
+  },
+  "settingsHaptics": "Haptic feedback",
+  "@settingsHaptics": {
+    "description": "Setting: vibration taps."
+  },
+  "settingsHapticsHint": "Small taps when you refresh, switch tabs or confirm",
+  "@settingsHapticsHint": {
+    "description": "Explains the haptic feedback setting."
+  },
+  "settingsConfirmLeave": "Ask before closing",
+  "@settingsConfirmLeave": {
+    "description": "Setting: confirm before leaving a server or shell."
+  },
+  "settingsConfirmLeaveHint": "Confirm before leaving an open server or shell",
+  "@settingsConfirmLeaveHint": {
+    "description": "Explains the ask-before-closing setting."
+  },
+  "settingsShell": "Shell",
+  "@settingsShell": {
+    "description": "Settings section for the terminal."
+  },
+  "settingsShellFontSize": "Font size",
+  "@settingsShellFontSize": {
+    "description": "Setting: terminal text size."
+  },
+  "settingsShellKeys": "Extra keys",
+  "@settingsShellKeys": {
+    "description": "Setting: show Esc, Tab, Ctrl+C and arrows under the terminal."
+  },
+  "settingsShellKeysHint": "Esc, Tab, Ctrl+C and arrows under the terminal",
+  "@settingsShellKeysHint": {
+    "description": "Explains the extra keys setting."
+  },
+  "settingsSecurity": "Security",
+  "@settingsSecurity": {
+    "description": "Settings section."
+  },
+  "settingsCertificates": "Trusted certificates",
+  "@settingsCertificates": {
+    "description": "Row that opens the list of certificates the user chose to trust."
+  },
+  "settingsCertificatesEmpty": "No certificates are trusted. A self-signed certificate you accept for a server will show up here.",
+  "@settingsCertificatesEmpty": {
+    "description": "Empty list of trusted certificates."
+  },
+  "settingsCertificateForget": "Forget",
+  "@settingsCertificateForget": {
+    "description": "Button that stops trusting a certificate."
+  },
+  "settingsCertificateForgetTitle": "Forget the certificate of {name}?",
+  "@settingsCertificateForgetTitle": {
+    "description": "Title of the confirmation.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsCertificateForgetBody": "You will be asked whether to trust it again the next time you connect.",
+  "@settingsCertificateForgetBody": {
+    "description": "Body of the confirmation."
+  },
+  "settingsAbout": "About",
+  "@settingsAbout": {
+    "description": "Settings section."
+  },
+  "settingsVersion": "Version",
+  "@settingsVersion": {
+    "description": "Row with the app version."
+  },
+  "settingsLicences": "Open-source licences",
+  "@settingsLicences": {
+    "description": "Row that opens the licence list."
+  },
+  "settingsSource": "Source code",
+  "@settingsSource": {
+    "description": "Row that opens the project page."
+  },
+  "shellLeaveTitle": "Close the shell?",
+  "@shellLeaveTitle": {
+    "description": "Title of the dialog shown when leaving a running shell."
+  },
+  "shellLeaveBody": "Anything running in it stops.",
+  "@shellLeaveBody": {
+    "description": "Body of the dialog shown when leaving a running shell."
+  },
+  "shellLeaveConfirm": "Close shell",
+  "@shellLeaveConfirm": {
+    "description": "Button that closes the shell."
   }
 }

@@ -3,9 +3,12 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:liquid_glass_widgets/liquid_glass_widgets.dart' as lg;
 import 'package:truenas_mobile/core/instances/instance_repository.dart';
 import 'package:truenas_mobile/core/instances/instances_provider.dart';
 import 'package:truenas_mobile/core/instances/server_instance.dart';
+import 'package:truenas_mobile/core/settings/app_settings.dart';
+import 'package:truenas_mobile/core/settings/settings_provider.dart';
 import 'package:truenas_mobile/features/server/server_screen.dart';
 import 'package:truenas_mobile/shared/glass.dart';
 import 'package:truenas_mobile/shared/theme.dart';
@@ -35,6 +38,7 @@ void main() {
     TargetPlatform platform = TargetPlatform.android,
     bool fromList = false,
     String? url,
+    AppSettings settings = const AppSettings(),
   }) async {
     tester.view.physicalSize = size;
     tester.view.devicePixelRatio = 1;
@@ -57,6 +61,7 @@ void main() {
           instanceRepositoryProvider.overrideWithValue(
             InstanceRepository(store),
           ),
+          initialSettingsProvider.overrideWithValue(settings),
         ],
       );
       await container.read(instancesProvider.future);
@@ -147,6 +152,20 @@ void main() {
     await close(tester);
   });
 
+  testWidgets('the glass tab bar is plain: no tint, no colours of ours', (
+    tester,
+  ) async {
+    await open(tester, const Size(400, 800), platform: TargetPlatform.iOS);
+    final bar = tester.widget<lg.GlassTabBar>(find.byType(lg.GlassTabBar));
+    expect(bar.settings, isNull);
+    expect(bar.indicatorColor, isNull);
+    expect(bar.selectedIconColor, isNull);
+    expect(bar.unselectedIconColor, isNull);
+    expect(bar.selectedLabelColor, isNull);
+    expect(bar.unselectedLabelColor, isNull);
+    await close(tester);
+  });
+
   group('going back to the server list', () {
     testWidgets('asks before closing an open server', (tester) async {
       await open(tester, const Size(400, 800), fromList: true);
@@ -170,6 +189,22 @@ void main() {
       });
       await tester.pump(const Duration(seconds: 1));
       expect(find.byType(NavigationBar), findsNothing);
+      expect(find.text('servers'), findsOneWidget);
+      await close(tester);
+    });
+
+    testWidgets('does not ask when the user turned that off', (tester) async {
+      await open(
+        tester,
+        const Size(400, 800),
+        fromList: true,
+        settings: const AppSettings(confirmLeave: false),
+      );
+      expect(find.byType(NavigationBar), findsOneWidget);
+      await tester.tap(find.byType(BackButton));
+      await tester.pump(const Duration(seconds: 1));
+      await tester.pump(const Duration(seconds: 1));
+      expect(find.text('Disconnect from Home?'), findsNothing);
       expect(find.text('servers'), findsOneWidget);
       await close(tester);
     });

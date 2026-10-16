@@ -8,6 +8,7 @@ import '../../shared/ui.dart';
 import '../../shared/widgets.dart';
 import '../storage/storage_helpers.dart';
 import '../explorer/api_explorer_screen.dart';
+import '../settings/settings_screen.dart';
 import '../shell/shell_screen.dart';
 import '../system/api_keys_screen.dart';
 import '../system/network_screen.dart';
@@ -142,6 +143,12 @@ class MoreTab extends StatelessWidget {
               AppPalette.tileBlue,
               l10n.explorerTitle,
               () => ApiExplorerScreen(session: session),
+            ),
+            entry(
+              Icons.settings_rounded,
+              AppPalette.tileSlate,
+              l10n.settingsTitle,
+              () => const SettingsScreen(),
             ),
           ],
         ),

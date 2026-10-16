@@ -432,7 +432,7 @@ class _RingPainter extends CustomPainter {
       !_sameSegments(old.segments, segments);
 }
 
-/// A dialog button: a Cupertino action on iOS, a Material button elsewhere.
+/// A dialog button. On iOS the glass dialog restyles it as a capsule.
 Widget dialogAction(
   BuildContext context, {
   required String label,
@@ -440,14 +440,6 @@ Widget dialogAction(
   bool primary = false,
   bool destructive = false,
 }) {
-  if (isCupertino(context)) {
-    return CupertinoDialogAction(
-      onPressed: onPressed,
-      isDefaultAction: primary,
-      isDestructiveAction: destructive,
-      child: Text(label),
-    );
-  }
   if (!primary && !destructive) {
     return TextButton(onPressed: onPressed, child: Text(label));
   }

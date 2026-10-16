@@ -8,6 +8,7 @@ import '../../shared/ui.dart';
 import '../sharing/sharing_widgets.dart';
 import '../storage/storage_helpers.dart';
 import 'protection_screen.dart';
+import '../../shared/dialogs.dart';
 
 /// Every dataset on the server, e.g. `tank/media`.
 Future<List<String>> localDatasets(TrueNasSession session) async {
@@ -21,17 +22,23 @@ Future<List<String>> localDatasets(TrueNasSession session) async {
 }
 
 Future<String?> _pickDataset(BuildContext context, List<String> datasets) =>
-    showDialog<String>(
+    showAppDialog<String>(
       context: context,
-      builder: (context) => SimpleDialog(
+      builder: (context) => AppDialog(
+        scrollable: true,
         title: Text(AppLocalizations.of(context).pickDataset),
-        children: [
-          for (final d in datasets)
-            SimpleDialogOption(
-              onPressed: () => Navigator.pop(context, d),
-              child: Text(d),
-            ),
-        ],
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            for (final d in datasets)
+              ListTile(
+                dense: true,
+                title: Text(d),
+                onTap: () => Navigator.pop(context, d),
+              ),
+          ],
+        ),
       ),
     );
 

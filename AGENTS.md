@@ -69,6 +69,11 @@ README covers what the app does; this file covers how to work on it.
 
 - One branded design with platform-adaptive controls (`isCupertino`), not
   separate Material and Cupertino UIs. iOS gets liquid glass chrome.
+- Dialogs, sheets and "more" menus go through `lib/shared/dialogs.dart`
+  (`AppDialog` with `showAppDialog`, `showAppSheet`, `AppPopupMenu`), never
+  `AlertDialog`, `showDialog`, `showModalBottomSheet` or `PopupMenuButton`
+  directly: on iOS they are liquid glass like the system's on iOS 26, which
+  Flutter's own Cupertino dialogs are not.
 - Haptics go through `lib/shared/haptics.dart`. Use `AppRefreshIndicator`,
   `AppSwitch` and `AppSwitchTile` (in `ui.dart`) instead of the bare Material
   widgets so pull to refresh and switches tick; the Material switch makes no

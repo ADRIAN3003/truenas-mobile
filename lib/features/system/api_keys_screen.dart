@@ -11,6 +11,7 @@ import '../../shared/viz_colors.dart';
 import '../../shared/widgets.dart';
 import '../sharing/sharing_widgets.dart';
 import '../storage/storage_helpers.dart';
+import '../../shared/dialogs.dart';
 
 /// API keys: list, add (showing the secret once) and delete.
 class ApiKeysScreen extends StatefulWidget {
@@ -37,7 +38,7 @@ class _ApiKeysScreenState extends State<ApiKeysScreen>
         if (!u.locked) u.username,
     ];
     final current = _session.userInfo?['pw_name'] as String?;
-    final request = await showDialog<(String, String)>(
+    final request = await showAppDialog<(String, String)>(
       context: context,
       builder: (_) => _NewKeyDialog(
         usernames: usernames,
@@ -52,7 +53,7 @@ class _ApiKeysScreenState extends State<ApiKeysScreen>
       key = await _session.system.createApiKey(request.$1, request.$2);
     });
     if (!ok || !mounted) return;
-    await showDialog<void>(
+    await showAppDialog<void>(
       context: context,
       barrierDismissible: false,
       builder: (_) => _KeyCreatedDialog(secret: key!),
@@ -185,7 +186,7 @@ class _NewKeyDialogState extends State<_NewKeyDialog> {
     final l10n = AppLocalizations.of(context);
     final user = _user;
     final name = _name.text.trim();
-    return AlertDialog(
+    return AppDialog(
       title: Text(l10n.apiKeyCreate),
       content: Column(
         mainAxisSize: MainAxisSize.min,
@@ -233,7 +234,7 @@ class _KeyCreatedDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final messenger = ScaffoldMessenger.of(context);
-    return AlertDialog(
+    return AppDialog(
       title: Text(l10n.apiKeyCreatedTitle),
       content: Column(
         mainAxisSize: MainAxisSize.min,

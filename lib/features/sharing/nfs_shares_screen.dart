@@ -8,6 +8,7 @@ import '../../shared/widgets.dart';
 import '../storage/storage_helpers.dart';
 import 'share_dialogs.dart';
 import 'sharing_widgets.dart';
+import '../../shared/dialogs.dart';
 
 typedef _NfsData = (List<NfsShare>, ServiceEntry?);
 
@@ -38,7 +39,7 @@ class _NfsSharesScreenState extends State<NfsSharesScreen>
     final l10n = AppLocalizations.of(context);
     final paths = await shareablePaths(_session);
     if (!mounted) return;
-    final request = await showDialog<NewShareRequest>(
+    final request = await showAppDialog<NewShareRequest>(
       context: context,
       builder: (_) => NewShareDialog(paths: paths, withName: false),
     );
@@ -67,7 +68,7 @@ class _NfsSharesScreenState extends State<NfsSharesScreen>
 
   Future<void> _edit(NfsShare share) async {
     final l10n = AppLocalizations.of(context);
-    final result = await showDialog<ShareEditResult>(
+    final result = await showAppDialog<ShareEditResult>(
       context: context,
       builder: (_) => ShareEditDialog(
         title: share.path,

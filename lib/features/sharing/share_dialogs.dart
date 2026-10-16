@@ -6,6 +6,7 @@ import '../../shared/theme.dart';
 import '../../shared/viz_colors.dart';
 import '../../shared/widgets.dart';
 import 'sharing_widgets.dart';
+import '../../shared/dialogs.dart';
 
 /// One share in a list, with an enable switch.
 class ShareTile extends StatelessWidget {
@@ -136,7 +137,7 @@ class _NewShareDialogState extends State<NewShareDialog> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final path = _path;
-    return AlertDialog(
+    return AppDialog(
       title: Text(l10n.shareCreate),
       content: path == null
           ? Text(l10n.shareNoDatasets)
@@ -272,7 +273,7 @@ class _ShareEditDialogState extends State<ShareEditDialog> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
-    return AlertDialog(
+    return AppDialog(
       title: Text(widget.title, overflow: TextOverflow.ellipsis),
       content: SingleChildScrollView(
         child: Column(

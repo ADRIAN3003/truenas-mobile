@@ -2,6 +2,8 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
+import 'dialogs.dart';
+import 'glass.dart';
 import 'haptics.dart';
 import 'theme.dart';
 import 'ui.dart';
@@ -129,33 +131,34 @@ Future<bool> confirmAction(
   bool destructive = false,
 }) async {
   final controller = TextEditingController();
-  final confirmed = await showAdaptiveDialog<bool>(
+  final confirmed = await showAppDialog<bool>(
     context: context,
     builder: (context) => StatefulBuilder(
       builder: (context, setState) {
         final enabled =
             typeToConfirm == null || controller.text.trim() == typeToConfirm;
-        return AlertDialog.adaptive(
+        return AppDialog(
           title: Text(title),
-          // Material keeps the text field working inside a Cupertino dialog.
-          content: Material(
-            type: MaterialType.transparency,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(body),
-                if (typeToConfirm != null) ...[
-                  const SizedBox(height: 16),
-                  TextField(
-                    controller: controller,
-                    autocorrect: false,
-                    decoration: InputDecoration(labelText: typeToConfirmHint),
-                    onChanged: (_) => setState(() {}),
-                  ),
-                ],
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                body,
+                textAlign: useGlassChrome(context)
+                    ? TextAlign.center
+                    : TextAlign.start,
+              ),
+              if (typeToConfirm != null) ...[
+                const SizedBox(height: 16),
+                TextField(
+                  controller: controller,
+                  autocorrect: false,
+                  decoration: InputDecoration(labelText: typeToConfirmHint),
+                  onChanged: (_) => setState(() {}),
+                ),
               ],
-            ),
+            ],
           ),
           actions: [
             dialogAction(

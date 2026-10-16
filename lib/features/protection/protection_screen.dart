@@ -114,22 +114,18 @@ class _ProtectionScreenState extends State<ProtectionScreen>
 
   Future<void> _add(List<ProtectionKind> kinds) async {
     final l10n = AppLocalizations.of(context);
-    final kind = await showAppSheet<ProtectionKind>(
+    final picked = await showAppChoice<ProtectionKind>(
       context: context,
-      builder: (context) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            for (final kind in kinds)
-              ListTile(
-                leading: IconTile(kindIcon(kind), kindColor(kind)),
-                title: Text(kindTitle(l10n, kind)),
-                onTap: () => Navigator.pop(context, kind),
-              ),
-          ],
-        ),
-      ),
+      choices: [
+        for (final kind in kinds)
+          appChoice(
+            kind,
+            kindTitle(l10n, kind),
+            leading: IconTile(kindIcon(kind), kindColor(kind)),
+          ),
+      ],
     );
+    final kind = picked?.$1;
     if (kind != null && mounted) await _edit(kind);
   }
 

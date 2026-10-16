@@ -4,6 +4,7 @@ import 'dart:ui' as ui;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import 'glass.dart';
 import 'haptics.dart';
 import 'theme.dart';
 
@@ -184,8 +185,97 @@ class AppSwitch extends StatelessWidget {
   final ValueChanged<bool>? onChanged;
 
   @override
-  Widget build(BuildContext context) =>
-      Switch.adaptive(value: value, onChanged: _tickOnToggle(onChanged));
+  Widget build(BuildContext context) => useGlassChrome(context)
+      ? GlassSwitchControl(value: value, onChanged: _tickOnToggle(onChanged))
+      : Switch.adaptive(value: value, onChanged: _tickOnToggle(onChanged));
+}
+
+/// A slider: the glass slider on iOS, Material's elsewhere.
+class AppSlider extends StatelessWidget {
+  const AppSlider({
+    super.key,
+    required this.value,
+    required this.onChanged,
+    required this.min,
+    required this.max,
+    this.divisions,
+    this.label,
+    this.onChangeEnd,
+  });
+
+  final double value;
+  final ValueChanged<double> onChanged;
+  final ValueChanged<double>? onChangeEnd;
+  final double min;
+  final double max;
+  final int? divisions;
+  final String? label;
+
+  @override
+  Widget build(BuildContext context) => useGlassChrome(context)
+      ? GlassSliderControl(
+          value: value,
+          min: min,
+          max: max,
+          divisions: divisions,
+          onChanged: onChanged,
+          onChangeEnd: onChangeEnd,
+        )
+      : Slider.adaptive(
+          value: value,
+          min: min,
+          max: max,
+          divisions: divisions,
+          label: label,
+          onChanged: onChanged,
+          onChangeEnd: onChangeEnd,
+        );
+}
+
+/// Two to five exclusive choices side by side: the glass segmented control on
+/// iOS, Material's [SegmentedButton] elsewhere. Pass [inGlass] inside a dialog,
+/// where a glass control over glass distorts, to keep the Material one.
+class AppSegments<T> extends StatelessWidget {
+  const AppSegments({
+    super.key,
+    required this.values,
+    required this.labels,
+    required this.selected,
+    required this.onChanged,
+    this.icons,
+    this.inGlass = false,
+  });
+
+  final List<T> values;
+  final List<String> labels;
+  final List<IconData>? icons;
+  final T selected;
+  final ValueChanged<T> onChanged;
+  final bool inGlass;
+
+  @override
+  Widget build(BuildContext context) => useGlassChrome(context) && !inGlass
+      ? GlassSegments(
+          labels: labels,
+          icons: icons,
+          selectedIndex: values.indexOf(selected),
+          onSelected: (i) {
+            Haptics.selection();
+            onChanged(values[i]);
+          },
+        )
+      : SegmentedButton<T>(
+          segments: [
+            for (final (i, value) in values.indexed)
+              ButtonSegment(
+                value: value,
+                label: Text(labels[i]),
+                icon: icons == null ? null : Icon(icons![i]),
+              ),
+          ],
+          selected: {selected},
+          onSelectionChanged: (s) => onChanged(s.single),
+        );
 }
 
 /// A list tile with a platform switch that ticks when it flips. Tapping the

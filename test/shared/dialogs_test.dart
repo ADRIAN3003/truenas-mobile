@@ -4,6 +4,7 @@ import 'package:liquid_glass_widgets/liquid_glass_widgets.dart' as lg;
 import 'package:truenas_mobile/shared/dialogs.dart';
 import 'package:truenas_mobile/shared/glass.dart';
 import 'package:truenas_mobile/shared/theme.dart';
+import 'package:truenas_mobile/shared/ui.dart';
 
 void main() {
   Widget host(TargetPlatform platform, Widget Function(BuildContext) body) =>
@@ -33,55 +34,58 @@ void main() {
       await tester.pumpAndSettle();
     }
 
-    testWidgets('shows its icon, title, content and actions on glass', (
-      tester,
-    ) async {
-      String? result;
-      await tester.pumpWidget(
-        host(
-          TargetPlatform.iOS,
-          (context) => TextButton(
-            onPressed: () async => result = await showAppDialog<String>(
-              context: context,
-              builder: (context) => AppDialog(
-                icon: const Icon(Icons.shield_outlined),
-                title: const Text('Trust it?'),
-                content: const Text('A new certificate.'),
-                actions: [
-                  dialogAction(
-                    context,
-                    label: 'Cancel',
-                    onPressed: () => Navigator.pop(context, 'no'),
-                  ),
-                  dialogAction(
-                    context,
-                    label: 'Trust',
-                    primary: true,
-                    onPressed: () => Navigator.pop(context, 'yes'),
-                  ),
-                ],
+    testWidgets(
+      "is the package's glass dialog with icon, title, content and actions",
+      (tester) async {
+        String? result;
+        await tester.pumpWidget(
+          host(
+            TargetPlatform.iOS,
+            (context) => TextButton(
+              onPressed: () async => result = await showAppDialog<String>(
+                context: context,
+                builder: (context) => AppDialog(
+                  icon: const Icon(Icons.shield_outlined),
+                  title: const Text('Trust it?'),
+                  content: const Text('A new certificate.'),
+                  actions: [
+                    dialogAction(
+                      context,
+                      label: 'Cancel',
+                      onPressed: () => Navigator.pop(context, 'no'),
+                    ),
+                    dialogAction(
+                      context,
+                      label: 'Trust',
+                      primary: true,
+                      onPressed: () => Navigator.pop(context, 'yes'),
+                    ),
+                  ],
+                ),
               ),
+              child: const Text('open'),
             ),
-            child: const Text('open'),
           ),
-        ),
-      );
-      await tester.tap(find.text('open'));
-      await tester.pumpAndSettle();
-      expect(find.byType(GlassDialogPanel), findsOneWidget);
-      expect(find.byIcon(Icons.shield_outlined), findsOneWidget);
-      expect(find.text('Trust it?'), findsOneWidget);
-      expect(find.text('A new certificate.'), findsOneWidget);
-      // Two actions sit side by side.
-      expect(
-        tester.getCenter(find.text('Cancel')).dy,
-        tester.getCenter(find.text('Trust')).dy,
-      );
-      await tester.tap(find.text('Trust'));
-      await tester.pumpAndSettle();
-      expect(result, 'yes');
-      expect(find.byType(GlassDialogPanel), findsNothing);
-    }, variant: ios);
+        );
+        await tester.tap(find.text('open'));
+        await tester.pumpAndSettle();
+        expect(find.byType(lg.GlassDialog), findsOneWidget);
+        expect(find.byType(GlassAlert), findsOneWidget);
+        expect(find.byIcon(Icons.shield_outlined), findsOneWidget);
+        expect(find.text('Trust it?'), findsOneWidget);
+        expect(find.text('A new certificate.'), findsOneWidget);
+        // Two actions sit side by side.
+        expect(
+          tester.getCenter(find.text('Cancel')).dy,
+          tester.getCenter(find.text('Trust')).dy,
+        );
+        await tester.tap(find.text('Trust'));
+        await tester.pumpAndSettle();
+        expect(result, 'yes');
+        expect(find.byType(lg.GlassDialog), findsNothing);
+      },
+      variant: ios,
+    );
 
     testWidgets('three actions stack', (tester) async {
       await open(
@@ -133,14 +137,14 @@ void main() {
       expect(tester.getTopLeft(find.text('tank/dataset59')).dy, lessThan(700));
     }, variant: ios);
 
-    testWidgets('the glass is plain: no tint, no filled or coloured buttons', (
+    testWidgets('the glass is plain and the buttons are the package\'s', (
       tester,
     ) async {
       await open(
         tester,
         (context) => AppDialog(
           title: const Text('Restart?'),
-          content: const Text('Services stop for a moment.'),
+          message: 'Services stop for a moment.',
           actions: [
             dialogAction(context, label: 'Cancel', onPressed: () {}),
             dialogAction(
@@ -153,23 +157,25 @@ void main() {
           ],
         ),
       );
-      final card = tester.widget<lg.GlassCard>(find.byType(lg.GlassCard));
-      expect(card.settings, isNull);
+      final dialog = tester.widget<lg.GlassDialog>(find.byType(lg.GlassDialog));
+      expect(dialog.settings, isNull);
+      expect(dialog.title, 'Restart?');
+      expect(dialog.message, 'Services stop for a moment.');
+      expect(find.text('Services stop for a moment.'), findsOneWidget);
+      expect(
+        dialog.actions.map((a) => (a.label, a.isPrimary, a.isDestructive)),
+        [('Cancel', false, false), ('Restart', true, true)],
+      );
+      expect(find.byType(lg.GlassButton), findsNWidgets(2));
       expect(
         find.descendant(
-          of: find.byType(GlassDialogPanel),
+          of: find.byType(lg.GlassDialog),
           matching: find.byWidgetPredicate(
             (w) => w is FilledButton || w is TextButton || w is OutlinedButton,
           ),
         ),
         findsNothing,
       );
-      TextStyle labelStyle(String label) =>
-          DefaultTextStyle.of(tester.element(find.text(label))).style;
-      // Only the destructive label is coloured, only the primary one is bold.
-      expect(labelStyle('Restart').color, isNot(labelStyle('Cancel').color));
-      expect(labelStyle('Restart').fontWeight, FontWeight.w700);
-      expect(labelStyle('Cancel').fontWeight, isNot(FontWeight.w700));
     }, variant: ios);
 
     testWidgets('a button without a handler is disabled', (tester) async {
@@ -187,10 +193,10 @@ void main() {
       await tester.tap(find.text('Create'));
       await tester.pumpAndSettle();
       expect(taps, 0);
-      expect(find.byType(GlassDialogPanel), findsOneWidget);
+      expect(find.byType(lg.GlassDialog), findsOneWidget);
     }, variant: ios);
 
-    testWidgets('text fields work inside the panel', (tester) async {
+    testWidgets('text fields work inside the dialog', (tester) async {
       final controller = TextEditingController();
       addTearDown(controller.dispose);
       await open(
@@ -198,6 +204,7 @@ void main() {
         (context) => AppDialog(
           title: const Text('Name'),
           content: TextField(controller: controller),
+          actions: [dialogAction(context, label: 'Save', onPressed: () {})],
         ),
       );
       await tester.enterText(find.byType(TextField), 'tank');
@@ -210,10 +217,10 @@ void main() {
       addTearDown(tester.view.reset);
       await open(
         tester,
-        (context) => const AppDialog(
-          title: Text('Name'),
-          content: TextField(),
-          actions: [SizedBox(height: 46, child: Text('Save'))],
+        (context) => AppDialog(
+          title: const Text('Name'),
+          content: const TextField(),
+          actions: [dialogAction(context, label: 'Save', onPressed: () {})],
         ),
       );
       final before = tester.getBottomLeft(find.text('Save')).dy;
@@ -242,26 +249,29 @@ void main() {
     await tester.tap(find.text('open'));
     await tester.pumpAndSettle();
     expect(find.byType(AlertDialog), findsOneWidget);
-    expect(find.byType(GlassDialogPanel), findsNothing);
+    expect(find.byType(lg.GlassDialog), findsNothing);
   });
 
-  group('showAppSheet', () {
-    Future<void> openSheet(
+  group('showAppChoice', () {
+    Future<void> openChoice(
       WidgetTester tester,
       TargetPlatform platform,
-      void Function(String?) done,
-    ) async {
+      void Function((String?,)?) done, {
+      bool dialogOnAndroid = false,
+    }) async {
       await tester.pumpWidget(
         host(
           platform,
           (context) => TextButton(
             onPressed: () async => done(
-              await showAppSheet<String>(
+              await showAppChoice<String?>(
                 context: context,
-                builder: (context) => ListTile(
-                  title: const Text('Snapshot task'),
-                  onTap: () => Navigator.pop(context, 'snapshot'),
-                ),
+                title: 'Theme',
+                dialogOnAndroid: dialogOnAndroid,
+                choices: [
+                  appChoice<String?>(null, 'Same as device', selected: true),
+                  appChoice<String?>('dark', 'Dark'),
+                ],
               ),
             ),
             child: const Text('open'),
@@ -272,28 +282,163 @@ void main() {
       await tester.pumpAndSettle();
     }
 
-    testWidgets('is opaque and rounded on iOS and returns the choice', (
+    testWidgets('is the glass action sheet on iOS and returns the choice', (
       tester,
     ) async {
-      String? picked;
-      await openSheet(tester, TargetPlatform.iOS, (v) => picked = v);
-      final sheet = tester.widget<BottomSheet>(find.byType(BottomSheet));
-      expect(sheet.backgroundColor, isNotNull);
-      expect(sheet.backgroundColor!.a, 1);
-      expect(sheet.showDragHandle, isTrue);
-      await tester.tap(find.text('Snapshot task'));
+      (String?,)? picked;
+      await openChoice(tester, TargetPlatform.iOS, (v) => picked = v);
+      expect(find.byType(BottomSheet), findsNothing);
+      expect(find.text('Theme'), findsOneWidget);
+      expect(find.text('Same as device'), findsOneWidget);
+      // The current choice carries a check.
+      expect(find.byIcon(Icons.check_rounded), findsOneWidget);
+      await tester.tap(find.text('Dark'));
       await tester.pumpAndSettle();
-      expect(picked, 'snapshot');
+      expect(picked, ('dark',));
+    }, variant: ios);
+
+    testWidgets('choosing a null value is not dismissing', (tester) async {
+      (String?,)? picked;
+      await openChoice(tester, TargetPlatform.iOS, (v) => picked = v);
+      await tester.tap(find.text('Same as device'));
+      await tester.pumpAndSettle();
+      expect(picked, (null,));
+    }, variant: ios);
+
+    testWidgets('Cancel dismisses with nothing chosen', (tester) async {
+      var done = false;
+      (String?,)? picked = ('x',);
+      await openChoice(tester, TargetPlatform.iOS, (v) {
+        picked = v;
+        done = true;
+      });
+      await tester.tap(find.text('Cancel'));
+      await tester.pumpAndSettle();
+      expect(done, isTrue);
+      expect(picked, isNull);
     }, variant: ios);
 
     testWidgets('is a Material bottom sheet on Android', (tester) async {
-      String? picked;
-      await openSheet(tester, TargetPlatform.android, (v) => picked = v);
+      (String?,)? picked;
+      await openChoice(tester, TargetPlatform.android, (v) => picked = v);
       expect(find.byType(BottomSheet), findsOneWidget);
-      await tester.tap(find.text('Snapshot task'));
+      await tester.tap(find.text('Dark'));
       await tester.pumpAndSettle();
-      expect(picked, 'snapshot');
+      expect(picked, ('dark',));
     });
+
+    testWidgets('can be a dialog on Android, for a long list', (tester) async {
+      (String?,)? picked;
+      await openChoice(
+        tester,
+        TargetPlatform.android,
+        (v) => picked = v,
+        dialogOnAndroid: true,
+      );
+      expect(find.byType(AlertDialog), findsOneWidget);
+      await tester.tap(find.text('Dark'));
+      await tester.pumpAndSettle();
+      expect(picked, ('dark',));
+    });
+  });
+
+  group('AppSwitch, AppSlider and AppSegments', () {
+    testWidgets('are the package\'s glass controls on iOS', (tester) async {
+      var on = false;
+      var size = 14.0;
+      var segment = 0;
+      await tester.pumpWidget(
+        host(
+          TargetPlatform.iOS,
+          (context) => StatefulBuilder(
+            builder: (context, setState) => Column(
+              children: [
+                AppSwitch(value: on, onChanged: (v) => setState(() => on = v)),
+                AppSlider(
+                  value: size,
+                  min: 10,
+                  max: 20,
+                  divisions: 10,
+                  onChanged: (v) => setState(() => size = v),
+                ),
+                AppSegments<int>(
+                  values: const [0, 1],
+                  labels: const ['One', 'Two'],
+                  selected: segment,
+                  onChanged: (v) => setState(() => segment = v),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+      expect(find.byType(lg.GlassSwitch), findsOneWidget);
+      expect(find.byType(lg.GlassSlider), findsOneWidget);
+      expect(find.byType(lg.GlassSegmentedControl), findsOneWidget);
+      expect(find.byType(Switch), findsNothing);
+      expect(find.byType(Slider), findsNothing);
+      expect(find.byType(SegmentedButton<int>), findsNothing);
+
+      await tester.tap(find.byType(lg.GlassSwitch));
+      await tester.pumpAndSettle();
+      expect(on, isTrue);
+    }, variant: ios);
+
+    testWidgets('a disabled glass switch ignores taps', (tester) async {
+      await tester.pumpWidget(
+        host(
+          TargetPlatform.iOS,
+          (context) => const AppSwitch(value: false, onChanged: null),
+        ),
+      );
+      await tester.tap(find.byType(lg.GlassSwitch), warnIfMissed: false);
+      await tester.pumpAndSettle();
+      expect(
+        tester.widget<lg.GlassSwitch>(find.byType(lg.GlassSwitch)).value,
+        isFalse,
+      );
+    }, variant: ios);
+
+    testWidgets('are Material on Android', (tester) async {
+      await tester.pumpWidget(
+        host(
+          TargetPlatform.android,
+          (context) => Column(
+            children: [
+              AppSwitch(value: false, onChanged: (_) {}),
+              AppSlider(value: 1, min: 0, max: 2, onChanged: (_) {}),
+              AppSegments<int>(
+                values: const [0, 1],
+                labels: const ['One', 'Two'],
+                selected: 0,
+                onChanged: (_) {},
+              ),
+            ],
+          ),
+        ),
+      );
+      expect(find.byType(Switch), findsOneWidget);
+      expect(find.byType(Slider), findsOneWidget);
+      expect(find.byType(SegmentedButton<int>), findsOneWidget);
+      expect(find.byType(lg.GlassSwitch), findsNothing);
+    });
+
+    testWidgets('segments stay Material inside a glass dialog', (tester) async {
+      await tester.pumpWidget(
+        host(
+          TargetPlatform.iOS,
+          (context) => AppSegments<int>(
+            inGlass: true,
+            values: const [0, 1],
+            labels: const ['One', 'Two'],
+            selected: 0,
+            onChanged: (_) {},
+          ),
+        ),
+      );
+      expect(find.byType(SegmentedButton<int>), findsOneWidget);
+      expect(find.byType(lg.GlassSegmentedControl), findsNothing);
+    }, variant: ios);
   });
 
   group('AppPopupMenu', () {

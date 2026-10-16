@@ -190,7 +190,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get errorCancelled => 'Connection cancelled.';
 
   @override
-  String get tabDashboard => 'Dashboard';
+  String get tabDashboard => 'Home';
 
   @override
   String get tabAlerts => 'Alerts';

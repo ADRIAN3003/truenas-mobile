@@ -7,6 +7,7 @@ import '../../core/instances/server_instance.dart';
 import '../../core/session/truenas_session.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../shared/connect_dialogs.dart';
+import '../../shared/ui.dart';
 
 /// Adds a new server, or edits [instance] when given.
 class ServerFormScreen extends ConsumerStatefulWidget {
@@ -157,22 +158,13 @@ class _ServerFormScreenState extends ConsumerState<ServerFormScreen> {
               },
             ),
             const SizedBox(height: 24),
-            SegmentedButton<AuthMethod>(
-              segments: [
-                ButtonSegment(
-                  value: AuthMethod.apiKey,
-                  label: Text(l10n.authApiKey),
-                  icon: const Icon(Icons.key_outlined),
-                ),
-                ButtonSegment(
-                  value: AuthMethod.password,
-                  label: Text(l10n.authPassword),
-                  icon: const Icon(Icons.password_outlined),
-                ),
-              ],
-              selected: {_authMethod},
-              onSelectionChanged: (selection) => setState(() {
-                _authMethod = selection.single;
+            AppSegments<AuthMethod>(
+              values: const [AuthMethod.apiKey, AuthMethod.password],
+              labels: [l10n.authApiKey, l10n.authPassword],
+              icons: const [Icons.key_outlined, Icons.password_outlined],
+              selected: _authMethod,
+              onChanged: (method) => setState(() {
+                _authMethod = method;
                 _secret.clear();
               }),
             ),

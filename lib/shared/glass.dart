@@ -185,112 +185,94 @@ Future<T?> showGlassDialog<T>({
   builder: builder,
 );
 
-/// An iOS 26 alert on liquid glass: an optional [icon], a centred [title],
-/// scrolling [content], and [actions] ([GlassDialogButton]s), side by side
-/// when there are two or fewer and stacked otherwise.
+/// A button of a [GlassAlert].
+typedef GlassAlertAction = ({
+  String label,
+  VoidCallback? onPressed,
+  bool primary,
+  bool destructive,
+});
+
+/// An iOS 26 alert: the package's [lg.GlassDialog] with a [title], a
+/// [message], optional [content] (a form, a list; it scrolls when it is taller
+/// than the room there is) and one to three [actions].
 ///
-/// The glass is left plain: no tint, rim or button colours of our own, so it
-/// looks like the system's.
-class GlassDialogPanel extends StatelessWidget {
-  const GlassDialogPanel({
+/// The package's dialog does not lift above the keyboard or scroll, and its
+/// buttons cannot be disabled or carry an icon, so this wraps it for the first
+/// two; an action without a handler does nothing.
+class GlassAlert extends StatelessWidget {
+  const GlassAlert({
     super.key,
-    this.icon,
     this.title,
+    this.message,
+    this.icon,
     this.content,
-    this.actions = const [],
+    required this.actions,
   });
 
+  final String? title;
+  final String? message;
   final Widget? icon;
-  final Widget? title;
   final Widget? content;
-  final List<Widget> actions;
+  final List<GlassAlertAction> actions;
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final text = theme.textTheme;
-    final scheme = theme.colorScheme;
+    final media = MediaQuery.of(context);
+    // What is left for the content after the keyboard, the safe areas, the
+    // margin, and the title, message and buttons around it.
+    final room =
+        media.size.height -
+        media.viewInsets.bottom -
+        media.padding.vertical -
+        48 -
+        170 -
+        (message == null ? 0 : 90);
+    final body = icon == null && content == null
+        ? null
+        : Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              if (icon != null)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: IconTheme.merge(
+                    data: const IconThemeData(size: 32),
+                    child: Center(child: icon),
+                  ),
+                ),
+              if (content != null)
+                ConstrainedBox(
+                  constraints: BoxConstraints(maxHeight: math.max(96, room)),
+                  child: SingleChildScrollView(child: content),
+                ),
+            ],
+          );
     return SafeArea(
       child: AnimatedPadding(
-        // Keep the panel above the keyboard.
-        padding:
-            MediaQuery.viewInsetsOf(context) +
-            const EdgeInsets.symmetric(horizontal: 32, vertical: 24),
+        // Keep the alert above the keyboard.
+        padding: media.viewInsets + const EdgeInsets.all(24),
         duration: const Duration(milliseconds: 100),
         curve: Curves.decelerate,
-        child: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 340),
-            // The Material widgets inside (text fields, list tiles) need a
-            // Material ancestor, which a Cupertino route does not provide.
-            child: Material(
-              type: MaterialType.transparency,
-              child: lg.GlassCard(
-                useOwnLayer: true,
-                shape: const lg.LiquidRoundedSuperellipse(borderRadius: 34),
-                padding: const EdgeInsets.fromLTRB(20, 22, 20, 16),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    if (icon != null)
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 10),
-                        child: IconTheme.merge(
-                          data: const IconThemeData(size: 32),
-                          child: Center(child: icon),
-                        ),
-                      ),
-                    if (title != null)
-                      DefaultTextStyle(
-                        style: text.titleMedium!.copyWith(
-                          fontWeight: FontWeight.w700,
-                          color: scheme.onSurface,
-                        ),
-                        textAlign: TextAlign.center,
-                        child: title!,
-                      ),
-                    if (content != null)
-                      Flexible(
-                        child: Padding(
-                          padding: EdgeInsets.only(top: title == null ? 0 : 10),
-                          child: SingleChildScrollView(
-                            child: DefaultTextStyle(
-                              style: text.bodyMedium!.copyWith(
-                                color: scheme.onSurface,
-                              ),
-                              child: content!,
-                            ),
-                          ),
-                        ),
-                      ),
-                    if (actions.isNotEmpty)
-                      Padding(
-                        padding: const EdgeInsets.only(top: 18),
-                        child: actions.length <= 2
-                            ? Row(
-                                children: [
-                                  for (final (i, action) in actions.indexed)
-                                    Expanded(
-                                      child: Padding(
-                                        padding: EdgeInsetsDirectional.only(
-                                          start: i == 0 ? 0 : 8,
-                                        ),
-                                        child: action,
-                                      ),
-                                    ),
-                                ],
-                              )
-                            : Column(
-                                crossAxisAlignment: CrossAxisAlignment.stretch,
-                                spacing: 8,
-                                children: actions,
-                              ),
-                      ),
-                  ],
+        // The Material widgets inside (text fields, list tiles) need a
+        // Material ancestor, which a Cupertino route does not provide.
+        child: Material(
+          type: MaterialType.transparency,
+          child: lg.GlassDialog(
+            title: title,
+            message: message,
+            content: body,
+            maxWidth: 340,
+            actions: [
+              for (final action in actions)
+                lg.GlassDialogAction(
+                  label: action.label,
+                  isPrimary: action.primary,
+                  isDestructive: action.destructive,
+                  onPressed: action.onPressed ?? () {},
                 ),
-              ),
-            ),
+            ],
           ),
         ),
       ),
@@ -298,87 +280,124 @@ class GlassDialogPanel extends StatelessWidget {
   }
 }
 
-/// A button of a [GlassDialogPanel]: a solid capsule with a text label, like
-/// the buttons of the system's alerts. The main action ([primary]) is filled
-/// with the accent colour; the rest are a neutral grey. A [destructive] label
-/// is red. Nothing is see-through, so every button stands out on the glass.
-class GlassDialogButton extends StatelessWidget {
-  const GlassDialogButton({
+/// One choice of [showGlassChoices].
+typedef GlassChoice<T> = ({T value, String label, Widget? icon, bool selected});
+
+/// An iOS 26 action sheet that picks one of [choices] ([selected] is marked
+/// with a check, otherwise the choice's [icon] shows). The result is a record
+/// so choosing a null value is told apart from dismissing the sheet, which
+/// gives null.
+Future<(T,)?> showGlassChoices<T>({
+  required BuildContext context,
+  required List<GlassChoice<T>> choices,
+  required String cancelLabel,
+  String? title,
+}) async {
+  (T,)? picked;
+  await lg.showGlassActionSheet<void>(
+    context: context,
+    title: title,
+    cancelLabel: cancelLabel,
+    actions: [
+      for (final choice in choices)
+        lg.GlassActionSheetAction(
+          label: choice.label,
+          icon: choice.selected ? const Icon(Icons.check_rounded) : choice.icon,
+          // The sheet closes itself after this.
+          onPressed: () => picked = (choice.value,),
+        ),
+    ],
+  );
+  return picked;
+}
+
+/// An iOS 26 switch: the package's [lg.GlassSwitch] on its own glass layer.
+class GlassSwitchControl extends StatelessWidget {
+  const GlassSwitchControl({
     super.key,
-    required this.label,
-    required this.onPressed,
-    this.icon,
-    this.primary = false,
-    this.destructive = false,
+    required this.value,
+    required this.onChanged,
   });
 
-  final String label;
-
-  /// Null disables the button.
-  final VoidCallback? onPressed;
-  final IconData? icon;
-  final bool primary;
-  final bool destructive;
+  final bool value;
+  final ValueChanged<bool>? onChanged;
 
   @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final scheme = theme.colorScheme;
-    final dark = theme.brightness == Brightness.dark;
-    // A destructive action is never filled: the label alone warns.
-    final filled = primary && !destructive;
-    final background = filled
-        ? scheme.primary
-        : scheme.onSurface.withValues(alpha: dark ? 0.22 : 0.12);
-    final foreground = filled
-        ? scheme.onPrimary
-        : destructive
-        ? (dark ? const Color(0xFFFF6961) : const Color(0xFFE5271B))
-        : scheme.onSurface;
-    return Opacity(
-      opacity: onPressed == null ? 0.4 : 1,
-      child: Material(
-        color: background,
-        shape: const StadiumBorder(),
-        clipBehavior: Clip.antiAlias,
-        child: InkWell(
-          onTap: onPressed,
-          child: SizedBox(
-            height: 46,
-            child: Center(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12),
-                child: DefaultTextStyle.merge(
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: primary ? FontWeight.w700 : FontWeight.w500,
-                    color: foreground,
-                  ),
-                  child: IconTheme.merge(
-                    data: IconThemeData(color: foreground, size: 18),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      spacing: 6,
-                      children: [
-                        if (icon != null) Icon(icon),
-                        Flexible(
-                          child: Text(
-                            label,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
+  Widget build(BuildContext context) => Opacity(
+    opacity: onChanged == null ? 0.4 : 1,
+    child: IgnorePointer(
+      ignoring: onChanged == null,
+      child: lg.GlassSwitch(
+        value: value,
+        useOwnLayer: true,
+        // Haptics follow the app's own setting (see Haptics).
+        enableHaptics: false,
+        onChanged: onChanged ?? (_) {},
       ),
-    );
-  }
+    ),
+  );
+}
+
+/// An iOS 26 slider: the package's [lg.GlassSlider] on its own glass layer.
+class GlassSliderControl extends StatelessWidget {
+  const GlassSliderControl({
+    super.key,
+    required this.value,
+    required this.onChanged,
+    this.onChangeEnd,
+    this.min = 0,
+    this.max = 1,
+    this.divisions,
+  });
+
+  final double value;
+  final ValueChanged<double> onChanged;
+  final ValueChanged<double>? onChangeEnd;
+  final double min;
+  final double max;
+  final int? divisions;
+
+  @override
+  Widget build(BuildContext context) => lg.GlassSlider(
+    value: value,
+    min: min,
+    max: max,
+    divisions: divisions,
+    useOwnLayer: true,
+    onChanged: onChanged,
+    onChangeEnd: onChangeEnd,
+  );
+}
+
+/// An iOS 26 segmented control: the package's [lg.GlassSegmentedControl].
+/// Not for use inside a glass dialog, where glass over glass distorts.
+class GlassSegments extends StatelessWidget {
+  const GlassSegments({
+    super.key,
+    required this.labels,
+    required this.selectedIndex,
+    required this.onSelected,
+    this.icons,
+  });
+
+  final List<String> labels;
+  final List<IconData>? icons;
+  final int selectedIndex;
+  final ValueChanged<int> onSelected;
+
+  @override
+  Widget build(BuildContext context) => lg.GlassSegmentedControl(
+    useOwnLayer: true,
+    selectedIndex: selectedIndex,
+    onSegmentSelected: onSelected,
+    segments: [
+      for (final (i, label) in labels.indexed)
+        lg.GlassSegment(
+          label: label,
+          icon: icons == null ? null : Icon(icons![i], size: 18),
+        ),
+    ],
+  );
 }
 
 /// One entry of a [GlassPopupMenu].

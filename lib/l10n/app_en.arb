@@ -238,7 +238,7 @@
   "@errorCancelled": {
     "description": "Shown when the user cancels a certificate or 2FA prompt."
   },
-  "tabDashboard": "Dashboard",
+  "tabDashboard": "Home",
   "@tabDashboard": {
     "description": "Bottom navigation tab for the dashboard."
   },

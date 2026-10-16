@@ -229,7 +229,7 @@ void main() {
       );
       await tester.tap(find.byType(BackButton));
       await tester.pumpAndSettle();
-      expect(find.byType(GlassDialogPanel), findsOneWidget);
+      expect(find.byType(lg.GlassDialog), findsOneWidget);
       expect(find.text('Disconnect from Home?'), findsOneWidget);
       await close(tester);
     });

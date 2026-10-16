@@ -21,26 +21,15 @@ Future<List<String>> localDatasets(TrueNasSession session) async {
   return names;
 }
 
-Future<String?> _pickDataset(BuildContext context, List<String> datasets) =>
-    showAppDialog<String>(
-      context: context,
-      builder: (context) => AppDialog(
-        scrollable: true,
-        title: Text(AppLocalizations.of(context).pickDataset),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            for (final d in datasets)
-              ListTile(
-                dense: true,
-                title: Text(d),
-                onTap: () => Navigator.pop(context, d),
-              ),
-          ],
-        ),
-      ),
-    );
+Future<String?> _pickDataset(
+  BuildContext context,
+  List<String> datasets,
+) async => (await showAppChoice<String>(
+  context: context,
+  title: AppLocalizations.of(context).pickDataset,
+  dialogOnAndroid: true,
+  choices: [for (final d in datasets) appChoice(d, d)],
+))?.$1;
 
 String? _required(AppLocalizations l10n, String? value) =>
     (value ?? '').trim().isEmpty ? l10n.validationRequired : null;

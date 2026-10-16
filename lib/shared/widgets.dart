@@ -3,7 +3,6 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 import 'dialogs.dart';
-import 'glass.dart';
 import 'haptics.dart';
 import 'theme.dart';
 import 'viz_colors.dart';
@@ -140,29 +139,28 @@ Future<bool> confirmAction(
             typeToConfirm == null || controller.text.trim() == typeToConfirm;
         return AppDialog(
           title: Text(title),
+          message: body,
           scrollable: details != null,
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Text(
-                body,
-                textAlign: useGlassChrome(context)
-                    ? TextAlign.center
-                    : TextAlign.start,
-              ),
-              if (details != null) ...[const SizedBox(height: 12), details],
-              if (typeToConfirm != null) ...[
-                const SizedBox(height: 16),
-                TextField(
-                  controller: controller,
-                  autocorrect: false,
-                  decoration: InputDecoration(labelText: typeToConfirmHint),
-                  onChanged: (_) => setState(() {}),
+          content: details == null && typeToConfirm == null
+              ? null
+              : Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    ?details,
+                    if (typeToConfirm != null) ...[
+                      if (details != null) const SizedBox(height: 16),
+                      TextField(
+                        controller: controller,
+                        autocorrect: false,
+                        decoration: InputDecoration(
+                          labelText: typeToConfirmHint,
+                        ),
+                        onChanged: (_) => setState(() {}),
+                      ),
+                    ],
+                  ],
                 ),
-              ],
-            ],
-          ),
           actions: [
             dialogAction(
               context,

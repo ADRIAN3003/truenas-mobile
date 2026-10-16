@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:truenas_mobile/shared/glass.dart';
+import 'package:liquid_glass_widgets/liquid_glass_widgets.dart' as lg;
 import 'package:truenas_mobile/shared/theme.dart';
 import 'package:truenas_mobile/shared/widgets.dart';
 
@@ -28,19 +28,23 @@ void main() {
     await tester.pumpAndSettle();
   }
 
-  testWidgets('confirmations use a glass panel on iOS', (tester) async {
+  testWidgets('confirmations use the package\'s glass dialog on iOS', (
+    tester,
+  ) async {
     await openConfirm(tester, TargetPlatform.iOS);
-    expect(find.byType(GlassDialogPanel), findsOneWidget);
+    expect(find.byType(lg.GlassDialog), findsOneWidget);
     expect(find.byType(AlertDialog), findsNothing);
-    expect(find.widgetWithText(GlassDialogButton, 'Delete'), findsOneWidget);
-    expect(find.widgetWithText(GlassDialogButton, 'Cancel'), findsOneWidget);
+    expect(find.text('Gone for good.'), findsOneWidget);
+    expect(find.widgetWithText(lg.GlassButton, 'Delete'), findsOneWidget);
+    expect(find.widgetWithText(lg.GlassButton, 'Cancel'), findsOneWidget);
     expect(find.byType(FilledButton), findsNothing);
   });
 
   testWidgets('confirmations use a Material dialog on Android', (tester) async {
     await openConfirm(tester, TargetPlatform.android);
-    expect(find.byType(GlassDialogPanel), findsNothing);
+    expect(find.byType(lg.GlassDialog), findsNothing);
     expect(find.byType(AlertDialog), findsOneWidget);
+    expect(find.text('Gone for good.'), findsOneWidget);
     expect(find.widgetWithText(FilledButton, 'Delete'), findsOneWidget);
     expect(find.widgetWithText(TextButton, 'Cancel'), findsOneWidget);
   });

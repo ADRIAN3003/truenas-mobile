@@ -431,7 +431,7 @@ abstract class AppLocalizations {
   /// Bottom navigation tab for the dashboard.
   ///
   /// In en, this message translates to:
-  /// **'Dashboard'**
+  /// **'Home'**
   String get tabDashboard;
 
   /// Bottom navigation tab for alerts.

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:liquid_glass_widgets/liquid_glass_widgets.dart' as lg;
 import 'package:truenas_mobile/shared/theme.dart';
 import 'package:truenas_mobile/shared/ui.dart';
 import 'package:truenas_mobile/shared/widgets.dart';
@@ -202,7 +203,7 @@ void main() {
     testWidgets('an iOS switch ticks once', (tester) async {
       bool? changed;
       await tester.pumpWidget(iosTile((v) => changed = v, false));
-      await tester.tap(find.byType(Switch));
+      await tester.tap(find.byType(lg.GlassSwitch));
       await tester.pumpAndSettle();
       expect(changed, isTrue);
       expect(taps, ['selectionClick']);

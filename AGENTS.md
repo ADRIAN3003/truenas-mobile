@@ -69,22 +69,36 @@ README covers what the app does; this file covers how to work on it.
 
 - One branded design with platform-adaptive controls (`isCupertino`), not
   separate Material and Cupertino UIs. iOS gets liquid glass chrome.
-- Dialogs, sheets and "more" menus go through `lib/shared/dialogs.dart`
-  (`AppDialog` with `showAppDialog`, `showAppSheet`, `AppPopupMenu`), never
+- On iOS the chrome is `liquid_glass_widgets`, used through its own widgets
+  rather than our look-alikes. Read `.claude/skills/liquid-glass-widgets/SKILL.md`
+  (the package's own guide, copied from its repo) before touching glass; its
+  rules apply (public import only, no glass inside glass, `GlassTabBar.bottom`,
+  `GlassDialog`, `GlassSwitch`, ...). `glass.dart` is still the only file that
+  imports the package, and the adaptive wrappers below pick the glass widget on
+  iOS and the Material one elsewhere.
+- Dialogs, choices and "more" menus go through `lib/shared/dialogs.dart`
+  (`AppDialog` with `showAppDialog`, `showAppChoice`, `AppPopupMenu`), never
   `AlertDialog`, `showDialog`, `showModalBottomSheet` or `PopupMenuButton`
-  directly: on iOS they are liquid glass like the system's on iOS 26, which
-  Flutter's own Cupertino dialogs are not.
-  Dialog buttons come from `dialogAction` (same file), never a bare
-  `TextButton`/`FilledButton`. Keep the glass of dialogs, menus and the tab
-  bar plain: no `glassColor`, tint or custom colours on the glass itself (they
-  looked wrong on a device). The one colour on the tab bar is the selected
-  tab's icon and label in the accent colour; the package draws a selected
-  tab a second time, 15% larger and heavier, which clipped the "D" of
-  Dashboard, so `glass.dart` sets `magnification: 1` and equal label weights.
-  Bottom sheets (`showAppSheet`) are opaque, not glass: a see-through sheet
-  over a list was unreadable. The dialog *buttons* on iOS are solid capsules
-  like the system's alert on iOS 26/27: the primary one filled with the
-  accent colour, the rest neutral grey, a destructive label red.
+  directly. On iOS `AppDialog` is the package's `GlassDialog` (via
+  `GlassAlert`, which adds scrolling and lifts it above the keyboard), a choice
+  is its `showGlassActionSheet`, a menu its `GlassMenu`. `GlassDialog` takes
+  one to three buttons with a plain string label: no icon, no disabled state (a
+  button without a handler does nothing), and the title must be a `Text`. So
+  `dialogAction` (same file), never a bare `TextButton`/`FilledButton`; a list
+  of choices is `showAppChoice`, not a dialog without buttons. Keep the glass
+  plain: no `glassColor`, tint or custom colours on it (they looked wrong on a
+  device). The one colour on the tab bar is the selected tab's icon and label
+  in the accent colour; the package draws a selected tab a second time, 15%
+  larger and heavier, which clipped the "D" of Dashboard, so `glass.dart` sets
+  `magnification: 1` and equal label weights, and the tab labels stay short.
+- Switches, sliders and segmented controls are `AppSwitch`/`AppSwitchTile`,
+  `AppSlider` and `AppSegments` (in `ui.dart`): `GlassSwitch`, `GlassSlider`
+  and `GlassSegmentedControl` on iOS. Pass `inGlass: true` to `AppSegments` in
+  a dialog (glass inside glass distorts). Not ported yet: the scaffolds and
+  app bars (still `Scaffold`/`AppBar` with our own `GlassTopEdge` and
+  `ChromeInsets`, instead of `GlassScaffold`/`GlassAppBar`), buttons, text
+  fields and snackbars (a `GlassToast` needs a live context and would sit over
+  the tab bar).
 - Haptics go through `lib/shared/haptics.dart` (switched off by
   `Haptics.enabled`, which the settings notifier keeps in step). Use
   `AppRefreshIndicator`, `AppSwitch` and `AppSwitchTile` (in `ui.dart`)

@@ -69,6 +69,10 @@ README covers what the app does; this file covers how to work on it.
 
 - One branded design with platform-adaptive controls (`isCupertino`), not
   separate Material and Cupertino UIs. iOS gets liquid glass chrome.
+- Haptics go through `lib/shared/haptics.dart`. Use `AppRefreshIndicator`,
+  `AppSwitch` and `AppSwitchTile` (in `ui.dart`) instead of the bare Material
+  widgets so pull to refresh and switches tick; the Material switch makes no
+  haptic of its own, even in its iOS look.
 - App ID `hu.adrian.truenasmobile` on both platforms. MIT licence.
 - Branch names are descriptive kebab-case, e.g. `claude/shell-reverse-proxy`.
 - PRs follow `.github/pull_request_template.md`. The owner merges as soon as

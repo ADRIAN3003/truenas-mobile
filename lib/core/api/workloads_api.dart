@@ -102,6 +102,10 @@ class WorkloadsApi {
 
   static Map<String, Object?> vmShell(int id) => {'vm_id': id};
 
+  /// What an app or container shell tries when the image has no bash, which
+  /// is the server's default. Lean images such as Alpine only have `sh`.
+  static const shellFallbacks = ['/bin/sh'];
+
   Future<Map<String, Object?>> containerShell(LinuxContainer c) async =>
       await containerBackend() == ContainerBackend.containers
       ? {'container_id': int.parse(c.id)}

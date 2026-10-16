@@ -100,7 +100,7 @@ class _JobsTabState extends State<JobsTab> {
             : Text(describeConnectError(l10n, _error!)),
       );
     }
-    return RefreshIndicator.adaptive(
+    return AppRefreshIndicator(
       onRefresh: _load,
       child: jobs.isEmpty
           ? ListView(

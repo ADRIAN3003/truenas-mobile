@@ -66,7 +66,7 @@ class ShareTile extends StatelessWidget {
       ),
       trailing: Semantics(
         label: l10n.shareEnabled,
-        child: Switch.adaptive(value: enabled, onChanged: onToggle),
+        child: AppSwitch(value: enabled, onChanged: onToggle),
       ),
       onTap: onTap,
     );
@@ -173,7 +173,7 @@ class _NewShareDialogState extends State<NewShareDialog> {
                       decoration: InputDecoration(labelText: l10n.shareComment),
                     ),
                     if (!widget.withName)
-                      SwitchListTile.adaptive(
+                      AppSwitchTile(
                         contentPadding: EdgeInsets.zero,
                         title: Text(l10n.shareReadOnly),
                         value: _readOnly,
@@ -283,20 +283,20 @@ class _ShareEditDialogState extends State<ShareEditDialog> {
               decoration: InputDecoration(labelText: l10n.shareComment),
             ),
             const SizedBox(height: 8),
-            SwitchListTile.adaptive(
+            AppSwitchTile(
               contentPadding: EdgeInsets.zero,
               title: Text(l10n.shareEnabled),
               value: _enabled,
               onChanged: (v) => setState(() => _enabled = v),
             ),
-            SwitchListTile.adaptive(
+            AppSwitchTile(
               contentPadding: EdgeInsets.zero,
               title: Text(l10n.shareReadOnly),
               value: _readOnly,
               onChanged: (v) => setState(() => _readOnly = v),
             ),
             if (_browsable != null)
-              SwitchListTile.adaptive(
+              AppSwitchTile(
                 contentPadding: EdgeInsets.zero,
                 title: Text(l10n.shareBrowsable),
                 value: _browsable!,

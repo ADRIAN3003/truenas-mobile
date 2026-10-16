@@ -2588,5 +2588,26 @@
   "dashboardConnected": "Connected",
   "@dashboardConnected": {
     "description": "Shown on the dashboard header while the app is connected to the server"
+  },
+  "fieldPasswordKeep": "Leave empty to keep the saved password, or type a new one to replace it.",
+  "@fieldPasswordKeep": {
+    "description": "Helper text under the password field when editing a saved server."
+  },
+  "fieldApiKeyKeep": "Leave empty to keep the saved API key, or paste a new one to replace it.",
+  "@fieldApiKeyKeep": {
+    "description": "Helper text under the API key field when editing a saved server."
+  },
+  "tabSharesShort": "Shares",
+  "@tabSharesShort": {
+    "description": "Bottom navigation label for shares; keep it short, the bar is narrow."
+  },
+  "shellFallback": "That shell is not in this container. Trying {shell} instead.",
+  "@shellFallback": {
+    "description": "Printed in the terminal when the default shell is missing in an app or container and another one is tried.",
+    "placeholders": {
+      "shell": {
+        "type": "String"
+      }
+    }
   }
 }

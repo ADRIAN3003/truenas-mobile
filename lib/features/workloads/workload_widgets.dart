@@ -204,16 +204,23 @@ class WorkloadMenu extends StatelessWidget {
 }
 
 /// Opens a shell with [options] (a VM console, app or container shell).
+/// [fallbackCommands] are tried in turn when the server's default shell is
+/// not in the image.
 Future<void> openShell(
   BuildContext context,
   TrueNasSession session,
   Map<String, Object?> options,
-  String title,
-) => Navigator.push(
+  String title, {
+  List<String> fallbackCommands = const [],
+}) => Navigator.push(
   context,
   MaterialPageRoute<void>(
-    builder: (_) =>
-        ShellScreen(session: session, options: options, title: title),
+    builder: (_) => ShellScreen(
+      session: session,
+      options: options,
+      title: title,
+      fallbackCommands: fallbackCommands,
+    ),
   ),
 );
 
@@ -261,5 +268,6 @@ Future<void> openAppShell(
     session,
     WorkloadsApi.appShell(app, id),
     '$app · ${containers[id]}',
+    fallbackCommands: WorkloadsApi.shellFallbacks,
   );
 }

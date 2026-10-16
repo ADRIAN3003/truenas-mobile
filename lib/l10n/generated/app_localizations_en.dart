@@ -1869,4 +1869,20 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get dashboardConnected => 'Connected';
+
+  @override
+  String get fieldPasswordKeep =>
+      'Leave empty to keep the saved password, or type a new one to replace it.';
+
+  @override
+  String get fieldApiKeyKeep =>
+      'Leave empty to keep the saved API key, or paste a new one to replace it.';
+
+  @override
+  String get tabSharesShort => 'Shares';
+
+  @override
+  String shellFallback(String shell) {
+    return 'That shell is not in this container. Trying $shell instead.';
+  }
 }

@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
+import 'haptics.dart';
 import 'theme.dart';
 import 'ui.dart';
 import 'viz_colors.dart';
@@ -175,5 +176,12 @@ Future<bool> confirmAction(
     ),
   );
   controller.dispose();
+  if (confirmed == true) {
+    if (destructive) {
+      Haptics.warning();
+    } else {
+      Haptics.confirm();
+    }
+  }
   return confirmed ?? false;
 }

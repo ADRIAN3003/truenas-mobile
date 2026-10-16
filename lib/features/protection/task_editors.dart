@@ -4,6 +4,7 @@ import '../../core/models/protection.dart';
 import '../../core/models/protection_drafts.dart';
 import '../../core/session/truenas_session.dart';
 import '../../l10n/generated/app_localizations.dart';
+import '../../shared/ui.dart';
 import '../sharing/sharing_widgets.dart';
 import '../storage/storage_helpers.dart';
 import 'protection_screen.dart';
@@ -313,7 +314,7 @@ class _ReplicationEditorState extends State<ReplicationEditor>
           ),
           validator: (v) => _required(l10n, v),
         ),
-        SwitchListTile.adaptive(
+        AppSwitchTile(
           contentPadding: EdgeInsets.zero,
           title: Text(l10n.snapshotTaskRecursive),
           value: d.recursive,
@@ -355,7 +356,7 @@ class _ReplicationEditorState extends State<ReplicationEditor>
               validator: (v) => _required(l10n, v),
             ),
         ],
-        SwitchListTile.adaptive(
+        AppSwitchTile(
           contentPadding: EdgeInsets.zero,
           title: Text(l10n.replicationAuto),
           value: d.auto,
@@ -782,7 +783,7 @@ class _RsyncEditorState extends State<RsyncEditor>
           decoration: InputDecoration(labelText: l10n.rsyncRemotePath),
           validator: d.ssh ? (v) => _required(l10n, v) : null,
         ),
-        SwitchListTile.adaptive(
+        AppSwitchTile(
           contentPadding: EdgeInsets.zero,
           title: Text(l10n.rsyncDelete),
           value: d.delete,

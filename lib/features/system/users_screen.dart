@@ -160,7 +160,7 @@ class _UsersScreenState extends State<UsersScreen>
             onRefresh: load,
             builder: (data) {
               final (users, groups) = data;
-              final builtinToggle = SwitchListTile.adaptive(
+              final builtinToggle = AppSwitchTile(
                 title: Text(l10n.usersShowBuiltin),
                 value: _showBuiltin,
                 onChanged: (v) {
@@ -406,7 +406,7 @@ class _NewUserDialogState extends State<_NewUserDialog> {
                 validator: (v) =>
                     (v ?? '').isEmpty ? l10n.userPasswordRequired : null,
               ),
-              SwitchListTile.adaptive(
+              AppSwitchTile(
                 contentPadding: EdgeInsets.zero,
                 title: Text(l10n.userSmb),
                 value: _smb,

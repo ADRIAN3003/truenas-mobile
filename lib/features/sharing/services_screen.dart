@@ -173,7 +173,7 @@ class _ServiceTile extends StatelessWidget {
                   ),
                 ),
               ),
-              Switch.adaptive(
+              AppSwitch(
                 value: service.enable,
                 onChanged: busy ? null : onAutostart,
               ),

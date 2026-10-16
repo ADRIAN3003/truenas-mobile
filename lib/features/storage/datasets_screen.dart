@@ -440,7 +440,7 @@ class _DatasetScreenState extends State<DatasetScreen> {
         icon: const Icon(Icons.add_a_photo_outlined),
         label: Text(l10n.snapshotCreate),
       ),
-      body: RefreshIndicator.adaptive(
+      body: AppRefreshIndicator(
         onRefresh: _load,
         child: ListView(
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 88),

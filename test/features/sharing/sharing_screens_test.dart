@@ -9,6 +9,7 @@ import 'package:truenas_mobile/features/sharing/services_screen.dart';
 import 'package:truenas_mobile/features/sharing/shares_tab.dart';
 import 'package:truenas_mobile/features/sharing/smb_shares_screen.dart';
 import 'package:truenas_mobile/l10n/generated/app_localizations.dart';
+import 'package:truenas_mobile/shared/ui.dart';
 
 import '../../support/fake_truenas_server.dart';
 
@@ -134,7 +135,7 @@ void main() {
 
     await tester.tap(find.text('/mnt/tank/media'));
     await tester.pumpAndSettle();
-    await tester.tap(find.widgetWithText(SwitchListTile, 'Read only'));
+    await tester.tap(find.widgetWithText(AppSwitchTile, 'Read only'));
     await tester.tap(find.text('Save'));
     await settle(tester);
     expect(server.nfsShares.single['ro'], isFalse);

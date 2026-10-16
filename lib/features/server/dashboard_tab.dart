@@ -101,7 +101,7 @@ class _DashboardTabState extends State<DashboardTab> {
         ? [const _WaitingCard()]
         : [_GaugesCard(history: _history), _NetworkCard(history: _history)];
     final pools = [if (_pools != null) _PoolsCard(pools: _pools!)];
-    return RefreshIndicator.adaptive(
+    return AppRefreshIndicator(
       edgeOffset: ChromeInsets.of(context).top,
       onRefresh: _refresh,
       child: LayoutBuilder(
@@ -367,7 +367,7 @@ class _GaugesCard extends StatelessWidget {
     Widget gauge({
       required String title,
       required List<(double, Color)> segments,
-      required String value,
+      required double percent,
       required String detail,
     }) => Column(
       children: [
@@ -375,7 +375,7 @@ class _GaugesCard extends StatelessWidget {
         const SizedBox(height: 10),
         RingGauge(
           segments: segments,
-          child: Text(value, style: big),
+          child: AnimatedPercent(percent, style: big),
         ),
         const SizedBox(height: 8),
         Text(detail, style: caption, textAlign: TextAlign.center),
@@ -394,7 +394,7 @@ class _GaugesCard extends StatelessWidget {
                   child: gauge(
                     title: l10n.cpuTitle,
                     segments: [(stats.cpuPercent / 100, colors.series1)],
-                    value: '${stats.cpuPercent.round()}%',
+                    percent: stats.cpuPercent,
                     detail: temperature == null
                         ? ''
                         : l10n.cpuTemperature(temperature.toStringAsFixed(0)),
@@ -404,10 +404,10 @@ class _GaugesCard extends StatelessWidget {
                   child: gauge(
                     title: l10n.memoryTitle,
                     segments: [
-                      (services / total, colors.series1),
+                      (services / total, colors.series3),
                       (arc / total, colors.series2),
                     ],
-                    value: '${(stats.memoryUsed / total * 100).round()}%',
+                    percent: stats.memoryUsed / total * 100,
                     detail: l10n.poolUsage(
                       formatBytes(stats.memoryUsed),
                       formatBytes(stats.memoryTotal),
@@ -423,7 +423,7 @@ class _GaugesCard extends StatelessWidget {
               alignment: WrapAlignment.center,
               children: [
                 LegendItem(
-                  colors.series1,
+                  colors.series3,
                   '${l10n.memoryServices} ${formatBytes(services)}',
                 ),
                 LegendItem(

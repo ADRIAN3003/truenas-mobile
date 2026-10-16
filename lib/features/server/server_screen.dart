@@ -7,6 +7,7 @@ import '../../core/session/truenas_session.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../shared/connect_dialogs.dart';
 import '../../shared/glass.dart';
+import '../../shared/haptics.dart';
 import '../sharing/shares_tab.dart';
 import '../storage/storage_tab.dart';
 import '../workloads/apps_tab.dart';
@@ -112,7 +113,7 @@ class _ServerScreenState extends ConsumerState<ServerScreen>
         (
           Icons.folder_shared_outlined,
           Icons.folder_shared_rounded,
-          l10n.tabShares,
+          l10n.tabSharesShort,
         ),
         (Icons.widgets_outlined, Icons.widgets_rounded, l10n.tabApps),
         (Icons.more_horiz_rounded, Icons.more_horiz_rounded, l10n.tabMore),
@@ -131,7 +132,11 @@ class _ServerScreenState extends ConsumerState<ServerScreen>
           MoreTab(session: session, serverName: instance?.name ?? ''),
         ],
       );
-      void select(int index) => setState(() => _tab = index);
+      void select(int index) {
+        if (index != _tab) Haptics.selection();
+        setState(() => _tab = index);
+      }
+
       final width = MediaQuery.sizeOf(context).width;
       // Tablets and landscape phones get a side rail instead of a bottom bar.
       if (width >= railBreakpoint) {

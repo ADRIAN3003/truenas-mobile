@@ -125,7 +125,6 @@ class _PoolCard extends StatelessWidget {
     final theme = Theme.of(context);
     final colors = VizColors.of(context);
     final scan = pool.scan;
-    final percent = (pool.usedFraction * 100).round();
     return Card(
       child: InkWell(
         onTap: onTap,
@@ -137,7 +136,10 @@ class _PoolCard extends StatelessWidget {
                 size: 76,
                 stroke: 8,
                 segments: [(pool.usedFraction, colors.series1)],
-                child: Text('$percent%', style: theme.textTheme.titleMedium),
+                child: AnimatedPercent(
+                  pool.usedFraction * 100,
+                  style: theme.textTheme.titleMedium,
+                ),
               ),
               const SizedBox(width: 16),
               Expanded(

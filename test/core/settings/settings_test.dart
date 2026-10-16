@@ -12,6 +12,8 @@ void main() {
     expect(settings.confirmLeave, isTrue);
     expect(settings.shellFontSize, 13);
     expect(settings.shellExtraKeys, isTrue);
+    expect(settings.checkForUpdates, isTrue);
+    expect(settings.skippedVersion, isNull);
   });
 
   test('settings round-trip through JSON', () {
@@ -22,6 +24,8 @@ void main() {
       confirmLeave: false,
       shellFontSize: 16,
       shellExtraKeys: false,
+      checkForUpdates: false,
+      skippedVersion: '0.1.4',
     );
     final back = AppSettings.fromJson(settings.toJson());
     expect(back.theme, ThemeChoice.dark);
@@ -30,6 +34,8 @@ void main() {
     expect(back.confirmLeave, isFalse);
     expect(back.shellFontSize, 16);
     expect(back.shellExtraKeys, isFalse);
+    expect(back.checkForUpdates, isFalse);
+    expect(back.skippedVersion, '0.1.4');
   });
 
   test('unknown or missing values fall back to the defaults', () {
@@ -52,6 +58,20 @@ void main() {
     const settings = AppSettings(language: 'hu');
     expect(settings.copyWith(haptics: false).language, 'hu');
     expect(settings.copyWith(language: () => null).language, isNull);
+  });
+
+  test('copyWith can skip a version and stop skipping it', () {
+    const settings = AppSettings();
+    final skipped = settings.copyWith(skippedVersion: () => '0.1.4');
+    expect(skipped.skippedVersion, '0.1.4');
+    expect(skipped.copyWith(haptics: false).skippedVersion, '0.1.4');
+    expect(skipped.copyWith(skippedVersion: () => null).skippedVersion, isNull);
+  });
+
+  test('settings saved before updates existed keep the update defaults', () {
+    final settings = AppSettings.fromJson({'theme': 'dark'});
+    expect(settings.checkForUpdates, isTrue);
+    expect(settings.skippedVersion, isNull);
   });
 
   group('SettingsRepository', () {

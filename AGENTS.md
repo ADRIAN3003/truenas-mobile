@@ -98,6 +98,20 @@ README covers what the app does; this file covers how to work on it.
   to install one over another ("app not updated"). `release.yml` signs with
   the four `ANDROID_*` secrets; `tools/make-android-keystore.sh` makes them.
   Never generate or commit a signing key without the owner's say-so.
+- App updates (`lib/core/updates/`, `lib/features/updates/`) read the public
+  GitHub releases API for `ADRIAN3003/truenas-mobile`; nothing else is sent.
+  The updater relies on how `release.yml` names things: tags `vX.Y.Z` and
+  assets `truenas-mobile-<tag>-<abi>-release.apk` (plus the universal
+  `...-release.apk`). Keep those names or change `ReleaseInfo.apkFor` with
+  them. It always picks the per-ABI APK: Flutter adds 1000 x ABI to the
+  version code of split builds, so a universal APK cannot install over one.
+  Installing goes through `MainActivity` (a method channel, a FileProvider on
+  the `updates/` cache folder and the `REQUEST_INSTALL_PACKAGES`
+  permission); Android's installer verifies the signature, so the fixed
+  signing key above is what makes in-app updates possible. Tests fake GitHub
+  with `FakeGitHub` and the installer and downloader in
+  `test/support/update_fakes.dart`; `updateAutoCheckProvider` is off unless
+  `main` turns it on, so widget tests never look for updates by themselves.
 - App ID `hu.adrian.truenasmobile` on both platforms. MIT licence.
 - Branch names are descriptive kebab-case, e.g. `claude/shell-reverse-proxy`.
 - PRs follow `.github/pull_request_template.md`. The owner merges as soon as

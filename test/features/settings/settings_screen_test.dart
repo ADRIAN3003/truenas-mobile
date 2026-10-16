@@ -8,9 +8,11 @@ import 'package:truenas_mobile/core/instances/instances_provider.dart';
 import 'package:truenas_mobile/core/instances/server_instance.dart';
 import 'package:truenas_mobile/core/settings/app_settings.dart';
 import 'package:truenas_mobile/core/settings/settings_provider.dart';
+import 'package:truenas_mobile/features/updates/updates_provider.dart';
 import 'package:truenas_mobile/shared/haptics.dart';
 
 import '../../support/memory_store.dart';
+import '../../support/update_fakes.dart';
 
 void main() {
   late MemoryStore serverStore;
@@ -48,6 +50,9 @@ void main() {
         settingsRepositoryProvider.overrideWithValue(
           SettingsRepository(settingsStore),
         ),
+        updateCheckerProvider.overrideWithValue(
+          FakeGitHub([releaseJson('v0.1.2', body: 'First notes')]).checker,
+        ),
       ],
     );
     addTearDown(container.dispose);
@@ -79,6 +84,7 @@ void main() {
       'General',
       'Shell',
       'Security',
+      'Updates',
       'About',
     ]) {
       expect(find.text(title), findsOneWidget);
@@ -130,6 +136,33 @@ void main() {
     await tester.pumpAndSettle();
     expect(container.read(settingsProvider).confirmLeave, isFalse);
     expect((await saved()).confirmLeave, isFalse);
+  });
+
+  testWidgets('checking for updates on start can be turned off', (
+    tester,
+  ) async {
+    await open(tester);
+    expect(container.read(settingsProvider).checkForUpdates, isTrue);
+    await tester.tap(find.text('Check on start'));
+    await tester.pumpAndSettle();
+    expect(container.read(settingsProvider).checkForUpdates, isFalse);
+    expect((await saved()).checkForUpdates, isFalse);
+  });
+
+  testWidgets('the update rows open the update and release notes screens', (
+    tester,
+  ) async {
+    await open(tester);
+    await tester.tap(find.text('Check for updates'));
+    await tester.pumpAndSettle();
+    expect(find.text('Software update'), findsOneWidget);
+    expect(find.text("You're up to date"), findsOneWidget);
+    await tester.pageBack();
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Release notes'));
+    await tester.pumpAndSettle();
+    expect(find.text('First notes'), findsOneWidget);
   });
 
   testWidgets('shell font size and extra keys are saved', (tester) async {

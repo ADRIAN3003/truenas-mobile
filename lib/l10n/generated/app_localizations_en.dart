@@ -2011,4 +2011,141 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get shellLeaveConfirm => 'Close shell';
+
+  @override
+  String get settingsUpdates => 'Updates';
+
+  @override
+  String get settingsCheckUpdates => 'Check on start';
+
+  @override
+  String get settingsCheckUpdatesHint =>
+      'Looks for a newer release on GitHub when the app opens. Nothing else is sent.';
+
+  @override
+  String get settingsCheckNow => 'Check for updates';
+
+  @override
+  String get settingsReleaseNotes => 'Release notes';
+
+  @override
+  String get appUpdateTitle => 'Software update';
+
+  @override
+  String get appUpdateChecking => 'Checking for updates…';
+
+  @override
+  String get appUpdateUpToDateTitle => 'You\'re up to date';
+
+  @override
+  String appUpdateUpToDateBody(String version) {
+    return 'TrueNAS Mobile $version is the newest release.';
+  }
+
+  @override
+  String get appUpdateNoReleases => 'No releases have been published yet.';
+
+  @override
+  String appUpdateAvailableTitle(String version) {
+    return 'Version $version is available';
+  }
+
+  @override
+  String appUpdateAvailableBody(String current) {
+    return 'You have version $current.';
+  }
+
+  @override
+  String appUpdateReleased(DateTime date) {
+    final intl.DateFormat dateDateFormat = intl.DateFormat.yMMMd(localeName);
+    final String dateString = dateDateFormat.format(date);
+
+    return 'Released $dateString';
+  }
+
+  @override
+  String get appUpdateDownload => 'Download and install';
+
+  @override
+  String get appUpdateOpenRelease => 'Open release page';
+
+  @override
+  String get appUpdateViewOnGitHub => 'View on GitHub';
+
+  @override
+  String get appUpdateSkip => 'Skip this version';
+
+  @override
+  String get appUpdateSkippedNote =>
+      'You chose to skip this version, so it is not offered when the app opens.';
+
+  @override
+  String get appUpdateUnskip => 'Stop skipping';
+
+  @override
+  String get appUpdateLater => 'Later';
+
+  @override
+  String get appUpdateViewUpdate => 'View update';
+
+  @override
+  String get appUpdatePromptTitle => 'Update available';
+
+  @override
+  String appUpdatePromptBody(String version, String current) {
+    return 'Version $version is available. You have $current.';
+  }
+
+  @override
+  String get appUpdateDownloading => 'Downloading…';
+
+  @override
+  String appUpdateDownloadingPercent(int percent) {
+    return 'Downloading… $percent%';
+  }
+
+  @override
+  String get appUpdateInstalling => 'Opening the installer…';
+
+  @override
+  String get appUpdateWhatsNew => 'What\'s new';
+
+  @override
+  String get appUpdateNoNotes => 'This release has no notes.';
+
+  @override
+  String get appUpdateAllNotes => 'All release notes';
+
+  @override
+  String get appUpdateCheckFailed =>
+      'Couldn\'t check for updates. Check your connection and try again.';
+
+  @override
+  String get appUpdateRateLimited =>
+      'GitHub is limiting requests from this network. Try again later.';
+
+  @override
+  String get appUpdateErrNoApk =>
+      'This release has no APK for your phone. Open the release page to get it.';
+
+  @override
+  String get appUpdateErrDownload =>
+      'The download failed. Check your connection and try again.';
+
+  @override
+  String get appUpdateErrDamaged =>
+      'The downloaded file is damaged. Try again.';
+
+  @override
+  String get appUpdateErrInstall => 'Couldn\'t open the installer.';
+
+  @override
+  String get appUpdatePermissionTitle => 'Allow installing updates';
+
+  @override
+  String get appUpdatePermissionBody =>
+      'Android asks for your permission before an app can install updates. Open the settings, allow it for TrueNAS Mobile, then come back and tap Download and install again.';
+
+  @override
+  String get appUpdateOpenSettings => 'Open settings';
 }

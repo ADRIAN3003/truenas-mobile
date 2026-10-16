@@ -2008,4 +2008,141 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get shellLeaveConfirm => 'Shell bezárása';
+
+  @override
+  String get settingsUpdates => 'Frissítések';
+
+  @override
+  String get settingsCheckUpdates => 'Keresés induláskor';
+
+  @override
+  String get settingsCheckUpdatesHint =>
+      'Induláskor megnézi a GitHubon, van-e újabb kiadás. Mást nem küld el.';
+
+  @override
+  String get settingsCheckNow => 'Frissítések keresése';
+
+  @override
+  String get settingsReleaseNotes => 'Kiadási megjegyzések';
+
+  @override
+  String get appUpdateTitle => 'Szoftverfrissítés';
+
+  @override
+  String get appUpdateChecking => 'Frissítések keresése…';
+
+  @override
+  String get appUpdateUpToDateTitle => 'A legfrissebb verziót használod';
+
+  @override
+  String appUpdateUpToDateBody(String version) {
+    return 'A TrueNAS Mobile $version a legújabb kiadás.';
+  }
+
+  @override
+  String get appUpdateNoReleases => 'Még nem jelent meg kiadás.';
+
+  @override
+  String appUpdateAvailableTitle(String version) {
+    return 'Elérhető a $version verzió';
+  }
+
+  @override
+  String appUpdateAvailableBody(String current) {
+    return 'Jelenleg a $current verzió van telepítve.';
+  }
+
+  @override
+  String appUpdateReleased(DateTime date) {
+    final intl.DateFormat dateDateFormat = intl.DateFormat.yMMMd(localeName);
+    final String dateString = dateDateFormat.format(date);
+
+    return 'Megjelent: $dateString';
+  }
+
+  @override
+  String get appUpdateDownload => 'Letöltés és telepítés';
+
+  @override
+  String get appUpdateOpenRelease => 'Kiadás oldalának megnyitása';
+
+  @override
+  String get appUpdateViewOnGitHub => 'Megnyitás a GitHubon';
+
+  @override
+  String get appUpdateSkip => 'Verzió kihagyása';
+
+  @override
+  String get appUpdateSkippedNote =>
+      'Kihagytad ezt a verziót, ezért induláskor nem ajánljuk fel.';
+
+  @override
+  String get appUpdateUnskip => 'Mégsem hagyom ki';
+
+  @override
+  String get appUpdateLater => 'Később';
+
+  @override
+  String get appUpdateViewUpdate => 'Részletek';
+
+  @override
+  String get appUpdatePromptTitle => 'Frissítés érhető el';
+
+  @override
+  String appUpdatePromptBody(String version, String current) {
+    return 'Elérhető a $version verzió. Jelenleg a $current van telepítve.';
+  }
+
+  @override
+  String get appUpdateDownloading => 'Letöltés…';
+
+  @override
+  String appUpdateDownloadingPercent(int percent) {
+    return 'Letöltés… $percent%';
+  }
+
+  @override
+  String get appUpdateInstalling => 'A telepítő megnyitása…';
+
+  @override
+  String get appUpdateWhatsNew => 'Újdonságok';
+
+  @override
+  String get appUpdateNoNotes => 'Ehhez a kiadáshoz nincs leírás.';
+
+  @override
+  String get appUpdateAllNotes => 'Minden kiadási megjegyzés';
+
+  @override
+  String get appUpdateCheckFailed =>
+      'Nem sikerült frissítést keresni. Ellenőrizd a kapcsolatot, és próbáld újra.';
+
+  @override
+  String get appUpdateRateLimited =>
+      'A GitHub korlátozza a kéréseket erről a hálózatról. Próbáld később.';
+
+  @override
+  String get appUpdateErrNoApk =>
+      'Ehhez a kiadáshoz nincs a telefonodnak megfelelő APK. Nyisd meg a kiadás oldalát, és onnan töltsd le.';
+
+  @override
+  String get appUpdateErrDownload =>
+      'A letöltés nem sikerült. Ellenőrizd a kapcsolatot, és próbáld újra.';
+
+  @override
+  String get appUpdateErrDamaged => 'A letöltött fájl sérült. Próbáld újra.';
+
+  @override
+  String get appUpdateErrInstall => 'Nem sikerült megnyitni a telepítőt.';
+
+  @override
+  String get appUpdatePermissionTitle =>
+      'Frissítések telepítésének engedélyezése';
+
+  @override
+  String get appUpdatePermissionBody =>
+      'Az Android engedélyt kér, mielőtt egy app frissítést telepíthet. Nyisd meg a beállításokat, engedélyezd a TrueNAS Mobile számára, majd térj vissza, és koppints újra a Letöltés és telepítés gombra.';
+
+  @override
+  String get appUpdateOpenSettings => 'Beállítások megnyitása';
 }

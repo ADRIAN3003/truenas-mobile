@@ -14,6 +14,8 @@ class AppSettings {
     this.confirmLeave = true,
     this.shellFontSize = defaultShellFontSize,
     this.shellExtraKeys = true,
+    this.checkForUpdates = true,
+    this.skippedVersion,
   });
 
   factory AppSettings.fromJson(Map<String, dynamic> json) => AppSettings(
@@ -27,6 +29,8 @@ class AppSettings {
         ((json['shellFontSize'] as num?)?.toDouble() ?? defaultShellFontSize)
             .clamp(minShellFontSize, maxShellFontSize),
     shellExtraKeys: json['shellExtraKeys'] as bool? ?? true,
+    checkForUpdates: json['checkForUpdates'] as bool? ?? true,
+    skippedVersion: json['skippedVersion'] as String?,
   );
 
   /// Language codes the app is translated into.
@@ -53,6 +57,13 @@ class AppSettings {
   /// stay either way.
   final bool shellExtraKeys;
 
+  /// Look for a newer release on GitHub when the app opens.
+  final bool checkForUpdates;
+
+  /// The release (e.g. `0.1.4`) the user chose to skip: it is not offered
+  /// again when the app opens, but a newer one is.
+  final String? skippedVersion;
+
   AppSettings copyWith({
     ThemeChoice? theme,
     String? Function()? language,
@@ -60,6 +71,8 @@ class AppSettings {
     bool? confirmLeave,
     double? shellFontSize,
     bool? shellExtraKeys,
+    bool? checkForUpdates,
+    String? Function()? skippedVersion,
   }) => AppSettings(
     theme: theme ?? this.theme,
     language: language != null ? language() : this.language,
@@ -67,6 +80,10 @@ class AppSettings {
     confirmLeave: confirmLeave ?? this.confirmLeave,
     shellFontSize: shellFontSize ?? this.shellFontSize,
     shellExtraKeys: shellExtraKeys ?? this.shellExtraKeys,
+    checkForUpdates: checkForUpdates ?? this.checkForUpdates,
+    skippedVersion: skippedVersion != null
+        ? skippedVersion()
+        : this.skippedVersion,
   );
 
   Map<String, dynamic> toJson() => {
@@ -76,6 +93,8 @@ class AppSettings {
     'confirmLeave': confirmLeave,
     'shellFontSize': shellFontSize,
     'shellExtraKeys': shellExtraKeys,
+    'checkForUpdates': checkForUpdates,
+    'skippedVersion': skippedVersion,
   };
 }
 

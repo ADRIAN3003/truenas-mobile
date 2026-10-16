@@ -62,6 +62,7 @@ jobs:
           cp build/app/outputs/flutter-apk/app-*-release.apk dist/
           flutter build appbundle $ARGS
           cp build/app/outputs/bundle/release/app-release.aab dist/
+          # The app's updater finds its APK by these names (ReleaseInfo.apkFor).
           for f in dist/*; do mv "$f" "dist/truenas-mobile-$TAG-${f#dist/app-}"; done
           ls -l dist
       - uses: actions/upload-artifact@v7

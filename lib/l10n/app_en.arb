@@ -2768,5 +2768,191 @@
   "shellLeaveConfirm": "Close shell",
   "@shellLeaveConfirm": {
     "description": "Button that closes the shell."
+  },
+  "settingsUpdates": "Updates",
+  "@settingsUpdates": {
+    "description": "Section of the settings with the update options."
+  },
+  "settingsCheckUpdates": "Check on start",
+  "@settingsCheckUpdates": {
+    "description": "Switch that makes the app look for a newer release when it opens."
+  },
+  "settingsCheckUpdatesHint": "Looks for a newer release on GitHub when the app opens. Nothing else is sent.",
+  "@settingsCheckUpdatesHint": {
+    "description": "Explains what the check on start does."
+  },
+  "settingsCheckNow": "Check for updates",
+  "@settingsCheckNow": {
+    "description": "Row that opens the update screen and looks for a newer release."
+  },
+  "settingsReleaseNotes": "Release notes",
+  "@settingsReleaseNotes": {
+    "description": "Row that opens the list of release notes."
+  },
+  "appUpdateTitle": "Software update",
+  "@appUpdateTitle": {
+    "description": "Title of the update screen."
+  },
+  "appUpdateChecking": "Checking for updates…",
+  "@appUpdateChecking": {
+    "description": "Shown while looking for a newer release."
+  },
+  "appUpdateUpToDateTitle": "You're up to date",
+  "@appUpdateUpToDateTitle": {
+    "description": "Shown when the installed app is the newest release."
+  },
+  "appUpdateUpToDateBody": "TrueNAS Mobile {version} is the newest release.",
+  "@appUpdateUpToDateBody": {
+    "description": "Tells which version is installed and newest.",
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "appUpdateNoReleases": "No releases have been published yet.",
+  "@appUpdateNoReleases": {
+    "description": "Shown when GitHub lists no releases."
+  },
+  "appUpdateAvailableTitle": "Version {version} is available",
+  "@appUpdateAvailableTitle": {
+    "description": "Headline on the update screen when a newer release exists.",
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "appUpdateAvailableBody": "You have version {current}.",
+  "@appUpdateAvailableBody": {
+    "description": "Says which version is installed.",
+    "placeholders": {
+      "current": {
+        "type": "String"
+      }
+    }
+  },
+  "appUpdateReleased": "Released {date}",
+  "@appUpdateReleased": {
+    "description": "When a release was published.",
+    "placeholders": {
+      "date": {
+        "type": "DateTime",
+        "format": "yMMMd"
+      }
+    }
+  },
+  "appUpdateDownload": "Download and install",
+  "@appUpdateDownload": {
+    "description": "Android button that downloads the new APK and opens the installer."
+  },
+  "appUpdateOpenRelease": "Open release page",
+  "@appUpdateOpenRelease": {
+    "description": "Button that opens the release on GitHub, where the new version can be downloaded."
+  },
+  "appUpdateViewOnGitHub": "View on GitHub",
+  "@appUpdateViewOnGitHub": {
+    "description": "Link to the release on GitHub."
+  },
+  "appUpdateSkip": "Skip this version",
+  "@appUpdateSkip": {
+    "description": "Button that stops the app from offering this release."
+  },
+  "appUpdateSkippedNote": "You chose to skip this version, so it is not offered when the app opens.",
+  "@appUpdateSkippedNote": {
+    "description": "Shown on a release the user chose to skip."
+  },
+  "appUpdateUnskip": "Stop skipping",
+  "@appUpdateUnskip": {
+    "description": "Button that makes a skipped release be offered again."
+  },
+  "appUpdateLater": "Later",
+  "@appUpdateLater": {
+    "description": "Button that closes the update prompt without doing anything."
+  },
+  "appUpdateViewUpdate": "View update",
+  "@appUpdateViewUpdate": {
+    "description": "Button in the update prompt that opens the update screen."
+  },
+  "appUpdatePromptTitle": "Update available",
+  "@appUpdatePromptTitle": {
+    "description": "Title of the prompt shown when the app opens and a newer release exists."
+  },
+  "appUpdatePromptBody": "Version {version} is available. You have {current}.",
+  "@appUpdatePromptBody": {
+    "description": "Body of the update prompt.",
+    "placeholders": {
+      "version": {
+        "type": "String"
+      },
+      "current": {
+        "type": "String"
+      }
+    }
+  },
+  "appUpdateDownloading": "Downloading…",
+  "@appUpdateDownloading": {
+    "description": "Shown while the APK downloads and its size is not known."
+  },
+  "appUpdateDownloadingPercent": "Downloading… {percent}%",
+  "@appUpdateDownloadingPercent": {
+    "description": "Shown while the APK downloads.",
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "appUpdateInstalling": "Opening the installer…",
+  "@appUpdateInstalling": {
+    "description": "Shown right after the download, while Android's installer opens."
+  },
+  "appUpdateWhatsNew": "What's new",
+  "@appUpdateWhatsNew": {
+    "description": "Heading above the release notes of the new version."
+  },
+  "appUpdateNoNotes": "This release has no notes.",
+  "@appUpdateNoNotes": {
+    "description": "Shown for a release without notes."
+  },
+  "appUpdateAllNotes": "All release notes",
+  "@appUpdateAllNotes": {
+    "description": "Row that opens the list of every release's notes."
+  },
+  "appUpdateCheckFailed": "Couldn't check for updates. Check your connection and try again.",
+  "@appUpdateCheckFailed": {
+    "description": "Error when GitHub could not be reached."
+  },
+  "appUpdateRateLimited": "GitHub is limiting requests from this network. Try again later.",
+  "@appUpdateRateLimited": {
+    "description": "Error when GitHub's request limit was hit."
+  },
+  "appUpdateErrNoApk": "This release has no APK for your phone. Open the release page to get it.",
+  "@appUpdateErrNoApk": {
+    "description": "Error when the release has no APK for the phone's CPU."
+  },
+  "appUpdateErrDownload": "The download failed. Check your connection and try again.",
+  "@appUpdateErrDownload": {
+    "description": "Error when the APK download failed."
+  },
+  "appUpdateErrDamaged": "The downloaded file is damaged. Try again.",
+  "@appUpdateErrDamaged": {
+    "description": "Error when the downloaded APK does not match its checksum."
+  },
+  "appUpdateErrInstall": "Couldn't open the installer.",
+  "@appUpdateErrInstall": {
+    "description": "Error when Android's installer could not be opened."
+  },
+  "appUpdatePermissionTitle": "Allow installing updates",
+  "@appUpdatePermissionTitle": {
+    "description": "Title of the dialog that asks the user to allow installs from this app."
+  },
+  "appUpdatePermissionBody": "Android asks for your permission before an app can install updates. Open the settings, allow it for TrueNAS Mobile, then come back and tap Download and install again.",
+  "@appUpdatePermissionBody": {
+    "description": "Explains why Android's settings are opened."
+  },
+  "appUpdateOpenSettings": "Open settings",
+  "@appUpdateOpenSettings": {
+    "description": "Button that opens Android's page for allowing installs from this app."
   }
 }

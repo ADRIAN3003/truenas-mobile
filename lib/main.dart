@@ -5,6 +5,7 @@ import 'app.dart';
 import 'core/instances/instance_repository.dart';
 import 'core/settings/app_settings.dart';
 import 'core/settings/settings_provider.dart';
+import 'features/updates/updates_provider.dart';
 import 'shared/glass.dart';
 
 Future<void> main() async {
@@ -16,7 +17,10 @@ Future<void> main() async {
       .load();
   runApp(
     ProviderScope(
-      overrides: [initialSettingsProvider.overrideWithValue(settings)],
+      overrides: [
+        initialSettingsProvider.overrideWithValue(settings),
+        updateAutoCheckProvider.overrideWithValue(true),
+      ],
       child: wrapForGlass(const TrueNasMobileApp()),
     ),
   );

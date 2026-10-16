@@ -33,6 +33,12 @@ for Android and iOS that talks to the official TrueNAS middleware API
   and a generated form to call it, so anything without its own screen is
   still reachable.
 - **Tablets:** a navigation rail and a two-column dashboard on wide screens.
+- **App updates:** looks for a newer release on GitHub when the app opens
+  (switch it off in Settings), shows the release notes, and lets you skip a
+  version. On Android it downloads the APK and opens the installer; on iOS it
+  opens the release page.
+- **Settings:** theme, language, haptics, shell font size and keys, trusted
+  certificates.
 - **Languages:** English and Hungarian, following the device language.
 
 ## Supported TrueNAS versions
@@ -53,9 +59,11 @@ features appear or hide based on what your server offers. The legacy REST API
 Download the latest APK or IPA from the
 [Releases](https://github.com/ADRIAN3003/truenas-mobile/releases) page.
 
-- **Android:** install `app-release.apk` (or the APK for your CPU, for example
-  `app-arm64-v8a-release.apk`). You may need to allow installs from unknown
-  sources.
+- **Android:** install the APK for your CPU, which is `arm64-v8a` on nearly
+  every phone made in the last decade (for example
+  `truenas-mobile-v0.1.3-arm64-v8a-release.apk`). You may need to allow
+  installs from unknown sources. After that the app can update itself: it
+  downloads the new APK from the Releases page and opens the installer.
 - **iOS:** the IPA is unsigned. Sideload it with a tool such as
   [AltStore](https://altstore.io/) or [Sideloadly](https://sideloadly.io/),
   which sign it with your Apple ID.

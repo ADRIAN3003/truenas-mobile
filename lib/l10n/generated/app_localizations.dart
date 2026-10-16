@@ -3451,6 +3451,234 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Close shell'**
   String get shellLeaveConfirm;
+
+  /// Section of the settings with the update options.
+  ///
+  /// In en, this message translates to:
+  /// **'Updates'**
+  String get settingsUpdates;
+
+  /// Switch that makes the app look for a newer release when it opens.
+  ///
+  /// In en, this message translates to:
+  /// **'Check on start'**
+  String get settingsCheckUpdates;
+
+  /// Explains what the check on start does.
+  ///
+  /// In en, this message translates to:
+  /// **'Looks for a newer release on GitHub when the app opens. Nothing else is sent.'**
+  String get settingsCheckUpdatesHint;
+
+  /// Row that opens the update screen and looks for a newer release.
+  ///
+  /// In en, this message translates to:
+  /// **'Check for updates'**
+  String get settingsCheckNow;
+
+  /// Row that opens the list of release notes.
+  ///
+  /// In en, this message translates to:
+  /// **'Release notes'**
+  String get settingsReleaseNotes;
+
+  /// Title of the update screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Software update'**
+  String get appUpdateTitle;
+
+  /// Shown while looking for a newer release.
+  ///
+  /// In en, this message translates to:
+  /// **'Checking for updates…'**
+  String get appUpdateChecking;
+
+  /// Shown when the installed app is the newest release.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'re up to date'**
+  String get appUpdateUpToDateTitle;
+
+  /// Tells which version is installed and newest.
+  ///
+  /// In en, this message translates to:
+  /// **'TrueNAS Mobile {version} is the newest release.'**
+  String appUpdateUpToDateBody(String version);
+
+  /// Shown when GitHub lists no releases.
+  ///
+  /// In en, this message translates to:
+  /// **'No releases have been published yet.'**
+  String get appUpdateNoReleases;
+
+  /// Headline on the update screen when a newer release exists.
+  ///
+  /// In en, this message translates to:
+  /// **'Version {version} is available'**
+  String appUpdateAvailableTitle(String version);
+
+  /// Says which version is installed.
+  ///
+  /// In en, this message translates to:
+  /// **'You have version {current}.'**
+  String appUpdateAvailableBody(String current);
+
+  /// When a release was published.
+  ///
+  /// In en, this message translates to:
+  /// **'Released {date}'**
+  String appUpdateReleased(DateTime date);
+
+  /// Android button that downloads the new APK and opens the installer.
+  ///
+  /// In en, this message translates to:
+  /// **'Download and install'**
+  String get appUpdateDownload;
+
+  /// Button that opens the release on GitHub, where the new version can be downloaded.
+  ///
+  /// In en, this message translates to:
+  /// **'Open release page'**
+  String get appUpdateOpenRelease;
+
+  /// Link to the release on GitHub.
+  ///
+  /// In en, this message translates to:
+  /// **'View on GitHub'**
+  String get appUpdateViewOnGitHub;
+
+  /// Button that stops the app from offering this release.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip this version'**
+  String get appUpdateSkip;
+
+  /// Shown on a release the user chose to skip.
+  ///
+  /// In en, this message translates to:
+  /// **'You chose to skip this version, so it is not offered when the app opens.'**
+  String get appUpdateSkippedNote;
+
+  /// Button that makes a skipped release be offered again.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop skipping'**
+  String get appUpdateUnskip;
+
+  /// Button that closes the update prompt without doing anything.
+  ///
+  /// In en, this message translates to:
+  /// **'Later'**
+  String get appUpdateLater;
+
+  /// Button in the update prompt that opens the update screen.
+  ///
+  /// In en, this message translates to:
+  /// **'View update'**
+  String get appUpdateViewUpdate;
+
+  /// Title of the prompt shown when the app opens and a newer release exists.
+  ///
+  /// In en, this message translates to:
+  /// **'Update available'**
+  String get appUpdatePromptTitle;
+
+  /// Body of the update prompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Version {version} is available. You have {current}.'**
+  String appUpdatePromptBody(String version, String current);
+
+  /// Shown while the APK downloads and its size is not known.
+  ///
+  /// In en, this message translates to:
+  /// **'Downloading…'**
+  String get appUpdateDownloading;
+
+  /// Shown while the APK downloads.
+  ///
+  /// In en, this message translates to:
+  /// **'Downloading… {percent}%'**
+  String appUpdateDownloadingPercent(int percent);
+
+  /// Shown right after the download, while Android's installer opens.
+  ///
+  /// In en, this message translates to:
+  /// **'Opening the installer…'**
+  String get appUpdateInstalling;
+
+  /// Heading above the release notes of the new version.
+  ///
+  /// In en, this message translates to:
+  /// **'What\'s new'**
+  String get appUpdateWhatsNew;
+
+  /// Shown for a release without notes.
+  ///
+  /// In en, this message translates to:
+  /// **'This release has no notes.'**
+  String get appUpdateNoNotes;
+
+  /// Row that opens the list of every release's notes.
+  ///
+  /// In en, this message translates to:
+  /// **'All release notes'**
+  String get appUpdateAllNotes;
+
+  /// Error when GitHub could not be reached.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t check for updates. Check your connection and try again.'**
+  String get appUpdateCheckFailed;
+
+  /// Error when GitHub's request limit was hit.
+  ///
+  /// In en, this message translates to:
+  /// **'GitHub is limiting requests from this network. Try again later.'**
+  String get appUpdateRateLimited;
+
+  /// Error when the release has no APK for the phone's CPU.
+  ///
+  /// In en, this message translates to:
+  /// **'This release has no APK for your phone. Open the release page to get it.'**
+  String get appUpdateErrNoApk;
+
+  /// Error when the APK download failed.
+  ///
+  /// In en, this message translates to:
+  /// **'The download failed. Check your connection and try again.'**
+  String get appUpdateErrDownload;
+
+  /// Error when the downloaded APK does not match its checksum.
+  ///
+  /// In en, this message translates to:
+  /// **'The downloaded file is damaged. Try again.'**
+  String get appUpdateErrDamaged;
+
+  /// Error when Android's installer could not be opened.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t open the installer.'**
+  String get appUpdateErrInstall;
+
+  /// Title of the dialog that asks the user to allow installs from this app.
+  ///
+  /// In en, this message translates to:
+  /// **'Allow installing updates'**
+  String get appUpdatePermissionTitle;
+
+  /// Explains why Android's settings are opened.
+  ///
+  /// In en, this message translates to:
+  /// **'Android asks for your permission before an app can install updates. Open the settings, allow it for TrueNAS Mobile, then come back and tap Download and install again.'**
+  String get appUpdatePermissionBody;
+
+  /// Button that opens Android's page for allowing installs from this app.
+  ///
+  /// In en, this message translates to:
+  /// **'Open settings'**
+  String get appUpdateOpenSettings;
 }
 
 class _AppLocalizationsDelegate

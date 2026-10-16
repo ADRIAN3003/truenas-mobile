@@ -12,6 +12,7 @@ import '../../shared/haptics.dart';
 import '../../shared/theme.dart';
 import '../../shared/ui.dart';
 import '../../shared/widgets.dart';
+import '../updates/update_screen.dart';
 
 /// Where the project lives, for the About section.
 final _sourceUri = Uri.parse('https://github.com/ADRIAN3003/truenas-mobile');
@@ -127,6 +128,44 @@ class SettingsScreen extends ConsumerWidget {
                   context,
                   MaterialPageRoute<void>(
                     builder: (_) => const TrustedCertificatesScreen(),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          SectionHeader(l10n.settingsUpdates),
+          GroupedCard(
+            indent: 16,
+            children: [
+              AppSwitchTile(
+                title: Text(l10n.settingsCheckUpdates),
+                subtitle: Text(l10n.settingsCheckUpdatesHint),
+                value: settings.checkForUpdates,
+                onChanged: (on) =>
+                    notifier.update((s) => s.copyWith(checkForUpdates: on)),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          GroupedCard(
+            children: [
+              NavRow(
+                icon: Icons.system_update_rounded,
+                color: AppPalette.tileBlue,
+                title: l10n.settingsCheckNow,
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute<void>(builder: (_) => const UpdateScreen()),
+                ),
+              ),
+              NavRow(
+                icon: Icons.history_rounded,
+                color: AppPalette.tileSlate,
+                title: l10n.settingsReleaseNotes,
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute<void>(
+                    builder: (_) => const ReleaseNotesScreen(),
                   ),
                 ),
               ),

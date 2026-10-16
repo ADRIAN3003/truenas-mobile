@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'core/settings/app_settings.dart';
 import 'core/settings/settings_provider.dart';
 import 'features/instances/instances_screen.dart';
+import 'features/updates/update_prompt.dart';
 import 'l10n/generated/app_localizations.dart';
 import 'shared/theme.dart';
 
@@ -26,7 +27,7 @@ class TrueNasMobileApp extends ConsumerWidget {
         ThemeChoice.light => ThemeMode.light,
         ThemeChoice.dark => ThemeMode.dark,
       },
-      home: const InstancesScreen(),
+      home: const UpdateAutoCheck(child: InstancesScreen()),
     );
   }
 }

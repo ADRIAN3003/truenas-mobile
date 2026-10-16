@@ -13,6 +13,7 @@ import '../../shared/widgets.dart';
 import '../sharing/shares_tab.dart';
 import '../storage/storage_tab.dart';
 import '../workloads/apps_tab.dart';
+import '../settings/settings_screen.dart';
 import 'dashboard_tab.dart';
 import 'more_tab.dart';
 
@@ -124,6 +125,19 @@ class _ServerScreenState extends ConsumerState<ServerScreen>
     child: _screen(context),
   );
 
+  /// The app's settings, one tap away from any screen of the server.
+  List<Widget> _actions() => [
+    IconButton(
+      tooltip: AppLocalizations.of(context).settingsTitle,
+      onPressed: () => Navigator.push(
+        context,
+        MaterialPageRoute<void>(builder: (_) => const SettingsScreen()),
+      ),
+      icon: const Icon(Icons.settings_outlined),
+    ),
+    const SizedBox(width: 4),
+  ];
+
   Widget _screen(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final instance = _instance;
@@ -168,7 +182,10 @@ class _ServerScreenState extends ConsumerState<ServerScreen>
       // Tablets and landscape phones get a side rail instead of a bottom bar.
       if (width >= railBreakpoint) {
         return Scaffold(
-          appBar: AppBar(title: Text(instance?.name ?? '')),
+          appBar: AppBar(
+            title: Text(instance?.name ?? ''),
+            actions: _actions(),
+          ),
           body: SafeArea(
             top: false,
             child: Row(
@@ -207,6 +224,7 @@ class _ServerScreenState extends ConsumerState<ServerScreen>
           extendBodyBehindAppBar: true,
           appBar: AppBar(
             title: Text(instance?.name ?? ''),
+            actions: _actions(),
             backgroundColor: Colors.transparent,
           ),
           body: Stack(
@@ -223,7 +241,7 @@ class _ServerScreenState extends ConsumerState<ServerScreen>
         );
       }
       return Scaffold(
-        appBar: AppBar(title: Text(instance?.name ?? '')),
+        appBar: AppBar(title: Text(instance?.name ?? ''), actions: _actions()),
         body: body,
         bottomNavigationBar: DecoratedBox(
           decoration: BoxDecoration(
@@ -249,7 +267,7 @@ class _ServerScreenState extends ConsumerState<ServerScreen>
       );
     }
     return Scaffold(
-      appBar: AppBar(title: Text(instance?.name ?? '')),
+      appBar: AppBar(title: Text(instance?.name ?? ''), actions: _actions()),
       body: _error != null
           ? _ErrorState(
               message: describeConnectError(l10n, _error!),

@@ -16,6 +16,7 @@ class AppSettings {
     this.shellExtraKeys = true,
     this.checkForUpdates = true,
     this.skippedVersion,
+    this.defaultServerId,
   });
 
   factory AppSettings.fromJson(Map<String, dynamic> json) => AppSettings(
@@ -31,6 +32,7 @@ class AppSettings {
     shellExtraKeys: json['shellExtraKeys'] as bool? ?? true,
     checkForUpdates: json['checkForUpdates'] as bool? ?? true,
     skippedVersion: json['skippedVersion'] as String?,
+    defaultServerId: json['defaultServerId'] as String?,
   );
 
   /// Language codes the app is translated into.
@@ -64,6 +66,11 @@ class AppSettings {
   /// again when the app opens, but a newer one is.
   final String? skippedVersion;
 
+  /// The id of the server the app opens by itself at start, `''` for none,
+  /// or null when the user has not chosen (then a single saved server is the
+  /// default). See `defaultServer` in `default_server.dart`.
+  final String? defaultServerId;
+
   AppSettings copyWith({
     ThemeChoice? theme,
     String? Function()? language,
@@ -73,6 +80,7 @@ class AppSettings {
     bool? shellExtraKeys,
     bool? checkForUpdates,
     String? Function()? skippedVersion,
+    String? Function()? defaultServerId,
   }) => AppSettings(
     theme: theme ?? this.theme,
     language: language != null ? language() : this.language,
@@ -84,6 +92,9 @@ class AppSettings {
     skippedVersion: skippedVersion != null
         ? skippedVersion()
         : this.skippedVersion,
+    defaultServerId: defaultServerId != null
+        ? defaultServerId()
+        : this.defaultServerId,
   );
 
   Map<String, dynamic> toJson() => {
@@ -95,6 +106,7 @@ class AppSettings {
     'shellExtraKeys': shellExtraKeys,
     'checkForUpdates': checkForUpdates,
     'skippedVersion': skippedVersion,
+    'defaultServerId': defaultServerId,
   };
 }
 

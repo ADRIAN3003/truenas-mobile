@@ -79,26 +79,34 @@ README covers what the app does; this file covers how to work on it.
 - Dialogs, choices and "more" menus go through `lib/shared/dialogs.dart`
   (`AppDialog` with `showAppDialog`, `showAppChoice`, `AppPopupMenu`), never
   `AlertDialog`, `showDialog`, `showModalBottomSheet` or `PopupMenuButton`
-  directly. On iOS `AppDialog` is the package's `GlassDialog` (via
-  `GlassAlert`, which adds scrolling and lifts it above the keyboard), a choice
-  is its `showGlassActionSheet`, a menu its `GlassMenu`. `GlassDialog` takes
-  one to three buttons with a plain string label: no icon, no disabled state (a
-  button without a handler does nothing), and the title must be a `Text`. So
-  `dialogAction` (same file), never a bare `TextButton`/`FilledButton`; a list
-  of choices is `showAppChoice`, not a dialog without buttons. Keep the glass
-  plain: no `glassColor`, tint or custom colours on it (they looked wrong on a
-  device). The one colour on the tab bar is the selected tab's icon and label
-  in the accent colour; the package draws a selected tab a second time, 15%
-  larger and heavier, which clipped the "D" of Dashboard, so `glass.dart` sets
-  `magnification: 1` and equal label weights, and the tab labels stay short.
+  directly. `dialogAction` (same file) makes the buttons, never a bare
+  `TextButton`/`FilledButton`. On iOS an `AppDialog` is a `GlassAlert` and a
+  choice a glass sheet (both in `glass.dart`), a menu the package's
+  `GlassMenu`. The alert and the sheet are built on the package's `GlassCard`
+  rather than its `GlassDialog` and `showGlassActionSheet`, because those
+  cannot be restyled and looked wrong on a phone: the alert's buttons are
+  see-through with a coloured glow and a small fixed radius, the sheet is 65%
+  see-through and its text has no `Material` to sit on (yellow underlines). So
+  ours have a mostly opaque fill over the glass (`_GlassPanel`), a 34 radius,
+  and solid capsule buttons (the main one in the accent colour, the rest
+  grey, a destructive label red), 1 to 3 per alert. A route has no `Material`,
+  so anything that draws text on its own (a sheet) wraps itself in one.
+  Keep the glass itself plain (no tint or rim of our own). The two places
+  that do set glass colour on purpose: the panel's fill, and the tab bar,
+  which is tinted with the page colour because the package's own 24% white
+  wash made it a light slab on a dark theme. The one other colour on the tab
+  bar is the selected tab's icon and label in the accent colour; the package
+  draws a selected tab a second time, 15% larger and heavier, which clipped
+  the "D" of Dashboard, so `glass.dart` sets `magnification: 1` and equal
+  label weights, and the tab labels stay short ("Home").
 - Switches, sliders and segmented controls are `AppSwitch`/`AppSwitchTile`,
   `AppSlider` and `AppSegments` (in `ui.dart`): `GlassSwitch`, `GlassSlider`
-  and `GlassSegmentedControl` on iOS. Pass `inGlass: true` to `AppSegments` in
-  a dialog (glass inside glass distorts). Not ported yet: the scaffolds and
-  app bars (still `Scaffold`/`AppBar` with our own `GlassTopEdge` and
-  `ChromeInsets`, instead of `GlassScaffold`/`GlassAppBar`), buttons, text
-  fields and snackbars (a `GlassToast` needs a live context and would sit over
-  the tab bar).
+  and `GlassSegmentedControl` on iOS (the segments are 58 high so an icon and
+  its label fit). Pass `inGlass: true` to `AppSegments` in a dialog (glass
+  inside glass distorts). Not ported yet: the scaffolds and app bars (still
+  `Scaffold`/`AppBar` with our own `GlassTopEdge` and `ChromeInsets`, instead
+  of `GlassScaffold`/`GlassAppBar`), buttons, text fields and snackbars (a
+  `GlassToast` needs a live context and would sit over the tab bar).
 - Haptics go through `lib/shared/haptics.dart` (switched off by
   `Haptics.enabled`, which the settings notifier keeps in step). Use
   `AppRefreshIndicator`, `AppSwitch` and `AppSwitchTile` (in `ui.dart`)
@@ -111,6 +119,11 @@ README covers what the app does; this file covers how to work on it.
   tolerates old or damaged data), a row in
   `lib/features/settings/settings_screen.dart` and both ARB files. The shell
   screen reads them, so widget tests that pump it need a `ProviderScope`.
+- The app opens a default server by itself at start (`OpenDefaultServer`,
+  on only when `main` turns `openDefaultServerProvider` on): the one chosen in
+  settings (`defaultServerId`), a single saved server when nothing was chosen,
+  none when `''` was. See `defaultServer` in `lib/core/instances/`. Settings
+  are also one tap away inside a server (gear in its app bar).
 - Language is chosen on the phone's own page for the app where there is one:
   iOS Settings, and "App languages" on Android 13+ (`locales_config.xml`,
   `android:localeConfig`, `Info.plist` `CFBundleLocalizations`). There the

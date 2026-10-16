@@ -6,8 +6,8 @@ import 'glass.dart';
 /// ones on iOS (like the system's own on iOS 26), Material elsewhere. Callers
 /// build the same content for both.
 
-/// An alert or form dialog: [AlertDialog] on Android, a [GlassAlert] (the
-/// package's glass dialog) on iOS.
+/// An alert or form dialog: [AlertDialog] on Android, a [GlassAlert] (glass
+/// with solid capsule buttons) on iOS.
 ///
 /// [message] is the short text under the title. On iOS the title is plain
 /// text, [actions] come from [dialogAction] (one to three of them), and
@@ -53,6 +53,7 @@ class AppDialog extends StatelessWidget {
           for (final button in buttons)
             (
               label: button.label,
+              icon: button.icon,
               onPressed: button.onPressed,
               primary: button.primary,
               destructive: button.destructive,
@@ -80,9 +81,8 @@ class AppDialog extends StatelessWidget {
 }
 
 /// A dialog button: plain text on Android ([primary] filled, [destructive]
-/// red). On iOS [AppDialog] reads its label and flags and draws the glass
-/// dialog's own button, which has no icon and cannot be disabled, so a
-/// button without a handler does nothing there.
+/// red). On iOS [AppDialog] reads its label, icon and flags and draws a solid
+/// capsule instead; a button without a handler is dimmed and does nothing.
 class DialogActionButton extends StatelessWidget {
   const DialogActionButton({
     super.key,

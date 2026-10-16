@@ -6,6 +6,7 @@ import 'core/instances/instance_repository.dart';
 import 'core/settings/app_settings.dart';
 import 'core/settings/settings_provider.dart';
 import 'core/settings/system_language.dart';
+import 'features/instances/open_default_server.dart';
 import 'features/updates/updates_provider.dart';
 import 'shared/glass.dart';
 
@@ -23,6 +24,7 @@ Future<void> main() async {
         initialSettingsProvider.overrideWithValue(settings),
         systemLanguagePageProvider.overrideWithValue(systemLanguagePage),
         updateAutoCheckProvider.overrideWithValue(true),
+        openDefaultServerProvider.overrideWithValue(true),
       ],
       child: wrapForGlass(const TrueNasMobileApp()),
     ),

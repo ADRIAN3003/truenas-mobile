@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/api/server_address.dart';
+import '../../core/instances/default_server.dart';
 import '../../core/instances/instances_provider.dart';
 import '../../core/instances/server_instance.dart';
+import '../../core/settings/settings_provider.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../shared/dialogs.dart';
 import '../../shared/haptics.dart';
@@ -127,6 +129,12 @@ class _ServerCard extends ConsumerWidget {
     final palette = AppPalette.of(context);
     final secure = ServerAddress.tryParse(instance.url)?.isSecure ?? true;
     final version = instance.lastApiVersion;
+    final isDefault =
+        defaultServer(
+          ref.watch(instancesProvider).value ?? const [],
+          ref.watch(settingsProvider).defaultServerId,
+        )?.id ==
+        instance.id;
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: Card(
@@ -189,6 +197,12 @@ class _ServerCard extends ConsumerWidget {
                     spacing: 8,
                     runSpacing: 8,
                     children: [
+                      if (isDefault)
+                        _Chip(
+                          icon: Icons.star_rounded,
+                          label: l10n.serverDefaultBadge,
+                          tone: StatusTone.good,
+                        ),
                       _Chip(
                         icon: secure
                             ? Icons.lock_rounded

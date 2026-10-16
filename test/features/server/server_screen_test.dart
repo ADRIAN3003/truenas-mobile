@@ -118,6 +118,16 @@ void main() {
     });
   }
 
+  testWidgets('the app settings are one tap away inside a server', (
+    tester,
+  ) async {
+    await open(tester, const Size(400, 800));
+    await tester.tap(find.byTooltip('App settings'));
+    await tester.pumpAndSettle();
+    expect(find.text('Appearance'), findsOneWidget);
+    await close(tester);
+  });
+
   testWidgets('phones get a bottom navigation bar', (tester) async {
     await open(tester, const Size(400, 800));
     expect(find.byType(NavigationBar), findsOneWidget);
@@ -160,8 +170,13 @@ void main() {
     final accent = Theme.of(tester.element(find.byType(lg.GlassTabBar)))
         .colorScheme
         .primary;
-    // No tint and no colours on the glass or the unselected tabs.
-    expect(bar.settings, isNull);
+    // The glass is tinted with the page colour, so the bar is dark in the
+    // dark theme and light in the light one, and nothing else is coloured.
+    expect(
+      bar.settings?.glassColor,
+      AppPalette.of(tester.element(find.byType(lg.GlassTabBar))).background
+          .withValues(alpha: 0.6),
+    );
     expect(bar.indicatorColor, isNull);
     expect(bar.unselectedIconColor, isNull);
     expect(bar.unselectedLabelColor, isNull);
@@ -229,7 +244,7 @@ void main() {
       );
       await tester.tap(find.byType(BackButton));
       await tester.pumpAndSettle();
-      expect(find.byType(lg.GlassDialog), findsOneWidget);
+      expect(find.byType(GlassAlert), findsOneWidget);
       expect(find.text('Disconnect from Home?'), findsOneWidget);
       await close(tester);
     });

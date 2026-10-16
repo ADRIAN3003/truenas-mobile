@@ -98,6 +98,48 @@ void main() {
     expect(find.text('0.1.2 (3)'), findsOneWidget);
   });
 
+  group('default server', () {
+    const home = ServerInstance(
+      id: 'a',
+      name: 'Home',
+      url: 'https://home.local',
+      authMethod: AuthMethod.apiKey,
+      username: 'truenas_admin',
+      secret: 'key',
+    );
+    const office = ServerInstance(
+      id: 'b',
+      name: 'Office',
+      url: 'https://office.local',
+      authMethod: AuthMethod.apiKey,
+      username: 'truenas_admin',
+      secret: 'key',
+    );
+
+    testWidgets('is hidden until there is a server to choose', (tester) async {
+      await open(tester);
+      expect(find.text('Default server'), findsNothing);
+    });
+
+    testWidgets('a single server is already the default', (tester) async {
+      await open(tester, servers: [home]);
+      expect(find.text('Default server'), findsOneWidget);
+      expect(find.text('Home'), findsOneWidget);
+    });
+
+    testWidgets('picks the server to open at start, or none', (tester) async {
+      await open(tester, servers: [home, office]);
+      expect(find.text('None, show the server list'), findsOneWidget);
+      await choose(tester, 'Default server', 'Office');
+      expect(container.read(settingsProvider).defaultServerId, 'b');
+      expect((await saved()).defaultServerId, 'b');
+      expect(find.text('Office'), findsOneWidget);
+
+      await choose(tester, 'Default server', 'None, show the server list');
+      expect((await saved()).defaultServerId, '');
+    });
+  });
+
   testWidgets('choosing Dark switches the whole app and is remembered', (
     tester,
   ) async {

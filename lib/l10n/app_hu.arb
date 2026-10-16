@@ -605,5 +605,9 @@
   "appsUpdateAllDone": "{count, plural, other{{count} alkalmazás frissítve}}",
   "appsUpdateAllPartial": "{done}/{total} alkalmazás frissítve. Nem frissült: {failed}",
   "settingsLanguageSystemHint": "Megnyitja az alkalmazás nyelvi oldalát a telefon beállításaiban",
-  "settingsLanguageOpenFailed": "Nem sikerült megnyitni a telefon beállításait."
+  "settingsLanguageOpenFailed": "Nem sikerült megnyitni a telefon beállításait.",
+  "settingsStartup": "Indításkor",
+  "settingsDefaultServer": "Alapértelmezett szerver",
+  "settingsDefaultServerNone": "Egyik sem, a szerverlista jelenik meg",
+  "serverDefaultBadge": "Alapértelmezett"
 }

@@ -69,7 +69,6 @@ void main() {
         );
         await tester.tap(find.text('open'));
         await tester.pumpAndSettle();
-        expect(find.byType(lg.GlassDialog), findsOneWidget);
         expect(find.byType(GlassAlert), findsOneWidget);
         expect(find.byIcon(Icons.shield_outlined), findsOneWidget);
         expect(find.text('Trust it?'), findsOneWidget);
@@ -82,7 +81,7 @@ void main() {
         await tester.tap(find.text('Trust'));
         await tester.pumpAndSettle();
         expect(result, 'yes');
-        expect(find.byType(lg.GlassDialog), findsNothing);
+        expect(find.byType(GlassAlert), findsNothing);
       },
       variant: ios,
     );
@@ -137,7 +136,7 @@ void main() {
       expect(tester.getTopLeft(find.text('tank/dataset59')).dy, lessThan(700));
     }, variant: ios);
 
-    testWidgets('the glass is plain and the buttons are the package\'s', (
+    testWidgets('the buttons are solid capsules, not see-through glass', (
       tester,
     ) async {
       await open(
@@ -149,33 +148,66 @@ void main() {
             dialogAction(context, label: 'Cancel', onPressed: () {}),
             dialogAction(
               context,
-              label: 'Restart',
+              label: 'Save',
               primary: true,
-              destructive: true,
               onPressed: () {},
             ),
           ],
         ),
       );
-      final dialog = tester.widget<lg.GlassDialog>(find.byType(lg.GlassDialog));
-      expect(dialog.settings, isNull);
-      expect(dialog.title, 'Restart?');
-      expect(dialog.message, 'Services stop for a moment.');
+      expect(find.text('Restart?'), findsOneWidget);
       expect(find.text('Services stop for a moment.'), findsOneWidget);
-      expect(
-        dialog.actions.map((a) => (a.label, a.isPrimary, a.isDestructive)),
-        [('Cancel', false, false), ('Restart', true, true)],
-      );
-      expect(find.byType(lg.GlassButton), findsNWidgets(2));
+      // No glass button, no Material text button.
+      expect(find.byType(lg.GlassButton), findsNothing);
       expect(
         find.descendant(
-          of: find.byType(lg.GlassDialog),
-          matching: find.byWidgetPredicate(
-            (w) => w is FilledButton || w is TextButton || w is OutlinedButton,
-          ),
+          of: find.byType(GlassAlert),
+          matching: find.byType(TextButton),
         ),
         findsNothing,
       );
+      Material buttonOf(String label) => tester.widget<Material>(
+        find
+            .ancestor(of: find.text(label), matching: find.byType(Material))
+            .first,
+      );
+      final scheme = Theme.of(tester.element(find.text('Save'))).colorScheme;
+      for (final label in ['Cancel', 'Save']) {
+        expect(buttonOf(label).shape, isA<StadiumBorder>(), reason: label);
+      }
+      // The main action is the accent colour, fully opaque; the other is a
+      // neutral grey.
+      expect(buttonOf('Save').color, scheme.primary);
+      expect(buttonOf('Cancel').color!.a, greaterThan(0));
+      expect(buttonOf('Cancel').color!.a, lessThan(0.5));
+    }, variant: ios);
+
+    testWidgets('the panel is mostly opaque and well rounded', (tester) async {
+      await open(
+        tester,
+        (context) => AppDialog(
+          title: const Text('Restart?'),
+          actions: [dialogAction(context, label: 'OK', onPressed: () {})],
+        ),
+      );
+      final card = tester.widget<lg.GlassCard>(find.byType(lg.GlassCard));
+      expect(
+        (card.shape as lg.LiquidRoundedSuperellipse).borderRadius,
+        greaterThanOrEqualTo(30),
+      );
+      final fill =
+          tester
+                  .widget<DecoratedBox>(
+                    find
+                        .descendant(
+                          of: find.byType(lg.GlassCard),
+                          matching: find.byType(DecoratedBox),
+                        )
+                        .first,
+                  )
+                  .decoration
+              as ShapeDecoration;
+      expect(fill.color!.a, greaterThanOrEqualTo(0.8));
     }, variant: ios);
 
     testWidgets('a button without a handler is disabled', (tester) async {
@@ -193,7 +225,7 @@ void main() {
       await tester.tap(find.text('Create'));
       await tester.pumpAndSettle();
       expect(taps, 0);
-      expect(find.byType(lg.GlassDialog), findsOneWidget);
+      expect(find.byType(GlassAlert), findsOneWidget);
     }, variant: ios);
 
     testWidgets('text fields work inside the dialog', (tester) async {
@@ -249,7 +281,7 @@ void main() {
     await tester.tap(find.text('open'));
     await tester.pumpAndSettle();
     expect(find.byType(AlertDialog), findsOneWidget);
-    expect(find.byType(lg.GlassDialog), findsNothing);
+    expect(find.byType(GlassAlert), findsNothing);
   });
 
   group('showAppChoice', () {
@@ -288,6 +320,14 @@ void main() {
       (String?,)? picked;
       await openChoice(tester, TargetPlatform.iOS, (v) => picked = v);
       expect(find.byType(BottomSheet), findsNothing);
+      // The sheet is drawn on a Material, so its text has no yellow
+      // underline (a route has none of its own).
+      final text = tester.widget<Text>(find.text('Dark'));
+      expect(
+        DefaultTextStyle.of(tester.element(find.text('Dark'))).style.decoration,
+        isNot(TextDecoration.underline),
+      );
+      expect(text.style?.decoration, isNull);
       expect(find.text('Theme'), findsOneWidget);
       expect(find.text('Same as device'), findsOneWidget);
       // The current choice carries a check.

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../core/instances/default_server.dart';
 import '../../core/instances/instances_provider.dart';
 import '../../core/settings/app_settings.dart';
 import '../../core/settings/settings_provider.dart';
@@ -68,6 +69,29 @@ class SettingsScreen extends ConsumerWidget {
                 ),
             ],
           ),
+          if (ref.watch(instancesProvider).value case final servers?
+              when servers.isNotEmpty) ...[
+            SectionHeader(l10n.settingsStartup),
+            GroupedCard(
+              children: [
+                _ChoiceRow<String>(
+                  icon: Icons.dns_rounded,
+                  color: AppPalette.tileBlue,
+                  title: l10n.settingsDefaultServer,
+                  value:
+                      defaultServer(servers, settings.defaultServerId)?.id ??
+                      noDefaultServer,
+                  options: [
+                    (noDefaultServer, l10n.settingsDefaultServerNone),
+                    for (final server in servers) (server.id, server.name),
+                  ],
+                  onChanged: (id) => notifier.update(
+                    (s) => s.copyWith(defaultServerId: () => id),
+                  ),
+                ),
+              ],
+            ),
+          ],
           SectionHeader(l10n.settingsGeneral),
           GroupedCard(
             indent: 16,

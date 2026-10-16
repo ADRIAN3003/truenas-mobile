@@ -26,6 +26,7 @@ void main() {
       shellExtraKeys: false,
       checkForUpdates: false,
       skippedVersion: '0.1.4',
+      defaultServerId: 'abc',
     );
     final back = AppSettings.fromJson(settings.toJson());
     expect(back.theme, ThemeChoice.dark);
@@ -36,6 +37,7 @@ void main() {
     expect(back.shellExtraKeys, isFalse);
     expect(back.checkForUpdates, isFalse);
     expect(back.skippedVersion, '0.1.4');
+    expect(back.defaultServerId, 'abc');
   });
 
   test('unknown or missing values fall back to the defaults', () {
@@ -66,6 +68,18 @@ void main() {
     expect(skipped.skippedVersion, '0.1.4');
     expect(skipped.copyWith(haptics: false).skippedVersion, '0.1.4');
     expect(skipped.copyWith(skippedVersion: () => null).skippedVersion, isNull);
+  });
+
+  test('copyWith can choose, and clear, the default server', () {
+    const settings = AppSettings();
+    expect(settings.defaultServerId, isNull);
+    final chosen = settings.copyWith(defaultServerId: () => 'abc');
+    expect(chosen.defaultServerId, 'abc');
+    expect(chosen.copyWith(haptics: false).defaultServerId, 'abc');
+    expect(
+      chosen.copyWith(defaultServerId: () => null).defaultServerId,
+      isNull,
+    );
   });
 
   test('settings saved before updates existed keep the update defaults', () {

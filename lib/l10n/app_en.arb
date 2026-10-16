@@ -3027,5 +3027,21 @@
   "settingsLanguageOpenFailed": "Could not open your phone's settings.",
   "@settingsLanguageOpenFailed": {
     "description": "Snackbar when the system language page could not be opened."
+  },
+  "settingsStartup": "At start",
+  "@settingsStartup": {
+    "description": "Settings section: what the app does when it opens."
+  },
+  "settingsDefaultServer": "Default server",
+  "@settingsDefaultServer": {
+    "description": "Setting: the server the app opens by itself at start."
+  },
+  "settingsDefaultServerNone": "None, show the server list",
+  "@settingsDefaultServerNone": {
+    "description": "Choice: open no server at start."
+  },
+  "serverDefaultBadge": "Default",
+  "@serverDefaultBadge": {
+    "description": "Label on the server card of the default server."
   }
 }

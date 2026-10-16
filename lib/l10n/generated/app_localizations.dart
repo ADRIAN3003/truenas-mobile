@@ -3733,6 +3733,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Could not open your phone\'s settings.'**
   String get settingsLanguageOpenFailed;
+
+  /// Settings section: what the app does when it opens.
+  ///
+  /// In en, this message translates to:
+  /// **'At start'**
+  String get settingsStartup;
+
+  /// Setting: the server the app opens by itself at start.
+  ///
+  /// In en, this message translates to:
+  /// **'Default server'**
+  String get settingsDefaultServer;
+
+  /// Choice: open no server at start.
+  ///
+  /// In en, this message translates to:
+  /// **'None, show the server list'**
+  String get settingsDefaultServerNone;
+
+  /// Label on the server card of the default server.
+  ///
+  /// In en, this message translates to:
+  /// **'Default'**
+  String get serverDefaultBadge;
 }
 
 class _AppLocalizationsDelegate

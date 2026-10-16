@@ -2206,4 +2206,16 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get settingsLanguageOpenFailed =>
       'Could not open your phone\'s settings.';
+
+  @override
+  String get settingsStartup => 'At start';
+
+  @override
+  String get settingsDefaultServer => 'Default server';
+
+  @override
+  String get settingsDefaultServerNone => 'None, show the server list';
+
+  @override
+  String get serverDefaultBadge => 'Default';
 }

@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
-import 'package:flutter/cupertino.dart' show showCupertinoDialog;
+import 'package:flutter/cupertino.dart'
+    show showCupertinoDialog, showCupertinoModalPopup;
 import 'package:flutter/material.dart';
 import 'package:liquid_glass_widgets/liquid_glass_widgets.dart' as lg;
 
@@ -75,6 +76,21 @@ class GlassTabBar extends StatelessWidget {
     // labels stay at their size, like the system tab bar; the capsule has no
     // room to grow.
     const weight = TextStyle(fontWeight: FontWeight.w500);
+    // The package's bar is a 24% white wash on any background, which reads as
+    // a light grey slab on a dark theme. Tint it with the page colour instead,
+    // so it is dark in the dark theme and light in the light one.
+    final dark = Theme.of(context).brightness == Brightness.dark;
+    final settings = lg.LiquidGlassSettings(
+      thickness: 30,
+      blur: 3,
+      chromaticAberration: 0.3,
+      lightIntensity: dark ? 0.35 : 0.6,
+      refractiveIndex: 1.59,
+      saturation: 0.7,
+      ambientStrength: dark ? 0.2 : 1,
+      lightAngle: 0.75 * math.pi,
+      glassColor: AppPalette.of(context).background.withValues(alpha: 0.6),
+    );
     return Align(
       alignment: Alignment.bottomCenter,
       child: SafeArea(
@@ -90,6 +106,7 @@ class GlassTabBar extends StatelessWidget {
                 verticalPadding: 0,
                 iconSize: 22,
                 magnification: 1,
+                settings: settings,
                 selectedIconColor: accent,
                 selectedLabelColor: accent,
                 selectedLabelStyle: weight,
@@ -188,18 +205,57 @@ Future<T?> showGlassDialog<T>({
 /// A button of a [GlassAlert].
 typedef GlassAlertAction = ({
   String label,
+  IconData? icon,
   VoidCallback? onPressed,
   bool primary,
   bool destructive,
 });
 
-/// An iOS 26 alert: the package's [lg.GlassDialog] with a [title], a
-/// [message], optional [content] (a form, a list; it scrolls when it is taller
-/// than the room there is) and one to three [actions].
+/// The roundness of the alert and the sheets, like iOS 26's.
+const _panelRadius = 34.0;
+
+/// A panel of glass that is readable: the package's glass with the app's own
+/// surface colour over most of it, so what scrolls beneath shows through only
+/// as a hint.
+class _GlassPanel extends StatelessWidget {
+  const _GlassPanel({
+    required this.child,
+    this.padding = EdgeInsets.zero,
+    this.radius = _panelRadius,
+  });
+
+  final Widget child;
+  final EdgeInsetsGeometry padding;
+  final double radius;
+
+  @override
+  Widget build(BuildContext context) {
+    final fill = AppPalette.of(context).card.withValues(alpha: 0.86);
+    return lg.GlassCard(
+      useOwnLayer: true,
+      shape: lg.LiquidRoundedSuperellipse(borderRadius: radius),
+      padding: EdgeInsets.zero,
+      child: DecoratedBox(
+        decoration: ShapeDecoration(
+          color: fill,
+          shape: RoundedSuperellipseBorder(
+            borderRadius: BorderRadius.circular(radius),
+          ),
+        ),
+        child: Padding(padding: padding, child: child),
+      ),
+    );
+  }
+}
+
+/// An iOS 26 alert on the package's glass: an optional [icon], a centred
+/// [title] and [message], scrolling [content] (a form, a list) and [actions]
+/// as solid, fully rounded buttons, side by side when there are two or fewer
+/// and stacked otherwise. It lifts above the keyboard.
 ///
-/// The package's dialog does not lift above the keyboard or scroll, and its
-/// buttons cannot be disabled or carry an icon, so this wraps it for the first
-/// two; an action without a handler does nothing.
+/// The package's own [lg.GlassDialog] has fixed, see-through buttons and a
+/// corner radius that cannot be changed, which did not stand out or look like
+/// the system's alerts on a device, so the panel is built here from its glass.
 class GlassAlert extends StatelessWidget {
   const GlassAlert({
     super.key,
@@ -218,61 +274,160 @@ class GlassAlert extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final media = MediaQuery.of(context);
-    // What is left for the content after the keyboard, the safe areas, the
-    // margin, and the title, message and buttons around it.
-    final room =
-        media.size.height -
-        media.viewInsets.bottom -
-        media.padding.vertical -
-        48 -
-        170 -
-        (message == null ? 0 : 90);
-    final body = icon == null && content == null
-        ? null
-        : Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              if (icon != null)
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 8),
-                  child: IconTheme.merge(
-                    data: const IconThemeData(size: 32),
-                    child: Center(child: icon),
-                  ),
-                ),
-              if (content != null)
-                ConstrainedBox(
-                  constraints: BoxConstraints(maxHeight: math.max(96, room)),
-                  child: SingleChildScrollView(child: content),
-                ),
-            ],
-          );
+    final theme = Theme.of(context);
+    final text = theme.textTheme;
+    final scheme = theme.colorScheme;
+    final buttons = [
+      for (final action in actions) _AlertButton(action: action),
+    ];
     return SafeArea(
       child: AnimatedPadding(
         // Keep the alert above the keyboard.
-        padding: media.viewInsets + const EdgeInsets.all(24),
+        padding:
+            MediaQuery.viewInsetsOf(context) +
+            const EdgeInsets.symmetric(horizontal: 32, vertical: 24),
         duration: const Duration(milliseconds: 100),
         curve: Curves.decelerate,
-        // The Material widgets inside (text fields, list tiles) need a
-        // Material ancestor, which a Cupertino route does not provide.
-        child: Material(
-          type: MaterialType.transparency,
-          child: lg.GlassDialog(
-            title: title,
-            message: message,
-            content: body,
-            maxWidth: 340,
-            actions: [
-              for (final action in actions)
-                lg.GlassDialogAction(
-                  label: action.label,
-                  isPrimary: action.primary,
-                  isDestructive: action.destructive,
-                  onPressed: action.onPressed ?? () {},
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 340),
+            // The Material widgets inside (text fields, list tiles) need a
+            // Material ancestor, which a Cupertino route does not provide.
+            child: Material(
+              type: MaterialType.transparency,
+              child: _GlassPanel(
+                padding: const EdgeInsets.fromLTRB(20, 24, 20, 20),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    if (icon != null)
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 10),
+                        child: IconTheme.merge(
+                          data: const IconThemeData(size: 32),
+                          child: Center(child: icon),
+                        ),
+                      ),
+                    if (title != null)
+                      Text(
+                        title!,
+                        textAlign: TextAlign.center,
+                        style: text.titleLarge!.copyWith(
+                          fontWeight: FontWeight.w700,
+                          color: scheme.onSurface,
+                        ),
+                      ),
+                    if (message != null)
+                      Padding(
+                        padding: EdgeInsets.only(top: title == null ? 0 : 8),
+                        child: Text(
+                          message!,
+                          textAlign: TextAlign.center,
+                          style: text.bodyMedium!.copyWith(
+                            color: scheme.onSurface.withValues(alpha: 0.75),
+                          ),
+                        ),
+                      ),
+                    if (content != null)
+                      Flexible(
+                        child: Padding(
+                          padding: const EdgeInsets.only(top: 12),
+                          child: SingleChildScrollView(child: content),
+                        ),
+                      ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 20),
+                      child: actions.length <= 2
+                          ? Row(
+                              spacing: 10,
+                              children: [
+                                for (final button in buttons)
+                                  Expanded(child: button),
+                              ],
+                            )
+                          : Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              spacing: 10,
+                              children: buttons,
+                            ),
+                    ),
+                  ],
                 ),
-            ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// A button of a [GlassAlert]: a solid capsule with a text label, like the
+/// system's alerts. The main action is filled with the accent colour, the
+/// rest are a neutral grey, and a destructive label is red. Nothing is
+/// see-through, so every button stands out on the glass.
+class _AlertButton extends StatelessWidget {
+  const _AlertButton({required this.action});
+
+  final GlassAlertAction action;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    final dark = theme.brightness == Brightness.dark;
+    // A destructive action is never filled: the label alone warns.
+    final filled = action.primary && !action.destructive;
+    final background = filled
+        ? scheme.primary
+        : scheme.onSurface.withValues(alpha: dark ? 0.2 : 0.1);
+    final foreground = filled
+        ? scheme.onPrimary
+        : action.destructive
+        ? (dark ? const Color(0xFFFF6961) : const Color(0xFFE5271B))
+        : scheme.onSurface;
+    return Opacity(
+      opacity: action.onPressed == null ? 0.4 : 1,
+      child: Material(
+        color: background,
+        shape: const StadiumBorder(),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: action.onPressed,
+          child: SizedBox(
+            height: 50,
+            child: Center(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                child: DefaultTextStyle.merge(
+                  style: TextStyle(
+                    fontSize: 17,
+                    fontWeight: action.primary
+                        ? FontWeight.w700
+                        : FontWeight.w500,
+                    color: foreground,
+                  ),
+                  child: IconTheme.merge(
+                    data: IconThemeData(color: foreground, size: 18),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      spacing: 6,
+                      children: [
+                        if (action.icon != null) Icon(action.icon),
+                        Flexible(
+                          child: Text(
+                            action.label,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
           ),
         ),
       ),
@@ -292,23 +447,151 @@ Future<(T,)?> showGlassChoices<T>({
   required List<GlassChoice<T>> choices,
   required String cancelLabel,
   String? title,
-}) async {
-  (T,)? picked;
-  await lg.showGlassActionSheet<void>(
-    context: context,
-    title: title,
-    cancelLabel: cancelLabel,
-    actions: [
-      for (final choice in choices)
-        lg.GlassActionSheetAction(
-          label: choice.label,
-          icon: choice.selected ? const Icon(Icons.check_rounded) : choice.icon,
-          // The sheet closes itself after this.
-          onPressed: () => picked = (choice.value,),
+}) => showCupertinoModalPopup<(T,)>(
+  context: context,
+  barrierColor: Colors.black.withValues(alpha: 0.45),
+  builder: (context) =>
+      _ChoiceSheet<T>(title: title, choices: choices, cancelLabel: cancelLabel),
+);
+
+/// The sheet of [showGlassChoices]: a card of choices and a separate cancel
+/// card, floating at the bottom like the system's.
+class _ChoiceSheet<T> extends StatelessWidget {
+  const _ChoiceSheet({
+    required this.title,
+    required this.choices,
+    required this.cancelLabel,
+  });
+
+  final String? title;
+  final List<GlassChoice<T>> choices;
+  final String cancelLabel;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    final divider = Divider(
+      height: 0.5,
+      thickness: 0.5,
+      color: scheme.onSurface.withValues(alpha: 0.15),
+    );
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.all(10),
+        child: Material(
+          type: MaterialType.transparency,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            spacing: 10,
+            children: [
+              Flexible(
+                child: _GlassPanel(
+                  radius: 28,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(28),
+                    child: SingleChildScrollView(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          if (title != null) ...[
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 14,
+                              ),
+                              child: Text(
+                                title!,
+                                textAlign: TextAlign.center,
+                                style: theme.textTheme.labelLarge?.copyWith(
+                                  color: scheme.onSurface.withValues(
+                                    alpha: 0.6,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            divider,
+                          ],
+                          for (final (i, choice) in choices.indexed) ...[
+                            if (i > 0) divider,
+                            _SheetRow(
+                              label: choice.label,
+                              leading: choice.selected
+                                  ? const Icon(Icons.check_rounded)
+                                  : choice.icon,
+                              onTap: () =>
+                                  Navigator.pop(context, (choice.value,)),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              _GlassPanel(
+                radius: 28,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(28),
+                  child: _SheetRow(
+                    label: cancelLabel,
+                    bold: true,
+                    onTap: () => Navigator.pop(context),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
-    ],
-  );
-  return picked;
+      ),
+    );
+  }
+}
+
+class _SheetRow extends StatelessWidget {
+  const _SheetRow({
+    required this.label,
+    required this.onTap,
+    this.leading,
+    this.bold = false,
+  });
+
+  final String label;
+  final Widget? leading;
+  final bool bold;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        child: IconTheme.merge(
+          data: IconThemeData(color: scheme.onSurface, size: 22),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            spacing: 12,
+            children: [
+              ?leading,
+              Flexible(
+                child: Text(
+                  label,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: bold ? FontWeight.w700 : FontWeight.w500,
+                    color: scheme.onSurface,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 /// An iOS 26 switch: the package's [lg.GlassSwitch] on its own glass layer.
@@ -388,6 +671,10 @@ class GlassSegments extends StatelessWidget {
   @override
   Widget build(BuildContext context) => lg.GlassSegmentedControl(
     useOwnLayer: true,
+    // Tall enough for an icon above its label, and a capsule like the
+    // system's.
+    height: 58,
+    borderRadius: 29,
     selectedIndex: selectedIndex,
     onSegmentSelected: onSelected,
     segments: [

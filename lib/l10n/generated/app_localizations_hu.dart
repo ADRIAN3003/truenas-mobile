@@ -2200,4 +2200,17 @@ class AppLocalizationsHu extends AppLocalizations {
   @override
   String get settingsLanguageOpenFailed =>
       'Nem sikerült megnyitni a telefon beállításait.';
+
+  @override
+  String get settingsStartup => 'Indításkor';
+
+  @override
+  String get settingsDefaultServer => 'Alapértelmezett szerver';
+
+  @override
+  String get settingsDefaultServerNone =>
+      'Egyik sem, a szerverlista jelenik meg';
+
+  @override
+  String get serverDefaultBadge => 'Alapértelmezett';
 }

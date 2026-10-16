@@ -133,12 +133,20 @@ void main() {
           .subscribe('reporting.realtime')
           .listen(updates.add);
       addTearDown(sub.cancel);
-      await pumpEventQueue();
+      // The updates travel over a real socket, so wait for them instead of
+      // guessing how many event-loop turns they take.
+      Future<void> untilUpdates(int count) async {
+        for (var i = 0; i < 100 && updates.length < count; i++) {
+          await Future<void>.delayed(const Duration(milliseconds: 50));
+        }
+      }
+
+      await untilUpdates(1);
       expect(updates, hasLength(1));
       await server.dropConnections();
       await pumpEventQueue();
       await session.ensureAlive();
-      await pumpEventQueue();
+      await untilUpdates(2);
       expect(server.subscriptions, [
         'reporting.realtime',
         'reporting.realtime',

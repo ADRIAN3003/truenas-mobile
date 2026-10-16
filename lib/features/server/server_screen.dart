@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/instances/instances_provider.dart';
 import '../../core/instances/server_instance.dart';
+import '../../core/settings/settings_provider.dart';
 import '../../core/session/truenas_session.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../shared/connect_dialogs.dart';
@@ -113,7 +114,10 @@ class _ServerScreenState extends ConsumerState<ServerScreen>
 
   @override
   Widget build(BuildContext context) => PopScope(
-    canPop: _session == null || _info == null,
+    canPop:
+        !ref.watch(settingsProvider).confirmLeave ||
+        _session == null ||
+        _info == null,
     onPopInvokedWithResult: (didPop, _) {
       if (!didPop) _confirmLeave();
     },

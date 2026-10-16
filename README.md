@@ -84,12 +84,18 @@ To sign Android releases, add these repository secrets:
 
 | Secret | Value |
 |---|---|
-| `ANDROID_KEYSTORE_BASE64` | `base64 -w0 upload-keystore.jks` |
+| `ANDROID_KEYSTORE_BASE64` | `base64 < upload-keystore.jks \| tr -d '\n'` (works on macOS and Linux) |
 | `ANDROID_KEY_ALIAS` | key alias |
 | `ANDROID_KEY_PASSWORD` | key password |
 | `ANDROID_STORE_PASSWORD` | keystore password |
 
-Without them, release APKs are signed with the debug key.
+Without them, every release APK is signed with a new throw-away debug key, and
+Android refuses to install one release over another ("app not installed" or
+"unable to update"). [`tools/make-android-keystore.sh`](tools/make-android-keystore.sh)
+makes the key and prints the four values. Keep the key file: with a lost key,
+everyone has to uninstall the app before updating. Moving from debug-signed
+builds to a signed one also needs one uninstall, which removes the saved
+servers from the phone.
 
 ## Translations
 

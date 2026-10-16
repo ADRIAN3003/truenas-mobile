@@ -75,14 +75,29 @@ README covers what the app does; this file covers how to work on it.
   directly: on iOS they are liquid glass like the system's on iOS 26, which
   Flutter's own Cupertino dialogs are not.
   Dialog buttons come from `dialogAction` (same file), never a bare
-  `TextButton`/`FilledButton`. Keep the glass of dialogs, sheets and menus
-  plain: no `glassColor`, tint or filled/coloured capsules of our own (they
-  looked wrong on a device); only a destructive label is red and a primary
-  one bold.
-- Haptics go through `lib/shared/haptics.dart`. Use `AppRefreshIndicator`,
-  `AppSwitch` and `AppSwitchTile` (in `ui.dart`) instead of the bare Material
-  widgets so pull to refresh and switches tick; the Material switch makes no
-  haptic of its own, even in its iOS look.
+  `TextButton`/`FilledButton`. Keep the glass of dialogs, sheets, menus and
+  the tab bar plain: no `glassColor`, tint or custom colours on the glass
+  itself (they looked wrong on a device, and a coloured tab bar label is
+  drawn twice, which clipped the selected "D"). The dialog *buttons* on iOS
+  are solid capsules like the system's alert on iOS 26/27: the primary one
+  filled with the accent colour, the rest neutral grey, a destructive label
+  red.
+- Haptics go through `lib/shared/haptics.dart` (switched off by
+  `Haptics.enabled`, which the settings notifier keeps in step). Use
+  `AppRefreshIndicator`, `AppSwitch` and `AppSwitchTile` (in `ui.dart`)
+  instead of the bare Material widgets so pull to refresh and switches tick;
+  the Material switch makes no haptic of its own, even in its iOS look.
+- App settings (theme, language, haptics, leave warnings, shell font and
+  keys) live in `lib/core/settings/` and are read with
+  `ref.watch(settingsProvider)`; `main.dart` loads them before `runApp`.
+  Add a setting to `AppSettings` (with a default, and a `fromJson` that
+  tolerates old or damaged data), a row in
+  `lib/features/settings/settings_screen.dart` and both ARB files. The shell
+  screen reads them, so widget tests that pump it need a `ProviderScope`.
+- Android release APKs must be signed with a fixed key, or Android refuses
+  to install one over another ("app not updated"). `release.yml` signs with
+  the four `ANDROID_*` secrets; `tools/make-android-keystore.sh` makes them.
+  Never generate or commit a signing key without the owner's say-so.
 - App ID `hu.adrian.truenasmobile` on both platforms. MIT licence.
 - Branch names are descriptive kebab-case, e.g. `claude/shell-reverse-proxy`.
 - PRs follow `.github/pull_request_template.md`. The owner merges as soon as

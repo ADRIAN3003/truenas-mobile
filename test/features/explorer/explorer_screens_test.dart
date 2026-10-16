@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:truenas_mobile/core/instances/server_instance.dart';
 import 'package:truenas_mobile/core/session/truenas_session.dart';
@@ -14,10 +15,12 @@ void main() {
   late FakeTrueNasServer server;
   late TrueNasSession session;
 
-  Widget wrap(Widget child) => MaterialApp(
-    localizationsDelegates: AppLocalizations.localizationsDelegates,
-    supportedLocales: AppLocalizations.supportedLocales,
-    home: child,
+  Widget wrap(Widget child) => ProviderScope(
+    child: MaterialApp(
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      home: child,
+    ),
   );
 
   Future<void> settle(WidgetTester tester) async {

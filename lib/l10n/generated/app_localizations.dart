@@ -3277,6 +3277,180 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Stay'**
   String get leaveServerStay;
+
+  /// Title of the screen with the app's own settings.
+  ///
+  /// In en, this message translates to:
+  /// **'App settings'**
+  String get settingsTitle;
+
+  /// Settings section for theme and language.
+  ///
+  /// In en, this message translates to:
+  /// **'Appearance'**
+  String get settingsAppearance;
+
+  /// Setting: light, dark or like the device.
+  ///
+  /// In en, this message translates to:
+  /// **'Theme'**
+  String get settingsTheme;
+
+  /// Choice that follows the phone's own setting.
+  ///
+  /// In en, this message translates to:
+  /// **'Same as device'**
+  String get settingsSystemDefault;
+
+  /// Theme choice.
+  ///
+  /// In en, this message translates to:
+  /// **'Light'**
+  String get themeLight;
+
+  /// Theme choice.
+  ///
+  /// In en, this message translates to:
+  /// **'Dark'**
+  String get themeDark;
+
+  /// Setting: the language of the app.
+  ///
+  /// In en, this message translates to:
+  /// **'Language'**
+  String get settingsLanguage;
+
+  /// Settings section for behaviour.
+  ///
+  /// In en, this message translates to:
+  /// **'General'**
+  String get settingsGeneral;
+
+  /// Setting: vibration taps.
+  ///
+  /// In en, this message translates to:
+  /// **'Haptic feedback'**
+  String get settingsHaptics;
+
+  /// Explains the haptic feedback setting.
+  ///
+  /// In en, this message translates to:
+  /// **'Small taps when you refresh, switch tabs or confirm'**
+  String get settingsHapticsHint;
+
+  /// Setting: confirm before leaving a server or shell.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask before closing'**
+  String get settingsConfirmLeave;
+
+  /// Explains the ask-before-closing setting.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm before leaving an open server or shell'**
+  String get settingsConfirmLeaveHint;
+
+  /// Settings section for the terminal.
+  ///
+  /// In en, this message translates to:
+  /// **'Shell'**
+  String get settingsShell;
+
+  /// Setting: terminal text size.
+  ///
+  /// In en, this message translates to:
+  /// **'Font size'**
+  String get settingsShellFontSize;
+
+  /// Setting: show Esc, Tab, Ctrl+C and arrows under the terminal.
+  ///
+  /// In en, this message translates to:
+  /// **'Extra keys'**
+  String get settingsShellKeys;
+
+  /// Explains the extra keys setting.
+  ///
+  /// In en, this message translates to:
+  /// **'Esc, Tab, Ctrl+C and arrows under the terminal'**
+  String get settingsShellKeysHint;
+
+  /// Settings section.
+  ///
+  /// In en, this message translates to:
+  /// **'Security'**
+  String get settingsSecurity;
+
+  /// Row that opens the list of certificates the user chose to trust.
+  ///
+  /// In en, this message translates to:
+  /// **'Trusted certificates'**
+  String get settingsCertificates;
+
+  /// Empty list of trusted certificates.
+  ///
+  /// In en, this message translates to:
+  /// **'No certificates are trusted. A self-signed certificate you accept for a server will show up here.'**
+  String get settingsCertificatesEmpty;
+
+  /// Button that stops trusting a certificate.
+  ///
+  /// In en, this message translates to:
+  /// **'Forget'**
+  String get settingsCertificateForget;
+
+  /// Title of the confirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'Forget the certificate of {name}?'**
+  String settingsCertificateForgetTitle(String name);
+
+  /// Body of the confirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'You will be asked whether to trust it again the next time you connect.'**
+  String get settingsCertificateForgetBody;
+
+  /// Settings section.
+  ///
+  /// In en, this message translates to:
+  /// **'About'**
+  String get settingsAbout;
+
+  /// Row with the app version.
+  ///
+  /// In en, this message translates to:
+  /// **'Version'**
+  String get settingsVersion;
+
+  /// Row that opens the licence list.
+  ///
+  /// In en, this message translates to:
+  /// **'Open-source licences'**
+  String get settingsLicences;
+
+  /// Row that opens the project page.
+  ///
+  /// In en, this message translates to:
+  /// **'Source code'**
+  String get settingsSource;
+
+  /// Title of the dialog shown when leaving a running shell.
+  ///
+  /// In en, this message translates to:
+  /// **'Close the shell?'**
+  String get shellLeaveTitle;
+
+  /// Body of the dialog shown when leaving a running shell.
+  ///
+  /// In en, this message translates to:
+  /// **'Anything running in it stops.'**
+  String get shellLeaveBody;
+
+  /// Button that closes the shell.
+  ///
+  /// In en, this message translates to:
+  /// **'Close shell'**
+  String get shellLeaveConfirm;
 }
 
 class _AppLocalizationsDelegate

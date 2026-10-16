@@ -11,6 +11,7 @@ import '../../shared/widgets.dart';
 import '../sharing/sharing_widgets.dart';
 import '../storage/storage_helpers.dart';
 import 'task_editors.dart';
+import '../../shared/dialogs.dart';
 
 typedef _Tasks = Map<ProtectionKind, List<ProtectionTask>>;
 
@@ -113,9 +114,8 @@ class _ProtectionScreenState extends State<ProtectionScreen>
 
   Future<void> _add(List<ProtectionKind> kinds) async {
     final l10n = AppLocalizations.of(context);
-    final kind = await showModalBottomSheet<ProtectionKind>(
+    final kind = await showAppSheet<ProtectionKind>(
       context: context,
-      showDragHandle: true,
       builder: (context) => SafeArea(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -137,7 +137,7 @@ class _ProtectionScreenState extends State<ProtectionScreen>
     final l10n = AppLocalizations.of(context);
     final datasets = await localDatasets(_session);
     if (!mounted) return;
-    final request = await showDialog<_NewSnapshotTask>(
+    final request = await showAppDialog<_NewSnapshotTask>(
       context: context,
       builder: (_) => _NewSnapshotTaskDialog(datasets: datasets),
     );
@@ -339,18 +339,18 @@ class _TaskTile extends StatelessWidget {
         children: [
           Semantics(
             label: l10n.taskEnabled,
-            child: Switch.adaptive(value: task.enabled, onChanged: onToggle),
+            child: AppSwitch(value: task.enabled, onChanged: onToggle),
           ),
-          PopupMenuButton<String>(
+          AppPopupMenu<String>(
             onSelected: onAction,
-            itemBuilder: (context) => [
+            entries: [
               if (running && task.kind.abortable)
-                PopupMenuItem(value: 'stop', child: Text(l10n.taskStop))
+                menuEntry('stop', l10n.taskStop)
               else if (!running)
-                PopupMenuItem(value: 'run', child: Text(l10n.taskRunNow)),
+                menuEntry('run', l10n.taskRunNow),
               if (task.kind != ProtectionKind.snapshot)
-                PopupMenuItem(value: 'edit', child: Text(l10n.edit)),
-              PopupMenuItem(value: 'delete', child: Text(l10n.delete)),
+                menuEntry('edit', l10n.edit),
+              menuEntry('delete', l10n.delete, destructive: true),
             ],
           ),
         ],
@@ -402,7 +402,7 @@ class _NewSnapshotTaskDialogState extends State<_NewSnapshotTaskDialog> {
     final l10n = AppLocalizations.of(context);
     final dataset = _dataset;
     final keep = int.tryParse(_keep.text.trim());
-    return AlertDialog(
+    return AppDialog(
       title: Text(l10n.snapshotTaskCreate),
       content: dataset == null
           ? Text(l10n.shareNoDatasets)
@@ -425,7 +425,7 @@ class _NewSnapshotTaskDialogState extends State<_NewSnapshotTaskDialog> {
                     ],
                     onChanged: (d) => setState(() => _dataset = d),
                   ),
-                  SwitchListTile.adaptive(
+                  AppSwitchTile(
                     contentPadding: EdgeInsets.zero,
                     title: Text(l10n.snapshotTaskRecursive),
                     value: _recursive,

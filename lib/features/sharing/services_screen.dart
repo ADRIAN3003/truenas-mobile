@@ -8,6 +8,7 @@ import '../../shared/ui.dart';
 import '../../shared/widgets.dart';
 import '../storage/storage_helpers.dart';
 import 'sharing_widgets.dart';
+import '../../shared/dialogs.dart';
 
 /// Every system service with its state, controls and start-on-boot switch.
 class ServicesScreen extends StatefulWidget {
@@ -140,24 +141,15 @@ class _ServiceTile extends StatelessWidget {
                 )
               else
                 ServiceStateLabel(service: service),
-              PopupMenuButton<ServiceAction>(
+              AppPopupMenu<ServiceAction>(
                 enabled: !busy,
                 onSelected: onAction,
-                itemBuilder: (_) => [
+                entries: [
                   if (!service.running)
-                    PopupMenuItem(
-                      value: ServiceAction.start,
-                      child: Text(l10n.serviceStart),
-                    ),
+                    menuEntry(ServiceAction.start, l10n.serviceStart),
                   if (service.running) ...[
-                    PopupMenuItem(
-                      value: ServiceAction.restart,
-                      child: Text(l10n.serviceRestart),
-                    ),
-                    PopupMenuItem(
-                      value: ServiceAction.stop,
-                      child: Text(l10n.serviceStop),
-                    ),
+                    menuEntry(ServiceAction.restart, l10n.serviceRestart),
+                    menuEntry(ServiceAction.stop, l10n.serviceStop),
                   ],
                 ],
               ),
@@ -173,7 +165,7 @@ class _ServiceTile extends StatelessWidget {
                   ),
                 ),
               ),
-              Switch.adaptive(
+              AppSwitch(
                 value: service.enable,
                 onChanged: busy ? null : onAutostart,
               ),

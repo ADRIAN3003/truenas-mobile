@@ -784,7 +784,7 @@ class AppLocalizationsHu extends AppLocalizations {
       'Egyelőre csak megtekinthető. A módosításhoz használd a TrueNAS webes felületét.';
 
   @override
-  String get tabApps => 'Alkalmazások';
+  String get tabApps => 'Appok';
 
   @override
   String get tabMore => 'Továbbiak';
@@ -1866,4 +1866,20 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get dashboardConnected => 'Csatlakozva';
+
+  @override
+  String get fieldPasswordKeep =>
+      'Hagyd üresen a mentett jelszó megtartásához, vagy írj be egy újat a lecseréléséhez.';
+
+  @override
+  String get fieldApiKeyKeep =>
+      'Hagyd üresen a mentett API-kulcs megtartásához, vagy illessz be egy újat a lecseréléséhez.';
+
+  @override
+  String get tabSharesShort => 'Megosztás';
+
+  @override
+  String shellFallback(String shell) {
+    return 'Ez a shell nincs a konténerben. Helyette ezt próbálom: $shell.';
+  }
 }

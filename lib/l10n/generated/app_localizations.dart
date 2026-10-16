@@ -3211,6 +3211,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Connected'**
   String get dashboardConnected;
+
+  /// Helper text under the password field when editing a saved server.
+  ///
+  /// In en, this message translates to:
+  /// **'Leave empty to keep the saved password, or type a new one to replace it.'**
+  String get fieldPasswordKeep;
+
+  /// Helper text under the API key field when editing a saved server.
+  ///
+  /// In en, this message translates to:
+  /// **'Leave empty to keep the saved API key, or paste a new one to replace it.'**
+  String get fieldApiKeyKeep;
+
+  /// Bottom navigation label for shares; keep it short, the bar is narrow.
+  ///
+  /// In en, this message translates to:
+  /// **'Shares'**
+  String get tabSharesShort;
+
+  /// Printed in the terminal when the default shell is missing in an app or container and another one is tried.
+  ///
+  /// In en, this message translates to:
+  /// **'That shell is not in this container. Trying {shell} instead.'**
+  String shellFallback(String shell);
 }
 
 class _AppLocalizationsDelegate

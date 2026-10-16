@@ -25,7 +25,8 @@ class _ServerFormScreenState extends ConsumerState<ServerFormScreen> {
   late final _username = TextEditingController(
     text: widget.instance?.username ?? 'truenas_admin',
   );
-  late final _secret = TextEditingController(text: widget.instance?.secret);
+  // The saved password or key is never shown, so the field starts empty.
+  final _secret = TextEditingController();
   late AuthMethod _authMethod =
       widget.instance?.authMethod ?? AuthMethod.apiKey;
   late String? _pinnedFingerprint = widget.instance?.pinnedFingerprint;
@@ -42,6 +43,11 @@ class _ServerFormScreenState extends ConsumerState<ServerFormScreen> {
     super.dispose();
   }
 
+  /// Whether an empty secret field keeps the saved one: when editing, as long
+  /// as the sign-in method is still the one the secret belongs to.
+  bool get _keepsSavedSecret =>
+      widget.instance != null && widget.instance!.authMethod == _authMethod;
+
   ServerInstance _build() {
     final address = ServerAddress.tryParse(_url.text)!;
     final name = _name.text.trim();
@@ -51,7 +57,9 @@ class _ServerFormScreenState extends ConsumerState<ServerFormScreen> {
       url: address.toString(),
       authMethod: _authMethod,
       username: _username.text.trim(),
-      secret: _secret.text.trim(),
+      secret: _secret.text.trim().isEmpty && _keepsSavedSecret
+          ? widget.instance!.secret
+          : _secret.text.trim(),
       pinnedFingerprint: _pinnedFingerprint,
       lastApiVersion: _lastApiVersion,
     );
@@ -107,6 +115,7 @@ class _ServerFormScreenState extends ConsumerState<ServerFormScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final isApiKey = _authMethod == AuthMethod.apiKey;
+    final keepsSaved = _keepsSavedSecret;
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.instance == null ? l10n.addServer : l10n.editServer),
@@ -188,7 +197,10 @@ class _ServerFormScreenState extends ConsumerState<ServerFormScreen> {
               autofillHints: isApiKey ? null : const [AutofillHints.password],
               decoration: InputDecoration(
                 labelText: isApiKey ? l10n.fieldApiKey : l10n.fieldPassword,
-                helperText: isApiKey ? l10n.fieldApiKeyHelp : null,
+                hintText: keepsSaved ? '••••••••' : null,
+                helperText: keepsSaved
+                    ? (isApiKey ? l10n.fieldApiKeyKeep : l10n.fieldPasswordKeep)
+                    : (isApiKey ? l10n.fieldApiKeyHelp : null),
                 helperMaxLines: 2,
                 suffixIcon: IconButton(
                   tooltip: _obscure ? l10n.showSecret : l10n.hideSecret,
@@ -198,9 +210,10 @@ class _ServerFormScreenState extends ConsumerState<ServerFormScreen> {
                   onPressed: () => setState(() => _obscure = !_obscure),
                 ),
               ),
-              validator: (value) => value == null || value.trim().isEmpty
-                  ? l10n.validationRequired
-                  : null,
+              validator: (value) =>
+                  keepsSaved || (value != null && value.trim().isNotEmpty)
+                  ? null
+                  : l10n.validationRequired,
             ),
             const SizedBox(height: 32),
             OutlinedButton.icon(

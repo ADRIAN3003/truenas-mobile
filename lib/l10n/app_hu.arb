@@ -218,7 +218,7 @@
   "nvmetAnyHost": "Bármely gép csatlakozhat",
   "nvmetAllowedHosts": "Csak az engedélyezett gépek csatlakozhatnak",
   "viewOnlyNote": "Egyelőre csak megtekinthető. A módosításhoz használd a TrueNAS webes felületét.",
-  "tabApps": "Alkalmazások",
+  "tabApps": "Appok",
   "tabMore": "Továbbiak",
   "appsTitle": "Alkalmazások",
   "appsEmpty": "Nincs telepített alkalmazás",
@@ -518,5 +518,9 @@
   "cloudBackupPasswordHint": "Ez titkosítja a mentéseket. Őrizd meg: nélküle nem állíthatók vissza.",
   "cloudBackupPasswordKeep": "Hagyd üresen a jelenlegi jelszó megtartásához",
   "cloudBackupKeepLast": "Megőrzött mentések száma",
-  "dashboardConnected": "Csatlakozva"
+  "dashboardConnected": "Csatlakozva",
+  "fieldPasswordKeep": "Hagyd üresen a mentett jelszó megtartásához, vagy írj be egy újat a lecseréléséhez.",
+  "fieldApiKeyKeep": "Hagyd üresen a mentett API-kulcs megtartásához, vagy illessz be egy újat a lecseréléséhez.",
+  "tabSharesShort": "Megosztás",
+  "shellFallback": "Ez a shell nincs a konténerben. Helyette ezt próbálom: {shell}."
 }

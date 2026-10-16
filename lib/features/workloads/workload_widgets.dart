@@ -9,6 +9,7 @@ import '../../shared/viz_colors.dart';
 import '../../shared/widgets.dart';
 import '../shell/shell_screen.dart';
 import '../storage/storage_helpers.dart';
+import '../../shared/dialogs.dart';
 
 /// State label with icon and colour, for apps, VMs and containers.
 class WorkloadStateLabel extends StatelessWidget {
@@ -189,31 +190,37 @@ class WorkloadMenu extends StatelessWidget {
       );
     }
     final onShell = this.onShell;
-    return PopupMenuButton<Object>(
+    return AppPopupMenu<Object>(
       enabled: actions.isNotEmpty || onShell != null,
       onSelected: (value) =>
           value is WorkloadAction ? onSelected(value) : onShell?.call(),
-      itemBuilder: (_) => [
-        if (onShell != null)
-          PopupMenuItem(value: 'shell', child: Text(l10n.shellTitle)),
+      entries: [
+        if (onShell != null) menuEntry<Object>('shell', l10n.shellTitle),
         for (final action in actions)
-          PopupMenuItem(value: action, child: Text(actionLabel(l10n, action))),
+          menuEntry<Object>(action, actionLabel(l10n, action)),
       ],
     );
   }
 }
 
 /// Opens a shell with [options] (a VM console, app or container shell).
+/// [fallbackCommands] are tried in turn when the server's default shell is
+/// not in the image.
 Future<void> openShell(
   BuildContext context,
   TrueNasSession session,
   Map<String, Object?> options,
-  String title,
-) => Navigator.push(
+  String title, {
+  List<String> fallbackCommands = const [],
+}) => Navigator.push(
   context,
   MaterialPageRoute<void>(
-    builder: (_) =>
-        ShellScreen(session: session, options: options, title: title),
+    builder: (_) => ShellScreen(
+      session: session,
+      options: options,
+      title: title,
+      fallbackCommands: fallbackCommands,
+    ),
   ),
 );
 
@@ -242,17 +249,23 @@ Future<void> openAppShell(
   }
   final id = containers.length == 1
       ? containers.keys.single
-      : await showDialog<String>(
+      : await showAppDialog<String>(
           context: context,
-          builder: (context) => SimpleDialog(
+          builder: (context) => AppDialog(
+            scrollable: true,
             title: Text(l10n.shellPickContainer),
-            children: [
-              for (final MapEntry(:key, :value) in containers.entries)
-                SimpleDialogOption(
-                  onPressed: () => Navigator.pop(context, key),
-                  child: Text(value),
-                ),
-            ],
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                for (final MapEntry(:key, :value) in containers.entries)
+                  ListTile(
+                    dense: true,
+                    title: Text(value),
+                    onTap: () => Navigator.pop(context, key),
+                  ),
+              ],
+            ),
           ),
         );
   if (id == null || !context.mounted) return;
@@ -261,5 +274,6 @@ Future<void> openAppShell(
     session,
     WorkloadsApi.appShell(app, id),
     '$app · ${containers[id]}',
+    fallbackCommands: WorkloadsApi.shellFallbacks,
   );
 }

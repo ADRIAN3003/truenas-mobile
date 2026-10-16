@@ -8,6 +8,7 @@ import 'package:truenas_mobile/features/server/alerts_tab.dart';
 import 'package:truenas_mobile/features/server/dashboard_tab.dart';
 import 'package:truenas_mobile/features/server/jobs_tab.dart';
 import 'package:truenas_mobile/l10n/generated/app_localizations.dart';
+import 'package:truenas_mobile/shared/ui.dart';
 
 import '../../support/fake_truenas_server.dart';
 
@@ -74,6 +75,8 @@ void main() {
       ),
     );
     await settle(tester);
+    // The gauges count up to their value.
+    await tester.pump(gaugeDuration);
 
     expect(find.text('nas'), findsOneWidget);
     expect(find.text('24%'), findsOneWidget);

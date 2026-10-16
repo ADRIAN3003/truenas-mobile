@@ -264,6 +264,14 @@ class FakeTrueNasServer {
   /// Refuse every shell, as for a user without web shell access.
   bool shellDenied = false;
   Map<String, dynamic>? shellOptions;
+
+  /// Every shell the app asked for, oldest first.
+  final shellAttempts = <Map<String, dynamic>>[];
+
+  /// Shells missing from the container: asking for one prints the container
+  /// runtime's error and ends the shell. A request without a `command` asks
+  /// for `/bin/bash`, the server's default.
+  final missingShells = <String>{};
   final shellInput = StringBuffer();
   final shellResizes = <List<dynamic>>[];
 
@@ -978,6 +986,7 @@ class FakeTrueNasServer {
         if (!connected) {
           final message = jsonDecode(raw as String) as Map<String, dynamic>;
           shellOptions = message['options'] as Map<String, dynamic>?;
+          shellAttempts.add({...?shellOptions});
           if (shellDenied || message['token'] != shellToken) {
             socket.add(
               jsonEncode({
@@ -989,6 +998,18 @@ class FakeTrueNasServer {
           }
           connected = true;
           socket.add(jsonEncode({'msg': 'connected', 'id': 'shell-1'}));
+          final command = shellOptions?['command'] ?? '/bin/bash';
+          if (missingShells.contains(command)) {
+            socket.add(
+              utf8.encode(
+                'OCI runtime exec failed: exec failed: unable to start '
+                'container process: exec: "$command": stat $command: no such '
+                'file or directory: unknown\r\n',
+              ),
+            );
+            socket.close();
+            return;
+          }
           socket.add(utf8.encode('truenas# '));
           return;
         }

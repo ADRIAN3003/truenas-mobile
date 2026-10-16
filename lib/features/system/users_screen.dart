@@ -9,6 +9,7 @@ import '../../shared/viz_colors.dart';
 import '../../shared/widgets.dart';
 import '../sharing/sharing_widgets.dart';
 import '../storage/storage_helpers.dart';
+import '../../shared/dialogs.dart';
 
 typedef _AccountsData = (List<LocalUser>, List<LocalGroup>);
 
@@ -35,7 +36,7 @@ class _UsersScreenState extends State<UsersScreen>
 
   Future<void> _createUser() async {
     final l10n = AppLocalizations.of(context);
-    final request = await showDialog<_NewUser>(
+    final request = await showAppDialog<_NewUser>(
       context: context,
       builder: (_) => const _NewUserDialog(),
     );
@@ -55,7 +56,7 @@ class _UsersScreenState extends State<UsersScreen>
 
   Future<void> _createGroup() async {
     final l10n = AppLocalizations.of(context);
-    final name = await showDialog<String>(
+    final name = await showAppDialog<String>(
       context: context,
       builder: (_) => _NameDialog(
         title: l10n.groupCreate,
@@ -160,7 +161,7 @@ class _UsersScreenState extends State<UsersScreen>
             onRefresh: load,
             builder: (data) {
               final (users, groups) = data;
-              final builtinToggle = SwitchListTile.adaptive(
+              final builtinToggle = AppSwitchTile(
                 title: Text(l10n.usersShowBuiltin),
                 value: _showBuiltin,
                 onChanged: (v) {
@@ -303,17 +304,17 @@ class _UserTile extends StatelessWidget {
       ),
       trailing: user.builtin
           ? null
-          : PopupMenuButton<String>(
+          : AppPopupMenu<String>(
               onSelected: (value) => switch (value) {
                 'lock' => onLock(!user.locked),
                 _ => onDelete(),
               },
-              itemBuilder: (context) => [
-                PopupMenuItem(
-                  value: 'lock',
-                  child: Text(user.locked ? l10n.userUnlock : l10n.userLock),
+              entries: [
+                menuEntry(
+                  'lock',
+                  user.locked ? l10n.userUnlock : l10n.userLock,
                 ),
-                PopupMenuItem(value: 'delete', child: Text(l10n.delete)),
+                menuEntry('delete', l10n.delete, destructive: true),
               ],
             ),
     );
@@ -368,7 +369,7 @@ class _NewUserDialogState extends State<_NewUserDialog> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    return AlertDialog(
+    return AppDialog(
       title: Text(l10n.userCreate),
       content: Form(
         key: _formKey,
@@ -406,7 +407,7 @@ class _NewUserDialogState extends State<_NewUserDialog> {
                 validator: (v) =>
                     (v ?? '').isEmpty ? l10n.userPasswordRequired : null,
               ),
-              SwitchListTile.adaptive(
+              AppSwitchTile(
                 contentPadding: EdgeInsets.zero,
                 title: Text(l10n.userSmb),
                 value: _smb,
@@ -462,7 +463,7 @@ class _NameDialogState extends State<_NameDialog> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    return AlertDialog(
+    return AppDialog(
       title: Text(widget.title),
       content: Form(
         key: _formKey,

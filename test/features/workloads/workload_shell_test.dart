@@ -90,6 +90,39 @@ void main() {
     await disconnect(tester);
   });
 
+  testWidgets('an app without bash falls back to sh', (tester) async {
+    await connect(tester);
+    server.missingShells.add('/bin/bash');
+    await openShellFrom(tester, 'jellyfin');
+    await settle(tester);
+    expect(server.shellAttempts, [
+      {'app_name': 'jellyfin', 'container_id': 'c0ffee'},
+      {'app_name': 'jellyfin', 'container_id': 'c0ffee', 'command': '/bin/sh'},
+    ]);
+    expect(find.text('The shell has ended.'), findsNothing);
+    await disconnect(tester);
+  });
+
+  testWidgets('a container without any shell shows the error and stops', (
+    tester,
+  ) async {
+    await connect(tester);
+    server.missingShells.addAll(['/bin/bash', '/bin/sh']);
+    await openShellFrom(tester, 'jellyfin');
+    await settle(tester);
+    expect(server.shellAttempts, hasLength(2));
+    expect(find.text('The shell has ended.'), findsOneWidget);
+    await disconnect(tester);
+  });
+
+  testWidgets('a shell that starts is not retried', (tester) async {
+    await connect(tester);
+    await openShellFrom(tester, 'jellyfin');
+    await settle(tester);
+    expect(server.shellAttempts, hasLength(1));
+    await disconnect(tester);
+  });
+
   testWidgets('VM shell opens its console', (tester) async {
     await connect(tester);
     (server.vms.single['status'] as Map)['state'] = 'RUNNING';

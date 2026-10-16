@@ -91,7 +91,7 @@ class _AlertsTabState extends State<AlertsTab> {
     }
     final active = alerts.where((a) => !a.dismissed).toList();
     final dismissed = alerts.where((a) => a.dismissed).toList();
-    return RefreshIndicator.adaptive(
+    return AppRefreshIndicator(
       onRefresh: _load,
       child: ListView(
         padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),

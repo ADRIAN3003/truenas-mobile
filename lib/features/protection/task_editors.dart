@@ -4,9 +4,11 @@ import '../../core/models/protection.dart';
 import '../../core/models/protection_drafts.dart';
 import '../../core/session/truenas_session.dart';
 import '../../l10n/generated/app_localizations.dart';
+import '../../shared/ui.dart';
 import '../sharing/sharing_widgets.dart';
 import '../storage/storage_helpers.dart';
 import 'protection_screen.dart';
+import '../../shared/dialogs.dart';
 
 /// Every dataset on the server, e.g. `tank/media`.
 Future<List<String>> localDatasets(TrueNasSession session) async {
@@ -20,17 +22,23 @@ Future<List<String>> localDatasets(TrueNasSession session) async {
 }
 
 Future<String?> _pickDataset(BuildContext context, List<String> datasets) =>
-    showDialog<String>(
+    showAppDialog<String>(
       context: context,
-      builder: (context) => SimpleDialog(
+      builder: (context) => AppDialog(
+        scrollable: true,
         title: Text(AppLocalizations.of(context).pickDataset),
-        children: [
-          for (final d in datasets)
-            SimpleDialogOption(
-              onPressed: () => Navigator.pop(context, d),
-              child: Text(d),
-            ),
-        ],
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            for (final d in datasets)
+              ListTile(
+                dense: true,
+                title: Text(d),
+                onTap: () => Navigator.pop(context, d),
+              ),
+          ],
+        ),
       ),
     );
 
@@ -313,7 +321,7 @@ class _ReplicationEditorState extends State<ReplicationEditor>
           ),
           validator: (v) => _required(l10n, v),
         ),
-        SwitchListTile.adaptive(
+        AppSwitchTile(
           contentPadding: EdgeInsets.zero,
           title: Text(l10n.snapshotTaskRecursive),
           value: d.recursive,
@@ -355,7 +363,7 @@ class _ReplicationEditorState extends State<ReplicationEditor>
               validator: (v) => _required(l10n, v),
             ),
         ],
-        SwitchListTile.adaptive(
+        AppSwitchTile(
           contentPadding: EdgeInsets.zero,
           title: Text(l10n.replicationAuto),
           value: d.auto,
@@ -782,7 +790,7 @@ class _RsyncEditorState extends State<RsyncEditor>
           decoration: InputDecoration(labelText: l10n.rsyncRemotePath),
           validator: d.ssh ? (v) => _required(l10n, v) : null,
         ),
-        SwitchListTile.adaptive(
+        AppSwitchTile(
           contentPadding: EdgeInsets.zero,
           title: Text(l10n.rsyncDelete),
           value: d.delete,

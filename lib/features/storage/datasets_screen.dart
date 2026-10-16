@@ -9,6 +9,7 @@ import '../../shared/ui.dart';
 import '../../shared/formatting.dart';
 import '../../shared/widgets.dart';
 import 'storage_helpers.dart';
+import '../../shared/dialogs.dart';
 
 final _datasetName = RegExp(r'^[A-Za-z0-9_\-.:]+$');
 
@@ -55,7 +56,7 @@ class _DatasetsScreenState extends State<DatasetsScreen> {
         if (!d.isVolume) d.id,
     ];
     if (parents.isEmpty) parents.add(widget.pool);
-    final request = await showDialog<_CreateRequest>(
+    final request = await showAppDialog<_CreateRequest>(
       context: context,
       builder: (_) => _CreateDatasetDialog(parents: parents),
     );
@@ -209,7 +210,7 @@ class _CreateDatasetDialogState extends State<_CreateDatasetDialog> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    return AlertDialog(
+    return AppDialog(
       title: Text(l10n.datasetCreate),
       content: Form(
         key: _formKey,
@@ -355,7 +356,7 @@ class _DatasetScreenState extends State<DatasetScreen> {
 
   Future<void> _createSnapshot() async {
     final l10n = AppLocalizations.of(context);
-    final request = await showDialog<(String, bool)>(
+    final request = await showAppDialog<(String, bool)>(
       context: context,
       builder: (_) => const _CreateSnapshotDialog(),
     );
@@ -440,7 +441,7 @@ class _DatasetScreenState extends State<DatasetScreen> {
         icon: const Icon(Icons.add_a_photo_outlined),
         label: Text(l10n.snapshotCreate),
       ),
-      body: RefreshIndicator.adaptive(
+      body: AppRefreshIndicator(
         onRefresh: _load,
         child: ListView(
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 88),
@@ -523,18 +524,16 @@ class _DatasetScreenState extends State<DatasetScreen> {
                         ].join('\n'),
                       ),
                       isThreeLine: snapshot.created != null,
-                      trailing: PopupMenuButton<String>(
+                      trailing: AppPopupMenu<String>(
                         onSelected: (action) => action == 'rollback'
                             ? _rollback(snapshot)
                             : _deleteSnapshot(snapshot),
-                        itemBuilder: (_) => [
-                          PopupMenuItem(
-                            value: 'rollback',
-                            child: Text(l10n.snapshotRollback),
-                          ),
-                          PopupMenuItem(
-                            value: 'delete',
-                            child: Text(l10n.snapshotDelete),
+                        entries: [
+                          menuEntry('rollback', l10n.snapshotRollback),
+                          menuEntry(
+                            'delete',
+                            l10n.snapshotDelete,
+                            destructive: true,
                           ),
                         ],
                       ),
@@ -571,7 +570,7 @@ class _CreateSnapshotDialogState extends State<_CreateSnapshotDialog> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    return AlertDialog(
+    return AppDialog(
       title: Text(l10n.snapshotCreate),
       content: Form(
         key: _formKey,

@@ -11,6 +11,7 @@ import '../../shared/ui.dart';
 import '../../shared/widgets.dart';
 import '../../shared/connect_dialogs.dart';
 import '../../shared/viz_colors.dart';
+import '../../shared/dialogs.dart';
 
 /// Recent middleware jobs with live progress.
 class JobsTab extends StatefulWidget {
@@ -100,7 +101,7 @@ class _JobsTabState extends State<JobsTab> {
             : Text(describeConnectError(l10n, _error!)),
       );
     }
-    return RefreshIndicator.adaptive(
+    return AppRefreshIndicator(
       onRefresh: _load,
       child: jobs.isEmpty
           ? ListView(
@@ -201,9 +202,9 @@ class _JobTile extends StatelessWidget {
           : null,
       onTap: job.error == null
           ? null
-          : () => showDialog<void>(
+          : () => showAppDialog<void>(
               context: context,
-              builder: (context) => AlertDialog(
+              builder: (context) => AppDialog(
                 title: Text(job.title),
                 content: SingleChildScrollView(
                   child: SelectableText(job.error!),

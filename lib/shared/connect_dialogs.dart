@@ -6,6 +6,7 @@ import '../core/api/certificate_trust.dart';
 import '../core/api/truenas_connection.dart';
 import '../core/session/truenas_session.dart';
 import '../l10n/generated/app_localizations.dart';
+import 'dialogs.dart';
 
 /// Shows certificate details and returns true when the user trusts it.
 Future<bool> confirmCertificateDialog(
@@ -31,9 +32,9 @@ Future<bool> confirmCertificateDialog(
     ),
   );
 
-  final trusted = await showDialog<bool>(
+  final trusted = await showAppDialog<bool>(
     context: context,
-    builder: (context) => AlertDialog(
+    builder: (context) => AppDialog(
       icon: Icon(
         certificate.changed ? Icons.gpp_bad_outlined : Icons.shield_outlined,
         color: certificate.changed ? theme.colorScheme.error : null,
@@ -86,9 +87,9 @@ Future<bool> confirmCertificateDialog(
 Future<String?> askOtpDialog(BuildContext context) {
   final l10n = AppLocalizations.of(context);
   final controller = TextEditingController();
-  return showDialog<String>(
+  return showAppDialog<String>(
     context: context,
-    builder: (context) => AlertDialog(
+    builder: (context) => AppDialog(
       title: Text(l10n.otpTitle),
       content: Column(
         mainAxisSize: MainAxisSize.min,

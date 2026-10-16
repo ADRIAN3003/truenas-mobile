@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 
+import 'package:flutter/cupertino.dart' show showCupertinoDialog;
 import 'package:flutter/material.dart';
 import 'package:liquid_glass_widgets/liquid_glass_widgets.dart' as lg;
 
@@ -177,3 +178,209 @@ Widget wrapForGlass(Widget app) => lg.LiquidGlassWidgets.wrap(
   child: app,
   brightnessResolver: Theme.maybeBrightnessOf,
 );
+
+/// Glass for floating panels (dialogs, sheets, menus): frosted enough that
+/// text on it keeps its contrast over whatever is behind.
+lg.LiquidGlassSettings glassPanelSettings(BuildContext context) {
+  final dark = Theme.of(context).brightness == Brightness.dark;
+  return lg.LiquidGlassSettings(
+    glassColor: dark ? const Color(0xCC1A2333) : const Color(0xD9FFFFFF),
+    blur: 18,
+    thickness: 24,
+  );
+}
+
+/// Shows [builder]'s dialog the way iOS does: a dimmed barrier and a panel
+/// that scales in.
+Future<T?> showGlassDialog<T>({
+  required BuildContext context,
+  required WidgetBuilder builder,
+  bool barrierDismissible = true,
+}) => showCupertinoDialog<T>(
+  context: context,
+  barrierDismissible: barrierDismissible,
+  builder: builder,
+);
+
+/// An iOS 26 alert on liquid glass: an optional [icon], a centred [title],
+/// scrolling [content], and [actions] as capsules, side by side when there
+/// are two or fewer and stacked otherwise.
+class GlassDialogPanel extends StatelessWidget {
+  const GlassDialogPanel({
+    super.key,
+    this.icon,
+    this.title,
+    this.content,
+    this.actions = const [],
+  });
+
+  final Widget? icon;
+  final Widget? title;
+  final Widget? content;
+  final List<Widget> actions;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final text = theme.textTheme;
+    final scheme = theme.colorScheme;
+    // Buttons become capsules; the Material buttons the callers pass in keep
+    // their own colours (a destructive one stays red).
+    final capsule = ButtonStyle(
+      minimumSize: const WidgetStatePropertyAll(Size(0, 46)),
+      shape: const WidgetStatePropertyAll(StadiumBorder()),
+    );
+    final buttons = theme.copyWith(
+      textButtonTheme: TextButtonThemeData(
+        style: capsule.merge(
+          TextButton.styleFrom(
+            backgroundColor: scheme.onSurface.withValues(alpha: 0.08),
+          ),
+        ),
+      ),
+      filledButtonTheme: FilledButtonThemeData(style: capsule),
+      outlinedButtonTheme: OutlinedButtonThemeData(style: capsule),
+    );
+    return SafeArea(
+      child: AnimatedPadding(
+        // Keep the panel above the keyboard.
+        padding:
+            MediaQuery.viewInsetsOf(context) +
+            const EdgeInsets.symmetric(horizontal: 32, vertical: 24),
+        duration: const Duration(milliseconds: 100),
+        curve: Curves.decelerate,
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 340),
+            // The Material widgets inside (text fields, list tiles) need a
+            // Material ancestor, which a Cupertino route does not provide.
+            child: Material(
+              type: MaterialType.transparency,
+              child: lg.GlassCard(
+                useOwnLayer: true,
+                settings: glassPanelSettings(context),
+                shape: const lg.LiquidRoundedSuperellipse(borderRadius: 34),
+                padding: const EdgeInsets.fromLTRB(20, 22, 20, 16),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    if (icon != null)
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 10),
+                        child: IconTheme.merge(
+                          data: const IconThemeData(size: 32),
+                          child: Center(child: icon),
+                        ),
+                      ),
+                    if (title != null)
+                      DefaultTextStyle(
+                        style: text.titleMedium!.copyWith(
+                          fontWeight: FontWeight.w700,
+                          color: scheme.onSurface,
+                        ),
+                        textAlign: TextAlign.center,
+                        child: title!,
+                      ),
+                    if (content != null)
+                      Flexible(
+                        child: Padding(
+                          padding: EdgeInsets.only(top: title == null ? 0 : 10),
+                          child: SingleChildScrollView(
+                            child: DefaultTextStyle(
+                              style: text.bodyMedium!.copyWith(
+                                color: scheme.onSurface,
+                              ),
+                              child: content!,
+                            ),
+                          ),
+                        ),
+                      ),
+                    if (actions.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 18),
+                        child: Theme(
+                          data: buttons,
+                          child: actions.length <= 2
+                              ? Row(
+                                  children: [
+                                    for (final (i, action) in actions.indexed)
+                                      Expanded(
+                                        child: Padding(
+                                          padding: EdgeInsetsDirectional.only(
+                                            start: i == 0 ? 0 : 8,
+                                          ),
+                                          child: action,
+                                        ),
+                                      ),
+                                  ],
+                                )
+                              : Column(
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.stretch,
+                                  spacing: 8,
+                                  children: actions,
+                                ),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// A bottom sheet on liquid glass, floating with a margin like iOS 26's.
+Future<T?> showGlassSheet<T>({
+  required BuildContext context,
+  required WidgetBuilder builder,
+}) => lg.GlassSheet.show<T>(
+  context: context,
+  settings: glassPanelSettings(context),
+  builder: (context) =>
+      Material(type: MaterialType.transparency, child: builder(context)),
+);
+
+/// One entry of a [GlassPopupMenu].
+typedef GlassMenuEntry<T> = ({T value, String label, bool destructive});
+
+/// An iOS 26 pull-down menu: the trigger morphs into a liquid glass list.
+class GlassPopupMenu<T> extends StatelessWidget {
+  const GlassPopupMenu({
+    super.key,
+    required this.entries,
+    required this.onSelected,
+    this.enabled = true,
+    this.tooltip,
+  });
+
+  final List<GlassMenuEntry<T>> entries;
+  final ValueChanged<T> onSelected;
+  final bool enabled;
+  final String? tooltip;
+
+  @override
+  Widget build(BuildContext context) => lg.GlassMenu(
+    menuWidth: 220,
+    autoAdjustToScreen: true,
+    menuPadding: const EdgeInsets.all(12),
+    settings: glassPanelSettings(context),
+    triggerBuilder: (context, toggle) => IconButton(
+      tooltip: tooltip ?? MaterialLocalizations.of(context).showMenuTooltip,
+      onPressed: enabled ? toggle : null,
+      icon: const Icon(Icons.more_horiz_rounded),
+    ),
+    items: [
+      for (final entry in entries)
+        lg.GlassMenuItem(
+          title: entry.label,
+          isDestructive: entry.destructive,
+          onTap: () => onSelected(entry.value),
+        ),
+    ],
+  );
+}

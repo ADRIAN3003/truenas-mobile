@@ -274,6 +274,7 @@ class _AppsTabState extends State<AppsTab> with LoadState<AppsTab, _Workloads> {
                                 widget.session,
                                 options,
                                 container.name,
+                                fallbackCommands: WorkloadsApi.shellFallbacks,
                               );
                             }
                           : null,

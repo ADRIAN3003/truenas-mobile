@@ -283,7 +283,7 @@ class _ParamField extends StatelessWidget {
         ? param.name
         : '${param.name} (${l10n.explorerOptional})';
     final Widget field = switch (param.kind) {
-      ParamKind.boolean => SwitchListTile.adaptive(
+      ParamKind.boolean => AppSwitchTile(
         contentPadding: EdgeInsets.zero,
         title: Text(label),
         value: input.boolValue,

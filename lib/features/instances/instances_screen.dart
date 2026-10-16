@@ -9,6 +9,7 @@ import '../../shared/theme.dart';
 import '../../shared/ui.dart';
 import '../../shared/widgets.dart';
 import 'server_form_screen.dart';
+import '../../shared/dialogs.dart';
 
 /// Home screen listing saved TrueNAS servers.
 class InstancesScreen extends ConsumerWidget {
@@ -64,7 +65,7 @@ class _ServerTile extends ConsumerWidget {
         context,
         MaterialPageRoute<void>(builder: (_) => ServerScreen(instance.id)),
       ),
-      trailing: PopupMenuButton<_Action>(
+      trailing: AppPopupMenu<_Action>(
         onSelected: (action) async {
           switch (action) {
             case _Action.edit:
@@ -88,9 +89,9 @@ class _ServerTile extends ConsumerWidget {
               }
           }
         },
-        itemBuilder: (context) => [
-          PopupMenuItem(value: _Action.edit, child: Text(l10n.edit)),
-          PopupMenuItem(value: _Action.delete, child: Text(l10n.delete)),
+        entries: [
+          menuEntry(_Action.edit, l10n.edit),
+          menuEntry(_Action.delete, l10n.delete, destructive: true),
         ],
       ),
     );

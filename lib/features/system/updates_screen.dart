@@ -12,6 +12,7 @@ import '../../shared/viz_colors.dart';
 import '../../shared/widgets.dart';
 import '../sharing/sharing_widgets.dart';
 import '../storage/storage_helpers.dart';
+import '../../shared/dialogs.dart';
 
 typedef _UpdatesData = (String?, UpdateInfo, List<BootEnvironment>);
 
@@ -272,17 +273,13 @@ class _BootEnvTile extends StatelessWidget {
             ),
         ],
       ),
-      trailing: PopupMenuButton<String>(
+      trailing: AppPopupMenu<String>(
         onSelected: onAction,
-        itemBuilder: (context) => [
+        entries: [
           if (!env.activated && env.canActivate)
-            PopupMenuItem(value: 'activate', child: Text(l10n.bootEnvActivate)),
-          PopupMenuItem(
-            value: 'keep',
-            child: Text(env.keep ? l10n.bootEnvUnkeep : l10n.bootEnvKeep),
-          ),
-          if (canDelete)
-            PopupMenuItem(value: 'delete', child: Text(l10n.delete)),
+            menuEntry('activate', l10n.bootEnvActivate),
+          menuEntry('keep', env.keep ? l10n.bootEnvUnkeep : l10n.bootEnvKeep),
+          if (canDelete) menuEntry('delete', l10n.delete, destructive: true),
         ],
       ),
     );

@@ -121,7 +121,6 @@ class _UsageCard extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final colors = VizColors.of(context);
-    final percent = (pool.usedFraction * 100).round();
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -134,7 +133,10 @@ class _UsageCard extends StatelessWidget {
                   size: 88,
                   stroke: 9,
                   segments: [(pool.usedFraction, colors.series1)],
-                  child: Text('$percent%', style: theme.textTheme.titleLarge),
+                  child: AnimatedPercent(
+                    pool.usedFraction * 100,
+                    style: theme.textTheme.titleLarge,
+                  ),
                 ),
                 const SizedBox(width: 16),
                 Expanded(

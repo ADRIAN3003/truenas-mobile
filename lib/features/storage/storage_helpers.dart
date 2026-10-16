@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../shared/connect_dialogs.dart';
 import '../../shared/glass.dart';
+import '../../shared/haptics.dart';
 import '../../shared/theme.dart';
+import '../../shared/ui.dart';
 import '../../shared/viz_colors.dart';
 
 /// Runs [action], shows [success] or the error in a snackbar, and returns
@@ -17,11 +19,13 @@ Future<bool> runWithFeedback(
   final l10n = AppLocalizations.of(context);
   try {
     await action();
+    Haptics.confirm();
     if (success != null) {
       messenger.showSnackBar(SnackBar(content: Text(success)));
     }
     return true;
   } catch (error) {
+    Haptics.warning();
     messenger.showSnackBar(
       SnackBar(content: Text(describeConnectError(l10n, error))),
     );
@@ -62,7 +66,7 @@ class AsyncBody<T> extends StatelessWidget {
   Widget build(BuildContext context) {
     final value = this.value;
     if (value != null) {
-      return RefreshIndicator.adaptive(
+      return AppRefreshIndicator(
         edgeOffset: ChromeInsets.of(context).top,
         onRefresh: onRefresh,
         child: builder(value),

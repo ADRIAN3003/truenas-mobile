@@ -1,8 +1,10 @@
 import 'dart:math' as math;
+import 'dart:ui' as ui;
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import 'haptics.dart';
 import 'theme.dart';
 
 /// A white glyph on a rounded, solid colour square.
@@ -164,9 +166,104 @@ class NavRow extends StatelessWidget {
   );
 }
 
+/// Wraps [onChanged] so flipping a switch gives a tick. The Material switch
+/// makes none of its own, not even in its iOS look.
+ValueChanged<bool>? _tickOnToggle(ValueChanged<bool>? onChanged) =>
+    onChanged == null
+    ? null
+    : (value) {
+        Haptics.selection();
+        onChanged(value);
+      };
+
+/// A platform switch that ticks when it flips.
+class AppSwitch extends StatelessWidget {
+  const AppSwitch({super.key, required this.value, required this.onChanged});
+
+  final bool value;
+  final ValueChanged<bool>? onChanged;
+
+  @override
+  Widget build(BuildContext context) =>
+      Switch.adaptive(value: value, onChanged: _tickOnToggle(onChanged));
+}
+
+/// A list tile with a platform switch that ticks when it flips. Tapping the
+/// row flips the switch, like a [SwitchListTile].
+class AppSwitchTile extends StatelessWidget {
+  const AppSwitchTile({
+    super.key,
+    required this.value,
+    required this.onChanged,
+    required this.title,
+    this.subtitle,
+    this.contentPadding,
+  });
+
+  final bool value;
+  final ValueChanged<bool>? onChanged;
+  final Widget title;
+  final Widget? subtitle;
+  final EdgeInsetsGeometry? contentPadding;
+
+  @override
+  Widget build(BuildContext context) {
+    final onChanged = this.onChanged;
+    return MergeSemantics(
+      child: ListTile(
+        title: title,
+        subtitle: subtitle,
+        contentPadding: contentPadding,
+        enabled: onChanged != null,
+        trailing: AppSwitch(value: value, onChanged: onChanged),
+        // A tap on the rest of the row does not reach the switch.
+        onTap: onChanged == null
+            ? null
+            : () {
+                Haptics.selection();
+                onChanged(!value);
+              },
+      ),
+    );
+  }
+}
+
+/// A pull to refresh with the platform's spinner and a haptic tap when the
+/// pull goes far enough to start.
+class AppRefreshIndicator extends StatelessWidget {
+  const AppRefreshIndicator({
+    super.key,
+    required this.onRefresh,
+    required this.child,
+    this.edgeOffset = 0,
+  });
+
+  final Future<void> Function() onRefresh;
+  final Widget child;
+  final double edgeOffset;
+
+  @override
+  Widget build(BuildContext context) => RefreshIndicator.adaptive(
+    edgeOffset: edgeOffset,
+    onRefresh: () {
+      Haptics.refresh();
+      return onRefresh();
+    },
+    child: child,
+  );
+}
+
+/// How long a gauge takes to settle on a new value.
+const gaugeDuration = Duration(milliseconds: 600);
+
+/// The curve gauges and the numbers inside them share.
+const gaugeCurve = Curves.easeOutCubic;
+
 /// A ring gauge drawn from one or more segments (fractions of the whole)
-/// over a track, with a centred child.
-class RingGauge extends StatelessWidget {
+/// over a track, with a centred child. The ring sweeps in when it first
+/// appears and glides to each new value after that; with the system's
+/// reduce-motion setting on, it jumps instead.
+class RingGauge extends StatefulWidget {
   const RingGauge({
     super.key,
     required this.segments,
@@ -181,17 +278,118 @@ class RingGauge extends StatelessWidget {
   final double stroke;
 
   @override
-  Widget build(BuildContext context) => SizedBox.square(
-    dimension: size,
-    child: CustomPaint(
-      painter: _RingPainter(
-        segments: segments,
-        track: Theme.of(context).colorScheme.surfaceContainerHighest,
-        stroke: stroke,
-      ),
-      child: Center(child: child),
-    ),
+  State<RingGauge> createState() => _RingGaugeState();
+}
+
+class _RingGaugeState extends State<RingGauge>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller = AnimationController(
+    vsync: this,
+    duration: gaugeDuration,
   );
+
+  /// Where the current animation started and where it is headed.
+  late List<(double, Color)> _from = [
+    for (final (_, color) in widget.segments) (0.0, color),
+  ];
+  late List<(double, Color)> _to = widget.segments;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller.forward();
+  }
+
+  @override
+  void didUpdateWidget(RingGauge old) {
+    super.didUpdateWidget(old);
+    if (!_sameSegments(old.segments, widget.segments)) {
+      // Start from what is on screen now, so a value that changes mid-glide
+      // does not jump back.
+      _from = _current;
+      _to = widget.segments;
+      _controller.forward(from: 0);
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  List<(double, Color)> get _current =>
+      _lerpSegments(_from, _to, gaugeCurve.transform(_controller.value));
+
+  @override
+  Widget build(BuildContext context) {
+    final track = Theme.of(context).colorScheme.surfaceContainerHighest;
+    final still = MediaQuery.disableAnimationsOf(context);
+    return SizedBox.square(
+      dimension: widget.size,
+      child: AnimatedBuilder(
+        animation: _controller,
+        builder: (context, child) => CustomPaint(
+          painter: _RingPainter(
+            segments: still ? widget.segments : _current,
+            track: track,
+            stroke: widget.stroke,
+          ),
+          child: child,
+        ),
+        child: Center(child: widget.child),
+      ),
+    );
+  }
+}
+
+bool _sameSegments(List<(double, Color)> a, List<(double, Color)> b) =>
+    a.length == b.length &&
+    [for (var i = 0; i < a.length; i++) a[i] == b[i]].every((same) => same);
+
+/// Segments between [from] and [to]. When one list is shorter, its missing
+/// segments grow from or shrink to nothing in the other's colour.
+List<(double, Color)> _lerpSegments(
+  List<(double, Color)> from,
+  List<(double, Color)> to,
+  double t,
+) => [
+  for (var i = 0; i < math.max(from.length, to.length); i++)
+    (
+      ui.lerpDouble(
+        i < from.length ? from[i].$1 : 0,
+        i < to.length ? to[i].$1 : 0,
+        t,
+      )!,
+      Color.lerp(
+        i < from.length ? from[i].$2 : to[i].$2,
+        i < to.length ? to[i].$2 : from[i].$2,
+        t,
+      )!,
+    ),
+];
+
+/// A percentage that counts up to its value and between values, in step with
+/// the [RingGauge] around it.
+class AnimatedPercent extends StatelessWidget {
+  const AnimatedPercent(this.percent, {super.key, this.style});
+
+  /// 0 to 100.
+  final double percent;
+  final TextStyle? style;
+
+  @override
+  Widget build(BuildContext context) {
+    if (MediaQuery.disableAnimationsOf(context)) {
+      return Text('${percent.round()}%', style: style);
+    }
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: 0, end: percent),
+      duration: gaugeDuration,
+      curve: gaugeCurve,
+      builder: (context, value, _) => Text('${value.round()}%', style: style),
+    );
+  }
 }
 
 class _RingPainter extends CustomPainter {
@@ -231,12 +429,10 @@ class _RingPainter extends CustomPainter {
   bool shouldRepaint(_RingPainter old) =>
       old.track != track ||
       old.stroke != stroke ||
-      old.segments.length != segments.length ||
-      [for (var i = 0; i < segments.length; i++) old.segments[i] != segments[i]]
-          .any((changed) => changed);
+      !_sameSegments(old.segments, segments);
 }
 
-/// A dialog button: a Cupertino action on iOS, a Material button elsewhere.
+/// A dialog button. On iOS the glass dialog restyles it as a capsule.
 Widget dialogAction(
   BuildContext context, {
   required String label,
@@ -244,14 +440,6 @@ Widget dialogAction(
   bool primary = false,
   bool destructive = false,
 }) {
-  if (isCupertino(context)) {
-    return CupertinoDialogAction(
-      onPressed: onPressed,
-      isDefaultAction: primary,
-      isDestructiveAction: destructive,
-      child: Text(label),
-    );
-  }
   if (!primary && !destructive) {
     return TextButton(onPressed: onPressed, child: Text(label));
   }

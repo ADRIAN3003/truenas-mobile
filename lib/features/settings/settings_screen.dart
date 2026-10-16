@@ -6,6 +6,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../core/instances/instances_provider.dart';
 import '../../core/settings/app_settings.dart';
 import '../../core/settings/settings_provider.dart';
+import '../../core/settings/system_language.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../shared/dialogs.dart';
 import '../../shared/haptics.dart';
@@ -48,20 +49,23 @@ class SettingsScreen extends ConsumerWidget {
                 onChanged: (theme) =>
                     notifier.update((s) => s.copyWith(theme: theme)),
               ),
-              _ChoiceRow<String?>(
-                icon: Icons.language_rounded,
-                color: AppPalette.tileBlue,
-                title: l10n.settingsLanguage,
-                value: settings.language,
-                options: [
-                  (null, l10n.settingsSystemDefault),
-                  // A language is always named in itself.
-                  ('en', 'English'),
-                  ('hu', 'Magyar'),
-                ],
-                onChanged: (code) =>
-                    notifier.update((s) => s.copyWith(language: () => code)),
-              ),
+              if (ref.watch(systemLanguagePageProvider))
+                const _SystemLanguageRow()
+              else
+                _ChoiceRow<String?>(
+                  icon: Icons.language_rounded,
+                  color: AppPalette.tileBlue,
+                  title: l10n.settingsLanguage,
+                  value: settings.language,
+                  options: [
+                    (null, l10n.settingsSystemDefault),
+                    // A language is always named in itself.
+                    ('en', 'English'),
+                    ('hu', 'Magyar'),
+                  ],
+                  onChanged: (code) =>
+                      notifier.update((s) => s.copyWith(language: () => code)),
+                ),
             ],
           ),
           SectionHeader(l10n.settingsGeneral),
@@ -193,6 +197,47 @@ class SettingsScreen extends ConsumerWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+/// The Language row where the phone has a language page for the app (iOS, and
+/// Android 13 and newer): it shows the language in use and opens that page,
+/// because the language is changed there and not inside the app.
+class _SystemLanguageRow extends ConsumerWidget {
+  const _SystemLanguageRow();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    final muted = AppPalette.of(context).muted;
+    // A language is always named in itself.
+    final current = switch (Localizations.localeOf(context).languageCode) {
+      'hu' => 'Magyar',
+      _ => 'English',
+    };
+    return ListTile(
+      leading: const IconTile(Icons.language_rounded, AppPalette.tileBlue),
+      title: Text(l10n.settingsLanguage),
+      subtitle: Text(l10n.settingsLanguageSystemHint),
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(current, style: TextStyle(color: muted)),
+          const SizedBox(width: 8),
+          Icon(Icons.open_in_new_rounded, size: 18, color: muted),
+        ],
+      ),
+      onTap: () async {
+        final messenger = ScaffoldMessenger.of(context);
+        try {
+          await ref.read(systemLanguageProvider).open();
+        } catch (_) {
+          messenger.showSnackBar(
+            SnackBar(content: Text(l10n.settingsLanguageOpenFailed)),
+          );
+        }
+      },
     );
   }
 }

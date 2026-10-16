@@ -114,18 +114,32 @@ Future<T?> showAppDialog<T>({
         barrierDismissible: barrierDismissible,
       );
 
-/// A bottom sheet: a modal sheet with a drag handle on Android, a floating
-/// liquid glass sheet on iOS.
+/// A bottom sheet: a modal sheet with a drag handle. On iOS it has the big
+/// rounded top of iOS 26's sheets, but stays opaque: a see-through glass sheet
+/// let the page behind show through and made its text hard to read.
 Future<T?> showAppSheet<T>({
   required BuildContext context,
   required WidgetBuilder builder,
-}) => useGlassChrome(context)
-    ? showGlassSheet<T>(context: context, builder: builder)
-    : showModalBottomSheet<T>(
-        context: context,
-        showDragHandle: true,
-        builder: builder,
-      );
+}) {
+  if (!useGlassChrome(context)) {
+    return showModalBottomSheet<T>(
+      context: context,
+      showDragHandle: true,
+      builder: builder,
+    );
+  }
+  return showModalBottomSheet<T>(
+    context: context,
+    isScrollControlled: true,
+    useSafeArea: true,
+    showDragHandle: true,
+    backgroundColor: Theme.of(context).colorScheme.surfaceContainerHigh,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(34)),
+    ),
+    builder: builder,
+  );
+}
 
 /// One entry of an [AppPopupMenu].
 typedef AppMenuEntry<T> = ({T value, String label, bool destructive});

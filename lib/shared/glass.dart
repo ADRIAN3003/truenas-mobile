@@ -66,11 +66,15 @@ class GlassTabBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final width = math.min(MediaQuery.sizeOf(context).width - 24, 440.0);
-    // Plain glass: no tint and no colours of our own, so labels and icons
-    // keep one colour whether a tab is selected or not (a selected label is
-    // drawn a second time under the pill, and where it was wider than the
-    // pill that showed as a half-coloured letter). Tab labels stay at their
-    // size, like the system tab bar; the capsule has no room to grow.
+    final accent = Theme.of(context).colorScheme.primary;
+    // The glass itself stays plain; only the selected tab's icon and label
+    // take the accent colour. A selected tab is drawn a second time on top of
+    // the bar, 15% larger and heavier by default, and where that copy was
+    // wider than the one beneath it the label looked half coloured (the "D" of
+    // Dashboard). So the copy keeps the size and weight of the rest. Tab
+    // labels stay at their size, like the system tab bar; the capsule has no
+    // room to grow.
+    const weight = TextStyle(fontWeight: FontWeight.w500);
     return Align(
       alignment: Alignment.bottomCenter,
       child: SafeArea(
@@ -85,6 +89,11 @@ class GlassTabBar extends StatelessWidget {
                 horizontalPadding: 0,
                 verticalPadding: 0,
                 iconSize: 22,
+                magnification: 1,
+                selectedIconColor: accent,
+                selectedLabelColor: accent,
+                selectedLabelStyle: weight,
+                unselectedLabelStyle: weight,
                 selectedIndex: selectedIndex,
                 onTabSelected: onSelected,
                 tabs: [
@@ -371,16 +380,6 @@ class GlassDialogButton extends StatelessWidget {
     );
   }
 }
-
-/// A bottom sheet on liquid glass, floating with a margin like iOS 26's.
-Future<T?> showGlassSheet<T>({
-  required BuildContext context,
-  required WidgetBuilder builder,
-}) => lg.GlassSheet.show<T>(
-  context: context,
-  builder: (context) =>
-      Material(type: MaterialType.transparency, child: builder(context)),
-);
 
 /// One entry of a [GlassPopupMenu].
 typedef GlassMenuEntry<T> = ({T value, String label, bool destructive});

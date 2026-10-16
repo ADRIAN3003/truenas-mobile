@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'core/settings/app_settings.dart';
 import 'core/settings/settings_provider.dart';
+import 'core/settings/system_language.dart';
 import 'features/instances/instances_screen.dart';
 import 'features/updates/update_prompt.dart';
 import 'l10n/generated/app_localizations.dart';
@@ -14,11 +15,16 @@ class TrueNasMobileApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final settings = ref.watch(settingsProvider);
+    // With a system language page for the app, the language is whatever that
+    // says, which the phone already hands the app as its locale.
+    final inAppLanguage = ref.watch(systemLanguagePageProvider)
+        ? null
+        : settings.language;
     return MaterialApp(
       onGenerateTitle: (context) => AppLocalizations.of(context).appTitle,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
-      locale: settings.language == null ? null : Locale(settings.language!),
+      locale: inAppLanguage == null ? null : Locale(inAppLanguage),
       debugShowCheckedModeBanner: false,
       theme: buildAppTheme(Brightness.light),
       darkTheme: buildAppTheme(Brightness.dark),

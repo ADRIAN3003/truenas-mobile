@@ -105,6 +105,109 @@ void main() {
     await disconnect(tester);
   });
 
+  group('Update all', () {
+    Map<String, dynamic> extraApp(String name, {required bool update}) => {
+      'name': name,
+      'id': name,
+      'state': 'RUNNING',
+      'human_version': '1.0.0',
+      'version': '1.0.0',
+      'latest_version': update ? '1.1.0' : '1.0.0',
+      'upgrade_available': update,
+      'image_updates_available': false,
+      'custom_app': false,
+      'metadata': {'title': name[0].toUpperCase() + name.substring(1)},
+      'active_workloads': {'containers': 1, 'images': <String>[]},
+      'portals': <String, String>{},
+      'notes': null,
+    };
+
+    testWidgets('lists every app it will update, then updates them', (
+      tester,
+    ) async {
+      await connect(tester);
+      server.apps
+        ..add(extraApp('immich', update: true))
+        ..add(extraApp('plex', update: false));
+      await tester.pumpWidget(wrap(AppsTab(session: session)));
+      await settle(tester);
+
+      expect(find.text('2 apps have updates'), findsOneWidget);
+      await tester.tap(find.widgetWithText(FilledButton, 'Update all'));
+      await tester.pumpAndSettle();
+
+      // The dialog names both apps with their versions, and leaves out the
+      // one that is up to date.
+      expect(find.text('Update 2 apps?'), findsOneWidget);
+      expect(find.text('Jellyfin'), findsOneWidget);
+      expect(find.text('1.2.3 → 1.2.4'), findsOneWidget);
+      expect(find.text('Immich'), findsOneWidget);
+      expect(find.text('1.0.0 → 1.1.0'), findsOneWidget);
+      expect(find.text('Plex'), findsNothing);
+
+      await tester.tap(find.widgetWithText(FilledButton, 'Update all').last);
+      await settle(tester);
+
+      expect(
+        server.apps.map((a) => a['upgrade_available']),
+        everyElement(isFalse),
+      );
+      expect(find.text('2 apps updated'), findsOneWidget);
+      // Nothing left to update, so the card goes away.
+      expect(find.text('Update all'), findsNothing);
+      await disconnect(tester);
+    });
+
+    testWidgets('cancelling updates nothing', (tester) async {
+      await connect(tester);
+      await tester.pumpWidget(wrap(AppsTab(session: session)));
+      await settle(tester);
+
+      expect(find.text('1 app has an update'), findsOneWidget);
+      await tester.tap(find.widgetWithText(FilledButton, 'Update all'));
+      await tester.pumpAndSettle();
+      expect(find.text('Update 1 app?'), findsOneWidget);
+      await tester.tap(find.text('Cancel'));
+      await tester.pumpAndSettle();
+      expect(server.apps.single['upgrade_available'], isTrue);
+      expect(find.text('Update all'), findsOneWidget);
+      await disconnect(tester);
+    });
+
+    testWidgets('an app that fails does not stop the others', (tester) async {
+      await connect(tester);
+      server.apps.add(extraApp('immich', update: true));
+      server.failingUpgrades.add('jellyfin');
+      await tester.pumpWidget(wrap(AppsTab(session: session)));
+      await settle(tester);
+
+      await tester.tap(find.widgetWithText(FilledButton, 'Update all'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.widgetWithText(FilledButton, 'Update all').last);
+      await settle(tester);
+
+      expect(server.apps[0]['upgrade_available'], isTrue);
+      expect(server.apps[1]['upgrade_available'], isFalse);
+      expect(
+        find.text('1 of 2 apps updated. Not updated: jellyfin'),
+        findsOneWidget,
+      );
+      // jellyfin can still be updated, so the card stays.
+      expect(find.text('1 app has an update'), findsOneWidget);
+      await disconnect(tester);
+    });
+
+    testWidgets('is not offered when every app is up to date', (tester) async {
+      await connect(tester);
+      server.apps.single['upgrade_available'] = false;
+      await tester.pumpWidget(wrap(AppsTab(session: session)));
+      await settle(tester);
+
+      expect(find.text('Update all'), findsNothing);
+      await disconnect(tester);
+    });
+  });
+
   testWidgets('app screen upgrades after confirmation', (tester) async {
     await connect(tester);
     await tester.pumpWidget(wrap(AppsTab(session: session)));

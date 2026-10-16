@@ -596,5 +596,14 @@
   "appUpdateErrInstall": "Nem sikerült megnyitni a telepítőt.",
   "appUpdatePermissionTitle": "Frissítések telepítésének engedélyezése",
   "appUpdatePermissionBody": "Az Android engedélyt kér, mielőtt egy app frissítést telepíthet. Nyisd meg a beállításokat, engedélyezd a TrueNAS Mobile számára, majd térj vissza, és koppints újra a Letöltés és telepítés gombra.",
-  "appUpdateOpenSettings": "Beállítások megnyitása"
+  "appUpdateOpenSettings": "Beállítások megnyitása",
+  "appsUpdatesAvailable": "{count, plural, other{{count} alkalmazáshoz van frissítés}}",
+  "appsUpdateAll": "Összes frissítése",
+  "appsUpdateAllTitle": "{count, plural, other{{count} alkalmazás frissítése?}}",
+  "appsUpdateAllBody": "Az alkalmazások egymás után frissülnek, és mindegyik újraindul a frissítés közben.",
+  "appsUpdateAllProgress": "{name} frissítése ({current}/{total})",
+  "appsUpdateAllDone": "{count, plural, other{{count} alkalmazás frissítve}}",
+  "appsUpdateAllPartial": "{done}/{total} alkalmazás frissítve. Nem frissült: {failed}",
+  "settingsLanguageSystemHint": "Megnyitja az alkalmazás nyelvi oldalát a telefon beállításaiban",
+  "settingsLanguageOpenFailed": "Nem sikerült megnyitni a telefon beállításait."
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/misc.dart' show Override;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:truenas_mobile/app.dart';
@@ -8,9 +9,11 @@ import 'package:truenas_mobile/core/instances/instances_provider.dart';
 import 'package:truenas_mobile/core/instances/server_instance.dart';
 import 'package:truenas_mobile/core/settings/app_settings.dart';
 import 'package:truenas_mobile/core/settings/settings_provider.dart';
+import 'package:truenas_mobile/core/settings/system_language.dart';
 import 'package:truenas_mobile/features/updates/updates_provider.dart';
 import 'package:truenas_mobile/shared/haptics.dart';
 
+import '../../support/language_fakes.dart';
 import '../../support/memory_store.dart';
 import '../../support/update_fakes.dart';
 
@@ -36,6 +39,7 @@ void main() {
   Future<void> open(
     WidgetTester tester, {
     List<ServerInstance>? servers,
+    List<Override> overrides = const [],
   }) async {
     if (servers != null) await InstanceRepository(serverStore).save(servers);
     // Tall enough that every row is built.
@@ -53,6 +57,7 @@ void main() {
         updateCheckerProvider.overrideWithValue(
           FakeGitHub([releaseJson('v0.1.2', body: 'First notes')]).checker,
         ),
+        ...overrides,
       ],
     );
     addTearDown(container.dispose);
@@ -119,6 +124,82 @@ void main() {
     await choose(tester, 'Nyelv', 'Mint az eszköz');
     expect(container.read(settingsProvider).language, isNull);
     expect((await saved()).language, isNull);
+  });
+
+  group('language', () {
+    testWidgets('is picked inside the app when the phone has no page for it', (
+      tester,
+    ) async {
+      await open(tester);
+      await tester.tap(find.text('Language'));
+      await tester.pumpAndSettle();
+      expect(find.text('English'), findsOneWidget);
+      expect(find.text('Magyar'), findsOneWidget);
+      expect(find.byType(BottomSheet), findsOneWidget);
+    });
+
+    testWidgets("opens the phone's language page for the app instead", (
+      tester,
+    ) async {
+      final system = FakeSystemLanguage();
+      await open(
+        tester,
+        overrides: [
+          systemLanguagePageProvider.overrideWithValue(true),
+          systemLanguageProvider.overrideWithValue(system),
+        ],
+      );
+      expect(
+        find.text("Opens this app's language page in your phone's settings"),
+        findsOneWidget,
+      );
+      expect(find.text('English'), findsOneWidget);
+
+      await tester.tap(find.text('Language'));
+      await tester.pumpAndSettle();
+      expect(system.opened, 1);
+      // Nothing to pick in the app, and nothing saved from it.
+      expect(find.byType(BottomSheet), findsNothing);
+      expect((await saved()).language, isNull);
+    });
+
+    testWidgets("the phone's page decides, not an old in-app choice", (
+      tester,
+    ) async {
+      await open(
+        tester,
+        overrides: [
+          initialSettingsProvider.overrideWithValue(
+            const AppSettings(language: 'hu'),
+          ),
+          systemLanguagePageProvider.overrideWithValue(true),
+          systemLanguageProvider.overrideWithValue(FakeSystemLanguage()),
+        ],
+      );
+      expect(
+        tester.widget<MaterialApp>(find.byType(MaterialApp)).locale,
+        isNull,
+      );
+      expect(find.text('App settings'), findsOneWidget);
+    });
+
+    testWidgets('says so when the settings cannot be opened', (tester) async {
+      await open(
+        tester,
+        overrides: [
+          systemLanguagePageProvider.overrideWithValue(true),
+          systemLanguageProvider.overrideWithValue(
+            FakeSystemLanguage(failToOpen: true),
+          ),
+        ],
+      );
+      await tester.tap(find.text('Language'));
+      await tester.pumpAndSettle();
+      expect(
+        find.text("Could not open your phone's settings."),
+        findsOneWidget,
+      );
+    });
   });
 
   testWidgets('the haptics switch turns the app\'s taps off', (tester) async {

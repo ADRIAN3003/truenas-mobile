@@ -36,6 +36,7 @@ class TrueNasApp {
     required this.containers,
     required this.portals,
     required this.images,
+    this.chartVersion,
     this.latestVersion,
     this.title,
     this.iconUrl,
@@ -49,6 +50,7 @@ class TrueNasApp {
       name: (json['name'] ?? json['id'] ?? '').toString(),
       state: WorkloadState.parse(json['state']),
       version: (json['human_version'] ?? json['version'] ?? '').toString(),
+      chartVersion: json['version'] as String?,
       latestVersion: json['latest_version'] as String?,
       upgradeAvailable: json['upgrade_available'] == true,
       imageUpdatesAvailable: json['image_updates_available'] == true,
@@ -72,6 +74,10 @@ class TrueNasApp {
   final String name;
   final WorkloadState state;
   final String version;
+
+  /// The installed catalog version (`1.2.3`), the kind [latestVersion] is;
+  /// [version] is the longer human one (`10.10.7_1.2.3`).
+  final String? chartVersion;
   final String? latestVersion;
   final bool upgradeAvailable;
   final bool imageUpdatesAvailable;

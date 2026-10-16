@@ -146,6 +146,9 @@ class FakeTrueNasServer {
     },
   ];
 
+  /// Apps whose `app.upgrade` fails.
+  final failingUpgrades = <String>{};
+
   /// VMs served by `vm.query`.
   final vms = <Map<String, dynamic>>[
     {
@@ -654,6 +657,21 @@ class FakeTrueNasServer {
             result = apps;
           case 'app.start' || 'app.stop' || 'app.redeploy' || 'app.upgrade':
             final app = apps.firstWhere((a) => a['name'] == params[0]);
+            if (method == 'app.upgrade' &&
+                failingUpgrades.contains(params[0])) {
+              socket.add(
+                jsonEncode({
+                  'jsonrpc': '2.0',
+                  'id': message['id'],
+                  'error': {
+                    'code': -32001,
+                    'message': 'Method call error',
+                    'data': {'reason': '[EFAULT] Upgrade failed'},
+                  },
+                }),
+              );
+              return;
+            }
             app['state'] = method == 'app.stop' ? 'STOPPED' : 'RUNNING';
             if (method == 'app.upgrade') {
               app['human_version'] = app['latest_version'];

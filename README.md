@@ -24,8 +24,9 @@ for Android and iOS that talks to the official TrueNAS middleware API
   disable any of them, and add, edit or delete every kind.
 - **Shares:** SMB and NFS shares (create, edit, delete), services (start,
   stop, start on boot), and read-only views of iSCSI and NVMe-oF.
-- **Apps and VMs:** Docker apps (start, stop, redeploy, upgrade, delete),
-  virtual machines and containers (start, stop, restart), each with a shell.
+- **Apps and VMs:** Docker apps (start, stop, redeploy, upgrade, delete, or
+  update all that have a newer version, after listing them), virtual machines
+  and containers (start, stop, restart), each with a shell.
 - **System:** users and groups, API keys, network and certificates
   (read-only), updates and boot environments, reboot and shut down.
 - **Shell:** a terminal on the server, with Esc, Tab, Ctrl+C and arrow keys.
@@ -37,9 +38,11 @@ for Android and iOS that talks to the official TrueNAS middleware API
   (switch it off in Settings), shows the release notes, and lets you skip a
   version. On Android it downloads the APK and opens the installer; on iOS it
   opens the release page.
-- **Settings:** theme, language, haptics, shell font size and keys, trusted
-  certificates.
-- **Languages:** English and Hungarian, following the device language.
+- **Settings:** theme, haptics, shell font size and keys, trusted
+  certificates, and a link to the app's language page.
+- **Languages:** English and Hungarian. The language is chosen in the phone's
+  own settings for the app (iOS Settings, and Android 13 or newer); Android 12
+  and older pick it inside the app.
 
 ## Supported TrueNAS versions
 
@@ -113,7 +116,9 @@ the template. To add a language:
 
 1. Copy `lib/l10n/app_en.arb` to `app_<locale>.arb` (for example
    `app_de.arb`), set `"@@locale"` and translate the values.
-2. Add the locale to `CFBundleLocalizations` in `ios/Runner/Info.plist`.
+2. Add the locale to `CFBundleLocalizations` in `ios/Runner/Info.plist` and
+   to `android/app/src/main/res/xml/locales_config.xml`, which is how the
+   phone's per-app language page learns about it.
 3. Run `flutter gen-l10n` (it also runs automatically on build).
 
 ## Screenshots

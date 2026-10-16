@@ -272,12 +272,15 @@ void main() {
       await tester.pumpAndSettle();
     }
 
-    testWidgets('floats on glass on iOS and returns the choice', (
+    testWidgets('is opaque and rounded on iOS and returns the choice', (
       tester,
     ) async {
       String? picked;
       await openSheet(tester, TargetPlatform.iOS, (v) => picked = v);
-      expect(find.byType(BottomSheet), findsNothing);
+      final sheet = tester.widget<BottomSheet>(find.byType(BottomSheet));
+      expect(sheet.backgroundColor, isNotNull);
+      expect(sheet.backgroundColor!.a, 1);
+      expect(sheet.showDragHandle, isTrue);
       await tester.tap(find.text('Snapshot task'));
       await tester.pumpAndSettle();
       expect(picked, 'snapshot');

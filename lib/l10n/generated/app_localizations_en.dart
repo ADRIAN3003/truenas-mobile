@@ -2148,4 +2148,62 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get appUpdateOpenSettings => 'Open settings';
+
+  @override
+  String appsUpdatesAvailable(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count apps have updates',
+      one: '1 app has an update',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get appsUpdateAll => 'Update all';
+
+  @override
+  String appsUpdateAllTitle(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Update $count apps?',
+      one: 'Update 1 app?',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get appsUpdateAllBody =>
+      'These apps are updated one after another, and each restarts while it updates.';
+
+  @override
+  String appsUpdateAllProgress(String name, int current, int total) {
+    return 'Updating $name ($current of $total)';
+  }
+
+  @override
+  String appsUpdateAllDone(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count apps updated',
+      one: '1 app updated',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String appsUpdateAllPartial(int done, int total, String failed) {
+    return '$done of $total apps updated. Not updated: $failed';
+  }
+
+  @override
+  String get settingsLanguageSystemHint =>
+      'Opens this app\'s language page in your phone\'s settings';
+
+  @override
+  String get settingsLanguageOpenFailed =>
+      'Could not open your phone\'s settings.';
 }

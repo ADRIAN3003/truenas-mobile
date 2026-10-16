@@ -118,13 +118,15 @@ class SegmentedBar extends StatelessWidget {
 
 /// Asks the user to confirm an action. With [typeToConfirm], the confirm
 /// button only enables once that exact text is typed (for destructive
-/// actions such as deleting a dataset).
+/// actions such as deleting a dataset). [details] sits under the body, for a
+/// list of what the action affects.
 Future<bool> confirmAction(
   BuildContext context, {
   required String title,
   required String body,
   required String confirmLabel,
   required String cancelLabel,
+  Widget? details,
   String? typeToConfirm,
   String? typeToConfirmHint,
   bool destructive = false,
@@ -138,6 +140,7 @@ Future<bool> confirmAction(
             typeToConfirm == null || controller.text.trim() == typeToConfirm;
         return AppDialog(
           title: Text(title),
+          scrollable: details != null,
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -148,6 +151,7 @@ Future<bool> confirmAction(
                     ? TextAlign.center
                     : TextAlign.start,
               ),
+              if (details != null) ...[const SizedBox(height: 12), details],
               if (typeToConfirm != null) ...[
                 const SizedBox(height: 16),
                 TextField(

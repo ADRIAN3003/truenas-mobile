@@ -249,25 +249,15 @@ Future<void> openAppShell(
   }
   final id = containers.length == 1
       ? containers.keys.single
-      : await showAppDialog<String>(
+      : (await showAppChoice<String>(
           context: context,
-          builder: (context) => AppDialog(
-            scrollable: true,
-            title: Text(l10n.shellPickContainer),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                for (final MapEntry(:key, :value) in containers.entries)
-                  ListTile(
-                    dense: true,
-                    title: Text(value),
-                    onTap: () => Navigator.pop(context, key),
-                  ),
-              ],
-            ),
-          ),
-        );
+          title: l10n.shellPickContainer,
+          dialogOnAndroid: true,
+          choices: [
+            for (final MapEntry(:key, :value) in containers.entries)
+              appChoice(key, value),
+          ],
+        ))?.$1;
   if (id == null || !context.mounted) return;
   await openShell(
     context,

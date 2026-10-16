@@ -190,7 +190,7 @@ class AppLocalizationsHu extends AppLocalizations {
   String get errorCancelled => 'A kapcsolódás megszakítva.';
 
   @override
-  String get tabDashboard => 'Áttekintés';
+  String get tabDashboard => 'Főoldal';
 
   @override
   String get tabAlerts => 'Riasztások';

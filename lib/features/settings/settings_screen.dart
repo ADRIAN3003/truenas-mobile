@@ -94,7 +94,7 @@ class SettingsScreen extends ConsumerWidget {
             children: [
               ListTile(
                 title: Text(l10n.settingsShellFontSize),
-                subtitle: Slider.adaptive(
+                subtitle: AppSlider(
                   min: AppSettings.minShellFontSize,
                   max: AppSettings.maxShellFontSize,
                   divisions:
@@ -281,26 +281,13 @@ class _ChoiceRow<T> extends StatelessWidget {
       onTap: () async {
         // A record, so choosing the "null" option is told apart from
         // dismissing the sheet.
-        final picked = await showAppSheet<(T,)>(
+        final picked = await showAppChoice<T>(
           context: context,
-          builder: (context) => SafeArea(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                for (final (choice, label) in options)
-                  ListTile(
-                    title: Text(label),
-                    trailing: choice == value
-                        ? Icon(
-                            Icons.check_rounded,
-                            color: Theme.of(context).colorScheme.primary,
-                          )
-                        : null,
-                    onTap: () => Navigator.pop(context, (choice,)),
-                  ),
-              ],
-            ),
-          ),
+          title: title,
+          choices: [
+            for (final (choice, label) in options)
+              appChoice(choice, label, selected: choice == value),
+          ],
         );
         if (picked != null && picked.$1 != value) {
           Haptics.selection();

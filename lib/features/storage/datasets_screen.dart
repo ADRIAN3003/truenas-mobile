@@ -218,21 +218,14 @@ class _CreateDatasetDialogState extends State<_CreateDatasetDialog> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              SegmentedButton<bool>(
-                segments: [
-                  ButtonSegment(
-                    value: false,
-                    label: Text(l10n.datasetTypeFilesystem),
-                    icon: const Icon(Icons.folder_outlined),
-                  ),
-                  ButtonSegment(
-                    value: true,
-                    label: Text(l10n.datasetTypeVolume),
-                    icon: const Icon(Icons.storage_outlined),
-                  ),
-                ],
-                selected: {_volume},
-                onSelectionChanged: (s) => setState(() => _volume = s.first),
+              AppSegments<bool>(
+                // Inside a glass dialog, so no glass control over glass.
+                inGlass: true,
+                values: const [false, true],
+                labels: [l10n.datasetTypeFilesystem, l10n.datasetTypeVolume],
+                icons: const [Icons.folder_outlined, Icons.storage_outlined],
+                selected: _volume,
+                onChanged: (v) => setState(() => _volume = v),
               ),
               const SizedBox(height: 16),
               DropdownButtonFormField<String>(

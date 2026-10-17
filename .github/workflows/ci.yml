@@ -91,4 +91,22 @@ jobs:
           echo "--- signature"; codesign -dvv "$APPEX" 2>&1 || true
           echo "--- Info.plist"; plutil -p "$APPEX/Info.plist"
           echo "--- strings"; strings "$BIN" | grep -i -E "ActivityConfiguration|JobActivityAttributes|systemName|checkmark.shield" | head -20 || true
+      - name: Compare the extension and app binaries
+        run: |
+          APP=build/ios/iphoneos/Runner.app
+          APPEX="$APP/PlugIns/JobActivityWidget.appex"
+          for BIN in "$APPEX/JobActivityWidget" "$APP/Runner"; do
+            echo "=============== $BIN"
+            ls -l "$BIN"
+            echo "--- load commands"; otool -l "$BIN" | grep -E "^\s+cmd " | sort | uniq -c
+            echo "--- segments"; otool -l "$BIN" | grep -E -A8 "segname (__TEXT|__DATA|__LINKEDIT)$" | grep -E "segname|vmsize|fileoff|filesize|maxprot|initprot"
+            echo "--- embedded signature"; codesign -dvvv "$BIN" 2>&1 | grep -E "Format|CodeDirectory|Page size|Signature|flags|Identifier" || true
+            echo "--- verify as built"; codesign --verify --strict -vvv "$BIN" 2>&1 || true
+          done
+          echo "=============== re-sign a copy ad hoc, as a sideloading tool does"
+          cp "$APPEX/JobActivityWidget" /tmp/appex-bin
+          codesign --remove-signature /tmp/appex-bin || true
+          codesign --force --sign - /tmp/appex-bin
+          codesign --verify --strict -vvv /tmp/appex-bin
+          codesign -dvvv /tmp/appex-bin 2>&1 | grep -E "CodeDirectory|Page size|flags"
 

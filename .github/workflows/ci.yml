@@ -64,3 +64,17 @@ jobs:
           channel: stable
           cache: true
       - run: flutter build ios --release --no-codesign
+      # The lock screen progress is drawn by an app extension; without it in
+      # the app the Dynamic Island shows an empty pill.
+      - name: Check the Live Activity extension is embedded
+        run: |
+          APP=build/ios/iphoneos/Runner.app
+          APPEX="$APP/PlugIns/JobActivityWidget.appex"
+          ls -l "$APP/PlugIns"
+          test -x "$APPEX/JobActivityWidget"
+          plutil -p "$APPEX/Info.plist"
+          plutil -extract NSExtension.NSExtensionPointIdentifier raw "$APPEX/Info.plist" | grep -qx com.apple.widgetkit-extension
+          plutil -extract NSSupportsLiveActivities raw "$APP/Info.plist" | grep -qx true
+          test "$(plutil -extract CFBundleVersion raw "$APPEX/Info.plist")" = "$(plutil -extract CFBundleVersion raw "$APP/Info.plist")"
+          strings "$APPEX/JobActivityWidget" | grep -q JobActivityAttributes
+          strings "$APP/Runner" | grep -q JobActivityAttributes

@@ -1,3 +1,4 @@
+import 'job.dart';
 import 'json.dart';
 
 /// Normalised run state shared by apps, VMs and containers.
@@ -94,6 +95,88 @@ class TrueNasApp {
   final String? title;
   final String? iconUrl;
   final String? notes;
+}
+
+/// What a bulk run does to every app it covers.
+enum AppBulkAction {
+  upgrade('app.upgrade'),
+  start('app.start'),
+  stop('app.stop'),
+
+  /// Redeploys, which is what "restart" means for an app.
+  restart('app.redeploy');
+
+  const AppBulkAction(this.method);
+
+  /// The API method `core.bulk` runs once per app.
+  final String method;
+
+  static AppBulkAction? fromMethod(Object? method) {
+    for (final action in values) {
+      if (action.method == method) return action;
+    }
+    return null;
+  }
+}
+
+/// A bulk run over apps: the server's `core.bulk` job over `app.upgrade`,
+/// `app.start`, `app.stop` or `app.redeploy`. It lives on the server, so it
+/// carries on when the app is closed and can be found again by its [jobId]
+/// or by [AppBulkRun.fromJob] on any `core.bulk` job.
+class AppBulkRun {
+  const AppBulkRun({
+    required this.job,
+    required this.action,
+    required this.apps,
+  });
+
+  /// Null when [json] is not a bulk run over apps.
+  static AppBulkRun? fromJob(Map<String, dynamic> json) {
+    final arguments = json['arguments'];
+    if (json['method'] != 'core.bulk' ||
+        arguments is! List ||
+        arguments.length < 2 ||
+        arguments[1] is! List) {
+      return null;
+    }
+    final action = AppBulkAction.fromMethod(arguments[0]);
+    if (action == null) return null;
+    return AppBulkRun(
+      job: TrueNasJob.fromJson(json),
+      action: action,
+      apps: [
+        for (final call in arguments[1] as List)
+          if (call is List && call.isNotEmpty) call.first.toString(),
+      ],
+    );
+  }
+
+  /// The `core.bulk` job, for progress and the end state.
+  final TrueNasJob job;
+  final AppBulkAction action;
+
+  /// The apps it covers, in order.
+  final List<String> apps;
+
+  int get jobId => job.id;
+  bool get isActive => job.state.isActive;
+
+  /// Apps the server could not handle, with its reason. Empty while the job
+  /// runs. When the job itself failed or was aborted no per-app result is
+  /// trustworthy, so every app is listed.
+  Map<String, String> get failed {
+    if (isActive) return const {};
+    final results = job.raw['result'];
+    if (job.state == JobState.success && results is List) {
+      return {
+        for (var i = 0; i < apps.length && i < results.length; i++)
+          if (results[i] case {'error': final Object error})
+            apps[i]: error.toString(),
+      };
+    }
+    if (job.state == JobState.success) return const {};
+    return {for (final app in apps) app: job.error ?? job.state.name};
+  }
 }
 
 /// A virtual machine from `vm.query`.

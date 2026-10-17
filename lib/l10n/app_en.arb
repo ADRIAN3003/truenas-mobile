@@ -3062,18 +3062,22 @@
       }
     }
   },
-  "appsUpdateAllBody": "These apps are updated one after another, and each restarts while it updates.",
+  "appsUpdateAllBody": "TrueNAS updates these apps itself, one after another, and each restarts while it updates. It carries on if you close the app.",
   "@appsUpdateAllBody": {
     "description": "Explains what Update all does, above the list of apps."
   },
-  "appsUpdateAllProgress": "Updating {name} ({current} of {total})",
-  "@appsUpdateAllProgress": {
-    "description": "Progress line while Update all runs.",
+  "appsUpdateAllLeave": "TrueNAS carries on if you leave this screen or close the app.",
+  "@appsUpdateAllLeave": {
+    "description": "Reassurance under the Update all progress bar."
+  },
+  "appsBulkRunning": "{action, select, upgrade{Updating} start{Starting} stop{Stopping} restart{Restarting} other{Working}} on the server: {done} of {total} done",
+  "@appsBulkRunning": {
+    "description": "Progress line while the server runs a bulk action over apps. The action is upgrade, start, stop or restart.",
     "placeholders": {
-      "name": {
+      "action": {
         "type": "String"
       },
-      "current": {
+      "done": {
         "type": "int"
       },
       "total": {
@@ -3081,18 +3085,33 @@
       }
     }
   },
-  "appsUpdateAllDone": "{count, plural, =1{1 app updated} other{{count} apps updated}}",
-  "@appsUpdateAllDone": {
-    "description": "Snackbar after every app was updated.",
+  "appsBulkRunningNoCount": "{action, select, upgrade{Updating} start{Starting} stop{Stopping} restart{Restarting} other{Working}} {total, plural, =1{1 app} other{{total} apps}} on the server",
+  "@appsBulkRunningNoCount": {
+    "description": "Progress line when the server does not say how far a bulk action has got.",
     "placeholders": {
-      "count": {
+      "action": {
+        "type": "String"
+      },
+      "total": {
         "type": "int"
       }
     }
   },
-  "appsUpdateAllPartial": "{done} of {total} apps updated. Not updated: {failed}",
-  "@appsUpdateAllPartial": {
-    "description": "Snackbar when some apps could not be updated.",
+  "appsBulkDone": "{count, plural, =1{1 app} other{{count} apps}} {action, select, upgrade{updated} start{started} stop{stopped} restart{restarted} other{done}}",
+  "@appsBulkDone": {
+    "description": "Snackbar after a bulk action over apps worked for every app.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "action": {
+        "type": "String"
+      }
+    }
+  },
+  "appsBulkPartial": "{done} of {total} apps {action, select, upgrade{updated} start{started} stop{stopped} restart{restarted} other{done}}. {action, select, upgrade{Not updated} start{Not started} stop{Not stopped} restart{Not restarted} other{Failed}}: {failed}",
+  "@appsBulkPartial": {
+    "description": "Snackbar when a bulk action over apps failed for some apps.",
     "placeholders": {
       "done": {
         "type": "int"
@@ -3102,8 +3121,58 @@
       },
       "failed": {
         "type": "String"
+      },
+      "action": {
+        "type": "String"
       }
     }
+  },
+  "appsSelect": "Select",
+  "@appsSelect": {
+    "description": "Button that starts picking apps for a bulk action."
+  },
+  "appsSelectAll": "Select all",
+  "@appsSelectAll": {
+    "description": "Button that selects every app."
+  },
+  "appsSelectedCount": "{count} selected",
+  "@appsSelectedCount": {
+    "description": "Header while picking apps.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "appsBulkUpdate": "Update",
+  "@appsBulkUpdate": {
+    "description": "Bulk action button: update the selected apps."
+  },
+  "appsBulkStopTitle": "{count, plural, =1{Stop 1 app?} other{Stop {count} apps?}}",
+  "@appsBulkStopTitle": {
+    "description": "Confirmation title before stopping the selected apps.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "appsBulkStopBody": "They can't be reached until they are started again.",
+  "@appsBulkStopBody": {
+    "description": "Confirmation text before stopping the selected apps."
+  },
+  "appsBulkRestartTitle": "{count, plural, =1{Restart 1 app?} other{Restart {count} apps?}}",
+  "@appsBulkRestartTitle": {
+    "description": "Confirmation title before restarting the selected apps.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "appsBulkRestartBody": "They are unavailable for a moment while they restart.",
+  "@appsBulkRestartBody": {
+    "description": "Confirmation text before restarting the selected apps."
   },
   "settingsLanguageSystemHint": "Opens this app's language page in your phone's settings",
   "@settingsLanguageSystemHint": {

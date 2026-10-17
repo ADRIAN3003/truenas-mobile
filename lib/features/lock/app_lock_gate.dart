@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -5,6 +7,11 @@ import '../../core/security/biometric_auth.dart';
 import '../../core/settings/settings_provider.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../shared/theme.dart';
+
+/// How long a cold start shows the lock screen before the phone's prompt
+/// comes up, so the user sees the app's own screen behind it and not the
+/// launch screen. Zero here, so tests do not wait; `main` sets it.
+final lockPromptDelayProvider = Provider<Duration>((ref) => Duration.zero);
 
 /// Keeps the app behind the phone's own unlock (Face ID, a fingerprint or the
 /// passcode) while the app lock setting is on: at start, and each time the app
@@ -38,7 +45,13 @@ class _AppLockGateState extends ConsumerState<AppLockGate>
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _locked = _enabled;
-    if (_locked) WidgetsBinding.instance.addPostFrameCallback((_) => _unlock());
+    if (_locked) {
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        final delay = ref.read(lockPromptDelayProvider);
+        if (delay > Duration.zero) await Future<void>.delayed(delay);
+        if (mounted) unawaited(_unlock());
+      });
+    }
   }
 
   @override
@@ -144,46 +157,58 @@ class LockScreen extends ConsumerWidget {
     return Material(
       color: palette.background,
       child: SafeArea(
-        child: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(32),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  Icons.lock_rounded,
-                  size: 56,
-                  color: theme.colorScheme.primary,
+        child: Stack(
+          children: [
+            // The icon sits where the launch screen puts it, so starting the
+            // app does not make anything jump.
+            Center(
+              child: Semantics(
+                label: l10n.appTitle,
+                child: Image.asset(
+                  'assets/app_icon.png',
+                  width: 120,
+                  height: 120,
+                  excludeFromSemantics: true,
                 ),
-                const SizedBox(height: 20),
-                Text(
-                  l10n.appLockTitle,
-                  textAlign: TextAlign.center,
-                  style: theme.textTheme.titleLarge,
-                ),
-                if (failed) ...[
-                  const SizedBox(height: 8),
-                  Text(
-                    l10n.appLockFailed,
-                    textAlign: TextAlign.center,
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: palette.muted,
-                    ),
-                  ),
-                ],
-                const SizedBox(height: 28),
-                FilledButton.icon(
-                  onPressed: busy ? null : onUnlock,
-                  icon: Icon(switch (kind) {
-                    BiometricKind.face => Icons.face_unlock_rounded,
-                    BiometricKind.fingerprint => Icons.fingerprint_rounded,
-                    BiometricKind.other => Icons.lock_open_rounded,
-                  }),
-                  label: Text(l10n.appLockUnlock),
-                ),
-              ],
+              ),
             ),
-          ),
+            Align(
+              alignment: const Alignment(0, 0.62),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 32),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      l10n.appLockTitle,
+                      textAlign: TextAlign.center,
+                      style: theme.textTheme.titleLarge,
+                    ),
+                    if (failed) ...[
+                      const SizedBox(height: 8),
+                      Text(
+                        l10n.appLockFailed,
+                        textAlign: TextAlign.center,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: palette.muted,
+                        ),
+                      ),
+                    ],
+                    const SizedBox(height: 20),
+                    FilledButton.icon(
+                      onPressed: busy ? null : onUnlock,
+                      icon: Icon(switch (kind) {
+                        BiometricKind.face => Icons.face_unlock_rounded,
+                        BiometricKind.fingerprint => Icons.fingerprint_rounded,
+                        BiometricKind.other => Icons.lock_open_rounded,
+                      }),
+                      label: Text(l10n.appLockUnlock),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

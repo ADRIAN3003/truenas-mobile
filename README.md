@@ -148,8 +148,8 @@ before pointing the app at a server that holds data you care about.
 
 ## Contributing
 
-Issues and pull requests are welcome. Please run `dart format .`,
-`flutter analyze` and `flutter test` before opening a PR.
+Issues and pull requests are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md)
+for setup, the checks to run before opening a PR, and the project conventions.
 
 ## License
 

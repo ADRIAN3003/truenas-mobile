@@ -78,3 +78,17 @@ jobs:
           test "$(plutil -extract CFBundleVersion raw "$APPEX/Info.plist")" = "$(plutil -extract CFBundleVersion raw "$APP/Info.plist")"
           strings "$APPEX/JobActivityWidget" | grep -q JobActivityAttributes
           strings "$APP/Runner" | grep -q JobActivityAttributes
+      - name: Show how the Live Activity extension is built
+        run: |
+          APPEX=build/ios/iphoneos/Runner.app/PlugIns/JobActivityWidget.appex
+          BIN="$APPEX/JobActivityWidget"
+          echo "--- file"; file "$BIN"; ls -lR "$APPEX"
+          echo "--- load commands (entry point, min OS, SDK)"
+          otool -l "$BIN" | grep -E -A4 "LC_MAIN|LC_BUILD_VERSION|LC_UNIXTHREAD" || true
+          echo "--- linked libraries"; otool -L "$BIN"
+          echo "--- entry symbol"; nm "$BIN" | grep -i -E "NSExtensionMain|JobActivity" | head -20 || true
+          echo "--- undefined symbols (first 40)"; nm -u "$BIN" | head -40
+          echo "--- signature"; codesign -dvv "$APPEX" 2>&1 || true
+          echo "--- Info.plist"; plutil -p "$APPEX/Info.plist"
+          echo "--- strings"; strings "$BIN" | grep -i -E "ActivityConfiguration|JobActivityAttributes|systemName|checkmark.shield" | head -20 || true
+

@@ -68,7 +68,7 @@ class InstancesScreen extends ConsumerWidget {
             ),
           ),
         ),
-        AsyncError(:final error) => Center(child: Text(error.toString())),
+        AsyncError() => const _LoadError(),
         _ => const Center(child: CircularProgressIndicator.adaptive()),
       },
     );
@@ -338,6 +338,75 @@ class _AddCard extends StatelessWidget {
                 AppLocalizations.of(context).addServer,
                 style: Theme.of(context).textTheme.titleSmall
                     ?.copyWith(color: primary, fontWeight: FontWeight.w700),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// The saved servers could not be read. Nothing is deleted by that, so it
+/// offers another try before it offers to start over.
+class _LoadError extends ConsumerWidget {
+  const _LoadError();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 360),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const IconTile(
+                Icons.lock_outline_rounded,
+                AppPalette.tileOrange,
+                size: 72,
+              ),
+              const SizedBox(height: 20),
+              Text(
+                l10n.serversLoadErrorTitle,
+                textAlign: TextAlign.center,
+                style: theme.textTheme.headlineSmall?.copyWith(
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                l10n.serversLoadErrorBody,
+                textAlign: TextAlign.center,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: AppPalette.of(context).muted,
+                ),
+              ),
+              const SizedBox(height: 24),
+              FilledButton.icon(
+                onPressed: ref.read(instancesProvider.notifier).retry,
+                icon: const Icon(Icons.refresh_rounded),
+                label: Text(l10n.retry),
+              ),
+              const SizedBox(height: 8),
+              TextButton(
+                onPressed: () async {
+                  final confirmed = await confirmAction(
+                    context,
+                    title: l10n.serversClearTitle,
+                    body: l10n.serversClearBody,
+                    confirmLabel: l10n.serversClearConfirm,
+                    cancelLabel: l10n.cancel,
+                    destructive: true,
+                  );
+                  if (confirmed) {
+                    await ref.read(instancesProvider.notifier).clear();
+                  }
+                },
+                child: Text(l10n.serversClearAction),
               ),
             ],
           ),

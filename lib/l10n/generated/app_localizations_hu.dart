@@ -2401,4 +2401,29 @@ class AppLocalizationsHu extends AppLocalizations {
   @override
   String get jobsChannelDescription =>
       'Scrubok, replikációk és frissítések előrehaladása';
+
+  @override
+  String get serversLoadErrorTitle => 'Nem olvashatók a mentett szerverek';
+
+  @override
+  String get serversLoadErrorBody =>
+      'Semmi nem törlődött. A telefon biztonságos tárolója nem válaszolt. Próbáld újra; ha tartósan nem megy, töröld a listát, és add hozzá újra a szervereket.';
+
+  @override
+  String get serversClearAction => 'Mentett szerverek törlése';
+
+  @override
+  String get serversClearTitle => 'Törlöd a mentett szervereket?';
+
+  @override
+  String get serversClearBody =>
+      'Minden ebben az alkalmazásban mentett szerver törlődik belőle. Magukon a szervereken semmi nem változik.';
+
+  @override
+  String get serversClearConfirm => 'Törlés';
+
+  @override
+  String serverSaveFailed(String error) {
+    return 'A szervert nem sikerült elmenteni: $error';
+  }
 }

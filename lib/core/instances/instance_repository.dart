@@ -15,8 +15,14 @@ class SecureKeyValueStore implements KeyValueStore {
   /// so the background alert check can read the saved servers while the phone
   /// is locked. Items saved earlier are found as before and move to this
   /// level the next time they are written.
+  ///
+  /// `resetOnError: false` because the Android default erases everything the
+  /// moment one read fails (a Keystore that is not ready yet, the background
+  /// check starting up, a restored backup). That is how a saved server
+  /// vanished; now a failed read is only an error that can be retried.
   const SecureKeyValueStore([
     this._storage = const FlutterSecureStorage(
+      aOptions: AndroidOptions(resetOnError: false),
       iOptions: IOSOptions(accessibility: KeychainAccessibility.first_unlock),
     ),
   ]);
@@ -33,20 +39,42 @@ class SecureKeyValueStore implements KeyValueStore {
 
 /// Loads and saves the list of servers as one JSON document.
 class InstanceRepository {
-  const InstanceRepository(this._store);
+  const InstanceRepository(
+    this._store, {
+    this.retryDelay = const Duration(milliseconds: 300),
+  });
 
   /// The storage key of the saved servers.
   static const storageKey = 'servers.v1';
 
   final KeyValueStore _store;
 
+  /// Pause before the second and third read when storage throws.
+  final Duration retryDelay;
+
+  /// The saved servers. A storage error is thrown, never turned into an empty
+  /// list, so the caller cannot mistake "could not read" for "none saved" and
+  /// save over them.
   Future<List<ServerInstance>> load() async {
-    final raw = await _store.read(storageKey);
+    final raw = await _read();
     if (raw == null || raw.isEmpty) return [];
     final decoded = jsonDecode(raw) as List<dynamic>;
     return decoded
         .map((e) => ServerInstance.fromJson(e as Map<String, dynamic>))
         .toList();
+  }
+
+  /// Android's Keystore can fail for a moment (right after boot or an
+  /// update), so a failed read is tried again before it counts.
+  Future<String?> _read() async {
+    for (var attempt = 1; ; attempt++) {
+      try {
+        return await _store.read(storageKey);
+      } catch (_) {
+        if (attempt == 3) rethrow;
+        await Future<void>.delayed(retryDelay);
+      }
+    }
   }
 
   Future<void> save(List<ServerInstance> instances) => _store.write(

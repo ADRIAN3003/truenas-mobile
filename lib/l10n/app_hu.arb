@@ -653,5 +653,12 @@
   "jobsConnectionLost": "A kapcsolat megszakadt, az állapot lehet, hogy elavult",
   "jobsMoreCount": "+{count} további",
   "jobsChannelName": "Feladatok állapota",
-  "jobsChannelDescription": "Scrubok, replikációk és frissítések előrehaladása"
+  "jobsChannelDescription": "Scrubok, replikációk és frissítések előrehaladása",
+  "serversLoadErrorTitle": "Nem olvashatók a mentett szerverek",
+  "serversLoadErrorBody": "Semmi nem törlődött. A telefon biztonságos tárolója nem válaszolt. Próbáld újra; ha tartósan nem megy, töröld a listát, és add hozzá újra a szervereket.",
+  "serversClearAction": "Mentett szerverek törlése",
+  "serversClearTitle": "Törlöd a mentett szervereket?",
+  "serversClearBody": "Minden ebben az alkalmazásban mentett szerver törlődik belőle. Magukon a szervereken semmi nem változik.",
+  "serversClearConfirm": "Törlés",
+  "serverSaveFailed": "A szervert nem sikerült elmenteni: {error}"
 }

@@ -133,10 +133,23 @@ SCREENSHOTS=1 flutter test test/screenshots --update-goldens
 The same run also lays them out in `overview.png`, the single image at the
 top of this README, so it scales to the screen on phones.
 
+## AI usage
+
+Most of this app's code, tests and documentation were written by an AI
+assistant, [Claude](https://claude.ai) (Claude Code, through Claude
+Projects), working under the direction of the maintainer. The maintainer
+chose what to build, reviewed the changes, and tests each release on real
+devices against a real TrueNAS server. Automated checks (formatting,
+analysis and tests) run on every pull request.
+
+AI-written code can still contain mistakes. Please
+[open an issue](../../issues) if you find one, and see the disclaimer below
+before pointing the app at a server that holds data you care about.
+
 ## Contributing
 
-Issues and pull requests are welcome. Please run `dart format .`,
-`flutter analyze` and `flutter test` before opening a PR.
+Issues and pull requests are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md)
+for setup, the checks to run before opening a PR, and the project conventions.
 
 ## License
 

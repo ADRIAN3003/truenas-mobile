@@ -3937,6 +3937,90 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Default'**
   String get serverDefaultBadge;
+
+  /// Setting: show running jobs on the lock screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Live job progress'**
+  String get settingsLiveJobs;
+
+  /// Explains the live job progress setting.
+  ///
+  /// In en, this message translates to:
+  /// **'Scrubs, replications and updates on the lock screen and in notifications'**
+  String get settingsLiveJobsHint;
+
+  /// Kind of job: a pool scrub.
+  ///
+  /// In en, this message translates to:
+  /// **'Scrub'**
+  String get jobKindScrub;
+
+  /// Kind of job: a replication task run.
+  ///
+  /// In en, this message translates to:
+  /// **'Replication'**
+  String get jobKindReplication;
+
+  /// Kind of job: applications being updated.
+  ///
+  /// In en, this message translates to:
+  /// **'App update'**
+  String get jobKindAppUpdate;
+
+  /// Kind of job: a cloud sync task run.
+  ///
+  /// In en, this message translates to:
+  /// **'Cloud sync'**
+  String get jobKindCloudSync;
+
+  /// Kind of job: a cloud backup task run.
+  ///
+  /// In en, this message translates to:
+  /// **'Cloud backup'**
+  String get jobKindCloudBackup;
+
+  /// Kind of job: an rsync task run.
+  ///
+  /// In en, this message translates to:
+  /// **'Rsync task'**
+  String get jobKindRsync;
+
+  /// Kind of job: the TrueNAS system being updated.
+  ///
+  /// In en, this message translates to:
+  /// **'System update'**
+  String get jobKindSystemUpdate;
+
+  /// Lock screen text when the app lost touch with the server and no longer updates the progress.
+  ///
+  /// In en, this message translates to:
+  /// **'Not updating, open the app'**
+  String get jobsStale;
+
+  /// Shown in the app under running jobs when the server cannot be reached.
+  ///
+  /// In en, this message translates to:
+  /// **'Connection lost, progress may be out of date'**
+  String get jobsConnectionLost;
+
+  /// Under the running jobs when there are more than shown.
+  ///
+  /// In en, this message translates to:
+  /// **'+{count} more'**
+  String jobsMoreCount(int count);
+
+  /// Android notification channel name for running jobs.
+  ///
+  /// In en, this message translates to:
+  /// **'Job progress'**
+  String get jobsChannelName;
+
+  /// Android notification channel description.
+  ///
+  /// In en, this message translates to:
+  /// **'Progress of scrubs, replications and updates'**
+  String get jobsChannelDescription;
 }
 
 class _AppLocalizationsDelegate

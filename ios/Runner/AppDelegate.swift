@@ -21,5 +21,9 @@ import workmanager_apple
 
   func didInitializeImplicitFlutterEngine(_ engineBridge: FlutterImplicitEngineBridge) {
     GeneratedPluginRegistrant.register(with: engineBridge.pluginRegistry)
+    // Progress of running jobs as a Live Activity.
+    if let registrar = engineBridge.pluginRegistry.registrar(forPlugin: "LiveProgressPlugin") {
+      LiveProgressPlugin.register(with: registrar)
+    }
   }
 }

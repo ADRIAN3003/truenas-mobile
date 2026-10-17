@@ -131,6 +131,23 @@ README covers what the app does; this file covers how to work on it.
   `systemLanguagePageProvider`) and the stored `language` is ignored. Android
   12 and older, and tests, keep the in-app picker. A new language goes in the
   ARB files, `locales_config.xml` and `Info.plist`.
+- Live job progress (`lib/core/jobs/`, `lib/features/jobs/`): `JobTracker`
+  follows scrubs, replications, app/system updates and cloud/rsync tasks
+  (`JobKind.ofMethod`; `core.bulk` counts as the method it runs, which is how
+  "update all apps" looks) from the `core.get_jobs` events plus a 15 s
+  `core.get_jobs` poll while one runs (the poll also reconnects a dropped
+  socket and tells stale from live). `JobActivitySync` mirrors them onto
+  `LiveProgress` (method channel `hu.adrian.truenasmobile/live_progress`):
+  ActivityKit on iOS (`ios/Runner/LiveProgressPlugin.swift`, drawn by the
+  `JobActivityWidget` extension, whose `JobActivityAttributes.swift` in
+  `ios/Shared` is compiled into both targets) and a notification on Android
+  (`LiveProgressPlugin.kt`, a promoted ongoing progress notification on
+  Android 16). `JobMonitor` ties them to one open server, `ServerScreen` owns
+  it. There is no push server: the activity is refreshed every 30 s while the
+  app runs and goes stale (iOS `staleDate`) or says "not updating" when it
+  stops. The widget extension is in `Runner.xcodeproj` by hand (no Xcode here):
+  keep "Embed Foundation Extensions" before "Thin Binary" in the Runner phases,
+  or the build has a dependency cycle. Setting `liveJobs`.
 - App lock (`lib/core/security/biometric_auth.dart`, `lib/features/lock/`):
   setting `appLock`, off by default, offered in Settings > Security only when
   `BiometricAuth.isAvailable` (a biometric or a passcode is set). `AppLockGate`

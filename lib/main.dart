@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'app.dart';
 import 'core/instances/instance_repository.dart';
+import 'core/jobs/live_progress.dart';
 import 'core/notifications/background_alerts.dart';
 import 'core/notifications/local_alert_notifier.dart';
 import 'core/security/biometric_auth.dart';
@@ -48,6 +49,7 @@ Future<void> main() async {
         updateAutoCheckProvider.overrideWithValue(true),
         openDefaultServerProvider.overrideWithValue(true),
         biometricAuthProvider.overrideWithValue(const PlatformBiometricAuth()),
+        liveProgressProvider.overrideWithValue(const PlatformLiveProgress()),
       ],
       child: wrapForGlass(const TrueNasMobileApp()),
     ),

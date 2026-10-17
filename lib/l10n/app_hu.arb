@@ -639,5 +639,19 @@
   "settingsStartup": "Indításkor",
   "settingsDefaultServer": "Alapértelmezett szerver",
   "settingsDefaultServerNone": "Egyik sem, a szerverlista jelenik meg",
-  "serverDefaultBadge": "Alapértelmezett"
+  "serverDefaultBadge": "Alapértelmezett",
+  "settingsLiveJobs": "Élő feladatkövetés",
+  "settingsLiveJobsHint": "Scrubok, replikációk és frissítések a zárolt képernyőn és az értesítések között",
+  "jobKindScrub": "Scrub",
+  "jobKindReplication": "Replikáció",
+  "jobKindAppUpdate": "Alkalmazásfrissítés",
+  "jobKindCloudSync": "Felhőszinkron",
+  "jobKindCloudBackup": "Felhős mentés",
+  "jobKindRsync": "Rsync feladat",
+  "jobKindSystemUpdate": "Rendszerfrissítés",
+  "jobsStale": "Nem frissül, nyisd meg az alkalmazást",
+  "jobsConnectionLost": "A kapcsolat megszakadt, az állapot lehet, hogy elavult",
+  "jobsMoreCount": "+{count} további",
+  "jobsChannelName": "Feladatok állapota",
+  "jobsChannelDescription": "Scrubok, replikációk és frissítések előrehaladása"
 }

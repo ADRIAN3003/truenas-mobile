@@ -18,7 +18,13 @@ for Android and iOS that talks to the official TrueNAS middleware API
 - **Dashboard:** live CPU, memory (with ARC), network and pool health, plus
   system info and an alert summary. Alerts can be dismissed and restored, and new ones can be sent to the
   phone as notifications (checked in the background, off by default).
-- **Jobs:** running and recent jobs with progress, and abort.
+- **Jobs:** running and recent jobs with progress, and abort. Scrubs,
+  replications, app and system updates, cloud and rsync tasks also show their
+  progress in a card over the server screen and on the lock screen (a Live
+  Activity on iOS, a progress notification on Android, a live update on
+  Android 16). There is no push server, so the lock screen only moves while
+  the app is running or kept alive by the phone; when it stops hearing from the
+  server it says so. Settings > General > Live job progress turns it off.
 - **Storage:** pools with layout, scrub start, pause and stop; datasets and
   zvols (create, delete); snapshots (create, roll back, delete); disks with
   temperatures.
@@ -72,7 +78,9 @@ Download the latest APK or IPA from the
   downloads the new APK from the Releases page and opens the installer.
 - **iOS:** the IPA is unsigned. Sideload it with a tool such as
   [AltStore](https://altstore.io/) or [Sideloadly](https://sideloadly.io/),
-  which sign it with your Apple ID.
+  which sign it with your Apple ID. The IPA holds a second bundle, the
+  `JobActivityWidget` extension, for the lock screen progress; the signing tool
+  must sign it too (AltStore and Sideloadly do).
 
 ## Build from source
 

@@ -19,6 +19,7 @@ class AppSettings {
     this.skippedVersion,
     this.defaultServerId,
     this.appLock = false,
+    this.liveJobs = true,
     this.alertNotifications = false,
     this.alertLevel = AlertSeverity.critical,
   });
@@ -38,6 +39,7 @@ class AppSettings {
     skippedVersion: json['skippedVersion'] as String?,
     defaultServerId: json['defaultServerId'] as String?,
     appLock: json['appLock'] as bool? ?? false,
+    liveJobs: json['liveJobs'] as bool? ?? true,
     alertNotifications: json['alertNotifications'] as bool? ?? false,
     alertLevel:
         AlertSeverity.values.asNameMap()[json['alertLevel']] ??
@@ -84,6 +86,10 @@ class AppSettings {
   /// and each time it comes back from the background.
   final bool appLock;
 
+  /// Show running scrubs, replications and updates on the lock screen (a Live
+  /// Activity on iOS, a progress notification on Android).
+  final bool liveJobs;
+
   /// Check the saved servers in the background and show a notification for
   /// each new alert at or above [alertLevel].
   final bool alertNotifications;
@@ -103,6 +109,7 @@ class AppSettings {
     String? Function()? skippedVersion,
     String? Function()? defaultServerId,
     bool? appLock,
+    bool? liveJobs,
     bool? alertNotifications,
     AlertSeverity? alertLevel,
   }) => AppSettings(
@@ -120,6 +127,7 @@ class AppSettings {
         ? defaultServerId()
         : this.defaultServerId,
     appLock: appLock ?? this.appLock,
+    liveJobs: liveJobs ?? this.liveJobs,
     alertNotifications: alertNotifications ?? this.alertNotifications,
     alertLevel: alertLevel ?? this.alertLevel,
   );
@@ -135,6 +143,7 @@ class AppSettings {
     'skippedVersion': skippedVersion,
     'defaultServerId': defaultServerId,
     'appLock': appLock,
+    'liveJobs': liveJobs,
     'alertNotifications': alertNotifications,
     'alertLevel': alertLevel.name,
   };

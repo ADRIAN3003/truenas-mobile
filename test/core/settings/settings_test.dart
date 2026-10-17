@@ -29,6 +29,7 @@ void main() {
       skippedVersion: '0.1.4',
       defaultServerId: 'abc',
       appLock: true,
+      liveJobs: false,
       alertNotifications: true,
       alertLevel: AlertSeverity.warning,
     );
@@ -43,6 +44,7 @@ void main() {
     expect(back.skippedVersion, '0.1.4');
     expect(back.defaultServerId, 'abc');
     expect(back.appLock, isTrue);
+    expect(back.liveJobs, isFalse);
     expect(back.alertNotifications, isTrue);
     expect(back.alertLevel, AlertSeverity.warning);
   });
@@ -83,6 +85,12 @@ void main() {
     final on = const AppSettings().copyWith(appLock: true);
     expect(on.appLock, isTrue);
     expect(on.copyWith(haptics: false).appLock, isTrue);
+  });
+
+  test('live job progress is on unless it was turned off', () {
+    expect(const AppSettings().liveJobs, isTrue);
+    expect(AppSettings.fromJson(const {}).liveJobs, isTrue);
+    expect(const AppSettings().copyWith(liveJobs: false).liveJobs, isFalse);
   });
 
   test('alert notifications are off, for critical alerts, by default', () {

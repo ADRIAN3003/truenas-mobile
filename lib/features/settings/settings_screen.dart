@@ -115,6 +115,13 @@ class SettingsScreen extends ConsumerWidget {
                 onChanged: (on) =>
                     notifier.update((s) => s.copyWith(confirmLeave: on)),
               ),
+              AppSwitchTile(
+                title: Text(l10n.settingsLiveJobs),
+                subtitle: Text(l10n.settingsLiveJobsHint),
+                value: settings.liveJobs,
+                onChanged: (on) =>
+                    notifier.update((s) => s.copyWith(liveJobs: on)),
+              ),
             ],
           ),
           SectionHeader(l10n.settingsShell),

@@ -2354,4 +2354,51 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get serverDefaultBadge => 'Alapértelmezett';
+
+  @override
+  String get settingsLiveJobs => 'Élő feladatkövetés';
+
+  @override
+  String get settingsLiveJobsHint =>
+      'Scrubok, replikációk és frissítések a zárolt képernyőn és az értesítések között';
+
+  @override
+  String get jobKindScrub => 'Scrub';
+
+  @override
+  String get jobKindReplication => 'Replikáció';
+
+  @override
+  String get jobKindAppUpdate => 'Alkalmazásfrissítés';
+
+  @override
+  String get jobKindCloudSync => 'Felhőszinkron';
+
+  @override
+  String get jobKindCloudBackup => 'Felhős mentés';
+
+  @override
+  String get jobKindRsync => 'Rsync feladat';
+
+  @override
+  String get jobKindSystemUpdate => 'Rendszerfrissítés';
+
+  @override
+  String get jobsStale => 'Nem frissül, nyisd meg az alkalmazást';
+
+  @override
+  String get jobsConnectionLost =>
+      'A kapcsolat megszakadt, az állapot lehet, hogy elavult';
+
+  @override
+  String jobsMoreCount(int count) {
+    return '+$count további';
+  }
+
+  @override
+  String get jobsChannelName => 'Feladatok állapota';
+
+  @override
+  String get jobsChannelDescription =>
+      'Scrubok, replikációk és frissítések előrehaladása';
 }

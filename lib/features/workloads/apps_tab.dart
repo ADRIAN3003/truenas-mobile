@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../../core/api/workloads_api.dart';
@@ -8,6 +10,7 @@ import '../../shared/glass.dart';
 import '../../shared/haptics.dart';
 import '../../shared/theme.dart';
 import '../../shared/ui.dart';
+import '../../shared/connect_dialogs.dart';
 import '../../shared/formatting.dart';
 import '../../shared/viz_colors.dart';
 import '../../shared/widgets.dart';
@@ -24,6 +27,7 @@ class _Workloads {
     required this.vms,
     required this.containers,
     required this.containerActions,
+    required this.canUpgradeAll,
   });
 
   final List<TrueNasApp> apps;
@@ -34,6 +38,9 @@ class _Workloads {
   /// Null when the server has no container system.
   final List<LinuxContainer>? containers;
   final List<WorkloadAction> containerActions;
+
+  /// Whether the server can update all apps in one job.
+  final bool canUpgradeAll;
 }
 
 const _appActions = [
@@ -62,9 +69,11 @@ class _AppsTabState extends State<AppsTab> with LoadState<AppsTab, _Workloads> {
   /// Keys (`app:x`, `vm:1`, `ct:x`) of workloads with an action in flight.
   final _busy = <String>{};
 
-  /// Set while "Update all" runs: how many apps are done, of how many, and
-  /// which one is being updated now.
-  UpdateAllProgress? _updateAll;
+  /// The server's "Update all" job while it runs, polled by [_poll]. It
+  /// outlives this screen: [initState] picks it up again.
+  AppUpdateRun? _updateRun;
+  Timer? _poller;
+  var _polling = false;
 
   WorkloadsApi get _api => widget.session.workloads;
 
@@ -79,19 +88,97 @@ class _AppsTabState extends State<AppsTab> with LoadState<AppsTab, _Workloads> {
     }
 
     final backend = await _api.containerBackend();
-    final (apps, vms, containers, containerActions) = await (
+    final (apps, vms, containers, containerActions, canUpgradeAll) = await (
       _api.apps(),
       optional(_api.vms),
       backend == ContainerBackend.none
           ? Future<List<LinuxContainer>?>.value()
           : optional(_api.containers),
       _api.containerActions(),
+      _api.canUpgradeAll(),
     ).wait;
     return _Workloads(
       apps: apps,
       vms: vms,
       containers: containers,
       containerActions: containerActions,
+      canUpgradeAll: canUpgradeAll,
+    );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _resumeRun();
+  }
+
+  @override
+  void dispose() {
+    _poller?.cancel();
+    super.dispose();
+  }
+
+  /// Picks up an "Update all" job already running on the server, such as one
+  /// started before the app was closed or from the web UI.
+  Future<void> _resumeRun() async {
+    try {
+      final run = await _api.activeUpgradeRun();
+      if (run != null && mounted) _watch(run);
+    } catch (_) {
+      // Not being able to look is the same as nothing running.
+    }
+  }
+
+  void _watch(AppUpdateRun run) {
+    setState(() => _updateRun = run);
+    _poller?.cancel();
+    _poller = Timer.periodic(const Duration(seconds: 2), (_) => _poll());
+  }
+
+  /// Follows the job and refreshes the list so each app's new version shows as
+  /// the server gets to it. A dropped connection just skips a round.
+  Future<void> _poll() async {
+    final run = _updateRun;
+    if (run == null || _polling) return;
+    _polling = true;
+    try {
+      final latest = await _api.upgradeRun(run.jobId);
+      await load();
+      if (!mounted) return;
+      if (latest != null && latest.isActive) {
+        setState(() => _updateRun = latest);
+      } else {
+        _poller?.cancel();
+        setState(() => _updateRun = null);
+        _finished(latest ?? run);
+      }
+    } catch (_) {
+      // Try again on the next tick.
+    } finally {
+      _polling = false;
+    }
+  }
+
+  void _finished(AppUpdateRun run) {
+    final l10n = AppLocalizations.of(context);
+    final failed = run.failed;
+    if (failed.isEmpty) {
+      Haptics.confirm();
+    } else {
+      Haptics.warning();
+    }
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          failed.isEmpty
+              ? l10n.appsUpdateAllDone(run.apps.length)
+              : l10n.appsUpdateAllPartial(
+                  run.apps.length - failed.length,
+                  run.apps.length,
+                  failed.keys.join(', '),
+                ),
+        ),
+      ),
     );
   }
 
@@ -115,9 +202,9 @@ class _AppsTabState extends State<AppsTab> with LoadState<AppsTab, _Workloads> {
     if (mounted) setState(() => _busy.remove(key));
   }
 
-  /// Updates [apps] one after another (the server runs one upgrade job per
-  /// app), after listing them for the user to confirm. An app that fails does
-  /// not stop the rest.
+  /// Hands [apps] to the server as one job, after listing them for the user to
+  /// confirm, and follows it. The server does the work, so the user can leave;
+  /// an app that fails does not stop the rest.
   Future<void> _upgradeAll(List<TrueNasApp> apps) async {
     final l10n = AppLocalizations.of(context);
     final messenger = ScaffoldMessenger.of(context);
@@ -130,41 +217,40 @@ class _AppsTabState extends State<AppsTab> with LoadState<AppsTab, _Workloads> {
       cancelLabel: l10n.cancel,
     );
     if (!confirmed || !mounted) return;
-    final failed = <String>[];
-    var done = 0;
-    for (final app in apps) {
-      // The server screen was closed: the jobs already started carry on there.
+    try {
+      final id = await _api.upgradeAll([for (final app in apps) app.name]);
+      final run = await _api.upgradeRun(id);
       if (!mounted) return;
-      setState(() {
-        _busy.add('app:${app.name}');
-        _updateAll = (done: done, total: apps.length, name: app.name);
-      });
-      try {
-        await _api.appAction(app.name, WorkloadAction.upgrade);
-        done++;
-      } catch (_) {
-        failed.add(app.name);
+      if (run != null && run.isActive) {
+        _watch(run);
+      } else {
+        // Already over by the time it was looked up.
+        await load();
+        if (mounted && run != null) _finished(run);
       }
-      if (mounted) setState(() => _busy.remove('app:${app.name}'));
-    }
-    if (!mounted) return;
-    setState(() => _updateAll = null);
-    if (failed.isEmpty) {
-      Haptics.confirm();
-    } else {
+    } catch (error) {
       Haptics.warning();
+      messenger.showSnackBar(
+        SnackBar(content: Text(describeConnectError(l10n, error))),
+      );
     }
-    messenger.showSnackBar(
-      SnackBar(
-        content: Text(
-          failed.isEmpty
-              ? l10n.appsUpdateAllDone(done)
-              : l10n.appsUpdateAllPartial(done, apps.length, failed.join(', ')),
-        ),
-      ),
-    );
-    await load();
   }
+
+  /// Apps of the running job that have not got their new version yet.
+  Iterable<String> _pending(AppUpdateRun run, List<TrueNasApp> apps) => {
+    for (final app in apps)
+      if (app.upgradeAvailable) app.name,
+  }.intersection(run.apps.toSet());
+
+  UpdateAllProgress _progress(AppUpdateRun run, List<TrueNasApp> apps) => (
+    done: run.apps.length - _pending(run, apps).length,
+    total: run.apps.length,
+  );
+
+  bool _waitingForRun(TrueNasApp app) =>
+      _updateRun != null &&
+      app.upgradeAvailable &&
+      _updateRun!.apps.contains(app.name);
 
   Future<void> _openApp(TrueNasApp app) async {
     await Navigator.push(
@@ -190,10 +276,13 @@ class _AppsTabState extends State<AppsTab> with LoadState<AppsTab, _Workloads> {
         ),
         children: [
           if (appsWithUpdates(w.apps) case final updates
-              when updates.isNotEmpty || _updateAll != null) ...[
+              when w.canUpgradeAll &&
+                  (updates.isNotEmpty || _updateRun != null)) ...[
             UpdateAllCard(
-              count: _updateAll?.total ?? updates.length,
-              progress: _updateAll,
+              count: _updateRun?.apps.length ?? updates.length,
+              progress: _updateRun == null
+                  ? null
+                  : _progress(_updateRun!, w.apps),
               onPressed: () => _upgradeAll(updates),
             ),
             const SizedBox(height: 8),
@@ -230,7 +319,8 @@ class _AppsTabState extends State<AppsTab> with LoadState<AppsTab, _Workloads> {
                   ],
                 ),
                 trailing: WorkloadMenu(
-                  busy: _busy.contains('app:${app.name}'),
+                  busy:
+                      _busy.contains('app:${app.name}') || _waitingForRun(app),
                   actions: actionsFor(app.state, supported: _appActions),
                   onShell: app.state == WorkloadState.running
                       ? () => openAppShell(context, widget.session, app.name)

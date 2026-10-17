@@ -60,6 +60,50 @@ class WorkloadsApi {
         WorkloadAction.powerOff => throw UnsupportedError('powerOff'),
       };
 
+  /// Whether the server can update several apps in one job.
+  Future<bool> canUpgradeAll() => _catalog.has('core.bulk');
+
+  /// Starts one `core.bulk` job over `app.upgrade` for [names], as the web
+  /// UI's "Update All" does, and returns its id. The server does the work, so
+  /// it carries on when the phone is locked or the app is closed.
+  Future<int> upgradeAll(List<String> names) async => asInt(
+    await _client.call('core.bulk', [
+      'app.upgrade',
+      [
+        for (final name in names) [name],
+      ],
+    ]),
+  );
+
+  /// The "Update all" run behind job [id], or null when the server no
+  /// longer lists it.
+  Future<AppUpdateRun?> upgradeRun(int id) async {
+    final jobs = await _client.call('core.get_jobs', [
+      [
+        ['id', '=', id],
+      ],
+    ]) as List<dynamic>;
+    return jobs.isEmpty ? null : AppUpdateRun.fromJob(asMap(jobs.first));
+  }
+
+  /// The "Update all" run in progress, started from here or from the web UI.
+  Future<AppUpdateRun?> activeUpgradeRun() async {
+    final jobs = await _client.call('core.get_jobs', [
+      [
+        ['method', '=', 'core.bulk'],
+      ],
+      {
+        'order_by': ['-id'],
+        'limit': 20,
+      },
+    ]) as List<dynamic>;
+    for (final raw in jobs) {
+      final run = AppUpdateRun.fromJob(asMap(raw));
+      if (run != null && run.isActive) return run;
+    }
+    return null;
+  }
+
   Future<List<VirtualMachine>> vms() async =>
       (await _query('vm.query')).map(VirtualMachine.fromJson).toList();
 

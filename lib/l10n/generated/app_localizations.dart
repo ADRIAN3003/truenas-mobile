@@ -3755,14 +3755,20 @@ abstract class AppLocalizations {
   /// Explains what Update all does, above the list of apps.
   ///
   /// In en, this message translates to:
-  /// **'These apps are updated one after another, and each restarts while it updates.'**
+  /// **'TrueNAS updates these apps itself, one after another, and each restarts while it updates. It carries on if you close the app.'**
   String get appsUpdateAllBody;
 
-  /// Progress line while Update all runs.
+  /// Progress line while the server runs Update all.
   ///
   /// In en, this message translates to:
-  /// **'Updating {name} ({current} of {total})'**
-  String appsUpdateAllProgress(String name, int current, int total);
+  /// **'Updating on the server: {done} of {total} done'**
+  String appsUpdateAllProgress(int done, int total);
+
+  /// Reassurance under the Update all progress bar.
+  ///
+  /// In en, this message translates to:
+  /// **'TrueNAS carries on if you leave this screen or close the app.'**
+  String get appsUpdateAllLeave;
 
   /// Snackbar after every app was updated.
   ///

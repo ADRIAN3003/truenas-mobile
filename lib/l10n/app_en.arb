@@ -3013,24 +3013,25 @@
       }
     }
   },
-  "appsUpdateAllBody": "These apps are updated one after another, and each restarts while it updates.",
+  "appsUpdateAllBody": "TrueNAS updates these apps itself, one after another, and each restarts while it updates. It carries on if you close the app.",
   "@appsUpdateAllBody": {
     "description": "Explains what Update all does, above the list of apps."
   },
-  "appsUpdateAllProgress": "Updating {name} ({current} of {total})",
+  "appsUpdateAllProgress": "Updating on the server: {done} of {total} done",
   "@appsUpdateAllProgress": {
-    "description": "Progress line while Update all runs.",
+    "description": "Progress line while the server runs Update all.",
     "placeholders": {
-      "name": {
-        "type": "String"
-      },
-      "current": {
+      "done": {
         "type": "int"
       },
       "total": {
         "type": "int"
       }
     }
+  },
+  "appsUpdateAllLeave": "TrueNAS carries on if you leave this screen or close the app.",
+  "@appsUpdateAllLeave": {
+    "description": "Reassurance under the Update all progress bar."
   },
   "appsUpdateAllDone": "{count, plural, =1{1 app updated} other{{count} apps updated}}",
   "@appsUpdateAllDone": {

@@ -11,8 +11,8 @@ List<TrueNasApp> appsWithUpdates(Iterable<TrueNasApp> apps) => [
     if (app.upgradeAvailable) app,
 ];
 
-/// How far "Update all" has got.
-typedef UpdateAllProgress = ({int done, int total, String name});
+/// How far the server's "Update all" job has got: apps done of all of them.
+typedef UpdateAllProgress = ({int done, int total});
 
 /// What "Update all" is about to do: every app with the version it goes from
 /// and to.
@@ -65,8 +65,8 @@ class UpdateAllList extends StatelessWidget {
 }
 
 /// The card at the top of the apps list when some apps have updates: how many,
-/// and the button that updates them all. While that runs it shows which app is
-/// being updated.
+/// and the button that updates them all. While the server runs the job it shows
+/// how many are done; the job carries on if the user leaves.
 class UpdateAllCard extends StatelessWidget {
   const UpdateAllCard({
     super.key,
@@ -106,8 +106,7 @@ class UpdateAllCard extends StatelessWidget {
                       if (progress != null)
                         Text(
                           l10n.appsUpdateAllProgress(
-                            progress.name,
-                            progress.done + 1,
+                            progress.done,
                             progress.total,
                           ),
                           style: Theme.of(context).textTheme.bodySmall,
@@ -118,12 +117,19 @@ class UpdateAllCard extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 12),
-            if (progress != null)
+            if (progress != null) ...[
               LinearProgressIndicator(
-                value: progress.done / progress.total,
+                value: progress.total == 0
+                    ? null
+                    : progress.done / progress.total,
                 borderRadius: BorderRadius.circular(4),
-              )
-            else
+              ),
+              const SizedBox(height: 8),
+              Text(
+                l10n.appsUpdateAllLeave,
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
+            ] else
               FilledButton.icon(
                 onPressed: onPressed,
                 icon: const Icon(Icons.upgrade_rounded),

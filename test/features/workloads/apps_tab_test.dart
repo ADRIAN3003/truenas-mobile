@@ -30,6 +30,24 @@ void main() {
     await tester.pumpAndSettle();
   }
 
+  /// Like [settle] without waiting for animations: the spinners of apps that
+  /// wait for the server never stop.
+  Future<void> spin(WidgetTester tester) async {
+    for (var i = 0; i < 10; i++) {
+      await tester.runAsync(
+        () => Future<void>.delayed(const Duration(milliseconds: 50)),
+      );
+      await tester.pump(const Duration(milliseconds: 100));
+    }
+  }
+
+  /// Lets the tab's poll timer fire once and its requests come back.
+  Future<void> pollServer(WidgetTester tester) async {
+    await tester.pump(const Duration(seconds: 2));
+    await spin(tester);
+    await tester.pumpAndSettle();
+  }
+
   setUp(() => HttpOverrides.global = null);
 
   Future<void> connect(WidgetTester tester) async {
@@ -147,7 +165,16 @@ void main() {
 
       await tester.tap(find.widgetWithText(FilledButton, 'Update all').last);
       await settle(tester);
+      await pollServer(tester);
 
+      // One job on the server for both apps, not a call per app from the phone.
+      expect(server.bulkCalls, hasLength(1));
+      expect(server.bulkCalls.single.$1, 'app.upgrade');
+      expect(server.bulkCalls.single.$2, [
+        ['immich'],
+        ['jellyfin'],
+      ]);
+      expect(server.calls.map((c) => c.$1), isNot(contains('app.upgrade')));
       expect(
         server.apps.map((a) => a['upgrade_available']),
         everyElement(isFalse),
@@ -155,6 +182,42 @@ void main() {
       expect(find.text('2 apps updated'), findsOneWidget);
       // Nothing left to update, so the card goes away.
       expect(find.text('Update all'), findsNothing);
+      await disconnect(tester);
+    });
+
+    testWidgets('keeps going on the server when the screen is left', (
+      tester,
+    ) async {
+      await connect(tester);
+      server.apps.add(extraApp('immich', update: true));
+      server.holdBulkUpgrades = true;
+      await tester.pumpWidget(wrap(AppsTab(session: session)));
+      await settle(tester);
+
+      await tester.tap(find.widgetWithText(FilledButton, 'Update all'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.widgetWithText(FilledButton, 'Update all').last);
+      await spin(tester);
+      expect(find.text('Updating on the server: 0 of 2 done'), findsOneWidget);
+      expect(find.widgetWithText(FilledButton, 'Update all'), findsNothing);
+
+      // The user leaves; the job is not cancelled.
+      await tester.pumpWidget(const SizedBox());
+      expect(
+        server.apps.map((a) => a['upgrade_available']),
+        everyElement(true),
+      );
+
+      // Back on the tab the same job is found and followed.
+      await tester.pumpWidget(wrap(AppsTab(session: session)));
+      await spin(tester);
+      expect(find.text('Updating on the server: 0 of 2 done'), findsOneWidget);
+      expect(server.bulkCalls, hasLength(1));
+
+      server.finishBulkUpgrades();
+      await pollServer(tester);
+      expect(find.text('2 apps updated'), findsOneWidget);
+      expect(find.textContaining('Updating on the server'), findsNothing);
       await disconnect(tester);
     });
 
@@ -169,6 +232,7 @@ void main() {
       expect(find.text('Update 1 app?'), findsOneWidget);
       await tester.tap(find.text('Cancel'));
       await tester.pumpAndSettle();
+      expect(server.bulkCalls, isEmpty);
       expect(server.apps.single['upgrade_available'], isTrue);
       expect(find.text('Update all'), findsOneWidget);
       await disconnect(tester);
@@ -185,6 +249,7 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(find.widgetWithText(FilledButton, 'Update all').last);
       await settle(tester);
+      await pollServer(tester);
 
       expect(server.apps[0]['upgrade_available'], isTrue);
       expect(server.apps[1]['upgrade_available'], isFalse);

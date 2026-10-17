@@ -149,6 +149,13 @@ class FakeTrueNasServer {
   /// Apps whose `app.upgrade` fails.
   final failingUpgrades = <String>{};
 
+  /// When true a `core.bulk` job over `app.upgrade` stays RUNNING, upgrading
+  /// nothing, until [finishBulkUpgrades] runs it.
+  bool holdBulkUpgrades = false;
+
+  /// Calls to `core.bulk`: the method and the argument lists.
+  final bulkCalls = <(String, List<dynamic>)>[];
+
   /// VMs served by `vm.query`.
   final vms = <Map<String, dynamic>>[
     {
@@ -565,6 +572,7 @@ class FakeTrueNasServer {
               if (service == snapshotService)
                 for (final m in ['query', 'create', 'delete', 'rollback'])
                   '$service.$m': <String, dynamic>{},
+              if (service == 'core') 'core.bulk': <String, dynamic>{},
               if (service == 'service' && !legacy)
                 'service.control': <String, dynamic>{},
               if (service == 'nvmet.subsys' && !legacy)
@@ -678,6 +686,8 @@ class FakeTrueNasServer {
               app['upgrade_available'] = false;
             }
             result = _job();
+          case 'core.bulk':
+            result = _bulk(params[0] as String, params[1] as List<dynamic>);
           case 'app.delete':
             apps.removeWhere((a) => a['name'] == params[0]);
             result = _job();
@@ -968,8 +978,11 @@ class FakeTrueNasServer {
             alert['dismissed'] = message['method'] == 'alert.dismiss';
           case 'core.get_jobs'
               when params.isNotEmpty && (params.first as List).isNotEmpty:
-            final id = ((params.first as List).first as List)[2];
-            result = [?_finishedJobs[id]];
+            final filters = params.first as List;
+            result = [
+              for (final job in _finishedJobs.values.toList().reversed)
+                if (filters.every((f) => job[(f as List)[0]] == f[2])) job,
+            ];
           case 'core.get_jobs':
             result = [
               {
@@ -1068,6 +1081,59 @@ class FakeTrueNasServer {
         return true;
     }
     return null;
+  }
+
+  /// Runs `app.upgrade` over [calls] as one job, as `core.bulk` does, and
+  /// returns its id. See [holdBulkUpgrades].
+  int _bulk(String method, List<dynamic> calls) {
+    bulkCalls.add((method, calls));
+    final id = _nextJobId++;
+    final job = <String, dynamic>{
+      'id': id,
+      'method': 'core.bulk',
+      'arguments': [method, calls],
+      'state': 'RUNNING',
+      'progress': {'percent': 0, 'description': ''},
+      'result': null,
+    };
+    _finishedJobs[id] = job;
+    if (holdBulkUpgrades) {
+      _heldBulk.add(id);
+    } else {
+      _runBulk(job);
+    }
+    return id;
+  }
+
+  void _runBulk(Map<String, dynamic> job) {
+    final calls = (job['arguments'] as List)[1] as List;
+    job['result'] = [
+      for (final call in calls)
+        _upgradeApp((call as List).first as String)
+            ? {'result': true, 'error': null}
+            : {'result': null, 'error': '[EFAULT] Upgrade failed'},
+    ];
+    job['state'] = 'SUCCESS';
+    job['progress'] = {'percent': 100, 'description': ''};
+  }
+
+  bool _upgradeApp(String name) {
+    if (failingUpgrades.contains(name)) return false;
+    final app = apps.firstWhere((a) => a['name'] == name);
+    app['state'] = 'RUNNING';
+    app['human_version'] = app['latest_version'];
+    app['upgrade_available'] = false;
+    return true;
+  }
+
+  final _heldBulk = <int>[];
+
+  /// Finishes the `core.bulk` jobs held by [holdBulkUpgrades].
+  void finishBulkUpgrades() {
+    for (final id in _heldBulk) {
+      _runBulk(_finishedJobs[id]!);
+    }
+    _heldBulk.clear();
   }
 
   /// Records a finished job and returns its id.

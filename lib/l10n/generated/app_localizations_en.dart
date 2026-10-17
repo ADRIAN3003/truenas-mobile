@@ -2206,12 +2206,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get appsUpdateAllBody =>
-      'These apps are updated one after another, and each restarts while it updates.';
+      'TrueNAS updates these apps itself, one after another, and each restarts while it updates. It carries on if you close the app.';
 
   @override
-  String appsUpdateAllProgress(String name, int current, int total) {
-    return 'Updating $name ($current of $total)';
+  String appsUpdateAllProgress(int done, int total) {
+    return 'Updating on the server: $done of $total done';
   }
+
+  @override
+  String get appsUpdateAllLeave =>
+      'TrueNAS carries on if you leave this screen or close the app.';
 
   @override
   String appsUpdateAllDone(int count) {

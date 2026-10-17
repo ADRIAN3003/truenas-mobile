@@ -107,4 +107,67 @@ void main() {
       {'timeout': 60, 'force': false},
     ]);
   });
+
+  group('Update all', () {
+    test(
+      'is one core.bulk job over app.upgrade, not one call per app',
+      () async {
+        await connect();
+        expect(await session.workloads.canUpgradeAll(), isTrue);
+        final id = await session.workloads.upgradeAll(['jellyfin']);
+        expect(server.bulkCalls, hasLength(1));
+        expect(server.bulkCalls.single.$1, 'app.upgrade');
+        expect(server.bulkCalls.single.$2, [
+          ['jellyfin'],
+        ]);
+        expect(methods(), isNot(contains('app.upgrade')));
+        final run = (await session.workloads.upgradeRun(id))!;
+        expect(run.jobId, id);
+        expect(run.apps, ['jellyfin']);
+        expect(run.isActive, isFalse);
+        expect(run.failed, isEmpty);
+      },
+    );
+
+    test('a held job is found again as the active run', () async {
+      await connect();
+      expect(await session.workloads.activeUpgradeRun(), isNull);
+      server.holdBulkUpgrades = true;
+      final id = await session.workloads.upgradeAll(['jellyfin']);
+      final run = (await session.workloads.activeUpgradeRun())!;
+      expect(run.jobId, id);
+      expect(run.isActive, isTrue);
+      expect(run.failed, isEmpty);
+      expect(server.apps.single['upgrade_available'], isTrue);
+
+      server.finishBulkUpgrades();
+      expect(await session.workloads.activeUpgradeRun(), isNull);
+      expect(server.apps.single['upgrade_available'], isFalse);
+    });
+
+    test('names the apps the server could not update', () async {
+      await connect();
+      server.failingUpgrades.add('jellyfin');
+      final id = await session.workloads.upgradeAll(['jellyfin']);
+      final run = (await session.workloads.upgradeRun(id))!;
+      expect(run.failed, {'jellyfin': '[EFAULT] Upgrade failed'});
+    });
+
+    test('other bulk jobs are not an Update all run', () {
+      expect(
+        AppUpdateRun.fromJob({
+          'id': 1,
+          'method': 'core.bulk',
+          'arguments': [
+            'app.delete',
+            [
+              ['x'],
+            ],
+          ],
+          'state': 'RUNNING',
+        }),
+        isNull,
+      );
+    });
+  });
 }

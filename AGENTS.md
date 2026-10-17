@@ -141,8 +141,12 @@ README covers what the app does; this file covers how to work on it.
   on Android and `NSFaceIDUsageDescription` on iOS (all set). Tests use
   `FakeBiometricAuth`; the default provider is `NoBiometricAuth`, `main`
   overrides it.
-- Apps tab "Update all" upgrades the apps with updates one after another
-  (`app.upgrade` is a job per app), after listing them in a confirmation.
+- Apps tab "Update all" hands the apps with updates to the server as one
+  `core.bulk` job over `app.upgrade` (what the web UI does), after listing
+  them in a confirmation, so it carries on when the app is closed. The tab
+  polls the job (`AppUpdateRun`, found again on open via
+  `WorkloadsApi.activeUpgradeRun`); its id is `AppUpdateRun.jobId`. Gated on
+  `core.bulk`. Tests: `FakeTrueNasServer.holdBulkUpgrades` keeps it running.
 - Android release APKs must be signed with a fixed key, or Android refuses
   to install one over another ("app not updated"). `release.yml` signs with
   the four `ANDROID_*` secrets; `tools/make-android-keystore.sh` makes them.

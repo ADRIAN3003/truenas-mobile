@@ -1,3 +1,4 @@
+import 'job.dart';
 import 'json.dart';
 
 /// Normalised run state shared by apps, VMs and containers.
@@ -94,6 +95,59 @@ class TrueNasApp {
   final String? title;
   final String? iconUrl;
   final String? notes;
+}
+
+/// An "Update all" run: the server's `core.bulk` job over `app.upgrade`. It
+/// lives on the server, so it carries on when the app is closed and can be
+/// found again by its [jobId] or by [AppUpdateRun.fromJob] on any `core.bulk`
+/// job.
+class AppUpdateRun {
+  const AppUpdateRun({required this.job, required this.apps});
+
+  /// Null when [job] is not a bulk upgrade.
+  static AppUpdateRun? fromJob(Map<String, dynamic> json) {
+    final arguments = json['arguments'];
+    if (json['method'] != 'core.bulk' ||
+        arguments is! List ||
+        arguments.length < 2 ||
+        arguments[0] != 'app.upgrade' ||
+        arguments[1] is! List) {
+      return null;
+    }
+    return AppUpdateRun(
+      job: TrueNasJob.fromJson(json),
+      apps: [
+        for (final call in arguments[1] as List)
+          if (call is List && call.isNotEmpty) call.first.toString(),
+      ],
+    );
+  }
+
+  /// The `core.bulk` job, for progress and the end state.
+  final TrueNasJob job;
+
+  /// The apps it updates, in order.
+  final List<String> apps;
+
+  int get jobId => job.id;
+  bool get isActive => job.state.isActive;
+
+  /// Apps the server could not update, with its reason. Empty while the job
+  /// runs. When the job itself failed or was aborted no per-app result is
+  /// trustworthy, so every app is listed.
+  Map<String, String> get failed {
+    if (isActive) return const {};
+    final results = job.raw['result'];
+    if (job.state == JobState.success && results is List) {
+      return {
+        for (var i = 0; i < apps.length && i < results.length; i++)
+          if (results[i] case {'error': final Object error})
+            apps[i]: error.toString(),
+      };
+    }
+    if (job.state == JobState.success) return const {};
+    return {for (final app in apps) app: job.error ?? job.state.name};
+  }
 }
 
 /// A virtual machine from `vm.query`.

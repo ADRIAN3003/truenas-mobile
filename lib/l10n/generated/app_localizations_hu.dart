@@ -2202,12 +2202,16 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get appsUpdateAllBody =>
-      'Az alkalmazások egymás után frissülnek, és mindegyik újraindul a frissítés közben.';
+      'A TrueNAS maga frissíti ezeket az alkalmazásokat egymás után, és mindegyik újraindul a frissítés közben. Akkor is folytatja, ha bezárod az alkalmazást.';
 
   @override
-  String appsUpdateAllProgress(String name, int current, int total) {
-    return '$name frissítése ($current/$total)';
+  String appsUpdateAllProgress(int done, int total) {
+    return 'Frissítés a szerveren: $done/$total kész';
   }
+
+  @override
+  String get appsUpdateAllLeave =>
+      'A TrueNAS akkor is folytatja, ha elhagyod ezt a képernyőt vagy bezárod az alkalmazást.';
 
   @override
   String appsUpdateAllDone(int count) {

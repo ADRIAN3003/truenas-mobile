@@ -27,6 +27,7 @@ void main() {
       checkForUpdates: false,
       skippedVersion: '0.1.4',
       defaultServerId: 'abc',
+      appLock: true,
     );
     final back = AppSettings.fromJson(settings.toJson());
     expect(back.theme, ThemeChoice.dark);
@@ -38,6 +39,7 @@ void main() {
     expect(back.checkForUpdates, isFalse);
     expect(back.skippedVersion, '0.1.4');
     expect(back.defaultServerId, 'abc');
+    expect(back.appLock, isTrue);
   });
 
   test('unknown or missing values fall back to the defaults', () {
@@ -68,6 +70,14 @@ void main() {
     expect(skipped.skippedVersion, '0.1.4');
     expect(skipped.copyWith(haptics: false).skippedVersion, '0.1.4');
     expect(skipped.copyWith(skippedVersion: () => null).skippedVersion, isNull);
+  });
+
+  test('the app lock is off unless it was turned on', () {
+    expect(const AppSettings().appLock, isFalse);
+    expect(AppSettings.fromJson(const {}).appLock, isFalse);
+    final on = const AppSettings().copyWith(appLock: true);
+    expect(on.appLock, isTrue);
+    expect(on.copyWith(haptics: false).appLock, isTrue);
   });
 
   test('copyWith can choose, and clear, the default server', () {

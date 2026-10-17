@@ -1970,6 +1970,37 @@ class AppLocalizationsHu extends AppLocalizations {
   String get settingsSecurity => 'Biztonság';
 
   @override
+  String get settingsAppLock => 'Alkalmazászár';
+
+  @override
+  String get settingsAppLockHintFace =>
+      'Face ID-t vagy az eszköz kódját kéri az app megnyitásakor és a háttérből való visszatéréskor.';
+
+  @override
+  String get settingsAppLockHintFingerprint =>
+      'Ujjlenyomatot vagy az eszköz kódját kéri az app megnyitásakor és a háttérből való visszatéréskor.';
+
+  @override
+  String get settingsAppLockHintOther =>
+      'Biometrikus azonosítást vagy az eszköz kódját kéri az app megnyitásakor és a háttérből való visszatéréskor.';
+
+  @override
+  String get appLockReason => 'A TrueNAS Mobile feloldása';
+
+  @override
+  String get appLockChangeReason =>
+      'Erősítsd meg, hogy te vagy az, az alkalmazászár módosításához';
+
+  @override
+  String get appLockTitle => 'A TrueNAS Mobile zárolva van';
+
+  @override
+  String get appLockFailed => 'Nem sikerült a feloldás. Próbáld újra.';
+
+  @override
+  String get appLockUnlock => 'Feloldás';
+
+  @override
   String get settingsCertificates => 'Megbízható tanúsítványok';
 
   @override

@@ -2716,6 +2716,42 @@
   "@settingsSecurity": {
     "description": "Settings section."
   },
+  "settingsAppLock": "App lock",
+  "@settingsAppLock": {
+    "description": "Switch in Settings > Security."
+  },
+  "settingsAppLockHintFace": "Ask for Face ID or the device passcode when the app opens or comes back from the background.",
+  "@settingsAppLockHintFace": {
+    "description": "Subtitle of the app lock switch on a phone with face unlock."
+  },
+  "settingsAppLockHintFingerprint": "Ask for a fingerprint or the device passcode when the app opens or comes back from the background.",
+  "@settingsAppLockHintFingerprint": {
+    "description": "Subtitle of the app lock switch on a phone with a fingerprint reader."
+  },
+  "settingsAppLockHintOther": "Ask for biometrics or the device passcode when the app opens or comes back from the background.",
+  "@settingsAppLockHintOther": {
+    "description": "Subtitle of the app lock switch when the phone's biometric is not known."
+  },
+  "appLockReason": "Unlock TrueNAS Mobile",
+  "@appLockReason": {
+    "description": "Reason shown in the system's Face ID / fingerprint prompt when opening the app."
+  },
+  "appLockChangeReason": "Confirm it's you to change the app lock",
+  "@appLockChangeReason": {
+    "description": "Reason shown in the system prompt when turning the app lock on or off in Settings."
+  },
+  "appLockTitle": "TrueNAS Mobile is locked",
+  "@appLockTitle": {
+    "description": "Title of the lock screen."
+  },
+  "appLockFailed": "Not unlocked. Try again.",
+  "@appLockFailed": {
+    "description": "Shown on the lock screen after the prompt was cancelled or failed."
+  },
+  "appLockUnlock": "Unlock",
+  "@appLockUnlock": {
+    "description": "Button on the lock screen that opens the system prompt."
+  },
   "settingsCertificates": "Trusted certificates",
   "@settingsCertificates": {
     "description": "Row that opens the list of certificates the user chose to trust."

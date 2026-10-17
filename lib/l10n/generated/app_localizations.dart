@@ -3380,6 +3380,60 @@ abstract class AppLocalizations {
   /// **'Security'**
   String get settingsSecurity;
 
+  /// Switch in Settings > Security.
+  ///
+  /// In en, this message translates to:
+  /// **'App lock'**
+  String get settingsAppLock;
+
+  /// Subtitle of the app lock switch on a phone with face unlock.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask for Face ID or the device passcode when the app opens or comes back from the background.'**
+  String get settingsAppLockHintFace;
+
+  /// Subtitle of the app lock switch on a phone with a fingerprint reader.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask for a fingerprint or the device passcode when the app opens or comes back from the background.'**
+  String get settingsAppLockHintFingerprint;
+
+  /// Subtitle of the app lock switch when the phone's biometric is not known.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask for biometrics or the device passcode when the app opens or comes back from the background.'**
+  String get settingsAppLockHintOther;
+
+  /// Reason shown in the system's Face ID / fingerprint prompt when opening the app.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlock TrueNAS Mobile'**
+  String get appLockReason;
+
+  /// Reason shown in the system prompt when turning the app lock on or off in Settings.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm it\'s you to change the app lock'**
+  String get appLockChangeReason;
+
+  /// Title of the lock screen.
+  ///
+  /// In en, this message translates to:
+  /// **'TrueNAS Mobile is locked'**
+  String get appLockTitle;
+
+  /// Shown on the lock screen after the prompt was cancelled or failed.
+  ///
+  /// In en, this message translates to:
+  /// **'Not unlocked. Try again.'**
+  String get appLockFailed;
+
+  /// Button on the lock screen that opens the system prompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlock'**
+  String get appLockUnlock;
+
   /// Row that opens the list of certificates the user chose to trust.
   ///
   /// In en, this message translates to:

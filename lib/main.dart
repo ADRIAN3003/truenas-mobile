@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'app.dart';
 import 'core/instances/instance_repository.dart';
+import 'core/security/biometric_auth.dart';
 import 'core/settings/app_settings.dart';
 import 'core/settings/settings_provider.dart';
 import 'core/settings/system_language.dart';
@@ -25,6 +26,7 @@ Future<void> main() async {
         systemLanguagePageProvider.overrideWithValue(systemLanguagePage),
         updateAutoCheckProvider.overrideWithValue(true),
         openDefaultServerProvider.overrideWithValue(true),
+        biometricAuthProvider.overrideWithValue(const PlatformBiometricAuth()),
       ],
       child: wrapForGlass(const TrueNasMobileApp()),
     ),

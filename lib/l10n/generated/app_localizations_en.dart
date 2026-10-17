@@ -2504,4 +2504,26 @@ class AppLocalizationsEn extends AppLocalizations {
   String serverSaveFailed(String error) {
     return 'The server could not be saved: $error';
   }
+
+  @override
+  String get settingsLiveJobsNoExtension =>
+      'This copy of the app has no lock screen extension (the sideloading tool removed it), so jobs show in the app only';
+
+  @override
+  String get settingsLiveJobsDisabled =>
+      'Live Activities are turned off for this app in iOS Settings';
+
+  @override
+  String get jobsDismiss => 'Hide';
+
+  @override
+  String jobsRunningCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count jobs running',
+      one: '1 job running',
+    );
+    return '$_temp0';
+  }
 }

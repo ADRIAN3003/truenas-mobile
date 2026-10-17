@@ -7,6 +7,7 @@ import 'package:truenas_mobile/app.dart';
 import 'package:truenas_mobile/core/instances/instance_repository.dart';
 import 'package:truenas_mobile/core/instances/instances_provider.dart';
 import 'package:truenas_mobile/core/instances/server_instance.dart';
+import 'package:truenas_mobile/core/jobs/live_progress.dart';
 import 'package:truenas_mobile/core/models/alert.dart';
 import 'package:truenas_mobile/core/notifications/alert_kind_catalog.dart';
 import 'package:truenas_mobile/core/notifications/background_alerts.dart';
@@ -19,6 +20,7 @@ import 'package:truenas_mobile/shared/haptics.dart';
 
 import '../../support/alert_fakes.dart';
 import '../../support/biometric_fakes.dart';
+import '../../support/job_fakes.dart';
 import '../../support/language_fakes.dart';
 import '../../support/memory_store.dart';
 import '../../support/update_fakes.dart';
@@ -412,6 +414,38 @@ void main() {
       await tester.tap(find.text('Live job progress'));
       await tester.pumpAndSettle();
       expect((await saved()).liveJobs, isFalse);
+    });
+
+    testWidgets(
+      'says when the sideloaded copy lost its lock screen extension',
+      (tester) async {
+        await open(
+          tester,
+          overrides: [
+            liveProgressProvider.overrideWithValue(
+              FakeLiveProgress(liveSupport: LiveSupport.noExtension),
+            ),
+          ],
+        );
+        expect(
+          find.textContaining('has no lock screen extension'),
+          findsOneWidget,
+        );
+      },
+    );
+
+    testWidgets('says when Live Activities are off in iOS Settings', (
+      tester,
+    ) async {
+      await open(
+        tester,
+        overrides: [
+          liveProgressProvider.overrideWithValue(
+            FakeLiveProgress(liveSupport: LiveSupport.disabled),
+          ),
+        ],
+      );
+      expect(find.textContaining('turned off for this app'), findsOneWidget);
     });
 
     testWidgets('alert types can be switched off one by one', (tester) async {

@@ -13,6 +13,7 @@ import '../../shared/connect_dialogs.dart';
 import '../../shared/glass.dart';
 import '../../shared/haptics.dart';
 import '../../shared/widgets.dart';
+import '../jobs/job_gauge_button.dart';
 import '../jobs/job_progress_banner.dart';
 import '../jobs/job_texts.dart';
 import '../sharing/shares_tab.dart';
@@ -152,6 +153,11 @@ class _ServerScreenState extends ConsumerState<ServerScreen>
 
   /// The app's settings, one tap away from any screen of the server.
   List<Widget> _actions() => [
+    if (_jobs != null && _session != null)
+      JobGaugeButton(
+        tracker: _jobs!.tracker,
+        onOpen: () => openJobs(context, _session!),
+      ),
     IconButton(
       tooltip: AppLocalizations.of(context).settingsTitle,
       onPressed: () => Navigator.push(

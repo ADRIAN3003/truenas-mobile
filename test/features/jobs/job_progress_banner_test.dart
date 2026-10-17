@@ -83,4 +83,21 @@ void main() {
       findsOneWidget,
     );
   });
+
+  testWidgets('can be dismissed, and comes back for a new job', (tester) async {
+    source.active.add(jobJson(1, 'pool.scrub.run', percent: 42));
+    await pump(tester);
+    expect(find.byType(LinearProgressIndicator), findsOneWidget);
+    await tester.tap(find.byIcon(Icons.close_rounded));
+    await tester.pump();
+    expect(find.byType(LinearProgressIndicator), findsNothing);
+
+    await tester.runAsync(() async {
+      source.active.add(jobJson(2, 'app.upgrade', percent: 5));
+      await tracker.refresh();
+    });
+    await tester.pump();
+    expect(find.text('App update'), findsOneWidget);
+    expect(find.text('Scrub'), findsNothing);
+  });
 }

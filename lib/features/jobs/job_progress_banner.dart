@@ -11,8 +11,9 @@ import 'job_texts.dart';
 const bannerLimit = 3;
 
 /// A card over the bottom of the server screen with the scrubs,
-/// replications and updates that run. Gone when there are none.
-class JobProgressBanner extends StatelessWidget {
+/// replications and updates that run. Gone when there are none, and hidden by
+/// its close button until another job starts.
+class JobProgressBanner extends StatefulWidget {
   const JobProgressBanner({
     super.key,
     required this.tracker,
@@ -25,16 +26,28 @@ class JobProgressBanner extends StatelessWidget {
   final VoidCallback onOpen;
 
   @override
+  State<JobProgressBanner> createState() => _JobProgressBannerState();
+}
+
+class _JobProgressBannerState extends State<JobProgressBanner> {
+  /// Jobs the user hid. A job that starts later is not among them.
+  final _dismissed = <int>{};
+
+  @override
   Widget build(BuildContext context) => StreamBuilder<JobsSnapshot>(
-    stream: tracker.snapshots,
-    initialData: tracker.snapshot,
+    stream: widget.tracker.snapshots,
+    initialData: widget.tracker.snapshot,
     builder: (context, snapshot) {
       final data = snapshot.requireData;
-      if (data.jobs.isEmpty) return const SizedBox.shrink();
+      final visible = [
+        for (final job in data.jobs)
+          if (!_dismissed.contains(job.id)) job,
+      ];
+      if (visible.isEmpty) return const SizedBox.shrink();
       final l10n = AppLocalizations.of(context);
       final theme = Theme.of(context);
-      final shown = data.jobs.take(bannerLimit).toList();
-      final more = data.jobs.length - shown.length;
+      final shown = visible.take(bannerLimit).toList();
+      final more = visible.length - shown.length;
       return Semantics(
         container: true,
         child: Material(
@@ -44,35 +57,53 @@ class JobProgressBanner extends StatelessWidget {
           borderRadius: BorderRadius.circular(20),
           clipBehavior: Clip.antiAlias,
           child: InkWell(
-            onTap: onOpen,
+            onTap: widget.onOpen,
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
+              padding: const EdgeInsets.fromLTRB(16, 12, 4, 12),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  for (var i = 0; i < shown.length; i++) ...[
-                    if (i > 0) const SizedBox(height: 12),
-                    _BannerRow(shown[i], connected: data.connected),
-                  ],
-                  if (more > 0)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 8),
-                      child: Text(
-                        l10n.jobsMoreCount(more),
-                        style: theme.textTheme.bodySmall,
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 4),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          for (var i = 0; i < shown.length; i++) ...[
+                            if (i > 0) const SizedBox(height: 12),
+                            _BannerRow(shown[i], connected: data.connected),
+                          ],
+                          if (more > 0)
+                            Padding(
+                              padding: const EdgeInsets.only(top: 8),
+                              child: Text(
+                                l10n.jobsMoreCount(more),
+                                style: theme.textTheme.bodySmall,
+                              ),
+                            ),
+                          if (!data.connected && data.hasActive)
+                            Padding(
+                              padding: const EdgeInsets.only(top: 8),
+                              child: Text(
+                                l10n.jobsConnectionLost,
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                  color: theme.colorScheme.error,
+                                ),
+                              ),
+                            ),
+                        ],
                       ),
                     ),
-                  if (!data.connected && data.hasActive)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 8),
-                      child: Text(
-                        l10n.jobsConnectionLost,
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: theme.colorScheme.error,
-                        ),
-                      ),
+                  ),
+                  IconButton(
+                    tooltip: l10n.jobsDismiss,
+                    visualDensity: VisualDensity.compact,
+                    icon: const Icon(Icons.close_rounded, size: 20),
+                    onPressed: () => setState(
+                      () => _dismissed.addAll(visible.map((job) => job.id)),
                     ),
+                  ),
                 ],
               ),
             ),

@@ -672,5 +672,9 @@
   "serversClearTitle": "Törlöd a mentett szervereket?",
   "serversClearBody": "Minden ebben az alkalmazásban mentett szerver törlődik belőle. Magukon a szervereken semmi nem változik.",
   "serversClearConfirm": "Törlés",
-  "serverSaveFailed": "A szervert nem sikerült elmenteni: {error}"
+  "serverSaveFailed": "A szervert nem sikerült elmenteni: {error}",
+  "settingsLiveJobsNoExtension": "Az alkalmazás ezen példányában nincs zárolt képernyős bővítmény (az oldalbetöltő eszköz eltávolította), ezért a feladatok csak az alkalmazásban látszanak",
+  "settingsLiveJobsDisabled": "Az élő tevékenységek ki vannak kapcsolva az alkalmazásnak az iOS Beállításokban",
+  "jobsDismiss": "Elrejtés",
+  "jobsRunningCount": "{count, plural, one{1 feladat fut} other{{count} feladat fut}}"
 }

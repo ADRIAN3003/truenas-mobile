@@ -2477,4 +2477,26 @@ class AppLocalizationsHu extends AppLocalizations {
   String serverSaveFailed(String error) {
     return 'A szervert nem sikerült elmenteni: $error';
   }
+
+  @override
+  String get settingsLiveJobsNoExtension =>
+      'Az alkalmazás ezen példányában nincs zárolt képernyős bővítmény (az oldalbetöltő eszköz eltávolította), ezért a feladatok csak az alkalmazásban látszanak';
+
+  @override
+  String get settingsLiveJobsDisabled =>
+      'Az élő tevékenységek ki vannak kapcsolva az alkalmazásnak az iOS Beállításokban';
+
+  @override
+  String get jobsDismiss => 'Elrejtés';
+
+  @override
+  String jobsRunningCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count feladat fut',
+      one: '1 feladat fut',
+    );
+    return '$_temp0';
+  }
 }

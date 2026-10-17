@@ -69,6 +69,22 @@ class LiveProgressUpdate {
   };
 }
 
+/// Why running jobs can or cannot be shown outside the app.
+enum LiveSupport {
+  /// They can.
+  ok,
+
+  /// This platform has nothing to show them with.
+  unavailable,
+
+  /// The user turned Live Activities off for the app (iOS Settings).
+  disabled,
+
+  /// The build has no widget extension to draw them: a sideloading tool
+  /// removed it. The Dynamic Island would stay empty.
+  noExtension,
+}
+
 /// Shows running jobs outside the app: a Live Activity on the iPhone lock
 /// screen and Dynamic Island, an ongoing progress notification on Android.
 ///
@@ -78,6 +94,9 @@ class LiveProgressUpdate {
 abstract interface class LiveProgress {
   /// Whether this phone and its settings allow it at all.
   Future<bool> isSupported();
+
+  /// Whether it works, or why it does not.
+  Future<LiveSupport> support();
 
   /// Asks for the notification permission where the phone needs it (Android
   /// 13 and newer). True when jobs may be shown.
@@ -100,6 +119,9 @@ class NoLiveProgress implements LiveProgress {
 
   @override
   Future<bool> isSupported() async => false;
+
+  @override
+  Future<LiveSupport> support() async => LiveSupport.unavailable;
 
   @override
   Future<bool> requestPermission() async => false;
@@ -143,6 +165,20 @@ class PlatformLiveProgress implements LiveProgress {
       await _invoke<bool>('isSupported') ?? false;
 
   @override
+  Future<LiveSupport> support() async {
+    // Android has no extension to lose; there, supported means allowed.
+    if (defaultTargetPlatform == TargetPlatform.iOS) {
+      return switch (await _invoke<String>('status')) {
+        'ok' => LiveSupport.ok,
+        'disabled' => LiveSupport.disabled,
+        'noExtension' => LiveSupport.noExtension,
+        _ => LiveSupport.unavailable,
+      };
+    }
+    return await isSupported() ? LiveSupport.ok : LiveSupport.unavailable;
+  }
+
+  @override
   Future<bool> requestPermission() async =>
       await _invoke<bool>('requestPermission') ?? false;
 
@@ -160,4 +196,9 @@ class PlatformLiveProgress implements LiveProgress {
 
 final liveProgressProvider = Provider<LiveProgress>(
   (ref) => const NoLiveProgress(),
+);
+
+/// What the settings screen says under the live job progress switch.
+final liveSupportProvider = FutureProvider<LiveSupport>(
+  (ref) => ref.watch(liveProgressProvider).support(),
 );

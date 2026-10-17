@@ -175,12 +175,27 @@ class LiveProgressPlugin :
                         .setProgressIndeterminate(indeterminate)
                 )
             }
-            builder.setRequestPromotedOngoing(running)
+            requestPromotedOngoing(builder, running)
             if (running && progress != null) builder.setShortCriticalText("$percent%")
         } else if (running) {
             builder.setProgress(100, percent, indeterminate)
         }
         manager.notify(id, NOTIFICATION_ID, builder.build())
+    }
+
+    /**
+     * Asks to be shown as a live update. The setter arrived with Android 16
+     * QPR2 (API 36.1), which the build's SDK may not have, so it is looked up
+     * when it runs and skipped where it is missing.
+     */
+    private fun requestPromotedOngoing(builder: Notification.Builder, promoted: Boolean) {
+        try {
+            Notification.Builder::class.java
+                .getMethod("setRequestPromotedOngoing", java.lang.Boolean.TYPE)
+                .invoke(builder, promoted)
+        } catch (_: ReflectiveOperationException) {
+            // Older Android 16: the notification stays an ordinary ongoing one.
+        }
     }
 
     private fun ensureChannel(name: String, description: String) {

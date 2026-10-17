@@ -4,6 +4,8 @@
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
     <!-- Unlocks the app with a fingerprint or face, when the user turns that on. -->
     <uses-permission android:name="android.permission.USE_BIOMETRIC" />
+    <!-- Alert notifications (Android 13 and newer ask the user). -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <application
         android:label="TrueNAS Mobile"
         android:name="${applicationName}"

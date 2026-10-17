@@ -52,6 +52,8 @@ dependencies:
   liquid_glass_widgets: ^1.13.0
   package_info_plus: ^10.2.2
   local_auth: ^3.0.2
+  workmanager: ^0.10.10
+  flutter_local_notifications: ^22.3.2
 dev_dependencies:
   flutter_test:
     sdk: flutter

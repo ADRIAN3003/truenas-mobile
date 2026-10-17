@@ -14,7 +14,8 @@ for Android and iOS that talks to the official TrueNAS middleware API
   key (recommended) or a username, password and 2FA code. Self-signed
   certificates are pinned on first use.
 - **Dashboard:** live CPU, memory (with ARC), network and pool health, plus
-  system info and an alert summary. Alerts can be dismissed and restored.
+  system info and an alert summary. Alerts can be dismissed and restored, and new ones can be sent to the
+  phone as notifications (checked in the background, off by default).
 - **Jobs:** running and recent jobs with progress, and abort.
 - **Storage:** pools with layout, scrub start, pause and stop; datasets and
   zvols (create, delete); snapshots (create, roll back, delete); disks with

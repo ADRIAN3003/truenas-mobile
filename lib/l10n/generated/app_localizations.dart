@@ -3374,6 +3374,72 @@ abstract class AppLocalizations {
   /// **'Esc, Tab, Ctrl+C and arrows under the terminal'**
   String get settingsShellKeysHint;
 
+  /// Settings section for phone notifications.
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications'**
+  String get settingsNotifications;
+
+  /// Switch in Settings > Notifications.
+  ///
+  /// In en, this message translates to:
+  /// **'Alert notifications'**
+  String get settingsAlertNotifications;
+
+  /// Subtitle of the alert notifications switch on iOS.
+  ///
+  /// In en, this message translates to:
+  /// **'Checks your servers in the background and notifies you of new alerts. iOS decides when the check runs, so it can be late, and it stops if you swipe the app away.'**
+  String get settingsAlertNotificationsHintIos;
+
+  /// Subtitle of the alert notifications switch on Android.
+  ///
+  /// In en, this message translates to:
+  /// **'Checks your servers in the background about every 15 minutes and notifies you of new alerts.'**
+  String get settingsAlertNotificationsHintAndroid;
+
+  /// Setting: the lowest alert level that sends a notification.
+  ///
+  /// In en, this message translates to:
+  /// **'Notify for'**
+  String get settingsAlertLevel;
+
+  /// Choice: notify for critical alerts only.
+  ///
+  /// In en, this message translates to:
+  /// **'Critical alerts'**
+  String get settingsAlertLevelCritical;
+
+  /// Choice: notify for warnings and critical alerts.
+  ///
+  /// In en, this message translates to:
+  /// **'Warnings and critical'**
+  String get settingsAlertLevelWarning;
+
+  /// Snackbar when the user refused the notification permission.
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications are turned off for this app. Allow them in the phone\'s settings first.'**
+  String get settingsAlertPermissionDenied;
+
+  /// Name of the Android notification channel for new alerts.
+  ///
+  /// In en, this message translates to:
+  /// **'Alerts'**
+  String get alertNotificationChannel;
+
+  /// Description of the Android notification channel.
+  ///
+  /// In en, this message translates to:
+  /// **'New alerts from your TrueNAS servers'**
+  String get alertNotificationChannelDescription;
+
+  /// Notification text when several alerts arrived at once.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} new alerts'**
+  String alertNotificationMany(int count);
+
   /// Settings section.
   ///
   /// In en, this message translates to:

@@ -2712,6 +2712,55 @@
   "@settingsShellKeysHint": {
     "description": "Explains the extra keys setting."
   },
+  "settingsNotifications": "Notifications",
+  "@settingsNotifications": {
+    "description": "Settings section for phone notifications."
+  },
+  "settingsAlertNotifications": "Alert notifications",
+  "@settingsAlertNotifications": {
+    "description": "Switch in Settings > Notifications."
+  },
+  "settingsAlertNotificationsHintIos": "Checks your servers in the background and notifies you of new alerts. iOS decides when the check runs, so it can be late, and it stops if you swipe the app away.",
+  "@settingsAlertNotificationsHintIos": {
+    "description": "Subtitle of the alert notifications switch on iOS."
+  },
+  "settingsAlertNotificationsHintAndroid": "Checks your servers in the background about every 15 minutes and notifies you of new alerts.",
+  "@settingsAlertNotificationsHintAndroid": {
+    "description": "Subtitle of the alert notifications switch on Android."
+  },
+  "settingsAlertLevel": "Notify for",
+  "@settingsAlertLevel": {
+    "description": "Setting: the lowest alert level that sends a notification."
+  },
+  "settingsAlertLevelCritical": "Critical alerts",
+  "@settingsAlertLevelCritical": {
+    "description": "Choice: notify for critical alerts only."
+  },
+  "settingsAlertLevelWarning": "Warnings and critical",
+  "@settingsAlertLevelWarning": {
+    "description": "Choice: notify for warnings and critical alerts."
+  },
+  "settingsAlertPermissionDenied": "Notifications are turned off for this app. Allow them in the phone's settings first.",
+  "@settingsAlertPermissionDenied": {
+    "description": "Snackbar when the user refused the notification permission."
+  },
+  "alertNotificationChannel": "Alerts",
+  "@alertNotificationChannel": {
+    "description": "Name of the Android notification channel for new alerts."
+  },
+  "alertNotificationChannelDescription": "New alerts from your TrueNAS servers",
+  "@alertNotificationChannelDescription": {
+    "description": "Description of the Android notification channel."
+  },
+  "alertNotificationMany": "{count} new alerts",
+  "@alertNotificationMany": {
+    "description": "Notification text when several alerts arrived at once.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "settingsSecurity": "Security",
   "@settingsSecurity": {
     "description": "Settings section."

@@ -143,7 +143,12 @@ README covers what the app does; this file covers how to work on it.
   `ios/Shared` is compiled into both targets) and a notification on Android
   (`LiveProgressPlugin.kt`, a promoted ongoing progress notification on
   Android 16). `JobMonitor` ties them to one open server, `ServerScreen` owns
-  it. There is no push server: the activity is refreshed every 30 s while the
+  it. The in-app card (`JobProgressBanner`) has a close button (hides the jobs
+  it showed, not later ones); `JobGaugeButton` is the animated ring in the
+  app bar actions. `LiveProgress.support()` (`LiveSupport`) tells a missing
+  `JobActivityWidget.appex` (sideloader stripped it: the Dynamic Island is
+  empty) from Live Activities switched off; no activity starts without the
+  extension, Settings explains, and `ci.yml` checks the unsigned IPA embeds it. There is no push server: the activity is refreshed every 30 s while the
   app runs and goes stale (iOS `staleDate`) or says "not updating" when it
   stops. The widget extension is in `Runner.xcodeproj` by hand (no Xcode here):
   keep "Embed Foundation Extensions" before "Thin Binary" in the Runner phases,

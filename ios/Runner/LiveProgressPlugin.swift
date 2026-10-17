@@ -26,15 +26,22 @@ final class LiveProgressPlugin: NSObject, FlutterPlugin {
 
   func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
     guard #available(iOS 16.2, *) else {
-      result(call.method == "isSupported" || call.method == "requestPermission" ? false : nil)
+      switch call.method {
+      case "isSupported", "requestPermission": result(false)
+      case "status": result("unavailable")
+      default: result(nil)
+      }
       return
     }
     let args = call.arguments as? [String: Any] ?? [:]
     switch call.method {
+    case "status":
+      result(status())
     case "isSupported", "requestPermission":
       // Live Activities need no permission prompt; the user can turn them
-      // off for the app in Settings.
-      result(ActivityAuthorizationInfo().areActivitiesEnabled)
+      // off for the app in Settings. Without the extension the system would
+      // show an empty Dynamic Island, so none is started.
+      result(status() == "ok")
     case "show":
       show(args, result: result)
     case "end":
@@ -47,6 +54,25 @@ final class LiveProgressPlugin: NSObject, FlutterPlugin {
       result(nil)
     default:
       result(FlutterMethodNotImplemented)
+    }
+  }
+
+  /// ok, disabled (turned off for the app in iOS Settings) or noExtension.
+  @available(iOS 16.2, *)
+  private func status() -> String {
+    guard extensionEmbedded() else { return "noExtension" }
+    return ActivityAuthorizationInfo().areActivitiesEnabled ? "ok" : "disabled"
+  }
+
+  /// Whether the JobActivityWidget extension, which draws the activity, is in
+  /// the app. Some sideloading tools remove app extensions.
+  private func extensionEmbedded() -> Bool {
+    guard let plugIns = Bundle.main.builtInPlugInsURL,
+      let items = try? FileManager.default.contentsOfDirectory(
+        at: plugIns, includingPropertiesForKeys: nil)
+    else { return false }
+    return items.contains {
+      $0.pathExtension == "appex" && $0.lastPathComponent.hasPrefix("JobActivityWidget")
     }
   }
 

@@ -4135,6 +4135,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'The server could not be saved: {error}'**
   String serverSaveFailed(String error);
+
+  /// Shown under the live job progress setting on iOS when the widget extension is missing.
+  ///
+  /// In en, this message translates to:
+  /// **'This copy of the app has no lock screen extension (the sideloading tool removed it), so jobs show in the app only'**
+  String get settingsLiveJobsNoExtension;
+
+  /// Shown under the live job progress setting when the user turned Live Activities off.
+  ///
+  /// In en, this message translates to:
+  /// **'Live Activities are turned off for this app in iOS Settings'**
+  String get settingsLiveJobsDisabled;
+
+  /// Tooltip of the button that hides the running jobs card.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide'**
+  String get jobsDismiss;
+
+  /// Tooltip of the progress gauge in the app bar.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{1 job running} other{{count} jobs running}}'**
+  String jobsRunningCount(int count);
 }
 
 class _AppLocalizationsDelegate

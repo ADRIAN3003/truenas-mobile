@@ -3354,5 +3354,26 @@
         "type": "String"
       }
     }
+  },
+  "settingsLiveJobsNoExtension": "This copy of the app has no lock screen extension (the sideloading tool removed it), so jobs show in the app only",
+  "@settingsLiveJobsNoExtension": {
+    "description": "Shown under the live job progress setting on iOS when the widget extension is missing."
+  },
+  "settingsLiveJobsDisabled": "Live Activities are turned off for this app in iOS Settings",
+  "@settingsLiveJobsDisabled": {
+    "description": "Shown under the live job progress setting when the user turned Live Activities off."
+  },
+  "jobsDismiss": "Hide",
+  "@jobsDismiss": {
+    "description": "Tooltip of the button that hides the running jobs card."
+  },
+  "jobsRunningCount": "{count, plural, one{1 job running} other{{count} jobs running}}",
+  "@jobsRunningCount": {
+    "description": "Tooltip of the progress gauge in the app bar.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   }
 }

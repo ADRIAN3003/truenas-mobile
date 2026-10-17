@@ -20,7 +20,9 @@ for Android and iOS that talks to the official TrueNAS middleware API
   phone as notifications (checked in the background, off by default).
 - **Jobs:** running and recent jobs with progress, and abort. Scrubs,
   replications, app and system updates, cloud and rsync tasks also show their
-  progress in a card over the server screen and on the lock screen (a Live
+  progress in a card over the server screen (the close button hides it), a
+  gauge ring next to the settings icon (tap it for the list) and on the lock
+  screen and Dynamic Island (a Live
   Activity on iOS, a progress notification on Android, a live update on
   Android 16). There is no push server, so the lock screen only moves while
   the app is running or kept alive by the phone; when it stops hearing from the
@@ -98,7 +100,10 @@ Download the latest APK or IPA from the
   [AltStore](https://altstore.io/) or [Sideloadly](https://sideloadly.io/),
   which sign it with your Apple ID. The IPA holds a second bundle, the
   `JobActivityWidget` extension, for the lock screen progress; the signing tool
-  must sign it too (AltStore and Sideloadly do).
+  must sign it too: keep app extensions in the sideloading tool's options
+  (Sideloadly: leave "Remove app extensions" off; with a free Apple ID the
+  extension needs one of your three app slots). When the extension is missing
+  the Dynamic Island stays empty, and Settings > Notifications says so.
 
 ## Build from source
 

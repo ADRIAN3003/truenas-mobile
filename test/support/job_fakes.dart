@@ -85,9 +85,10 @@ class FakeJobSource implements JobSource {
 
 /// The lock screen, without a phone.
 class FakeLiveProgress implements LiveProgress {
-  FakeLiveProgress({this.supported = true});
+  FakeLiveProgress({this.supported = true, this.liveSupport = LiveSupport.ok});
 
   final bool supported;
+  final LiveSupport liveSupport;
   final shown = <LiveProgressUpdate>[];
   final ended = <String>[];
   final keptOnReconcile = <Set<String>>[];
@@ -95,6 +96,9 @@ class FakeLiveProgress implements LiveProgress {
 
   @override
   Future<bool> isSupported() async => supported;
+
+  @override
+  Future<LiveSupport> support() async => liveSupport;
 
   @override
   Future<bool> requestPermission() async {

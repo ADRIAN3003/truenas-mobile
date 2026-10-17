@@ -6,6 +6,7 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/instances/default_server.dart';
+import '../../core/jobs/live_progress.dart';
 import '../../core/instances/instances_provider.dart';
 import '../../core/models/alert.dart';
 import '../../core/notifications/background_alerts.dart';
@@ -334,7 +335,11 @@ class _NotificationsCard extends ConsumerWidget {
           ),
         AppSwitchTile(
           title: Text(l10n.settingsLiveJobs),
-          subtitle: Text(l10n.settingsLiveJobsHint),
+          subtitle: Text(switch (ref.watch(liveSupportProvider).value) {
+            LiveSupport.noExtension => l10n.settingsLiveJobsNoExtension,
+            LiveSupport.disabled => l10n.settingsLiveJobsDisabled,
+            _ => l10n.settingsLiveJobsHint,
+          }),
           value: settings.liveJobs,
           onChanged: (on) => notifier.update((s) => s.copyWith(liveJobs: on)),
         ),

@@ -1,6 +1,8 @@
-<img src="docs/icon/icon-1024.png" width="96" alt="" align="right">
+<p align="center">
+  <img src="docs/icon/icon-1024.png" width="96" alt="TrueNAS Mobile app icon">
+</p>
 
-# TrueNAS Mobile
+<h1 align="center">TrueNAS Mobile</h1>
 
 Manage your TrueNAS servers from your phone. TrueNAS Mobile is a Flutter app
 for Android and iOS that talks to the official TrueNAS middleware API

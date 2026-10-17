@@ -81,6 +81,14 @@
 	<true/>
 	<key>NSLocalNetworkUsageDescription</key>
 	<string>TrueNAS Mobile connects to TrueNAS servers on your local network.</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>fetch</string>
+	</array>
+	<key>BGTaskSchedulerPermittedIdentifiers</key>
+	<array>
+		<string>hu.adrian.truenasmobile.alertCheck</string>
+	</array>
 	<key>CFBundleLocalizations</key>
 	<array>
 		<string>en</string>

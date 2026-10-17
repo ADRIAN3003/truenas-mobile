@@ -1967,6 +1967,45 @@ class AppLocalizationsHu extends AppLocalizations {
       'Esc, Tab, Ctrl+C és nyilak a terminál alatt';
 
   @override
+  String get settingsNotifications => 'Értesítések';
+
+  @override
+  String get settingsAlertNotifications => 'Riasztási értesítések';
+
+  @override
+  String get settingsAlertNotificationsHintIos =>
+      'A háttérben ellenőrzi a szervereidet, és értesít az új riasztásokról. Az iOS dönti el, mikor fut az ellenőrzés, ezért késhet, és leáll, ha kisöpröd az appot.';
+
+  @override
+  String get settingsAlertNotificationsHintAndroid =>
+      'A háttérben kb. 15 percenként ellenőrzi a szervereidet, és értesít az új riasztásokról.';
+
+  @override
+  String get settingsAlertLevel => 'Értesítés ettől';
+
+  @override
+  String get settingsAlertLevelCritical => 'Kritikus riasztások';
+
+  @override
+  String get settingsAlertLevelWarning => 'Figyelmeztetések és kritikusak';
+
+  @override
+  String get settingsAlertPermissionDenied =>
+      'Az értesítések ki vannak kapcsolva ennél az appnál. Először engedélyezd őket a telefon beállításaiban.';
+
+  @override
+  String get alertNotificationChannel => 'Riasztások';
+
+  @override
+  String get alertNotificationChannelDescription =>
+      'Új riasztások a TrueNAS szervereidről';
+
+  @override
+  String alertNotificationMany(int count) {
+    return '$count új riasztás';
+  }
+
+  @override
   String get settingsSecurity => 'Biztonság';
 
   @override

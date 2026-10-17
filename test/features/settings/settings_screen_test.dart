@@ -7,6 +7,8 @@ import 'package:truenas_mobile/app.dart';
 import 'package:truenas_mobile/core/instances/instance_repository.dart';
 import 'package:truenas_mobile/core/instances/instances_provider.dart';
 import 'package:truenas_mobile/core/instances/server_instance.dart';
+import 'package:truenas_mobile/core/models/alert.dart';
+import 'package:truenas_mobile/core/notifications/background_alerts.dart';
 import 'package:truenas_mobile/core/security/biometric_auth.dart';
 import 'package:truenas_mobile/core/settings/app_settings.dart';
 import 'package:truenas_mobile/core/settings/settings_provider.dart';
@@ -14,6 +16,7 @@ import 'package:truenas_mobile/core/settings/system_language.dart';
 import 'package:truenas_mobile/features/updates/updates_provider.dart';
 import 'package:truenas_mobile/shared/haptics.dart';
 
+import '../../support/alert_fakes.dart';
 import '../../support/biometric_fakes.dart';
 import '../../support/language_fakes.dart';
 import '../../support/memory_store.dart';
@@ -368,6 +371,89 @@ void main() {
       expect(find.text('AB:CD:EF'), findsNothing);
       final servers = await InstanceRepository(serverStore).load();
       expect(servers.firstWhere((s) => s.id == 'a').pinnedFingerprint, isNull);
+    });
+  });
+
+  group('alert notifications', () {
+    late FakeAlertNotifier notifier;
+    late FakeBackgroundScheduler scheduler;
+    late List<Override> overrides;
+
+    setUp(() {
+      notifier = FakeAlertNotifier();
+      scheduler = FakeBackgroundScheduler();
+      overrides = [
+        alertNotificationServiceProvider.overrideWithValue(
+          AlertNotificationService(
+            scheduler: scheduler,
+            notifier: notifier,
+            store: MemoryStore(),
+          ),
+        ),
+      ];
+    });
+
+    testWidgets('are not offered where the phone cannot run them', (
+      tester,
+    ) async {
+      await open(tester);
+      expect(find.text('Alert notifications'), findsNothing);
+    });
+
+    testWidgets('turn on after the phone allows notifications', (tester) async {
+      await open(tester, overrides: overrides);
+      expect(find.text('Notify for'), findsNothing);
+      await tester.tap(find.text('Alert notifications'));
+      await tester.pumpAndSettle();
+      expect(notifier.permissionRequests, 1);
+      expect(scheduler.scheduled, isTrue);
+      expect((await saved()).alertNotifications, isTrue);
+      expect(find.text('Critical alerts'), findsOneWidget);
+    });
+
+    testWidgets('stay off when notifications are refused', (tester) async {
+      notifier.allowed = false;
+      await open(tester, overrides: overrides);
+      await tester.tap(find.text('Alert notifications'));
+      await tester.pumpAndSettle();
+      expect(scheduler.scheduled, isFalse);
+      expect((await saved()).alertNotifications, isFalse);
+      expect(find.textContaining('turned off for this app'), findsOneWidget);
+    });
+
+    testWidgets('turn off and stop the check', (tester) async {
+      await open(
+        tester,
+        overrides: [
+          ...overrides,
+          initialSettingsProvider.overrideWithValue(
+            const AppSettings(alertNotifications: true),
+          ),
+        ],
+      );
+      scheduler.scheduled = true;
+      await tester.tap(find.text('Alert notifications'));
+      await tester.pumpAndSettle();
+      expect(scheduler.scheduled, isFalse);
+      expect((await saved()).alertNotifications, isFalse);
+    });
+
+    testWidgets('choose the lowest level that notifies', (tester) async {
+      await open(
+        tester,
+        overrides: [
+          ...overrides,
+          initialSettingsProvider.overrideWithValue(
+            const AppSettings(alertNotifications: true),
+          ),
+        ],
+      );
+      await choose(tester, 'Notify for', 'Warnings and critical');
+      expect(
+        container.read(settingsProvider).alertLevel,
+        AlertSeverity.warning,
+      );
+      expect((await saved()).alertLevel, AlertSeverity.warning);
     });
   });
 

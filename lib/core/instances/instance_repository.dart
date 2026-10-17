@@ -11,7 +11,15 @@ abstract interface class KeyValueStore {
 }
 
 class SecureKeyValueStore implements KeyValueStore {
-  const SecureKeyValueStore([this._storage = const FlutterSecureStorage()]);
+  /// [KeychainAccessibility.first_unlock] instead of the default "unlocked",
+  /// so the background alert check can read the saved servers while the phone
+  /// is locked. Items saved earlier are found as before and move to this
+  /// level the next time they are written.
+  const SecureKeyValueStore([
+    this._storage = const FlutterSecureStorage(
+      iOptions: IOSOptions(accessibility: KeychainAccessibility.first_unlock),
+    ),
+  ]);
 
   final FlutterSecureStorage _storage;
 
@@ -27,12 +35,13 @@ class SecureKeyValueStore implements KeyValueStore {
 class InstanceRepository {
   const InstanceRepository(this._store);
 
-  static const _key = 'servers.v1';
+  /// The storage key of the saved servers.
+  static const storageKey = 'servers.v1';
 
   final KeyValueStore _store;
 
   Future<List<ServerInstance>> load() async {
-    final raw = await _store.read(_key);
+    final raw = await _store.read(storageKey);
     if (raw == null || raw.isEmpty) return [];
     final decoded = jsonDecode(raw) as List<dynamic>;
     return decoded
@@ -40,6 +49,8 @@ class InstanceRepository {
         .toList();
   }
 
-  Future<void> save(List<ServerInstance> instances) =>
-      _store.write(_key, jsonEncode(instances.map((e) => e.toJson()).toList()));
+  Future<void> save(List<ServerInstance> instances) => _store.write(
+    storageKey,
+    jsonEncode(instances.map((e) => e.toJson()).toList()),
+  );
 }

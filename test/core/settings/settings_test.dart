@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:truenas_mobile/core/models/alert.dart';
 import 'package:truenas_mobile/core/settings/app_settings.dart';
 
 import '../../support/memory_store.dart';
@@ -29,6 +30,8 @@ void main() {
       defaultServerId: 'abc',
       appLock: true,
       liveJobs: false,
+      alertNotifications: true,
+      alertLevel: AlertSeverity.warning,
     );
     final back = AppSettings.fromJson(settings.toJson());
     expect(back.theme, ThemeChoice.dark);
@@ -42,6 +45,8 @@ void main() {
     expect(back.defaultServerId, 'abc');
     expect(back.appLock, isTrue);
     expect(back.liveJobs, isFalse);
+    expect(back.alertNotifications, isTrue);
+    expect(back.alertLevel, AlertSeverity.warning);
   });
 
   test('unknown or missing values fall back to the defaults', () {
@@ -86,6 +91,14 @@ void main() {
     expect(const AppSettings().liveJobs, isTrue);
     expect(AppSettings.fromJson(const {}).liveJobs, isTrue);
     expect(const AppSettings().copyWith(liveJobs: false).liveJobs, isFalse);
+  });
+
+  test('alert notifications are off, for critical alerts, by default', () {
+    const settings = AppSettings();
+    expect(settings.alertNotifications, isFalse);
+    expect(settings.alertLevel, AlertSeverity.critical);
+    final back = AppSettings.fromJson(const {'alertLevel': 'loud'});
+    expect(back.alertLevel, AlertSeverity.critical);
   });
 
   test('copyWith can choose, and clear, the default server', () {

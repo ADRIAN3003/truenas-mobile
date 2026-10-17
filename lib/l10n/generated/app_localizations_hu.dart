@@ -2041,6 +2041,10 @@ class AppLocalizationsHu extends AppLocalizations {
       'Az értesítések ki vannak kapcsolva ennél az appnál. Először engedélyezd őket a telefon beállításaiban.';
 
   @override
+  String get settingsAlertScheduleFailed =>
+      'A telefon nem indította el a háttérellenőrzést. Próbáld újra egy pillanat múlva.';
+
+  @override
   String get alertNotificationChannel => 'Riasztások';
 
   @override

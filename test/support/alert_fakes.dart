@@ -11,12 +11,17 @@ class FakeAlertNotifier implements AlertNotifier {
   bool allowed;
   int permissionRequests = 0;
 
+  /// Thrown by [requestPermission] when set (a plugin that is not ready).
+  Object? permissionError;
+
   /// Every notification shown, as `server: id1,id2`.
   final shown = <String>[];
 
   @override
   Future<bool> requestPermission() async {
     permissionRequests++;
+    final error = permissionError;
+    if (error != null) throw error;
     return allowed;
   }
 
@@ -31,17 +36,26 @@ class FakeBackgroundScheduler implements BackgroundScheduler {
   bool scheduled = false;
   int scheduleCalls = 0;
 
+  /// Thrown by [schedule] and [cancel] when set (the phone said no).
+  Object? failWith;
+
   @override
   bool get isSupported => true;
 
   @override
   Future<void> schedule() async {
-    scheduled = true;
     scheduleCalls++;
+    final error = failWith;
+    if (error != null) throw error;
+    scheduled = true;
   }
 
   @override
-  Future<void> cancel() async => scheduled = false;
+  Future<void> cancel() async {
+    scheduled = false;
+    final error = failWith;
+    if (error != null) throw error;
+  }
 }
 
 /// A `alert.list` entry as the server sends it.

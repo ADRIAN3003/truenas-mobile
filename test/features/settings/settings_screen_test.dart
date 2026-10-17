@@ -510,6 +510,17 @@ void main() {
       expect(find.textContaining('turned off for this app'), findsOneWidget);
     });
 
+    testWidgets('stay off when the phone refuses the background task', (
+      tester,
+    ) async {
+      scheduler.failWith = StateError('BGTaskScheduler refused');
+      await open(tester, overrides: overrides);
+      await tester.tap(find.text('Alert notifications'));
+      await tester.pumpAndSettle();
+      expect((await saved()).alertNotifications, isFalse);
+      expect(find.textContaining('would not start'), findsOneWidget);
+    });
+
     testWidgets('turn off and stop the check', (tester) async {
       await open(
         tester,

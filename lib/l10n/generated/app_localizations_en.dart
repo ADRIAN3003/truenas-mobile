@@ -1970,6 +1970,45 @@ class AppLocalizationsEn extends AppLocalizations {
       'Esc, Tab, Ctrl+C and arrows under the terminal';
 
   @override
+  String get settingsNotifications => 'Notifications';
+
+  @override
+  String get settingsAlertNotifications => 'Alert notifications';
+
+  @override
+  String get settingsAlertNotificationsHintIos =>
+      'Checks your servers in the background and notifies you of new alerts. iOS decides when the check runs, so it can be late, and it stops if you swipe the app away.';
+
+  @override
+  String get settingsAlertNotificationsHintAndroid =>
+      'Checks your servers in the background about every 15 minutes and notifies you of new alerts.';
+
+  @override
+  String get settingsAlertLevel => 'Notify for';
+
+  @override
+  String get settingsAlertLevelCritical => 'Critical alerts';
+
+  @override
+  String get settingsAlertLevelWarning => 'Warnings and critical';
+
+  @override
+  String get settingsAlertPermissionDenied =>
+      'Notifications are turned off for this app. Allow them in the phone\'s settings first.';
+
+  @override
+  String get alertNotificationChannel => 'Alerts';
+
+  @override
+  String get alertNotificationChannelDescription =>
+      'New alerts from your TrueNAS servers';
+
+  @override
+  String alertNotificationMany(int count) {
+    return '$count new alerts';
+  }
+
+  @override
   String get settingsSecurity => 'Security';
 
   @override

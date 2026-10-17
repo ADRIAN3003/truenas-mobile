@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import '../instances/instance_repository.dart';
+import '../models/alert.dart';
 
 /// How the app picks light or dark.
 enum ThemeChoice { system, light, dark }
@@ -18,6 +19,8 @@ class AppSettings {
     this.skippedVersion,
     this.defaultServerId,
     this.appLock = false,
+    this.alertNotifications = false,
+    this.alertLevel = AlertSeverity.critical,
   });
 
   factory AppSettings.fromJson(Map<String, dynamic> json) => AppSettings(
@@ -35,6 +38,10 @@ class AppSettings {
     skippedVersion: json['skippedVersion'] as String?,
     defaultServerId: json['defaultServerId'] as String?,
     appLock: json['appLock'] as bool? ?? false,
+    alertNotifications: json['alertNotifications'] as bool? ?? false,
+    alertLevel:
+        AlertSeverity.values.asNameMap()[json['alertLevel']] ??
+        AlertSeverity.critical,
   );
 
   /// Language codes the app is translated into.
@@ -77,6 +84,14 @@ class AppSettings {
   /// and each time it comes back from the background.
   final bool appLock;
 
+  /// Check the saved servers in the background and show a notification for
+  /// each new alert at or above [alertLevel].
+  final bool alertNotifications;
+
+  /// The lowest [AlertSeverity] that is worth a notification. `info` is not
+  /// offered: it would only ever be noise.
+  final AlertSeverity alertLevel;
+
   AppSettings copyWith({
     ThemeChoice? theme,
     String? Function()? language,
@@ -88,6 +103,8 @@ class AppSettings {
     String? Function()? skippedVersion,
     String? Function()? defaultServerId,
     bool? appLock,
+    bool? alertNotifications,
+    AlertSeverity? alertLevel,
   }) => AppSettings(
     theme: theme ?? this.theme,
     language: language != null ? language() : this.language,
@@ -103,6 +120,8 @@ class AppSettings {
         ? defaultServerId()
         : this.defaultServerId,
     appLock: appLock ?? this.appLock,
+    alertNotifications: alertNotifications ?? this.alertNotifications,
+    alertLevel: alertLevel ?? this.alertLevel,
   );
 
   Map<String, dynamic> toJson() => {
@@ -116,6 +135,8 @@ class AppSettings {
     'skippedVersion': skippedVersion,
     'defaultServerId': defaultServerId,
     'appLock': appLock,
+    'alertNotifications': alertNotifications,
+    'alertLevel': alertLevel.name,
   };
 }
 

@@ -1,3 +1,5 @@
+import 'dart:io' show Platform;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -5,6 +7,8 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/instances/default_server.dart';
 import '../../core/instances/instances_provider.dart';
+import '../../core/models/alert.dart';
+import '../../core/notifications/background_alerts.dart';
 import '../../core/security/biometric_auth.dart';
 import '../../core/settings/app_settings.dart';
 import '../../core/settings/settings_provider.dart';
@@ -146,6 +150,10 @@ class SettingsScreen extends ConsumerWidget {
               ),
             ],
           ),
+          if (ref.watch(alertNotificationServiceProvider).isSupported) ...[
+            SectionHeader(l10n.settingsNotifications),
+            const _AlertNotificationsCard(),
+          ],
           SectionHeader(l10n.settingsSecurity),
           // Shown while the phone can ask, and also while the lock is on so
           // it can always be turned off.
@@ -229,6 +237,62 @@ class SettingsScreen extends ConsumerWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+/// The alert notifications switch and the lowest level that notifies.
+/// Turning it on asks the phone for permission to show notifications; if that
+/// is refused the switch stays off.
+class _AlertNotificationsCard extends ConsumerWidget {
+  const _AlertNotificationsCard();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    final settings = ref.watch(settingsProvider);
+    final notifier = ref.read(settingsProvider.notifier);
+    return GroupedCard(
+      indent: 16,
+      children: [
+        AppSwitchTile(
+          title: Text(l10n.settingsAlertNotifications),
+          subtitle: Text(
+            Platform.isIOS
+                ? l10n.settingsAlertNotificationsHintIos
+                : l10n.settingsAlertNotificationsHintAndroid,
+          ),
+          value: settings.alertNotifications,
+          onChanged: (on) async {
+            final service = ref.read(alertNotificationServiceProvider);
+            final servers = ref.read(instancesProvider).value ?? const [];
+            final messenger = ScaffoldMessenger.of(context);
+            final denied = l10n.settingsAlertPermissionDenied;
+            if (on) {
+              if (!await service.turnOn(servers, level: settings.alertLevel)) {
+                messenger.showSnackBar(SnackBar(content: Text(denied)));
+                return;
+              }
+            } else {
+              await service.turnOff();
+            }
+            await notifier.update((s) => s.copyWith(alertNotifications: on));
+          },
+        ),
+        if (settings.alertNotifications)
+          _ChoiceRow<AlertSeverity>(
+            icon: Icons.notifications_active_rounded,
+            color: AppPalette.tileOrange,
+            title: l10n.settingsAlertLevel,
+            value: settings.alertLevel,
+            options: [
+              (AlertSeverity.critical, l10n.settingsAlertLevelCritical),
+              (AlertSeverity.warning, l10n.settingsAlertLevelWarning),
+            ],
+            onChanged: (level) =>
+                notifier.update((s) => s.copyWith(alertLevel: level)),
+          ),
+      ],
     );
   }
 }

@@ -141,6 +141,27 @@ README covers what the app does; this file covers how to work on it.
   on Android and `NSFaceIDUsageDescription` on iOS (all set). Tests use
   `FakeBiometricAuth`; the default provider is `NoBiometricAuth`, `main`
   overrides it.
+- Alert notifications (`lib/core/notifications/`): setting `alertNotifications`
+  (off by default) and `alertLevel` (critical or warning and up), under
+  Settings > Notifications. There is no push server, so the phone's own
+  scheduler (Android WorkManager, iOS BGAppRefreshTask, both through
+  `workmanager`) runs `alertCallbackDispatcher` about every 15 minutes in a
+  headless isolate, which reads the settings and servers from secure storage
+  and runs `AlertWatcher`: sign in quietly (a server that needs a certificate
+  prompt or a 2FA code is skipped), `alert.list`, notify once per new active
+  alert at or above the level through `flutter_local_notifications`. Seen ids
+  are kept per server in `alertwatch.v1`; a server seen for the first time, and
+  the moment the setting is turned on, only record (old alerts are not news).
+  iOS decides when it really runs (and not after the app is swiped away), so
+  never promise timing. `SecureKeyValueStore` uses Keychain `first_unlock` so
+  the check can read the servers while the phone is locked. Native bits: iOS
+  `UIBackgroundModes` fetch, `BGTaskSchedulerPermittedIdentifiers`, and
+  `AppDelegate` (`setPluginRegistrantCallback`, `registerLaunchHandlers`, needed
+  with the scene lifecycle); Android `POST_NOTIFICATIONS`, core library
+  desugaring, and the `ic_stat_alert` icon kept by `res/raw/keep.xml`. Tests
+  fake the phone with `FakeAlertNotifier`/`FakeBackgroundScheduler`
+  (`test/support/alert_fakes.dart`) and the service provider is off unless
+  `main` overrides it.
 - Apps tab bulk actions hand the work to the server as one `core.bulk` job
   (what the web UI's "Update All" does), so it carries on when the app is
   closed: "Update all", or Select, tick apps, then Update, Start, Stop or

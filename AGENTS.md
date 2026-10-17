@@ -162,8 +162,13 @@ README covers what the app does; this file covers how to work on it.
   fake the phone with `FakeAlertNotifier`/`FakeBackgroundScheduler`
   (`test/support/alert_fakes.dart`) and the service provider is off unless
   `main` overrides it.
-- Apps tab "Update all" upgrades the apps with updates one after another
-  (`app.upgrade` is a job per app), after listing them in a confirmation.
+- Apps tab bulk actions hand the work to the server as one `core.bulk` job
+  (what the web UI's "Update All" does), so it carries on when the app is
+  closed: "Update all", or Select, tick apps, then Update, Start, Stop or
+  Restart (`app.upgrade/start/stop/redeploy`, `AppBulkAction`). The tab polls
+  the job (`AppBulkRun`, found again on open via
+  `WorkloadsApi.activeBulkRun`); its id is `AppBulkRun.jobId`. Gated on
+  `core.bulk`. Tests: `FakeTrueNasServer.holdBulk` keeps a job running.
 - Android release APKs must be signed with a fixed key, or Android refuses
   to install one over another ("app not updated"). `release.yml` signs with
   the four `ANDROID_*` secrets; `tools/make-android-keystore.sh` makes them.

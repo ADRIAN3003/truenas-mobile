@@ -2245,28 +2245,122 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get appsUpdateAllBody =>
-      'These apps are updated one after another, and each restarts while it updates.';
+      'TrueNAS updates these apps itself, one after another, and each restarts while it updates. It carries on if you close the app.';
 
   @override
-  String appsUpdateAllProgress(String name, int current, int total) {
-    return 'Updating $name ($current of $total)';
+  String get appsUpdateAllLeave =>
+      'TrueNAS carries on if you leave this screen or close the app.';
+
+  @override
+  String appsBulkRunning(String action, int done, int total) {
+    String _temp0 = intl.Intl.selectLogic(action, {
+      'upgrade': 'Updating',
+      'start': 'Starting',
+      'stop': 'Stopping',
+      'restart': 'Restarting',
+      'other': 'Working',
+    });
+    return '$_temp0 on the server: $done of $total done';
   }
 
   @override
-  String appsUpdateAllDone(int count) {
+  String appsBulkRunningNoCount(String action, int total) {
+    String _temp0 = intl.Intl.selectLogic(action, {
+      'upgrade': 'Updating',
+      'start': 'Starting',
+      'stop': 'Stopping',
+      'restart': 'Restarting',
+      'other': 'Working',
+    });
+    String _temp1 = intl.Intl.pluralLogic(
+      total,
+      locale: localeName,
+      other: '$total apps',
+      one: '1 app',
+    );
+    return '$_temp0 $_temp1 on the server';
+  }
+
+  @override
+  String appsBulkDone(int count, String action) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count apps updated',
-      one: '1 app updated',
+      other: '$count apps',
+      one: '1 app',
+    );
+    String _temp1 = intl.Intl.selectLogic(action, {
+      'upgrade': 'updated',
+      'start': 'started',
+      'stop': 'stopped',
+      'restart': 'restarted',
+      'other': 'done',
+    });
+    return '$_temp0 $_temp1';
+  }
+
+  @override
+  String appsBulkPartial(int done, int total, String failed, String action) {
+    String _temp0 = intl.Intl.selectLogic(action, {
+      'upgrade': 'updated',
+      'start': 'started',
+      'stop': 'stopped',
+      'restart': 'restarted',
+      'other': 'done',
+    });
+    String _temp1 = intl.Intl.selectLogic(action, {
+      'upgrade': 'Not updated',
+      'start': 'Not started',
+      'stop': 'Not stopped',
+      'restart': 'Not restarted',
+      'other': 'Failed',
+    });
+    return '$done of $total apps $_temp0. $_temp1: $failed';
+  }
+
+  @override
+  String get appsSelect => 'Select';
+
+  @override
+  String get appsSelectAll => 'Select all';
+
+  @override
+  String appsSelectedCount(int count) {
+    return '$count selected';
+  }
+
+  @override
+  String get appsBulkUpdate => 'Update';
+
+  @override
+  String appsBulkStopTitle(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Stop $count apps?',
+      one: 'Stop 1 app?',
     );
     return '$_temp0';
   }
 
   @override
-  String appsUpdateAllPartial(int done, int total, String failed) {
-    return '$done of $total apps updated. Not updated: $failed';
+  String get appsBulkStopBody =>
+      'They can\'t be reached until they are started again.';
+
+  @override
+  String appsBulkRestartTitle(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Restart $count apps?',
+      one: 'Restart 1 app?',
+    );
+    return '$_temp0';
   }
+
+  @override
+  String get appsBulkRestartBody =>
+      'They are unavailable for a moment while they restart.';
 
   @override
   String get settingsLanguageSystemHint =>

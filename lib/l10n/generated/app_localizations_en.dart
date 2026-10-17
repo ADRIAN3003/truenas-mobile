@@ -2248,4 +2248,51 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get serverDefaultBadge => 'Default';
+
+  @override
+  String get settingsLiveJobs => 'Live job progress';
+
+  @override
+  String get settingsLiveJobsHint =>
+      'Scrubs, replications and updates on the lock screen and in notifications';
+
+  @override
+  String get jobKindScrub => 'Scrub';
+
+  @override
+  String get jobKindReplication => 'Replication';
+
+  @override
+  String get jobKindAppUpdate => 'App update';
+
+  @override
+  String get jobKindCloudSync => 'Cloud sync';
+
+  @override
+  String get jobKindCloudBackup => 'Cloud backup';
+
+  @override
+  String get jobKindRsync => 'Rsync task';
+
+  @override
+  String get jobKindSystemUpdate => 'System update';
+
+  @override
+  String get jobsStale => 'Not updating, open the app';
+
+  @override
+  String get jobsConnectionLost =>
+      'Connection lost, progress may be out of date';
+
+  @override
+  String jobsMoreCount(int count) {
+    return '+$count more';
+  }
+
+  @override
+  String get jobsChannelName => 'Job progress';
+
+  @override
+  String get jobsChannelDescription =>
+      'Progress of scrubs, replications and updates';
 }

@@ -29,6 +29,18 @@ Future<void> openAlerts(BuildContext context, TrueNasSession session) =>
       ),
     );
 
+/// Opens the list of jobs as its own screen.
+Future<void> openJobs(BuildContext context, TrueNasSession session) =>
+    Navigator.push(
+      context,
+      MaterialPageRoute<void>(
+        builder: (context) => Scaffold(
+          appBar: AppBar(title: Text(AppLocalizations.of(context).tabJobs)),
+          body: JobsTab(session: session),
+        ),
+      ),
+    );
+
 /// Everything that doesn't need a tab of its own.
 class MoreTab extends StatelessWidget {
   const MoreTab({super.key, required this.session, required this.serverName});

@@ -75,6 +75,10 @@
 	</dict>
 	<key>NSFaceIDUsageDescription</key>
 	<string>TrueNAS Mobile uses Face ID to unlock the app when you turn on the app lock.</string>
+	<key>NSSupportsLiveActivities</key>
+	<true/>
+	<key>NSSupportsLiveActivitiesFrequentUpdates</key>
+	<true/>
 	<key>NSLocalNetworkUsageDescription</key>
 	<string>TrueNAS Mobile connects to TrueNAS servers on your local network.</string>
 	<key>CFBundleLocalizations</key>

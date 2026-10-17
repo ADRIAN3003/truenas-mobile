@@ -121,6 +121,27 @@ class TrueNasSession {
         .toList();
   }
 
+  /// The jobs that are waiting or running now.
+  Future<List<TrueNasJob>> activeJobs() => _jobsWhere([
+    [
+      'state',
+      'in',
+      ['WAITING', 'RUNNING'],
+    ],
+  ]);
+
+  /// Jobs by id, finished or not.
+  Future<List<TrueNasJob>> jobsById(Iterable<int> ids) => _jobsWhere([
+    ['id', 'in', ids.toList()],
+  ]);
+
+  Future<List<TrueNasJob>> _jobsWhere(List<Object?> filters) async {
+    final result = await client.call('core.get_jobs', [filters]) as List;
+    return result
+        .map((e) => TrueNasJob.fromJson(e as Map<String, dynamic>))
+        .toList();
+  }
+
   /// Job additions and progress updates.
   Stream<CollectionUpdate> jobChanges() => client.subscribe('core.get_jobs');
 

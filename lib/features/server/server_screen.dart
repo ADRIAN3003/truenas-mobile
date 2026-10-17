@@ -3,6 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/instances/instances_provider.dart';
 import '../../core/instances/server_instance.dart';
+import '../../core/jobs/job_monitor.dart';
+import '../../core/jobs/job_tracker.dart';
+import '../../core/jobs/live_progress.dart';
 import '../../core/settings/settings_provider.dart';
 import '../../core/session/truenas_session.dart';
 import '../../l10n/generated/app_localizations.dart';
@@ -10,6 +13,8 @@ import '../../shared/connect_dialogs.dart';
 import '../../shared/glass.dart';
 import '../../shared/haptics.dart';
 import '../../shared/widgets.dart';
+import '../jobs/job_progress_banner.dart';
+import '../jobs/job_texts.dart';
 import '../sharing/shares_tab.dart';
 import '../storage/storage_tab.dart';
 import '../workloads/apps_tab.dart';
@@ -33,6 +38,7 @@ class ServerScreen extends ConsumerStatefulWidget {
 class _ServerScreenState extends ConsumerState<ServerScreen>
     with WidgetsBindingObserver {
   TrueNasSession? _session;
+  JobMonitor? _jobs;
   Map<String, dynamic>? _info;
   Object? _error;
   var _tab = 0;
@@ -56,13 +62,16 @@ class _ServerScreenState extends ConsumerState<ServerScreen>
     // now rather than on the next tap, so live data resumes by itself.
     if (state == AppLifecycleState.resumed) {
       // A failed attempt is retried by the next call.
-      _session?.ensureAlive().catchError((_) {});
+      _session?.ensureAlive().catchError((_) {}).whenComplete(() {
+        _jobs?.refresh();
+      });
     }
   }
 
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    _jobs?.dispose();
     _session?.close();
     super.dispose();
   }
@@ -72,6 +81,9 @@ class _ServerScreenState extends ConsumerState<ServerScreen>
     if (instance == null) return;
     final previous = _session;
     _session = null;
+    final previousJobs = _jobs;
+    _jobs = null;
+    await previousJobs?.dispose();
     await previous?.close();
     setState(() {
       _error = null;
@@ -88,6 +100,14 @@ class _ServerScreenState extends ConsumerState<ServerScreen>
         return;
       }
       _session = session;
+      _jobs = JobMonitor(
+        source: SessionJobSource(session),
+        progress: ref.read(liveProgressProvider),
+        instanceId: instance.id,
+        serverName: () => _instance?.name ?? instance.name,
+        texts: () => AppLocalizations.of(context).jobTexts,
+        lockScreen: ref.read(settingsProvider).liveJobs,
+      )..start();
       if (updated.pinnedFingerprint != instance.pinnedFingerprint ||
           updated.lastApiVersion != instance.lastApiVersion) {
         await ref.read(instancesProvider.notifier).upsert(updated);
@@ -138,7 +158,31 @@ class _ServerScreenState extends ConsumerState<ServerScreen>
     const SizedBox(width: 4),
   ];
 
+  /// [content] with the running jobs floating over its bottom edge.
+  Widget _withJobs(Widget content, TrueNasSession session, double bottom) {
+    final jobs = _jobs;
+    if (jobs == null) return content;
+    return Stack(
+      children: [
+        content,
+        Positioned(
+          left: 12,
+          right: 12,
+          bottom: bottom,
+          child: JobProgressBanner(
+            tracker: jobs.tracker,
+            onOpen: () => openJobs(context, session),
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _screen(BuildContext context) {
+    ref.listen(
+      settingsProvider.select((s) => s.liveJobs),
+      (_, on) => _jobs?.setLockScreen(on),
+    );
     final l10n = AppLocalizations.of(context);
     final instance = _instance;
     final session = _session;
@@ -210,7 +254,7 @@ class _ServerScreenState extends ConsumerState<ServerScreen>
                   width: 1,
                   color: Theme.of(context).colorScheme.outlineVariant,
                 ),
-                Expanded(child: body),
+                Expanded(child: _withJobs(body, session, 12)),
               ],
             ),
           ),
@@ -230,6 +274,17 @@ class _ServerScreenState extends ConsumerState<ServerScreen>
           body: Stack(
             children: [
               ChromeInsets(insets: insets, child: body),
+              Positioned(
+                left: 12,
+                right: 12,
+                bottom: insets.bottom - 4,
+                child: _jobs == null
+                    ? const SizedBox.shrink()
+                    : JobProgressBanner(
+                        tracker: _jobs!.tracker,
+                        onOpen: () => openJobs(context, session),
+                      ),
+              ),
               GlassTopEdge(height: insets.top - 8),
               GlassTabBar(
                 destinations: destinations,
@@ -242,7 +297,7 @@ class _ServerScreenState extends ConsumerState<ServerScreen>
       }
       return Scaffold(
         appBar: AppBar(title: Text(instance?.name ?? ''), actions: _actions()),
-        body: body,
+        body: _withJobs(body, session, 12),
         bottomNavigationBar: DecoratedBox(
           decoration: BoxDecoration(
             border: Border(

@@ -3079,5 +3079,66 @@
   "serverDefaultBadge": "Default",
   "@serverDefaultBadge": {
     "description": "Label on the server card of the default server."
+  },
+  "settingsLiveJobs": "Live job progress",
+  "@settingsLiveJobs": {
+    "description": "Setting: show running jobs on the lock screen."
+  },
+  "settingsLiveJobsHint": "Scrubs, replications and updates on the lock screen and in notifications",
+  "@settingsLiveJobsHint": {
+    "description": "Explains the live job progress setting."
+  },
+  "jobKindScrub": "Scrub",
+  "@jobKindScrub": {
+    "description": "Kind of job: a pool scrub."
+  },
+  "jobKindReplication": "Replication",
+  "@jobKindReplication": {
+    "description": "Kind of job: a replication task run."
+  },
+  "jobKindAppUpdate": "App update",
+  "@jobKindAppUpdate": {
+    "description": "Kind of job: applications being updated."
+  },
+  "jobKindCloudSync": "Cloud sync",
+  "@jobKindCloudSync": {
+    "description": "Kind of job: a cloud sync task run."
+  },
+  "jobKindCloudBackup": "Cloud backup",
+  "@jobKindCloudBackup": {
+    "description": "Kind of job: a cloud backup task run."
+  },
+  "jobKindRsync": "Rsync task",
+  "@jobKindRsync": {
+    "description": "Kind of job: an rsync task run."
+  },
+  "jobKindSystemUpdate": "System update",
+  "@jobKindSystemUpdate": {
+    "description": "Kind of job: the TrueNAS system being updated."
+  },
+  "jobsStale": "Not updating, open the app",
+  "@jobsStale": {
+    "description": "Lock screen text when the app lost touch with the server and no longer updates the progress."
+  },
+  "jobsConnectionLost": "Connection lost, progress may be out of date",
+  "@jobsConnectionLost": {
+    "description": "Shown in the app under running jobs when the server cannot be reached."
+  },
+  "jobsMoreCount": "+{count} more",
+  "@jobsMoreCount": {
+    "description": "Under the running jobs when there are more than shown.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "jobsChannelName": "Job progress",
+  "@jobsChannelName": {
+    "description": "Android notification channel name for running jobs."
+  },
+  "jobsChannelDescription": "Progress of scrubs, replications and updates",
+  "@jobsChannelDescription": {
+    "description": "Android notification channel description."
   }
 }

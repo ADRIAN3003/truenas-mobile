@@ -432,6 +432,17 @@ class FakeTrueNasServer {
   };
 
   final _finishedJobs = <int, Map<String, dynamic>>{};
+
+  /// The one job `core.get_jobs` lists.
+  static const runningScrub = {
+    'id': 7,
+    'method': 'pool.scrub.run',
+    'state': 'RUNNING',
+    'arguments': ['tank'],
+    'progress': {'percent': 40, 'description': 'Scrubbing'},
+    'abortable': true,
+    'time_started': {r'$date': 1760000000000},
+  };
   var _nextJobId = 100;
 
   /// Events passed to `core.subscribe`.
@@ -967,20 +978,17 @@ class FakeTrueNasServer {
             final alert = alerts.firstWhere((a) => a['uuid'] == params.first);
             alert['dismissed'] = message['method'] == 'alert.dismiss';
           case 'core.get_jobs'
+              when params.isNotEmpty &&
+                  (params.first as List).isNotEmpty &&
+                  ((params.first as List).first as List)[0] == 'state':
+            // The jobs that are waiting or running.
+            result = [runningScrub];
+          case 'core.get_jobs'
               when params.isNotEmpty && (params.first as List).isNotEmpty:
             final id = ((params.first as List).first as List)[2];
             result = [?_finishedJobs[id]];
           case 'core.get_jobs':
-            result = [
-              {
-                'id': 7,
-                'method': 'pool.scrub.run',
-                'state': 'RUNNING',
-                'progress': {'percent': 40, 'description': 'Scrubbing'},
-                'abortable': true,
-                'time_started': {r'$date': 1760000000000},
-              },
-            ];
+            result = [runningScrub];
         }
         socket.add(
           jsonEncode({'jsonrpc': '2.0', 'id': message['id'], 'result': result}),

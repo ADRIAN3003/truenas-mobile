@@ -18,6 +18,7 @@ class AppSettings {
     this.skippedVersion,
     this.defaultServerId,
     this.appLock = false,
+    this.liveJobs = true,
   });
 
   factory AppSettings.fromJson(Map<String, dynamic> json) => AppSettings(
@@ -35,6 +36,7 @@ class AppSettings {
     skippedVersion: json['skippedVersion'] as String?,
     defaultServerId: json['defaultServerId'] as String?,
     appLock: json['appLock'] as bool? ?? false,
+    liveJobs: json['liveJobs'] as bool? ?? true,
   );
 
   /// Language codes the app is translated into.
@@ -77,6 +79,10 @@ class AppSettings {
   /// and each time it comes back from the background.
   final bool appLock;
 
+  /// Show running scrubs, replications and updates on the lock screen (a Live
+  /// Activity on iOS, a progress notification on Android).
+  final bool liveJobs;
+
   AppSettings copyWith({
     ThemeChoice? theme,
     String? Function()? language,
@@ -88,6 +94,7 @@ class AppSettings {
     String? Function()? skippedVersion,
     String? Function()? defaultServerId,
     bool? appLock,
+    bool? liveJobs,
   }) => AppSettings(
     theme: theme ?? this.theme,
     language: language != null ? language() : this.language,
@@ -103,6 +110,7 @@ class AppSettings {
         ? defaultServerId()
         : this.defaultServerId,
     appLock: appLock ?? this.appLock,
+    liveJobs: liveJobs ?? this.liveJobs,
   );
 
   Map<String, dynamic> toJson() => {
@@ -116,6 +124,7 @@ class AppSettings {
     'skippedVersion': skippedVersion,
     'defaultServerId': defaultServerId,
     'appLock': appLock,
+    'liveJobs': liveJobs,
   };
 }
 

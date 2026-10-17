@@ -128,6 +128,13 @@ void main() {
     await close(tester);
   });
 
+  testWidgets('a running scrub floats over the server screen', (tester) async {
+    await open(tester, const Size(400, 800));
+    expect(find.text('Scrub · tank'), findsOneWidget);
+    expect(find.text('40%'), findsOneWidget);
+    await close(tester);
+  });
+
   testWidgets('phones get a bottom navigation bar', (tester) async {
     await open(tester, const Size(400, 800));
     expect(find.byType(NavigationBar), findsOneWidget);

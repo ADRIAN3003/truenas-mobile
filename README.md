@@ -103,7 +103,13 @@ Download the latest APK or IPA from the
   must sign it too: keep app extensions in the sideloading tool's options
   (Sideloadly: leave "Remove app extensions" off; with a free Apple ID the
   extension needs one of your three app slots). When the extension is missing
-  the Dynamic Island stays empty, and Settings > Notifications says so.
+  the Dynamic Island stays empty, and Settings > Notifications says so. It is
+  also empty when the tool signs the extension badly: iOS then kills it as it
+  starts ("CODESIGNING: Invalid Page" in its crash log). That happened with
+  Sideloadly on iOS 27; the same build installed with `flutter install
+  --release` (Xcode signing) works. The activity only moves while the app
+  runs; there is no push server, so it goes stale some time after the app is
+  left.
 
 ## Build from source
 

@@ -5,6 +5,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/settings/settings_provider.dart';
 import '../../core/updates/release.dart';
+import '../../core/updates/release_notes.dart';
 import '../../core/updates/update_checker.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../shared/theme.dart';
@@ -449,9 +450,10 @@ class _NotesCard extends StatelessWidget {
                 style: theme.textTheme.bodyMedium?.copyWith(color: muted),
               )
             else
-              // GitHub's notes are Markdown, with links to pull requests.
+              // GitHub's notes are Markdown, with links to pull requests,
+              // which read better as #123 than as the whole address.
               MarkdownBody(
-                data: release.notes,
+                data: shortenGitHubLinks(release.notes),
                 selectable: true,
                 onTapLink: (_, href, _) {
                   if (href != null) _open(href);

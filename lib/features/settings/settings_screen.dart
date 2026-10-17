@@ -20,6 +20,7 @@ import '../../shared/theme.dart';
 import '../../shared/ui.dart';
 import '../../shared/widgets.dart';
 import '../updates/update_screen.dart';
+import 'alert_kinds_screen.dart';
 
 /// Where the project lives, for the About section.
 final _sourceUri = Uri.parse('https://github.com/ADRIAN3003/truenas-mobile');
@@ -115,13 +116,6 @@ class SettingsScreen extends ConsumerWidget {
                 onChanged: (on) =>
                     notifier.update((s) => s.copyWith(confirmLeave: on)),
               ),
-              AppSwitchTile(
-                title: Text(l10n.settingsLiveJobs),
-                subtitle: Text(l10n.settingsLiveJobsHint),
-                value: settings.liveJobs,
-                onChanged: (on) =>
-                    notifier.update((s) => s.copyWith(liveJobs: on)),
-              ),
             ],
           ),
           SectionHeader(l10n.settingsShell),
@@ -157,10 +151,12 @@ class SettingsScreen extends ConsumerWidget {
               ),
             ],
           ),
-          if (ref.watch(alertNotificationServiceProvider).isSupported) ...[
-            SectionHeader(l10n.settingsNotifications),
-            const _AlertNotificationsCard(),
-          ],
+          SectionHeader(l10n.settingsNotifications),
+          _NotificationsCard(
+            alertsSupported: ref
+                .watch(alertNotificationServiceProvider)
+                .isSupported,
+          ),
           SectionHeader(l10n.settingsSecurity),
           // Shown while the phone can ask, and also while the lock is on so
           // it can always be turned off.
@@ -248,11 +244,15 @@ class SettingsScreen extends ConsumerWidget {
   }
 }
 
-/// The alert notifications switch and the lowest level that notifies.
-/// Turning it on asks the phone for permission to show notifications; if that
-/// is refused the switch stays off.
-class _AlertNotificationsCard extends ConsumerWidget {
-  const _AlertNotificationsCard();
+/// What the app may notify about: new alerts (the switch, the lowest level
+/// and the kinds to leave out) and the live progress of running jobs. Turning
+/// alerts on asks the phone for permission to show notifications; if that is
+/// refused the switch stays off.
+class _NotificationsCard extends ConsumerWidget {
+  const _NotificationsCard({required this.alertsSupported});
+
+  /// Whether this phone can check for alerts in the background.
+  final bool alertsSupported;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -262,31 +262,35 @@ class _AlertNotificationsCard extends ConsumerWidget {
     return GroupedCard(
       indent: 16,
       children: [
-        AppSwitchTile(
-          title: Text(l10n.settingsAlertNotifications),
-          subtitle: Text(
-            Platform.isIOS
-                ? l10n.settingsAlertNotificationsHintIos
-                : l10n.settingsAlertNotificationsHintAndroid,
-          ),
-          value: settings.alertNotifications,
-          onChanged: (on) async {
-            final service = ref.read(alertNotificationServiceProvider);
-            final servers = ref.read(instancesProvider).value ?? const [];
-            final messenger = ScaffoldMessenger.of(context);
-            final denied = l10n.settingsAlertPermissionDenied;
-            if (on) {
-              if (!await service.turnOn(servers, level: settings.alertLevel)) {
-                messenger.showSnackBar(SnackBar(content: Text(denied)));
-                return;
+        if (alertsSupported)
+          AppSwitchTile(
+            title: Text(l10n.settingsAlertNotifications),
+            subtitle: Text(
+              Platform.isIOS
+                  ? l10n.settingsAlertNotificationsHintIos
+                  : l10n.settingsAlertNotificationsHintAndroid,
+            ),
+            value: settings.alertNotifications,
+            onChanged: (on) async {
+              final service = ref.read(alertNotificationServiceProvider);
+              final servers = ref.read(instancesProvider).value ?? const [];
+              final messenger = ScaffoldMessenger.of(context);
+              final denied = l10n.settingsAlertPermissionDenied;
+              if (on) {
+                if (!await service.turnOn(
+                  servers,
+                  level: settings.alertLevel,
+                )) {
+                  messenger.showSnackBar(SnackBar(content: Text(denied)));
+                  return;
+                }
+              } else {
+                await service.turnOff();
               }
-            } else {
-              await service.turnOff();
-            }
-            await notifier.update((s) => s.copyWith(alertNotifications: on));
-          },
-        ),
-        if (settings.alertNotifications)
+              await notifier.update((s) => s.copyWith(alertNotifications: on));
+            },
+          ),
+        if (alertsSupported && settings.alertNotifications)
           _ChoiceRow<AlertSeverity>(
             icon: Icons.notifications_active_rounded,
             color: AppPalette.tileOrange,
@@ -299,6 +303,33 @@ class _AlertNotificationsCard extends ConsumerWidget {
             onChanged: (level) =>
                 notifier.update((s) => s.copyWith(alertLevel: level)),
           ),
+        if (alertsSupported && settings.alertNotifications)
+          NavRow(
+            icon: Icons.tune_rounded,
+            color: AppPalette.tileSlate,
+            title: l10n.settingsAlertKinds,
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  l10n.settingsAlertKindsMuted(settings.mutedAlertKinds.length),
+                  style: TextStyle(color: AppPalette.of(context).muted),
+                ),
+                const SizedBox(width: 4),
+                const Chevron(),
+              ],
+            ),
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute<void>(builder: (_) => const AlertKindsScreen()),
+            ),
+          ),
+        AppSwitchTile(
+          title: Text(l10n.settingsLiveJobs),
+          subtitle: Text(l10n.settingsLiveJobsHint),
+          value: settings.liveJobs,
+          onChanged: (on) => notifier.update((s) => s.copyWith(liveJobs: on)),
+        ),
       ],
     );
   }

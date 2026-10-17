@@ -61,3 +61,55 @@ class TrueNasAlert {
       .replaceAll('&amp;', '&')
       .trim();
 }
+
+/// One kind of alert (TrueNAS calls it an alert class), e.g. `ScrubPaused`.
+/// Its [id] is the `klass` of the alerts of that kind.
+class AlertKind {
+  const AlertKind(this.id, {this.title, this.category});
+
+  factory AlertKind.fromJson(Map<String, dynamic> json) => AlertKind(
+    json['id'].toString(),
+    title: json['title'] as String?,
+    category: json['category'] as String?,
+  );
+
+  /// The kinds in an `alert.list_categories` result: a list of categories,
+  /// each with its `classes`. Anything unexpected is skipped.
+  static List<AlertKind> fromCategories(Object? result) => [
+    if (result is List)
+      for (final category in result)
+        if (category is Map)
+          for (final klass in (category['classes'] as List?) ?? const [])
+            if (klass is Map && klass['id'] != null)
+              AlertKind(
+                klass['id'].toString(),
+                title: klass['title'] as String?,
+                category: category['title'] as String?,
+              ),
+  ];
+
+  final String id;
+
+  /// The name TrueNAS shows, when it is known.
+  final String? title;
+
+  /// The group TrueNAS puts it in (Storage, Hardware, ...).
+  final String? category;
+
+  /// [title], or the id made readable (`PoolStatus` is "Pool Status").
+  String get label => title ?? humanizeAlertKind(id);
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'title': title,
+    'category': category,
+  };
+}
+
+/// `PoolStatus` as "Pool Status".
+String humanizeAlertKind(String id) => id
+    .replaceAllMapped(
+      RegExp(r'(?<=[a-z0-9])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])'),
+      (_) => ' ',
+    )
+    .trim();

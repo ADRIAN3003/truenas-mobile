@@ -8,6 +8,7 @@ import 'package:truenas_mobile/core/instances/instance_repository.dart';
 import 'package:truenas_mobile/core/instances/instances_provider.dart';
 import 'package:truenas_mobile/core/instances/server_instance.dart';
 import 'package:truenas_mobile/core/models/alert.dart';
+import 'package:truenas_mobile/core/notifications/alert_kind_catalog.dart';
 import 'package:truenas_mobile/core/notifications/background_alerts.dart';
 import 'package:truenas_mobile/core/security/biometric_auth.dart';
 import 'package:truenas_mobile/core/settings/app_settings.dart';
@@ -377,20 +378,108 @@ void main() {
   group('alert notifications', () {
     late FakeAlertNotifier notifier;
     late FakeBackgroundScheduler scheduler;
+    late MemoryStore alertStore;
     late List<Override> overrides;
 
     setUp(() {
       notifier = FakeAlertNotifier();
       scheduler = FakeBackgroundScheduler();
+      alertStore = MemoryStore();
       overrides = [
         alertNotificationServiceProvider.overrideWithValue(
           AlertNotificationService(
             scheduler: scheduler,
             notifier: notifier,
-            store: MemoryStore(),
+            store: alertStore,
           ),
         ),
       ];
+    });
+
+    List<Override> on() => [
+      ...overrides,
+      initialSettingsProvider.overrideWithValue(
+        const AppSettings(alertNotifications: true),
+      ),
+    ];
+
+    testWidgets('live job progress has its own switch in Notifications', (
+      tester,
+    ) async {
+      await open(tester);
+      expect(find.text('Notifications'), findsOneWidget);
+      expect(find.text('Alert notifications'), findsNothing);
+      await tester.tap(find.text('Live job progress'));
+      await tester.pumpAndSettle();
+      expect((await saved()).liveJobs, isFalse);
+    });
+
+    testWidgets('alert types can be switched off one by one', (tester) async {
+      await AlertKindCatalog(alertStore).record([
+        const AlertKind(
+          'PoolStatus',
+          title: 'Pool Status',
+          category: 'Storage',
+        ),
+        const AlertKind(
+          'ScrubPaused',
+          title: 'Scrub Paused',
+          category: 'Storage',
+        ),
+        const AlertKind('MadeUp'),
+      ]);
+      await open(tester, overrides: on());
+      expect(find.text('All on'), findsOneWidget);
+      await tester.tap(find.text('Alert types'));
+      await tester.pumpAndSettle();
+      expect(find.text('Storage'), findsOneWidget);
+      expect(find.text('Other'), findsOneWidget);
+      expect(find.text('Made Up'), findsOneWidget);
+
+      await tester.tap(find.text('Pool Status'));
+      await tester.pumpAndSettle();
+      expect(container.read(settingsProvider).mutedAlertKinds, {'PoolStatus'});
+      expect((await saved()).mutedAlertKinds, {'PoolStatus'});
+
+      await tester.enterText(find.byType(TextField), 'scrub');
+      await tester.pumpAndSettle();
+      expect(find.text('Pool Status'), findsNothing);
+      expect(find.text('Scrub Paused'), findsOneWidget);
+
+      await tester.tap(find.byType(BackButton));
+      await tester.pumpAndSettle();
+      expect(find.text('1 off'), findsOneWidget);
+    });
+
+    testWidgets('a kind muted before it was seen is listed and can come back', (
+      tester,
+    ) async {
+      await open(
+        tester,
+        overrides: [
+          ...overrides,
+          initialSettingsProvider.overrideWithValue(
+            const AppSettings(
+              alertNotifications: true,
+              mutedAlertKinds: {'SomethingNoisy'},
+            ),
+          ),
+        ],
+      );
+      await tester.tap(find.text('Alert types'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Something Noisy'));
+      await tester.pumpAndSettle();
+      expect(container.read(settingsProvider).mutedAlertKinds, isEmpty);
+    });
+
+    testWidgets('say where the types come from while there are none', (
+      tester,
+    ) async {
+      await open(tester, overrides: on());
+      await tester.tap(find.text('Alert types'));
+      await tester.pumpAndSettle();
+      expect(find.textContaining('first background check'), findsOneWidget);
     });
 
     testWidgets('are not offered where the phone cannot run them', (

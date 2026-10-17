@@ -100,6 +100,18 @@ class TrueNasSession {
         .toList();
   }
 
+  /// Every kind of alert the server can raise, with TrueNAS's own names.
+  /// Servers that cannot list them give an empty list.
+  Future<List<AlertKind>> alertKinds() async {
+    try {
+      return AlertKind.fromCategories(
+        await client.call('alert.list_categories'),
+      );
+    } catch (_) {
+      return const [];
+    }
+  }
+
   /// Fires whenever an alert is added, changed or removed.
   Stream<CollectionUpdate> alertChanges() => client.subscribe('alert.list');
 

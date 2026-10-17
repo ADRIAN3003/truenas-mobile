@@ -3398,6 +3398,72 @@ abstract class AppLocalizations {
   /// **'Checks your servers in the background about every 15 minutes and notifies you of new alerts.'**
   String get settingsAlertNotificationsHintAndroid;
 
+  /// Settings row: choose which kinds of alert notify.
+  ///
+  /// In en, this message translates to:
+  /// **'Alert types'**
+  String get settingsAlertKinds;
+
+  /// Value of the Alert types row: how many kinds are switched off.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{All on} other{{count} off}}'**
+  String settingsAlertKindsMuted(int count);
+
+  /// Title of the screen that lists the kinds of alert.
+  ///
+  /// In en, this message translates to:
+  /// **'Alert types'**
+  String get alertKindsTitle;
+
+  /// Explains the alert types screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Switch off the types of alert you don\'t want a notification for. They still show in the Alerts list.'**
+  String get alertKindsHint;
+
+  /// Empty state of the alert types screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Alert types appear here after the first background check of a server.'**
+  String get alertKindsEmpty;
+
+  /// Hint of the search box on the alert types screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Search'**
+  String get alertKindsSearch;
+
+  /// Group for alert types TrueNAS did not sort into a category.
+  ///
+  /// In en, this message translates to:
+  /// **'Other'**
+  String get alertKindsOther;
+
+  /// Alert menu entry: stop notifications for this kind of alert.
+  ///
+  /// In en, this message translates to:
+  /// **'Don\'t notify for this type'**
+  String get alertMuteKind;
+
+  /// Alert menu entry: bring notifications for this kind of alert back.
+  ///
+  /// In en, this message translates to:
+  /// **'Notify for this type again'**
+  String get alertUnmuteKind;
+
+  /// Snackbar after muting a kind of alert.
+  ///
+  /// In en, this message translates to:
+  /// **'No more notifications for \"{kind}\"'**
+  String alertKindMuted(String kind);
+
+  /// Snackbar after un-muting a kind of alert.
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications for \"{kind}\" are back'**
+  String alertKindUnmuted(String kind);
+
   /// Setting: the lowest alert level that sends a notification.
   ///
   /// In en, this message translates to:

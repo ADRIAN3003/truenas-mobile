@@ -50,10 +50,11 @@ Map<String, dynamic> alertJson(
   String level = 'CRITICAL',
   String text = 'Something happened',
   bool dismissed = false,
+  String klass = 'Test',
 }) => {
   'uuid': uuid,
   'level': level,
-  'klass': 'Test',
+  'klass': klass,
   'formatted': text,
   'dismissed': dismissed,
   'datetime': {r'$date': 1760000000000},

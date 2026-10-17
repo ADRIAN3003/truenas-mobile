@@ -25,13 +25,16 @@ class UpdateCheckException implements Exception {
   String toString() => 'UpdateCheckException($failure)';
 }
 
+/// `owner/name` of the repository the app's releases are published in.
+const defaultUpdateRepository = 'ADRIAN3003/truenas-mobile';
+
 /// Lists the app's published releases on GitHub. Only the public releases API
 /// is used, without a sign-in; nothing about the user or their servers is
 /// sent.
 class UpdateChecker {
   UpdateChecker({
     http.Client? client,
-    this.repository = 'ADRIAN3003/truenas-mobile',
+    this.repository = defaultUpdateRepository,
     this.timeout = const Duration(seconds: 15),
   }) : _client = client ?? http.Client();
 

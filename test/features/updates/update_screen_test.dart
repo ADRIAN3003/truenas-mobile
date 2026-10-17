@@ -258,6 +258,23 @@ void main() {
     expect(find.textContaining('Middle notes'), findsOneWidget);
   });
 
+  testWidgets('release notes show pull request links as #id', (tester) async {
+    await open(
+      tester,
+      FakeGitHub([
+        releaseJson(
+          'v0.1.4',
+          body:
+              'Alerts by @adrian in '
+              'https://github.com/ADRIAN3003/truenas-mobile/pull/33',
+        ),
+      ]),
+      screen: const ReleaseNotesScreen(),
+    );
+    expect(find.textContaining('#33', findRichText: true), findsOneWidget);
+    expect(find.textContaining('github.com', findRichText: true), findsNothing);
+  });
+
   testWidgets('a release without notes says so', (tester) async {
     await open(
       tester,

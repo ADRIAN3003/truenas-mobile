@@ -7,6 +7,7 @@ import 'package:truenas_mobile/core/instances/instances_provider.dart';
 import 'package:truenas_mobile/core/security/biometric_auth.dart';
 import 'package:truenas_mobile/core/settings/app_settings.dart';
 import 'package:truenas_mobile/core/settings/settings_provider.dart';
+import 'package:truenas_mobile/features/lock/app_lock_gate.dart';
 
 import '../../support/biometric_fakes.dart';
 import '../../support/memory_store.dart';
@@ -16,7 +17,11 @@ void main() {
 
   setUp(() => auth = FakeBiometricAuth());
 
-  Future<void> open(WidgetTester tester, {bool lockOn = true}) async {
+  Future<void> open(
+    WidgetTester tester, {
+    bool lockOn = true,
+    Duration promptDelay = Duration.zero,
+  }) async {
     final store = MemoryStore();
     await tester.pumpWidget(
       ProviderScope(
@@ -31,6 +36,7 @@ void main() {
             AppSettings(appLock: lockOn),
           ),
           biometricAuthProvider.overrideWithValue(auth),
+          lockPromptDelayProvider.overrideWithValue(promptDelay),
         ],
         child: const TrueNasMobileApp(),
       ),
@@ -67,6 +73,22 @@ void main() {
     expect(auth.prompts, ['Unlock TrueNAS Mobile']);
     expect(find.text('TrueNAS Mobile is locked'), findsNothing);
     expect(find.byTooltip('App settings'), findsOneWidget);
+  });
+
+  testWidgets('a cold start shows the lock screen before the prompt', (
+    tester,
+  ) async {
+    await open(tester, promptDelay: const Duration(milliseconds: 400));
+    // The app's own screen, with its icon, is up and the phone has not been
+    // asked yet, so the user never sees the launch screen behind the prompt.
+    expect(find.text('TrueNAS Mobile is locked'), findsOneWidget);
+    expect(find.byType(Image), findsOneWidget);
+    expect(auth.prompts, isEmpty);
+
+    await tester.pump(const Duration(milliseconds: 400));
+    await tester.pumpAndSettle();
+    expect(auth.prompts, hasLength(1));
+    expect(find.text('TrueNAS Mobile is locked'), findsNothing);
   });
 
   testWidgets('stays locked when the prompt fails, and Unlock tries again', (

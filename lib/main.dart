@@ -15,6 +15,7 @@ import 'core/settings/app_settings.dart';
 import 'core/settings/settings_provider.dart';
 import 'core/settings/system_language.dart';
 import 'features/instances/open_default_server.dart';
+import 'features/lock/app_lock_gate.dart';
 import 'features/updates/updates_provider.dart';
 import 'shared/glass.dart';
 
@@ -49,6 +50,9 @@ Future<void> main() async {
         updateAutoCheckProvider.overrideWithValue(true),
         openDefaultServerProvider.overrideWithValue(true),
         biometricAuthProvider.overrideWithValue(const PlatformBiometricAuth()),
+        lockPromptDelayProvider.overrideWithValue(
+          const Duration(milliseconds: 400),
+        ),
         liveProgressProvider.overrideWithValue(const PlatformLiveProgress()),
       ],
       child: wrapForGlass(const TrueNasMobileApp()),

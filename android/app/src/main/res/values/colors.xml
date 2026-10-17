@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- The page colour of the app (AppPalette.background), so the launch
+         screen, the lock screen and the app are one colour. -->
+    <color name="launch_background">#F3F5F9</color>
+</resources>

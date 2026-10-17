@@ -157,7 +157,13 @@ README covers what the app does; this file covers how to work on it.
   needs `FlutterFragmentActivity`, an AppCompat launch theme and `USE_BIOMETRIC`
   on Android and `NSFaceIDUsageDescription` on iOS (all set). Tests use
   `FakeBiometricAuth`; the default provider is `NoBiometricAuth`, `main`
-  overrides it.
+  overrides it. The lock screen is the app icon (`assets/app_icon.png`) on the
+  page colour, in the same spot as the launch screens (iOS `LaunchScreen`
+  with the `LaunchBackground` colour set, Android `launch_background` with
+  `colors.xml`, both light and dark), and a cold start waits
+  `lockPromptDelayProvider` before the phone's prompt so the launch screen
+  (white before) is never what sits behind Face ID. If the page colours in
+  `AppPalette` change, change those too.
 - Alert notifications (`lib/core/notifications/`): setting `alertNotifications`
   (off by default) and `alertLevel` (critical or warning and up), under
   Settings > Notifications. There is no push server, so the phone's own

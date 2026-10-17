@@ -2205,28 +2205,95 @@ class AppLocalizationsHu extends AppLocalizations {
       'A TrueNAS maga frissíti ezeket az alkalmazásokat egymás után, és mindegyik újraindul a frissítés közben. Akkor is folytatja, ha bezárod az alkalmazást.';
 
   @override
-  String appsUpdateAllProgress(int done, int total) {
-    return 'Frissítés a szerveren: $done/$total kész';
-  }
-
-  @override
   String get appsUpdateAllLeave =>
       'A TrueNAS akkor is folytatja, ha elhagyod ezt a képernyőt vagy bezárod az alkalmazást.';
 
   @override
-  String appsUpdateAllDone(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count alkalmazás frissítve',
-    );
-    return '$_temp0';
+  String appsBulkRunning(String action, int done, int total) {
+    String _temp0 = intl.Intl.selectLogic(action, {
+      'upgrade': 'Frissítés',
+      'start': 'Indítás',
+      'stop': 'Leállítás',
+      'restart': 'Újraindítás',
+      'other': 'Művelet',
+    });
+    return '$_temp0 a szerveren: $done/$total kész';
   }
 
   @override
-  String appsUpdateAllPartial(int done, int total, String failed) {
-    return '$done/$total alkalmazás frissítve. Nem frissült: $failed';
+  String appsBulkRunningNoCount(String action, int total) {
+    String _temp0 = intl.Intl.selectLogic(action, {
+      'upgrade': 'Frissítés',
+      'start': 'Indítás',
+      'stop': 'Leállítás',
+      'restart': 'Újraindítás',
+      'other': 'Művelet',
+    });
+    return '$_temp0 a szerveren: $total alkalmazás';
   }
+
+  @override
+  String appsBulkDone(int count, String action) {
+    String _temp0 = intl.Intl.selectLogic(action, {
+      'upgrade': 'frissítve',
+      'start': 'elindítva',
+      'stop': 'leállítva',
+      'restart': 'újraindítva',
+      'other': 'kész',
+    });
+    return '$count alkalmazás $_temp0';
+  }
+
+  @override
+  String appsBulkPartial(int done, int total, String failed, String action) {
+    String _temp0 = intl.Intl.selectLogic(action, {
+      'upgrade': 'frissítve',
+      'start': 'elindítva',
+      'stop': 'leállítva',
+      'restart': 'újraindítva',
+      'other': 'kész',
+    });
+    String _temp1 = intl.Intl.selectLogic(action, {
+      'upgrade': 'Nem frissült',
+      'start': 'Nem indult el',
+      'stop': 'Nem állt le',
+      'restart': 'Nem indult újra',
+      'other': 'Sikertelen',
+    });
+    return '$done/$total alkalmazás $_temp0. $_temp1: $failed';
+  }
+
+  @override
+  String get appsSelect => 'Kijelölés';
+
+  @override
+  String get appsSelectAll => 'Mind kijelölése';
+
+  @override
+  String appsSelectedCount(int count) {
+    return '$count kijelölve';
+  }
+
+  @override
+  String get appsBulkUpdate => 'Frissítés';
+
+  @override
+  String appsBulkStopTitle(int count) {
+    return '$count alkalmazás leállítása?';
+  }
+
+  @override
+  String get appsBulkStopBody =>
+      'Nem érhetők el, amíg újra el nem indítod őket.';
+
+  @override
+  String appsBulkRestartTitle(int count) {
+    return '$count alkalmazás újraindítása?';
+  }
+
+  @override
+  String get appsBulkRestartBody =>
+      'Az újraindítás alatt egy pillanatig nem érhetők el.';
 
   @override
   String get settingsLanguageSystemHint =>

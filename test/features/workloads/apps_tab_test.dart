@@ -163,7 +163,7 @@ void main() {
       expect(find.text('1.0.0 → 1.1.0'), findsOneWidget);
       expect(find.text('Plex'), findsNothing);
 
-      await tester.tap(find.widgetWithText(FilledButton, 'Update all').last);
+      await tester.tap(find.widgetWithText(FilledButton, 'Update').last);
       await settle(tester);
       await pollServer(tester);
 
@@ -190,13 +190,13 @@ void main() {
     ) async {
       await connect(tester);
       server.apps.add(extraApp('immich', update: true));
-      server.holdBulkUpgrades = true;
+      server.holdBulk = true;
       await tester.pumpWidget(wrap(AppsTab(session: session)));
       await settle(tester);
 
       await tester.tap(find.widgetWithText(FilledButton, 'Update all'));
       await tester.pumpAndSettle();
-      await tester.tap(find.widgetWithText(FilledButton, 'Update all').last);
+      await tester.tap(find.widgetWithText(FilledButton, 'Update').last);
       await spin(tester);
       expect(find.text('Updating on the server: 0 of 2 done'), findsOneWidget);
       expect(find.widgetWithText(FilledButton, 'Update all'), findsNothing);
@@ -214,7 +214,7 @@ void main() {
       expect(find.text('Updating on the server: 0 of 2 done'), findsOneWidget);
       expect(server.bulkCalls, hasLength(1));
 
-      server.finishBulkUpgrades();
+      server.finishBulk();
       await pollServer(tester);
       expect(find.text('2 apps updated'), findsOneWidget);
       expect(find.textContaining('Updating on the server'), findsNothing);
@@ -247,7 +247,7 @@ void main() {
 
       await tester.tap(find.widgetWithText(FilledButton, 'Update all'));
       await tester.pumpAndSettle();
-      await tester.tap(find.widgetWithText(FilledButton, 'Update all').last);
+      await tester.tap(find.widgetWithText(FilledButton, 'Update').last);
       await settle(tester);
       await pollServer(tester);
 
@@ -259,6 +259,108 @@ void main() {
       );
       // jellyfin can still be updated, so the card stays.
       expect(find.text('1 app has an update'), findsOneWidget);
+      await disconnect(tester);
+    });
+
+    Future<void> select(WidgetTester tester, List<String> names) async {
+      await tester.tap(find.text('Select'));
+      await tester.pumpAndSettle();
+      for (final name in names) {
+        await tester.tap(find.text(name));
+        await tester.pumpAndSettle();
+      }
+    }
+
+    testWidgets('updates only the apps that were selected', (tester) async {
+      await connect(tester);
+      server.apps.add(extraApp('immich', update: true));
+      await tester.pumpWidget(wrap(AppsTab(session: session)));
+      await settle(tester);
+
+      await select(tester, ['immich']);
+      expect(find.text('1 selected'), findsOneWidget);
+      await tester.tap(find.text('Update (1)'));
+      await tester.pumpAndSettle();
+      expect(find.text('Update 1 app?'), findsOneWidget);
+      expect(find.text('Immich'), findsOneWidget);
+      expect(find.text('Jellyfin'), findsNothing);
+      await tester.tap(find.widgetWithText(FilledButton, 'Update').last);
+      await settle(tester);
+      await pollServer(tester);
+
+      expect(server.bulkCalls.single.$1, 'app.upgrade');
+      expect(server.bulkCalls.single.$2, [
+        ['immich'],
+      ]);
+      expect(server.apps[0]['upgrade_available'], isTrue);
+      expect(server.apps[1]['upgrade_available'], isFalse);
+      expect(find.text('1 app updated'), findsOneWidget);
+      // The selection is over.
+      expect(find.text('Apps'), findsOneWidget);
+      await disconnect(tester);
+    });
+
+    testWidgets('stops the selected apps in one job after confirming', (
+      tester,
+    ) async {
+      await connect(tester);
+      server.apps.add(extraApp('immich', update: false));
+      await tester.pumpWidget(wrap(AppsTab(session: session)));
+      await settle(tester);
+
+      await select(tester, ['immich', 'jellyfin']);
+      // Both run, so start has nothing to do.
+      expect(
+        tester.widget<TextButton>(find.widgetWithText(TextButton, 'Start (0)')),
+        isA<TextButton>().having((b) => b.onPressed, 'onPressed', isNull),
+      );
+      await tester.tap(find.text('Stop (2)'));
+      await tester.pumpAndSettle();
+      expect(find.text('Stop 2 apps?'), findsOneWidget);
+      await tester.tap(find.widgetWithText(FilledButton, 'Stop').last);
+      await settle(tester);
+      await pollServer(tester);
+
+      expect(server.bulkCalls.single.$1, 'app.stop');
+      expect(server.bulkCalls.single.$2, [
+        ['immich'],
+        ['jellyfin'],
+      ]);
+      expect(server.calls.map((c) => c.$1), isNot(contains('app.stop')));
+      expect(server.apps.map((a) => a['state']), everyElement('STOPPED'));
+      expect(find.text('2 apps stopped'), findsOneWidget);
+      await disconnect(tester);
+    });
+
+    testWidgets('starts the stopped ones, restarts the running ones', (
+      tester,
+    ) async {
+      await connect(tester);
+      server.apps.add(extraApp('immich', update: false)..['state'] = 'STOPPED');
+      await tester.pumpWidget(wrap(AppsTab(session: session)));
+      await settle(tester);
+
+      await select(tester, ['immich', 'jellyfin']);
+      // Only the stopped app can start and only the running one restarts.
+      await tester.tap(find.text('Start (1)'));
+      await settle(tester);
+      await pollServer(tester);
+      expect(server.bulkCalls.single.$1, 'app.start');
+      expect(server.bulkCalls.single.$2, [
+        ['immich'],
+      ]);
+      // Starting needs no confirmation.
+      expect(find.text('1 app started'), findsOneWidget);
+
+      await select(tester, ['jellyfin']);
+      await tester.tap(find.text('Restart (1)'));
+      await tester.pumpAndSettle();
+      expect(find.text('Restart 1 app?'), findsOneWidget);
+      await tester.tap(find.widgetWithText(FilledButton, 'Restart').last);
+      await settle(tester);
+      await pollServer(tester);
+      expect(server.bulkCalls.last.$1, 'app.redeploy');
+      expect(find.text('1 app restarted'), findsOneWidget);
       await disconnect(tester);
     });
 

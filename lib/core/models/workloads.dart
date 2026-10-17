@@ -97,25 +97,53 @@ class TrueNasApp {
   final String? notes;
 }
 
-/// An "Update all" run: the server's `core.bulk` job over `app.upgrade`. It
-/// lives on the server, so it carries on when the app is closed and can be
-/// found again by its [jobId] or by [AppUpdateRun.fromJob] on any `core.bulk`
-/// job.
-class AppUpdateRun {
-  const AppUpdateRun({required this.job, required this.apps});
+/// What a bulk run does to every app it covers.
+enum AppBulkAction {
+  upgrade('app.upgrade'),
+  start('app.start'),
+  stop('app.stop'),
 
-  /// Null when [job] is not a bulk upgrade.
-  static AppUpdateRun? fromJob(Map<String, dynamic> json) {
+  /// Redeploys, which is what "restart" means for an app.
+  restart('app.redeploy');
+
+  const AppBulkAction(this.method);
+
+  /// The API method `core.bulk` runs once per app.
+  final String method;
+
+  static AppBulkAction? fromMethod(Object? method) {
+    for (final action in values) {
+      if (action.method == method) return action;
+    }
+    return null;
+  }
+}
+
+/// A bulk run over apps: the server's `core.bulk` job over `app.upgrade`,
+/// `app.start`, `app.stop` or `app.redeploy`. It lives on the server, so it
+/// carries on when the app is closed and can be found again by its [jobId]
+/// or by [AppBulkRun.fromJob] on any `core.bulk` job.
+class AppBulkRun {
+  const AppBulkRun({
+    required this.job,
+    required this.action,
+    required this.apps,
+  });
+
+  /// Null when [json] is not a bulk run over apps.
+  static AppBulkRun? fromJob(Map<String, dynamic> json) {
     final arguments = json['arguments'];
     if (json['method'] != 'core.bulk' ||
         arguments is! List ||
         arguments.length < 2 ||
-        arguments[0] != 'app.upgrade' ||
         arguments[1] is! List) {
       return null;
     }
-    return AppUpdateRun(
+    final action = AppBulkAction.fromMethod(arguments[0]);
+    if (action == null) return null;
+    return AppBulkRun(
       job: TrueNasJob.fromJson(json),
+      action: action,
       apps: [
         for (final call in arguments[1] as List)
           if (call is List && call.isNotEmpty) call.first.toString(),
@@ -125,14 +153,15 @@ class AppUpdateRun {
 
   /// The `core.bulk` job, for progress and the end state.
   final TrueNasJob job;
+  final AppBulkAction action;
 
-  /// The apps it updates, in order.
+  /// The apps it covers, in order.
   final List<String> apps;
 
   int get jobId => job.id;
   bool get isActive => job.state.isActive;
 
-  /// Apps the server could not update, with its reason. Empty while the job
+  /// Apps the server could not handle, with its reason. Empty while the job
   /// runs. When the job itself failed or was aborted no per-app result is
   /// trustworthy, so every app is listed.
   Map<String, String> get failed {

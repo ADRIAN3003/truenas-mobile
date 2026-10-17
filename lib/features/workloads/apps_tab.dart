@@ -27,7 +27,7 @@ class _Workloads {
     required this.vms,
     required this.containers,
     required this.containerActions,
-    required this.canUpgradeAll,
+    required this.canBulk,
   });
 
   final List<TrueNasApp> apps;
@@ -40,7 +40,7 @@ class _Workloads {
   final List<WorkloadAction> containerActions;
 
   /// Whether the server can update all apps in one job.
-  final bool canUpgradeAll;
+  final bool canBulk;
 }
 
 const _appActions = [
@@ -69,11 +69,15 @@ class _AppsTabState extends State<AppsTab> with LoadState<AppsTab, _Workloads> {
   /// Keys (`app:x`, `vm:1`, `ct:x`) of workloads with an action in flight.
   final _busy = <String>{};
 
-  /// The server's "Update all" job while it runs, polled by [_poll]. It
-  /// outlives this screen: [initState] picks it up again.
-  AppUpdateRun? _updateRun;
+  /// The server's bulk job (Update all, or an action on the selected apps)
+  /// while it runs, polled by [_poll]. It outlives this screen: [initState]
+  /// picks it up again.
+  AppBulkRun? _bulkRun;
   Timer? _poller;
   var _polling = false;
+
+  /// Apps ticked while choosing which to act on, or null when not choosing.
+  Set<String>? _selected;
 
   WorkloadsApi get _api => widget.session.workloads;
 
@@ -88,21 +92,21 @@ class _AppsTabState extends State<AppsTab> with LoadState<AppsTab, _Workloads> {
     }
 
     final backend = await _api.containerBackend();
-    final (apps, vms, containers, containerActions, canUpgradeAll) = await (
+    final (apps, vms, containers, containerActions, canBulk) = await (
       _api.apps(),
       optional(_api.vms),
       backend == ContainerBackend.none
           ? Future<List<LinuxContainer>?>.value()
           : optional(_api.containers),
       _api.containerActions(),
-      _api.canUpgradeAll(),
+      _api.canBulk(),
     ).wait;
     return _Workloads(
       apps: apps,
       vms: vms,
       containers: containers,
       containerActions: containerActions,
-      canUpgradeAll: canUpgradeAll,
+      canBulk: canBulk,
     );
   }
 
@@ -118,19 +122,19 @@ class _AppsTabState extends State<AppsTab> with LoadState<AppsTab, _Workloads> {
     super.dispose();
   }
 
-  /// Picks up an "Update all" job already running on the server, such as one
-  /// started before the app was closed or from the web UI.
+  /// Picks up a bulk job already running on the server, such as one started
+  /// before the app was closed or from the web UI.
   Future<void> _resumeRun() async {
     try {
-      final run = await _api.activeUpgradeRun();
+      final run = await _api.activeBulkRun();
       if (run != null && mounted) _watch(run);
     } catch (_) {
       // Not being able to look is the same as nothing running.
     }
   }
 
-  void _watch(AppUpdateRun run) {
-    setState(() => _updateRun = run);
+  void _watch(AppBulkRun run) {
+    setState(() => _bulkRun = run);
     _poller?.cancel();
     _poller = Timer.periodic(const Duration(seconds: 2), (_) => _poll());
   }
@@ -138,18 +142,18 @@ class _AppsTabState extends State<AppsTab> with LoadState<AppsTab, _Workloads> {
   /// Follows the job and refreshes the list so each app's new version shows as
   /// the server gets to it. A dropped connection just skips a round.
   Future<void> _poll() async {
-    final run = _updateRun;
+    final run = _bulkRun;
     if (run == null || _polling) return;
     _polling = true;
     try {
-      final latest = await _api.upgradeRun(run.jobId);
+      final latest = await _api.bulkRun(run.jobId);
       await load();
       if (!mounted) return;
       if (latest != null && latest.isActive) {
-        setState(() => _updateRun = latest);
+        setState(() => _bulkRun = latest);
       } else {
         _poller?.cancel();
-        setState(() => _updateRun = null);
+        setState(() => _bulkRun = null);
         _finished(latest ?? run);
       }
     } catch (_) {
@@ -159,7 +163,7 @@ class _AppsTabState extends State<AppsTab> with LoadState<AppsTab, _Workloads> {
     }
   }
 
-  void _finished(AppUpdateRun run) {
+  void _finished(AppBulkRun run) {
     final l10n = AppLocalizations.of(context);
     final failed = run.failed;
     if (failed.isEmpty) {
@@ -171,11 +175,12 @@ class _AppsTabState extends State<AppsTab> with LoadState<AppsTab, _Workloads> {
       SnackBar(
         content: Text(
           failed.isEmpty
-              ? l10n.appsUpdateAllDone(run.apps.length)
-              : l10n.appsUpdateAllPartial(
+              ? l10n.appsBulkDone(run.apps.length, run.action.name)
+              : l10n.appsBulkPartial(
                   run.apps.length - failed.length,
                   run.apps.length,
                   failed.keys.join(', '),
+                  run.action.name,
                 ),
         ),
       ),
@@ -202,25 +207,55 @@ class _AppsTabState extends State<AppsTab> with LoadState<AppsTab, _Workloads> {
     if (mounted) setState(() => _busy.remove(key));
   }
 
-  /// Hands [apps] to the server as one job, after listing them for the user to
-  /// confirm, and follows it. The server does the work, so the user can leave;
-  /// an app that fails does not stop the rest.
-  Future<void> _upgradeAll(List<TrueNasApp> apps) async {
+  /// Which apps [action] applies to: updates for those with one, start for
+  /// those that are down, stop and restart for those that are up.
+  static bool _applies(AppBulkAction action, TrueNasApp app) =>
+      switch (action) {
+        AppBulkAction.upgrade => app.upgradeAvailable,
+        AppBulkAction.start => !app.state.isUp,
+        AppBulkAction.stop || AppBulkAction.restart => app.state.isUp,
+      };
+
+  /// Asks the user to confirm [action] on [apps] where it needs it (start does
+  /// not), hands it to the server as one job and follows it. The server does
+  /// the work, so the user can leave; an app that fails does not stop the rest.
+  Future<void> _bulk(AppBulkAction action, List<TrueNasApp> apps) async {
+    if (apps.isEmpty || _bulkRun != null) return;
     final l10n = AppLocalizations.of(context);
     final messenger = ScaffoldMessenger.of(context);
-    final confirmed = await confirmAction(
-      context,
-      title: l10n.appsUpdateAllTitle(apps.length),
-      body: l10n.appsUpdateAllBody,
-      details: UpdateAllList(apps: apps),
-      confirmLabel: l10n.appsUpdateAll,
-      cancelLabel: l10n.cancel,
-    );
-    if (!confirmed || !mounted) return;
+    final Future<bool> ask = switch (action) {
+      AppBulkAction.upgrade => confirmAction(
+        context,
+        title: l10n.appsUpdateAllTitle(apps.length),
+        body: l10n.appsUpdateAllBody,
+        details: UpdateAllList(apps: apps),
+        confirmLabel: l10n.appsBulkUpdate,
+        cancelLabel: l10n.cancel,
+      ),
+      AppBulkAction.start => Future.value(true),
+      AppBulkAction.stop => confirmAction(
+        context,
+        title: l10n.appsBulkStopTitle(apps.length),
+        body: l10n.appsBulkStopBody,
+        details: UpdateAllList(apps: apps, showVersions: false),
+        confirmLabel: l10n.actionStop,
+        cancelLabel: l10n.cancel,
+      ),
+      AppBulkAction.restart => confirmAction(
+        context,
+        title: l10n.appsBulkRestartTitle(apps.length),
+        body: l10n.appsBulkRestartBody,
+        details: UpdateAllList(apps: apps, showVersions: false),
+        confirmLabel: l10n.actionRestart,
+        cancelLabel: l10n.cancel,
+      ),
+    };
+    if (!await ask || !mounted) return;
     try {
-      final id = await _api.upgradeAll([for (final app in apps) app.name]);
-      final run = await _api.upgradeRun(id);
+      final id = await _api.bulk(action, [for (final app in apps) app.name]);
+      final run = await _api.bulkRun(id);
       if (!mounted) return;
+      setState(() => _selected = null);
       if (run != null && run.isActive) {
         _watch(run);
       } else {
@@ -236,21 +271,37 @@ class _AppsTabState extends State<AppsTab> with LoadState<AppsTab, _Workloads> {
     }
   }
 
-  /// Apps of the running job that have not got their new version yet.
-  Iterable<String> _pending(AppUpdateRun run, List<TrueNasApp> apps) => {
-    for (final app in apps)
-      if (app.upgradeAvailable) app.name,
-  }.intersection(run.apps.toSet());
+  /// How far the running job has got, from what the apps look like now:
+  /// updated apps lost their update, started ones run, stopped ones are
+  /// stopped. A restart leaves no mark, so its progress is unknown.
+  BulkProgress _progress(AppBulkRun run, List<TrueNasApp> apps) {
+    final byName = {for (final app in apps) app.name: app};
+    int count(bool Function(TrueNasApp) test) => [
+      for (final name in run.apps)
+        if (byName[name] case final app? when test(app)) name,
+    ].length;
+    return (
+      action: run.action,
+      total: run.apps.length,
+      done: switch (run.action) {
+        AppBulkAction.upgrade => count((a) => !a.upgradeAvailable),
+        AppBulkAction.start => count((a) => a.state == WorkloadState.running),
+        AppBulkAction.stop => count((a) => a.state == WorkloadState.stopped),
+        AppBulkAction.restart => null,
+      },
+    );
+  }
 
-  UpdateAllProgress _progress(AppUpdateRun run, List<TrueNasApp> apps) => (
-    done: run.apps.length - _pending(run, apps).length,
-    total: run.apps.length,
-  );
-
+  /// Whether the running job still has to do [app].
   bool _waitingForRun(TrueNasApp app) =>
-      _updateRun != null &&
-      app.upgradeAvailable &&
-      _updateRun!.apps.contains(app.name);
+      _bulkRun != null &&
+      _bulkRun!.apps.contains(app.name) &&
+      _applies(_bulkRun!.action, app);
+
+  void _toggle(String name) => setState(() {
+    final selected = _selected!;
+    if (!selected.remove(name)) selected.add(name);
+  });
 
   Future<void> _openApp(TrueNasApp app) async {
     await Navigator.push(
@@ -264,30 +315,90 @@ class _AppsTabState extends State<AppsTab> with LoadState<AppsTab, _Workloads> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
     return AsyncBody<_Workloads>(
       value: data,
       error: error,
       onRefresh: load,
-      builder: (w) => ListView(
-        padding: ChromeInsets.pad(
-          context,
-          const EdgeInsets.fromLTRB(16, 0, 16, 24),
-        ),
-        children: [
-          if (appsWithUpdates(w.apps) case final updates
-              when w.canUpgradeAll &&
-                  (updates.isNotEmpty || _updateRun != null)) ...[
-            UpdateAllCard(
-              count: _updateRun?.apps.length ?? updates.length,
-              progress: _updateRun == null
-                  ? null
-                  : _progress(_updateRun!, w.apps),
-              onPressed: () => _upgradeAll(updates),
-            ),
-            const SizedBox(height: 8),
+      builder: (w) {
+        final selected = _selected;
+        final picked = [
+          for (final app in w.apps)
+            if (selected?.contains(app.name) ?? false) app,
+        ];
+        return Stack(
+          children: [
+            _list(context, w),
+            if (selected != null && picked.isNotEmpty)
+              Positioned(
+                left: 16,
+                right: 16,
+                bottom: ChromeInsets.of(context).bottom,
+                child: AppsBulkBar(
+                  options: [
+                    for (final action in AppBulkAction.values)
+                      (
+                        action: action,
+                        count: picked.where((a) => _applies(action, a)).length,
+                      ),
+                  ],
+                  onPressed: (action) => _bulk(action, [
+                    for (final app in picked)
+                      if (_applies(action, app)) app,
+                  ]),
+                ),
+              ),
           ],
-          ...groupedSection(l10n.appsTitle, empty: l10n.appsEmpty, [
+        );
+      },
+    );
+  }
+
+  Widget _list(BuildContext context, _Workloads w) {
+    final l10n = AppLocalizations.of(context);
+    final selected = _selected;
+    return ListView(
+      padding: ChromeInsets.pad(
+        context,
+        EdgeInsets.fromLTRB(16, 0, 16, selected == null ? 24 : 96),
+      ),
+      children: [
+        if (appsWithUpdates(w.apps) case final updates
+            when w.canBulk && (updates.isNotEmpty || _bulkRun != null)) ...[
+          UpdateAllCard(
+            count: updates.length,
+            progress: _bulkRun == null ? null : _progress(_bulkRun!, w.apps),
+            onPressed: () => _bulk(AppBulkAction.upgrade, updates),
+          ),
+          const SizedBox(height: 8),
+        ],
+        ...groupedSection(
+          selected == null
+              ? l10n.appsTitle
+              : l10n.appsSelectedCount(selected.length),
+          empty: l10n.appsEmpty,
+          trailing: !w.canBulk || w.apps.isEmpty || _bulkRun != null
+              ? null
+              : selected == null
+              ? TextButton(
+                  onPressed: () => setState(() => _selected = {}),
+                  child: Text(l10n.appsSelect),
+                )
+              : Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextButton(
+                      onPressed: () => setState(
+                        () => _selected = {for (final a in w.apps) a.name},
+                      ),
+                      child: Text(l10n.appsSelectAll),
+                    ),
+                    TextButton(
+                      onPressed: () => setState(() => _selected = null),
+                      child: Text(l10n.done),
+                    ),
+                  ],
+                ),
+          [
             for (final app in w.apps)
               ListTile(
                 leading: AppIcon(url: app.iconUrl),
@@ -318,135 +429,138 @@ class _AppsTabState extends State<AppsTab> with LoadState<AppsTab, _Workloads> {
                     ),
                   ],
                 ),
-                trailing: WorkloadMenu(
-                  busy:
-                      _busy.contains('app:${app.name}') || _waitingForRun(app),
-                  actions: actionsFor(app.state, supported: _appActions),
-                  onShell: app.state == WorkloadState.running
-                      ? () => openAppShell(context, widget.session, app.name)
-                      : null,
-                  onSelected: (action) => _run(
-                    'app:${app.name}',
-                    app.name,
-                    action,
-                    () => _api.appAction(app.name, action),
-                  ),
-                ),
-                onTap: () => _openApp(app),
-              ),
-          ]),
-          if (w.vms case final vms?)
-            ...groupedSection(l10n.vmsTitle, empty: l10n.vmsEmpty, [
-              for (final vm in vms)
-                ListTile(
-                  leading: const IconTile(
-                    Icons.computer_rounded,
-                    AppPalette.tilePurple,
-                    size: 40,
-                  ),
-                  title: Text(vm.name),
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        [
-                          l10n.vmSummary(
-                            vm.vcpus,
-                            formatBytes(vm.memoryMib * 1024 * 1024),
-                          ),
-                          if (vm.description.isNotEmpty) vm.description,
-                        ].join('\n'),
-                      ),
-                      const SizedBox(height: 4),
-                      WorkloadStateLabel(state: vm.state),
-                    ],
-                  ),
-                  trailing: WorkloadMenu(
-                    busy: _busy.contains('vm:${vm.id}'),
-                    actions: actionsFor(vm.state, supported: _vmActions),
-                    onShell: vm.state == WorkloadState.running
-                        ? () => openShell(
-                            context,
-                            widget.session,
-                            WorkloadsApi.vmShell(vm.id),
-                            vm.name,
-                          )
-                        : null,
-                    onSelected: (action) => _run(
-                      'vm:${vm.id}',
-                      vm.name,
-                      action,
-                      () => _api.vmAction(vm.id, action),
-                      isVm: true,
-                    ),
-                  ),
-                ),
-            ]),
-          if (w.containers case final containers?)
-            ...groupedSection(
-              l10n.containersTitle,
-              empty: l10n.containersEmpty,
-              [
-                for (final container in containers)
-                  ListTile(
-                    leading: IconTile(
-                      container.isVm
-                          ? Icons.computer_rounded
-                          : Icons.inventory_2_rounded,
-                      container.isVm
-                          ? AppPalette.tilePurple
-                          : AppPalette.tileTeal,
-                      size: 40,
-                    ),
-                    title: Text(container.name),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        if (container.isVm || container.description != null)
-                          Text(
-                            [
-                              if (container.isVm) l10n.containerIsVm,
-                              ?container.description,
-                            ].join(' · '),
-                          ),
-                        const SizedBox(height: 4),
-                        WorkloadStateLabel(state: container.state),
-                      ],
-                    ),
-                    trailing: WorkloadMenu(
-                      busy: _busy.contains('ct:${container.id}'),
-                      actions: actionsFor(
-                        container.state,
-                        supported: w.containerActions,
-                      ),
-                      onShell: container.state == WorkloadState.running
-                          ? () async {
-                              final options = await _api.containerShell(
-                                container,
-                              );
-                              if (!context.mounted) return;
-                              await openShell(
+                trailing: selected != null
+                    ? Checkbox(
+                        value: selected.contains(app.name),
+                        onChanged: (_) => _toggle(app.name),
+                      )
+                    : WorkloadMenu(
+                        busy:
+                            _busy.contains('app:${app.name}') ||
+                            _waitingForRun(app),
+                        actions: actionsFor(app.state, supported: _appActions),
+                        onShell: app.state == WorkloadState.running
+                            ? () => openAppShell(
                                 context,
                                 widget.session,
-                                options,
-                                container.name,
-                                fallbackCommands: WorkloadsApi.shellFallbacks,
-                              );
-                            }
-                          : null,
-                      onSelected: (action) => _run(
-                        'ct:${container.id}',
-                        container.name,
-                        action,
-                        () => _api.containerAction(container, action),
-                        isVm: container.isVm,
+                                app.name,
+                              )
+                            : null,
+                        onSelected: (action) => _run(
+                          'app:${app.name}',
+                          app.name,
+                          action,
+                          () => _api.appAction(app.name, action),
+                        ),
                       ),
+                onTap: () =>
+                    selected != null ? _toggle(app.name) : _openApp(app),
+              ),
+          ],
+        ),
+        if (w.vms case final vms?)
+          ...groupedSection(l10n.vmsTitle, empty: l10n.vmsEmpty, [
+            for (final vm in vms)
+              ListTile(
+                leading: const IconTile(
+                  Icons.computer_rounded,
+                  AppPalette.tilePurple,
+                  size: 40,
+                ),
+                title: Text(vm.name),
+                subtitle: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      [
+                        l10n.vmSummary(
+                          vm.vcpus,
+                          formatBytes(vm.memoryMib * 1024 * 1024),
+                        ),
+                        if (vm.description.isNotEmpty) vm.description,
+                      ].join('\n'),
                     ),
+                    const SizedBox(height: 4),
+                    WorkloadStateLabel(state: vm.state),
+                  ],
+                ),
+                trailing: WorkloadMenu(
+                  busy: _busy.contains('vm:${vm.id}'),
+                  actions: actionsFor(vm.state, supported: _vmActions),
+                  onShell: vm.state == WorkloadState.running
+                      ? () => openShell(
+                          context,
+                          widget.session,
+                          WorkloadsApi.vmShell(vm.id),
+                          vm.name,
+                        )
+                      : null,
+                  onSelected: (action) => _run(
+                    'vm:${vm.id}',
+                    vm.name,
+                    action,
+                    () => _api.vmAction(vm.id, action),
+                    isVm: true,
                   ),
-              ],
-            ),
-        ],
-      ),
+                ),
+              ),
+          ]),
+        if (w.containers case final containers?)
+          ...groupedSection(l10n.containersTitle, empty: l10n.containersEmpty, [
+            for (final container in containers)
+              ListTile(
+                leading: IconTile(
+                  container.isVm
+                      ? Icons.computer_rounded
+                      : Icons.inventory_2_rounded,
+                  container.isVm ? AppPalette.tilePurple : AppPalette.tileTeal,
+                  size: 40,
+                ),
+                title: Text(container.name),
+                subtitle: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (container.isVm || container.description != null)
+                      Text(
+                        [
+                          if (container.isVm) l10n.containerIsVm,
+                          ?container.description,
+                        ].join(' · '),
+                      ),
+                    const SizedBox(height: 4),
+                    WorkloadStateLabel(state: container.state),
+                  ],
+                ),
+                trailing: WorkloadMenu(
+                  busy: _busy.contains('ct:${container.id}'),
+                  actions: actionsFor(
+                    container.state,
+                    supported: w.containerActions,
+                  ),
+                  onShell: container.state == WorkloadState.running
+                      ? () async {
+                          final options = await _api.containerShell(container);
+                          if (!context.mounted) return;
+                          await openShell(
+                            context,
+                            widget.session,
+                            options,
+                            container.name,
+                            fallbackCommands: WorkloadsApi.shellFallbacks,
+                          );
+                        }
+                      : null,
+                  onSelected: (action) => _run(
+                    'ct:${container.id}',
+                    container.name,
+                    action,
+                    () => _api.containerAction(container, action),
+                    isVm: container.isVm,
+                  ),
+                ),
+              ),
+          ]),
+      ],
     );
   }
 }

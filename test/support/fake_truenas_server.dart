@@ -149,9 +149,9 @@ class FakeTrueNasServer {
   /// Apps whose `app.upgrade` fails.
   final failingUpgrades = <String>{};
 
-  /// When true a `core.bulk` job over `app.upgrade` stays RUNNING, upgrading
-  /// nothing, until [finishBulkUpgrades] runs it.
-  bool holdBulkUpgrades = false;
+  /// When true a `core.bulk` job over apps stays RUNNING, changing nothing,
+  /// until [finishBulk] runs it.
+  bool holdBulk = false;
 
   /// Calls to `core.bulk`: the method and the argument lists.
   final bulkCalls = <(String, List<dynamic>)>[];
@@ -1083,8 +1083,8 @@ class FakeTrueNasServer {
     return null;
   }
 
-  /// Runs `app.upgrade` over [calls] as one job, as `core.bulk` does, and
-  /// returns its id. See [holdBulkUpgrades].
+  /// Runs [method] over [calls] as one job, as `core.bulk` does, and
+  /// returns its id. See [holdBulk].
   int _bulk(String method, List<dynamic> calls) {
     bulkCalls.add((method, calls));
     final id = _nextJobId++;
@@ -1097,7 +1097,7 @@ class FakeTrueNasServer {
       'result': null,
     };
     _finishedJobs[id] = job;
-    if (holdBulkUpgrades) {
+    if (holdBulk) {
       _heldBulk.add(id);
     } else {
       _runBulk(job);
@@ -1106,10 +1106,11 @@ class FakeTrueNasServer {
   }
 
   void _runBulk(Map<String, dynamic> job) {
+    final method = (job['arguments'] as List)[0] as String;
     final calls = (job['arguments'] as List)[1] as List;
     job['result'] = [
       for (final call in calls)
-        _upgradeApp((call as List).first as String)
+        _applyToApp(method, (call as List).first as String)
             ? {'result': true, 'error': null}
             : {'result': null, 'error': '[EFAULT] Upgrade failed'},
     ];
@@ -1117,19 +1118,21 @@ class FakeTrueNasServer {
     job['progress'] = {'percent': 100, 'description': ''};
   }
 
-  bool _upgradeApp(String name) {
-    if (failingUpgrades.contains(name)) return false;
+  bool _applyToApp(String method, String name) {
+    if (method == 'app.upgrade' && failingUpgrades.contains(name)) return false;
     final app = apps.firstWhere((a) => a['name'] == name);
-    app['state'] = 'RUNNING';
-    app['human_version'] = app['latest_version'];
-    app['upgrade_available'] = false;
+    app['state'] = method == 'app.stop' ? 'STOPPED' : 'RUNNING';
+    if (method == 'app.upgrade') {
+      app['human_version'] = app['latest_version'];
+      app['upgrade_available'] = false;
+    }
     return true;
   }
 
   final _heldBulk = <int>[];
 
-  /// Finishes the `core.bulk` jobs held by [holdBulkUpgrades].
-  void finishBulkUpgrades() {
+  /// Finishes the `core.bulk` jobs held by [holdBulk].
+  void finishBulk() {
     for (final id in _heldBulk) {
       _runBulk(_finishedJobs[id]!);
     }

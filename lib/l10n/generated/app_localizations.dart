@@ -3758,29 +3758,83 @@ abstract class AppLocalizations {
   /// **'TrueNAS updates these apps itself, one after another, and each restarts while it updates. It carries on if you close the app.'**
   String get appsUpdateAllBody;
 
-  /// Progress line while the server runs Update all.
-  ///
-  /// In en, this message translates to:
-  /// **'Updating on the server: {done} of {total} done'**
-  String appsUpdateAllProgress(int done, int total);
-
   /// Reassurance under the Update all progress bar.
   ///
   /// In en, this message translates to:
   /// **'TrueNAS carries on if you leave this screen or close the app.'**
   String get appsUpdateAllLeave;
 
-  /// Snackbar after every app was updated.
+  /// Progress line while the server runs a bulk action over apps. The action is upgrade, start, stop or restart.
   ///
   /// In en, this message translates to:
-  /// **'{count, plural, =1{1 app updated} other{{count} apps updated}}'**
-  String appsUpdateAllDone(int count);
+  /// **'{action, select, upgrade{Updating} start{Starting} stop{Stopping} restart{Restarting} other{Working}} on the server: {done} of {total} done'**
+  String appsBulkRunning(String action, int done, int total);
 
-  /// Snackbar when some apps could not be updated.
+  /// Progress line when the server does not say how far a bulk action has got.
   ///
   /// In en, this message translates to:
-  /// **'{done} of {total} apps updated. Not updated: {failed}'**
-  String appsUpdateAllPartial(int done, int total, String failed);
+  /// **'{action, select, upgrade{Updating} start{Starting} stop{Stopping} restart{Restarting} other{Working}} {total, plural, =1{1 app} other{{total} apps}} on the server'**
+  String appsBulkRunningNoCount(String action, int total);
+
+  /// Snackbar after a bulk action over apps worked for every app.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 app} other{{count} apps}} {action, select, upgrade{updated} start{started} stop{stopped} restart{restarted} other{done}}'**
+  String appsBulkDone(int count, String action);
+
+  /// Snackbar when a bulk action over apps failed for some apps.
+  ///
+  /// In en, this message translates to:
+  /// **'{done} of {total} apps {action, select, upgrade{updated} start{started} stop{stopped} restart{restarted} other{done}}. {action, select, upgrade{Not updated} start{Not started} stop{Not stopped} restart{Not restarted} other{Failed}}: {failed}'**
+  String appsBulkPartial(int done, int total, String failed, String action);
+
+  /// Button that starts picking apps for a bulk action.
+  ///
+  /// In en, this message translates to:
+  /// **'Select'**
+  String get appsSelect;
+
+  /// Button that selects every app.
+  ///
+  /// In en, this message translates to:
+  /// **'Select all'**
+  String get appsSelectAll;
+
+  /// Header while picking apps.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} selected'**
+  String appsSelectedCount(int count);
+
+  /// Bulk action button: update the selected apps.
+  ///
+  /// In en, this message translates to:
+  /// **'Update'**
+  String get appsBulkUpdate;
+
+  /// Confirmation title before stopping the selected apps.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Stop 1 app?} other{Stop {count} apps?}}'**
+  String appsBulkStopTitle(int count);
+
+  /// Confirmation text before stopping the selected apps.
+  ///
+  /// In en, this message translates to:
+  /// **'They can\'t be reached until they are started again.'**
+  String get appsBulkStopBody;
+
+  /// Confirmation title before restarting the selected apps.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Restart 1 app?} other{Restart {count} apps?}}'**
+  String appsBulkRestartTitle(int count);
+
+  /// Confirmation text before restarting the selected apps.
+  ///
+  /// In en, this message translates to:
+  /// **'They are unavailable for a moment while they restart.'**
+  String get appsBulkRestartBody;
 
   /// Subtitle of the Language row when the language is chosen in the system settings.
   ///

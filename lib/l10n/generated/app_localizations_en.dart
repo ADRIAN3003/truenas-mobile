@@ -2044,6 +2044,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'Notifications are turned off for this app. Allow them in the phone\'s settings first.';
 
   @override
+  String get settingsAlertScheduleFailed =>
+      'The phone would not start the background check. Try again in a moment.';
+
+  @override
   String get alertNotificationChannel => 'Alerts';
 
   @override

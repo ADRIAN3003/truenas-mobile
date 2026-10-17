@@ -3488,6 +3488,12 @@ abstract class AppLocalizations {
   /// **'Notifications are turned off for this app. Allow them in the phone\'s settings first.'**
   String get settingsAlertPermissionDenied;
 
+  /// Snackbar when scheduling the background alert check failed.
+  ///
+  /// In en, this message translates to:
+  /// **'The phone would not start the background check. Try again in a moment.'**
+  String get settingsAlertScheduleFailed;
+
   /// Name of the Android notification channel for new alerts.
   ///
   /// In en, this message translates to:

@@ -16,6 +16,13 @@ import workmanager_apple
     // With the scene lifecycle the plugin cannot register the check in time
     // by itself.
     WorkmanagerPlugin.registerLaunchHandlers()
+    // iOS only accepts a BGTask handler registered before launch finishes;
+    // registering later (what the Dart side does the first time the setting is
+    // turned on) raises an exception that cannot be caught and kills the app.
+    // The id must match `_taskName` in background_alerts.dart and Info.plist.
+    WorkmanagerPlugin.registerPeriodicTask(
+      withIdentifier: "hu.adrian.truenasmobile.alertCheck",
+      earliestBeginInSeconds: NSNumber(value: 15 * 60))
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
 

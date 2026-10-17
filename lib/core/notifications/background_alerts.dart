@@ -115,6 +115,18 @@ Future<void> runBackgroundAlertCheck({
   );
 }
 
+/// How [AlertNotificationService.turnOn] ended.
+enum AlertTurnOn {
+  /// Allowed and scheduled.
+  on,
+
+  /// The user does not allow notifications for the app.
+  denied,
+
+  /// The phone refused (permission prompt or background task).
+  failed,
+}
+
 /// Turns the background alert check on and off.
 class AlertNotificationService {
   AlertNotificationService({
@@ -132,32 +144,52 @@ class AlertNotificationService {
   /// The kinds of alert met so far, for Settings.
   AlertKindCatalog get kinds => AlertKindCatalog(store);
 
-  /// Asks the phone for permission, then schedules the check. False (and
-  /// nothing scheduled) when the user does not allow notifications.
+  /// Asks the phone for permission, then schedules the check. Nothing is
+  /// scheduled unless the result is [AlertTurnOn.on]. Never throws: a phone
+  /// that refuses the permission prompt or the background task is a
+  /// [AlertTurnOn.failed], not a crash.
   ///
   /// The alerts the servers already have are recorded first, so only alerts
   /// that come after this moment are news.
-  Future<bool> turnOn(
+  Future<AlertTurnOn> turnOn(
     List<ServerInstance> servers, {
     required AlertSeverity level,
   }) async {
-    if (!await notifier.requestPermission()) return false;
-    // Saved again on purpose: on iOS this moves the servers to storage that
-    // the phone can read while it is locked, as the check runs then.
-    await _rewrite(InstanceRepository.storageKey);
     try {
-      await AlertWatcher(
-        store: store,
-        notifier: notifier,
-      ).check(servers, minimum: level, notify: false);
+      if (!await notifier.requestPermission()) return AlertTurnOn.denied;
+      // Saved again on purpose: on iOS this moves the servers to storage that
+      // the phone can read while it is locked, as the check runs then.
+      try {
+        await _rewrite(InstanceRepository.storageKey);
+      } catch (_) {
+        // The servers stay where they were; the check still runs when the
+        // phone is unlocked.
+      }
+      try {
+        await AlertWatcher(
+          store: store,
+          notifier: notifier,
+        ).check(servers, minimum: level, notify: false);
+      } catch (_) {
+        // Servers that are down are recorded by the first background check.
+      }
+      await scheduler.schedule();
+      return AlertTurnOn.on;
     } catch (_) {
-      // Servers that are down are recorded by the first background check.
+      try {
+        await scheduler.cancel();
+      } catch (_) {}
+      return AlertTurnOn.failed;
     }
-    await scheduler.schedule();
-    return true;
   }
 
-  Future<void> turnOff() => scheduler.cancel();
+  Future<void> turnOff() async {
+    try {
+      await scheduler.cancel();
+    } catch (_) {
+      // Nothing was scheduled, or the phone has already dropped it.
+    }
+  }
 
   /// At app start: schedules the check again when it is on (the phone may
   /// have dropped it, and the callback handle changes with each app update).

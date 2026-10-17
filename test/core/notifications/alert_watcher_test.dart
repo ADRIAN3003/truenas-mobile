@@ -279,7 +279,7 @@ void main() {
       server.alerts.add(alertJson('a3'));
       expect(
         await service.turnOn([home()], level: AlertSeverity.critical),
-        isTrue,
+        AlertTurnOn.on,
       );
       expect(scheduler.scheduled, isTrue);
       expect(notifier.shown, isEmpty);
@@ -291,9 +291,32 @@ void main() {
       notifier.allowed = false;
       expect(
         await service.turnOn([home()], level: AlertSeverity.critical),
-        isFalse,
+        AlertTurnOn.denied,
       );
       expect(scheduler.scheduled, isFalse);
+    });
+
+    test('a phone that refuses the background task is not a crash', () async {
+      scheduler.failWith = StateError('BGTaskScheduler refused');
+      expect(
+        await service.turnOn([home()], level: AlertSeverity.critical),
+        AlertTurnOn.failed,
+      );
+      expect(scheduler.scheduled, isFalse);
+    });
+
+    test('a failing permission prompt is not a crash either', () async {
+      notifier.permissionError = StateError('plugin not ready');
+      expect(
+        await service.turnOn([home()], level: AlertSeverity.critical),
+        AlertTurnOn.failed,
+      );
+      expect(scheduler.scheduled, isFalse);
+    });
+
+    test('turning it off survives a phone that cannot cancel', () async {
+      scheduler.failWith = StateError('nothing to cancel');
+      await service.turnOff();
     });
 
     test('turning it off cancels the check', () async {

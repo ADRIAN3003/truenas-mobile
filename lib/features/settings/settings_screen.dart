@@ -276,12 +276,20 @@ class _NotificationsCard extends ConsumerWidget {
               final servers = ref.read(instancesProvider).value ?? const [];
               final messenger = ScaffoldMessenger.of(context);
               final denied = l10n.settingsAlertPermissionDenied;
+              final failed = l10n.settingsAlertScheduleFailed;
               if (on) {
-                if (!await service.turnOn(
+                final result = await service.turnOn(
                   servers,
                   level: settings.alertLevel,
-                )) {
-                  messenger.showSnackBar(SnackBar(content: Text(denied)));
+                );
+                if (result != AlertTurnOn.on) {
+                  messenger.showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        result == AlertTurnOn.denied ? denied : failed,
+                      ),
+                    ),
+                  );
                   return;
                 }
               } else {

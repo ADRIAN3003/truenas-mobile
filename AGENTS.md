@@ -180,7 +180,12 @@ README covers what the app does; this file covers how to work on it.
   the check can read the servers while the phone is locked. Native bits: iOS
   `UIBackgroundModes` fetch, `BGTaskSchedulerPermittedIdentifiers`, and
   `AppDelegate` (`setPluginRegistrantCallback`, `registerLaunchHandlers`, needed
-  with the scene lifecycle); Android `POST_NOTIFICATIONS`, core library
+  with the scene lifecycle, and `registerPeriodicTask(withIdentifier:)` for the
+  alert task: iOS only takes a BGTask handler registered before launch ends, a
+  later `BGTaskScheduler.register` (what Dart's `registerPeriodicTask` does the
+  first time) raises an exception that kills the app, so the id in `AppDelegate`,
+  `Info.plist` and `_taskName` must match); `turnOn` never throws, it returns
+  an `AlertTurnOn`; Android `POST_NOTIFICATIONS`, core library
   desugaring, and the `ic_stat_alert` icon kept by `res/raw/keep.xml`. Tests
   fake the phone with `FakeAlertNotifier`/`FakeBackgroundScheduler`
   (`test/support/alert_fakes.dart`) and the service provider is off unless

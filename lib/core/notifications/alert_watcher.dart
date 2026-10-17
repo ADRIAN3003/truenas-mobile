@@ -5,6 +5,7 @@ import '../instances/instance_repository.dart';
 import '../instances/server_instance.dart';
 import '../models/alert.dart';
 import '../session/truenas_session.dart';
+import 'alert_kind_catalog.dart';
 
 /// Shows alerts on the phone. The real one is `LocalAlertNotifier`; tests use
 /// a fake.
@@ -74,35 +75,48 @@ class AlertWatcher {
   /// above [minimum]. With [notify] off the alerts are only recorded as seen
   /// (used when the feature is turned on, so old alerts stay quiet).
   ///
+  /// Alerts whose kind is in [muted] are recorded as seen but not announced.
+  ///
   /// A server that cannot be reached is skipped and tried again next time.
   Future<void> check(
     List<ServerInstance> servers, {
     required AlertSeverity minimum,
     bool notify = true,
+    Set<String> muted = const {},
   }) async {
     final seen = await _load();
     final next = <String, Set<String>>{};
+    final kinds = <AlertKind>[];
     await Future.wait([
       for (final server in servers)
-        _checkOne(server, seen[server.id], minimum, notify).then((ids) {
+        _checkOne(server, seen[server.id], minimum, notify, muted).then((
+          result,
+        ) {
           // Unreachable: keep what was known.
-          final known = ids ?? seen[server.id];
+          final known = result?.ids ?? seen[server.id];
           if (known != null) next[server.id] = known;
+          if (result != null) kinds.addAll(result.kinds);
         }),
     ]);
+    try {
+      await AlertKindCatalog(store).record(kinds);
+    } catch (_) {
+      // The list in Settings is a convenience; the check goes on.
+    }
     await store.write(
       _key,
       jsonEncode({for (final e in next.entries) e.key: e.value.toList()}),
     );
   }
 
-  /// The ids of the alerts that are active now, or null when the server could
-  /// not be checked (so nothing is forgotten).
-  Future<Set<String>?> _checkOne(
+  /// The ids of the alerts that are active now and the kinds of alert met, or
+  /// null when the server could not be checked (so nothing is forgotten).
+  Future<({Set<String> ids, List<AlertKind> kinds})?> _checkOne(
     ServerInstance server,
     Set<String>? seen,
     AlertSeverity minimum,
     bool notify,
+    Set<String> muted,
   ) async {
     TrueNasSession? session;
     try {
@@ -116,11 +130,23 @@ class AlertWatcher {
         if (notify && seen != null)
           for (final alert in active)
             if (!seen.contains(alert.id) &&
+                !muted.contains(alert.klass) &&
                 alert.level.severity.index >= minimum.index)
               alert,
       ];
+      // Before anything is shown: a slow answer here must not leave the
+      // alerts shown but not recorded.
+      final listed = await session.alertKinds().timeout(
+        timeout,
+        onTimeout: () => const [],
+      );
       if (fresh.isNotEmpty) await _show(server, fresh);
-      return {for (final alert in active) alert.id};
+      final kinds = [
+        for (final alert in alerts)
+          if (alert.klass.isNotEmpty) AlertKind(alert.klass),
+        ...listed,
+      ];
+      return (ids: {for (final alert in active) alert.id}, kinds: kinds);
     } catch (_) {
       return null;
     } finally {

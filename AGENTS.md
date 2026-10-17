@@ -179,6 +179,14 @@ README covers what the app does; this file covers how to work on it.
   fake the phone with `FakeAlertNotifier`/`FakeBackgroundScheduler`
   (`test/support/alert_fakes.dart`) and the service provider is off unless
   `main` overrides it.
+- Alert types can be muted (`mutedAlertKinds`, the alert's `klass`, global not
+  per server). `AlertWatcher` still records muted alerts as seen, so
+  unmuting never replays old ones. The list for Settings > Notifications >
+  Alert types is `AlertKindCatalog` (`alertkinds.v1`), filled by each check
+  from `alert.list_categories` (titles and categories, optional on a server)
+  and from the alerts seen; muting also works from the menu on an alert in the
+  Alerts tab. The live job progress switch (`liveJobs`) sits in the same
+  Notifications section.
 - Apps tab bulk actions hand the work to the server as one `core.bulk` job
   (what the web UI's "Update All" does), so it carries on when the app is
   closed: "Update all", or Select, tick apps, then Update, Start, Stop or

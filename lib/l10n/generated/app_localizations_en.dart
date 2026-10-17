@@ -1984,6 +1984,53 @@ class AppLocalizationsEn extends AppLocalizations {
       'Checks your servers in the background about every 15 minutes and notifies you of new alerts.';
 
   @override
+  String get settingsAlertKinds => 'Alert types';
+
+  @override
+  String settingsAlertKindsMuted(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count off',
+      zero: 'All on',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get alertKindsTitle => 'Alert types';
+
+  @override
+  String get alertKindsHint =>
+      'Switch off the types of alert you don\'t want a notification for. They still show in the Alerts list.';
+
+  @override
+  String get alertKindsEmpty =>
+      'Alert types appear here after the first background check of a server.';
+
+  @override
+  String get alertKindsSearch => 'Search';
+
+  @override
+  String get alertKindsOther => 'Other';
+
+  @override
+  String get alertMuteKind => 'Don\'t notify for this type';
+
+  @override
+  String get alertUnmuteKind => 'Notify for this type again';
+
+  @override
+  String alertKindMuted(String kind) {
+    return 'No more notifications for \"$kind\"';
+  }
+
+  @override
+  String alertKindUnmuted(String kind) {
+    return 'Notifications for \"$kind\" are back';
+  }
+
+  @override
   String get settingsAlertLevel => 'Notify for';
 
   @override

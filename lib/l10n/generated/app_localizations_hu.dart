@@ -1981,6 +1981,53 @@ class AppLocalizationsHu extends AppLocalizations {
       'A háttérben kb. 15 percenként ellenőrzi a szervereidet, és értesít az új riasztásokról.';
 
   @override
+  String get settingsAlertKinds => 'Riasztástípusok';
+
+  @override
+  String settingsAlertKindsMuted(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count ki',
+      zero: 'Mind be',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get alertKindsTitle => 'Riasztástípusok';
+
+  @override
+  String get alertKindsHint =>
+      'Kapcsold ki azokat a riasztástípusokat, amikről nem kérsz értesítést. A Riasztások listában továbbra is látszanak.';
+
+  @override
+  String get alertKindsEmpty =>
+      'A riasztástípusok egy szerver első háttérellenőrzése után jelennek meg itt.';
+
+  @override
+  String get alertKindsSearch => 'Keresés';
+
+  @override
+  String get alertKindsOther => 'Egyéb';
+
+  @override
+  String get alertMuteKind => 'Ne értesítsen erről a típusról';
+
+  @override
+  String get alertUnmuteKind => 'Értesítsen újra erről a típusról';
+
+  @override
+  String alertKindMuted(String kind) {
+    return 'Nincs több értesítés ebből: \"$kind\"';
+  }
+
+  @override
+  String alertKindUnmuted(String kind) {
+    return 'Újra értesítést kapsz ebből: \"$kind\"';
+  }
+
+  @override
   String get settingsAlertLevel => 'Értesítés ettől';
 
   @override

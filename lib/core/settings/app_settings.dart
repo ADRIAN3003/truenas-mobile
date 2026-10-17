@@ -22,6 +22,7 @@ class AppSettings {
     this.liveJobs = true,
     this.alertNotifications = false,
     this.alertLevel = AlertSeverity.critical,
+    this.mutedAlertKinds = const {},
   });
 
   factory AppSettings.fromJson(Map<String, dynamic> json) => AppSettings(
@@ -44,6 +45,10 @@ class AppSettings {
     alertLevel:
         AlertSeverity.values.asNameMap()[json['alertLevel']] ??
         AlertSeverity.critical,
+    mutedAlertKinds: {
+      for (final id in (json['mutedAlertKinds'] as List?) ?? const [])
+        if (id is String && id.isNotEmpty) id,
+    },
   );
 
   /// Language codes the app is translated into.
@@ -98,6 +103,10 @@ class AppSettings {
   /// offered: it would only ever be noise.
   final AlertSeverity alertLevel;
 
+  /// The kinds of alert (`AlertKind.id`) the user does not want a
+  /// notification for. They still show in the Alerts list.
+  final Set<String> mutedAlertKinds;
+
   AppSettings copyWith({
     ThemeChoice? theme,
     String? Function()? language,
@@ -112,6 +121,7 @@ class AppSettings {
     bool? liveJobs,
     bool? alertNotifications,
     AlertSeverity? alertLevel,
+    Set<String>? mutedAlertKinds,
   }) => AppSettings(
     theme: theme ?? this.theme,
     language: language != null ? language() : this.language,
@@ -130,6 +140,7 @@ class AppSettings {
     liveJobs: liveJobs ?? this.liveJobs,
     alertNotifications: alertNotifications ?? this.alertNotifications,
     alertLevel: alertLevel ?? this.alertLevel,
+    mutedAlertKinds: mutedAlertKinds ?? this.mutedAlertKinds,
   );
 
   Map<String, dynamic> toJson() => {
@@ -146,6 +157,7 @@ class AppSettings {
     'liveJobs': liveJobs,
     'alertNotifications': alertNotifications,
     'alertLevel': alertLevel.name,
+    'mutedAlertKinds': mutedAlertKinds.toList()..sort(),
   };
 }
 

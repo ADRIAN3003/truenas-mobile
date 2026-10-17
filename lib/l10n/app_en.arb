@@ -2728,6 +2728,65 @@
   "@settingsAlertNotificationsHintAndroid": {
     "description": "Subtitle of the alert notifications switch on Android."
   },
+  "settingsAlertKinds": "Alert types",
+  "@settingsAlertKinds": {
+    "description": "Settings row: choose which kinds of alert notify."
+  },
+  "settingsAlertKindsMuted": "{count, plural, =0{All on} other{{count} off}}",
+  "@settingsAlertKindsMuted": {
+    "description": "Value of the Alert types row: how many kinds are switched off.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "alertKindsTitle": "Alert types",
+  "@alertKindsTitle": {
+    "description": "Title of the screen that lists the kinds of alert."
+  },
+  "alertKindsHint": "Switch off the types of alert you don't want a notification for. They still show in the Alerts list.",
+  "@alertKindsHint": {
+    "description": "Explains the alert types screen."
+  },
+  "alertKindsEmpty": "Alert types appear here after the first background check of a server.",
+  "@alertKindsEmpty": {
+    "description": "Empty state of the alert types screen."
+  },
+  "alertKindsSearch": "Search",
+  "@alertKindsSearch": {
+    "description": "Hint of the search box on the alert types screen."
+  },
+  "alertKindsOther": "Other",
+  "@alertKindsOther": {
+    "description": "Group for alert types TrueNAS did not sort into a category."
+  },
+  "alertMuteKind": "Don't notify for this type",
+  "@alertMuteKind": {
+    "description": "Alert menu entry: stop notifications for this kind of alert."
+  },
+  "alertUnmuteKind": "Notify for this type again",
+  "@alertUnmuteKind": {
+    "description": "Alert menu entry: bring notifications for this kind of alert back."
+  },
+  "alertKindMuted": "No more notifications for \"{kind}\"",
+  "@alertKindMuted": {
+    "description": "Snackbar after muting a kind of alert.",
+    "placeholders": {
+      "kind": {
+        "type": "String"
+      }
+    }
+  },
+  "alertKindUnmuted": "Notifications for \"{kind}\" are back",
+  "@alertKindUnmuted": {
+    "description": "Snackbar after un-muting a kind of alert.",
+    "placeholders": {
+      "kind": {
+        "type": "String"
+      }
+    }
+  },
   "settingsAlertLevel": "Notify for",
   "@settingsAlertLevel": {
     "description": "Setting: the lowest alert level that sends a notification."

@@ -7,6 +7,7 @@ import '../instances/instance_repository.dart';
 import '../instances/server_instance.dart';
 import '../models/alert.dart';
 import '../settings/app_settings.dart';
+import 'alert_kind_catalog.dart';
 import 'alert_watcher.dart';
 import 'local_alert_notifier.dart';
 
@@ -107,7 +108,11 @@ Future<void> runBackgroundAlertCheck({
               : PlatformDispatcher.instance.locale,
         ),
   );
-  await watcher.check(servers, minimum: settings.alertLevel);
+  await watcher.check(
+    servers,
+    minimum: settings.alertLevel,
+    muted: settings.mutedAlertKinds,
+  );
 }
 
 /// Turns the background alert check on and off.
@@ -123,6 +128,9 @@ class AlertNotificationService {
   final KeyValueStore store;
 
   bool get isSupported => scheduler.isSupported;
+
+  /// The kinds of alert met so far, for Settings.
+  AlertKindCatalog get kinds => AlertKindCatalog(store);
 
   /// Asks the phone for permission, then schedules the check. False (and
   /// nothing scheduled) when the user does not allow notifications.

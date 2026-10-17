@@ -1,26 +1,37 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/misc.dart' show Override;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:truenas_mobile/core/instances/server_instance.dart';
+import 'package:truenas_mobile/core/notifications/background_alerts.dart';
 import 'package:truenas_mobile/core/session/truenas_session.dart';
+import 'package:truenas_mobile/core/settings/app_settings.dart';
+import 'package:truenas_mobile/core/settings/settings_provider.dart';
 import 'package:truenas_mobile/features/server/alerts_tab.dart';
 import 'package:truenas_mobile/features/server/dashboard_tab.dart';
 import 'package:truenas_mobile/features/server/jobs_tab.dart';
 import 'package:truenas_mobile/l10n/generated/app_localizations.dart';
 import 'package:truenas_mobile/shared/ui.dart';
 
+import '../../support/alert_fakes.dart';
 import '../../support/fake_truenas_server.dart';
+import '../../support/memory_store.dart';
 
 void main() {
   late FakeTrueNasServer server;
   late TrueNasSession session;
 
-  Widget wrap(Widget child) => MaterialApp(
-    localizationsDelegates: AppLocalizations.localizationsDelegates,
-    supportedLocales: AppLocalizations.supportedLocales,
-    home: Scaffold(body: child),
-  );
+  Widget wrap(Widget child, {List<Override> overrides = const []}) =>
+      ProviderScope(
+        overrides: overrides,
+        child: MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: Scaffold(body: child),
+        ),
+      );
 
   /// Lets real socket traffic happen, then rebuilds.
   Future<void> settle(WidgetTester tester) async {
@@ -107,6 +118,60 @@ void main() {
     await settle(tester);
     expect(server.alerts.first['dismissed'], isTrue);
     expect(find.text('No active alerts'), findsOneWidget);
+    await disconnect(tester);
+  });
+
+  testWidgets('a kind of alert can be muted and unmuted', (tester) async {
+    await connect(tester);
+    final container = ProviderContainer(
+      overrides: [
+        settingsRepositoryProvider.overrideWithValue(
+          SettingsRepository(MemoryStore()),
+        ),
+        alertNotificationServiceProvider.overrideWithValue(
+          AlertNotificationService(
+            scheduler: FakeBackgroundScheduler(),
+            notifier: FakeAlertNotifier(),
+            store: MemoryStore(),
+          ),
+        ),
+      ],
+    );
+    addTearDown(container.dispose);
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: Scaffold(body: AlertsTab(session: session)),
+        ),
+      ),
+    );
+    await settle(tester);
+
+    await tester.tap(find.byType(PopupMenuButton<bool>).first);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text("Don't notify for this type"));
+    await tester.pumpAndSettle();
+    expect(container.read(settingsProvider).mutedAlertKinds, {'PoolStatus'});
+    expect(find.textContaining('No more notifications'), findsOneWidget);
+
+    await tester.tap(find.byType(PopupMenuButton<bool>).first);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Notify for this type again'));
+    await tester.pumpAndSettle();
+    expect(container.read(settingsProvider).mutedAlertKinds, isEmpty);
+    await disconnect(tester);
+  });
+
+  testWidgets('there is no mute menu where alerts do not notify', (
+    tester,
+  ) async {
+    await connect(tester);
+    await tester.pumpWidget(wrap(AlertsTab(session: session)));
+    await settle(tester);
+    expect(find.byType(PopupMenuButton<bool>), findsNothing);
     await disconnect(tester);
   });
 

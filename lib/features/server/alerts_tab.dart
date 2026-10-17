@@ -1,11 +1,15 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import '../../core/models/alert.dart';
+import '../../core/notifications/background_alerts.dart';
+import '../../core/settings/settings_provider.dart';
 import '../../core/session/truenas_session.dart';
 import '../../l10n/generated/app_localizations.dart';
+import '../../shared/dialogs.dart';
 import '../../shared/theme.dart';
 import '../../shared/ui.dart';
 import '../../shared/widgets.dart';
@@ -13,16 +17,16 @@ import '../../shared/connect_dialogs.dart';
 import '../../shared/viz_colors.dart';
 
 /// Active and dismissed alerts, updated live.
-class AlertsTab extends StatefulWidget {
+class AlertsTab extends ConsumerStatefulWidget {
   const AlertsTab({super.key, required this.session});
 
   final TrueNasSession session;
 
   @override
-  State<AlertsTab> createState() => _AlertsTabState();
+  ConsumerState<AlertsTab> createState() => _AlertsTabState();
 }
 
-class _AlertsTabState extends State<AlertsTab> {
+class _AlertsTabState extends ConsumerState<AlertsTab> {
   List<TrueNasAlert>? _alerts;
   Object? _error;
   StreamSubscription<Object?>? _changes;
@@ -78,9 +82,40 @@ class _AlertsTabState extends State<AlertsTab> {
     }
   }
 
+  /// Stops (or brings back) notifications for the kind of [alert].
+  Future<void> _toggleMute(TrueNasAlert alert) async {
+    final messenger = ScaffoldMessenger.of(context);
+    final l10n = AppLocalizations.of(context);
+    final label = AlertKind(alert.klass).label;
+    final mute = !ref
+        .read(settingsProvider)
+        .mutedAlertKinds
+        .contains(alert.klass);
+    await ref
+        .read(settingsProvider.notifier)
+        .update(
+          (s) => s.copyWith(
+            mutedAlertKinds: {
+              for (final id in s.mutedAlertKinds)
+                if (id != alert.klass) id,
+              if (mute) alert.klass,
+            },
+          ),
+        );
+    messenger.showSnackBar(
+      SnackBar(
+        content: Text(
+          mute ? l10n.alertKindMuted(label) : l10n.alertKindUnmuted(label),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final canMute = ref.watch(alertNotificationServiceProvider).isSupported;
+    final muted = ref.watch(settingsProvider.select((s) => s.mutedAlertKinds));
     final alerts = _alerts;
     if (alerts == null) {
       return Center(
@@ -105,10 +140,22 @@ class _AlertsTabState extends State<AlertsTab> {
                 ),
                 title: Text(l10n.alertsNone),
               ),
-            for (final alert in active) _AlertTile(alert, onToggle: _toggle),
+            for (final alert in active)
+              _AlertTile(
+                alert,
+                onToggle: _toggle,
+                onToggleMute: canMute ? _toggleMute : null,
+                muted: muted.contains(alert.klass),
+              ),
           ]),
           ...groupedSection(l10n.alertsDismissed, indent: 72, [
-            for (final alert in dismissed) _AlertTile(alert, onToggle: _toggle),
+            for (final alert in dismissed)
+              _AlertTile(
+                alert,
+                onToggle: _toggle,
+                onToggleMute: canMute ? _toggleMute : null,
+                muted: muted.contains(alert.klass),
+              ),
           ]),
         ],
       ),
@@ -117,10 +164,22 @@ class _AlertsTabState extends State<AlertsTab> {
 }
 
 class _AlertTile extends StatelessWidget {
-  const _AlertTile(this.alert, {required this.onToggle});
+  const _AlertTile(
+    this.alert, {
+    required this.onToggle,
+    required this.onToggleMute,
+    required this.muted,
+  });
 
   final TrueNasAlert alert;
   final ValueChanged<TrueNasAlert> onToggle;
+
+  /// Stops or brings back notifications for this kind of alert; null where
+  /// the phone shows no alert notifications.
+  final ValueChanged<TrueNasAlert>? onToggleMute;
+
+  /// Whether notifications for this kind of alert are off.
+  final bool muted;
 
   @override
   Widget build(BuildContext context) {
@@ -160,9 +219,26 @@ class _AlertTile extends StatelessWidget {
         title: Text(alert.plainMessage),
         subtitle: Text(meta),
         isThreeLine: alert.plainMessage.length > 60,
-        trailing: TextButton(
-          onPressed: () => onToggle(alert),
-          child: Text(alert.dismissed ? l10n.alertRestore : l10n.alertDismiss),
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextButton(
+              onPressed: () => onToggle(alert),
+              child: Text(
+                alert.dismissed ? l10n.alertRestore : l10n.alertDismiss,
+              ),
+            ),
+            if (onToggleMute != null && alert.klass.isNotEmpty)
+              AppPopupMenu<bool>(
+                entries: [
+                  menuEntry(
+                    true,
+                    muted ? l10n.alertUnmuteKind : l10n.alertMuteKind,
+                  ),
+                ],
+                onSelected: (_) => onToggleMute!(alert),
+              ),
+          ],
         ),
       ),
     );

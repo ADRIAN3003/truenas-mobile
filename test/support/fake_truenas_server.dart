@@ -50,6 +50,18 @@ class FakeTrueNasServer {
     },
   ];
 
+  /// Served by `alert.list_categories`: the kinds of alert, by category.
+  final alertCategories = <Map<String, dynamic>>[
+    {
+      'id': 'STORAGE',
+      'title': 'Storage',
+      'classes': [
+        {'id': 'PoolStatus', 'title': 'Pool Status', 'level': 'CRITICAL'},
+        {'id': 'ScrubPaused', 'title': 'Scrub Paused', 'level': 'WARNING'},
+      ],
+    },
+  ];
+
   /// Service that holds snapshot methods: `pool.snapshot` (25.10+) or
   /// `zfs.snapshot` (25.04).
   String snapshotService = 'pool.snapshot';
@@ -984,6 +996,8 @@ class FakeTrueNasServer {
             result = {'sda': 34, 'nvme0n1': null};
           case 'alert.list':
             result = alerts;
+          case 'alert.list_categories':
+            result = alertCategories;
           case 'alert.dismiss' || 'alert.restore':
             final alert = alerts.firstWhere((a) => a['uuid'] == params.first);
             alert['dismissed'] = message['method'] == 'alert.dismiss';

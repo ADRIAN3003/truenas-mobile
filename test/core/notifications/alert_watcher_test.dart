@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:truenas_mobile/core/instances/instance_repository.dart';
 import 'package:truenas_mobile/core/instances/server_instance.dart';
 import 'package:truenas_mobile/core/models/alert.dart';
+import 'package:truenas_mobile/core/notifications/alert_kind_catalog.dart';
 import 'package:truenas_mobile/core/notifications/alert_watcher.dart';
 import 'package:truenas_mobile/core/notifications/background_alerts.dart';
 import 'package:truenas_mobile/core/settings/app_settings.dart';
@@ -39,7 +40,8 @@ void main() {
     List<ServerInstance> servers, {
     AlertSeverity minimum = AlertSeverity.critical,
     bool notify = true,
-  }) => watcher.check(servers, minimum: minimum, notify: notify);
+    Set<String> muted = const {},
+  }) => watcher.check(servers, minimum: minimum, notify: notify, muted: muted);
 
   test('the first look at a server only records what is there', () async {
     await check([home()]);
@@ -163,6 +165,82 @@ void main() {
     expect(
       (jsonDecode(store.values['alertwatch.v1']!) as Map).keys,
       isNot(contains('2')),
+    );
+  });
+
+  group('alert kinds', () {
+    test('a muted kind is not announced, others still are', () async {
+      await check([home()], muted: {'Noisy'});
+      server.alerts.addAll([
+        alertJson('n1', klass: 'Noisy'),
+        alertJson('q1', klass: 'Quiet'),
+      ]);
+      await check([home()], muted: {'Noisy'});
+      expect(notifier.shown, ['Home: q1']);
+    });
+
+    test('unmuting does not bring back what was skipped', () async {
+      await check([home()], muted: {'Noisy'});
+      server.alerts.add(alertJson('n1', klass: 'Noisy'));
+      await check([home()], muted: {'Noisy'});
+      await check([home()]);
+      expect(notifier.shown, isEmpty);
+      server.alerts.add(alertJson('n2', klass: 'Noisy'));
+      await check([home()]);
+      expect(notifier.shown, ['Home: n2']);
+    });
+
+    test('the kinds TrueNAS lists and the ones seen are remembered', () async {
+      server.alerts.add(alertJson('x1', klass: 'MadeUpKind'));
+      await check([home()]);
+      final kinds = await AlertKindCatalog(store).load();
+      expect(
+        kinds.map((k) => k.id),
+        containsAll(['PoolStatus', 'ScrubPaused']),
+      );
+      expect(kinds.map((k) => k.id), contains('MadeUpKind'));
+      final pool = kinds.firstWhere((k) => k.id == 'PoolStatus');
+      expect(pool.label, 'Pool Status');
+      expect(pool.category, 'Storage');
+      // A kind seen only in an alert is named from its id.
+      expect(
+        kinds.firstWhere((k) => k.id == 'MadeUpKind').label,
+        'Made Up Kind',
+      );
+    });
+
+    test('a server that cannot list kinds is still checked', () async {
+      server.alertCategories.clear();
+      await check([home()]);
+      server.alerts.add(alertJson('a3'));
+      await check([home()]);
+      expect(notifier.shown, ['Home: a3']);
+    });
+
+    test('names are made readable', () {
+      expect(humanizeAlertKind('PoolStatus'), 'Pool Status');
+      expect(humanizeAlertKind('SMART'), 'SMART');
+      expect(humanizeAlertKind('NVDIMMLifetime'), 'NVDIMM Lifetime');
+    });
+
+    test(
+      'the background check uses the muted kinds from the settings',
+      () async {
+        await InstanceRepository(store).save([home()]);
+        await SettingsRepository(store).save(
+          const AppSettings(
+            alertNotifications: true,
+            mutedAlertKinds: {'Noisy'},
+          ),
+        );
+        await runBackgroundAlertCheck(store: store, notifier: notifier);
+        server.alerts.addAll([
+          alertJson('n1', klass: 'Noisy'),
+          alertJson('q1', klass: 'Quiet'),
+        ]);
+        await runBackgroundAlertCheck(store: store, notifier: notifier);
+        expect(notifier.shown, ['Home: q1']);
+      },
     );
   });
 

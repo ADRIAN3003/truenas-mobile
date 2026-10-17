@@ -32,6 +32,7 @@ void main() {
       liveJobs: false,
       alertNotifications: true,
       alertLevel: AlertSeverity.warning,
+      mutedAlertKinds: {'PoolStatus', 'ScrubPaused'},
     );
     final back = AppSettings.fromJson(settings.toJson());
     expect(back.theme, ThemeChoice.dark);
@@ -47,6 +48,7 @@ void main() {
     expect(back.liveJobs, isFalse);
     expect(back.alertNotifications, isTrue);
     expect(back.alertLevel, AlertSeverity.warning);
+    expect(back.mutedAlertKinds, {'PoolStatus', 'ScrubPaused'});
   });
 
   test('unknown or missing values fall back to the defaults', () {
@@ -97,6 +99,13 @@ void main() {
     const settings = AppSettings();
     expect(settings.alertNotifications, isFalse);
     expect(settings.alertLevel, AlertSeverity.critical);
+    expect(settings.mutedAlertKinds, isEmpty);
+    expect(
+      AppSettings.fromJson(const {
+        'mutedAlertKinds': ['A', 3, ''],
+      }).mutedAlertKinds,
+      {'A'},
+    );
     final back = AppSettings.fromJson(const {'alertLevel': 'loud'});
     expect(back.alertLevel, AlertSeverity.critical);
   });

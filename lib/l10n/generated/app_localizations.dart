@@ -4021,6 +4021,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Progress of scrubs, replications and updates'**
   String get jobsChannelDescription;
+
+  /// Title shown when the saved servers could not be read from secure storage.
+  ///
+  /// In en, this message translates to:
+  /// **'Can\'t read your saved servers'**
+  String get serversLoadErrorTitle;
+
+  /// Explains that a failed read deleted nothing and offers retry or clearing.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing was deleted. The phone\'s secure storage did not answer. Try again; if it keeps failing, clear the list and add your servers again.'**
+  String get serversLoadErrorBody;
+
+  /// Button that clears the saved servers when they cannot be read.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear saved servers'**
+  String get serversClearAction;
+
+  /// Title of the clear-all-servers confirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear saved servers?'**
+  String get serversClearTitle;
+
+  /// Body of the clear-all-servers confirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'Every server saved in this app is removed from it. Nothing changes on the servers themselves.'**
+  String get serversClearBody;
+
+  /// Confirm button of the clear-all-servers dialog.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear'**
+  String get serversClearConfirm;
+
+  /// Snackbar when saving a server to secure storage failed.
+  ///
+  /// In en, this message translates to:
+  /// **'The server could not be saved: {error}'**
+  String serverSaveFailed(String error);
 }
 
 class _AppLocalizationsDelegate

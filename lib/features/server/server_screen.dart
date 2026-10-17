@@ -110,7 +110,12 @@ class _ServerScreenState extends ConsumerState<ServerScreen>
       )..start();
       if (updated.pinnedFingerprint != instance.pinnedFingerprint ||
           updated.lastApiVersion != instance.lastApiVersion) {
-        await ref.read(instancesProvider.notifier).upsert(updated);
+        // Remembering the pin is a courtesy; failing to save it must not
+        // fail a connection that worked.
+        await ref
+            .read(instancesProvider.notifier)
+            .upsert(updated)
+            .catchError((_) {});
       }
       final info = await session.systemInfo();
       if (mounted) setState(() => _info = info);

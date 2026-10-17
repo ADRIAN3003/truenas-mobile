@@ -186,6 +186,13 @@ README covers what the app does; this file covers how to work on it.
   the job (`AppBulkRun`, found again on open via
   `WorkloadsApi.activeBulkRun`); its id is `AppBulkRun.jobId`. Gated on
   `core.bulk`. Tests: `FakeTrueNasServer.holdBulk` keeps a job running.
+- Saved servers live in secure storage (`SecureKeyValueStore`). Its Android
+  default `resetOnError: true` erases everything when one read fails, so it is
+  off; a failed read is retried, then shown as an error with Try again and
+  Clear (`InstancesNotifier`), and a list that could not be read is never saved
+  over. Changes to the list run through one queue. The encrypted prefs are
+  excluded from Android backups (`backup_rules.xml`, `data_extraction_rules.xml`)
+  since the Keystore key does not travel.
 - Android release APKs must be signed with a fixed key, or Android refuses
   to install one over another ("app not updated"). `release.yml` signs with
   the four `ANDROID_*` secrets; `tools/make-android-keystore.sh` makes them.

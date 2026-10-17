@@ -3258,5 +3258,38 @@
   "jobsChannelDescription": "Progress of scrubs, replications and updates",
   "@jobsChannelDescription": {
     "description": "Android notification channel description."
+  },
+  "serversLoadErrorTitle": "Can't read your saved servers",
+  "@serversLoadErrorTitle": {
+    "description": "Title shown when the saved servers could not be read from secure storage."
+  },
+  "serversLoadErrorBody": "Nothing was deleted. The phone's secure storage did not answer. Try again; if it keeps failing, clear the list and add your servers again.",
+  "@serversLoadErrorBody": {
+    "description": "Explains that a failed read deleted nothing and offers retry or clearing."
+  },
+  "serversClearAction": "Clear saved servers",
+  "@serversClearAction": {
+    "description": "Button that clears the saved servers when they cannot be read."
+  },
+  "serversClearTitle": "Clear saved servers?",
+  "@serversClearTitle": {
+    "description": "Title of the clear-all-servers confirmation."
+  },
+  "serversClearBody": "Every server saved in this app is removed from it. Nothing changes on the servers themselves.",
+  "@serversClearBody": {
+    "description": "Body of the clear-all-servers confirmation."
+  },
+  "serversClearConfirm": "Clear",
+  "@serversClearConfirm": {
+    "description": "Confirm button of the clear-all-servers dialog."
+  },
+  "serverSaveFailed": "The server could not be saved: {error}",
+  "@serverSaveFailed": {
+    "description": "Snackbar when saving a server to secure storage failed.",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
   }
 }

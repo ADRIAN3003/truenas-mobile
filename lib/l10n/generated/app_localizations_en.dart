@@ -2428,4 +2428,29 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get jobsChannelDescription =>
       'Progress of scrubs, replications and updates';
+
+  @override
+  String get serversLoadErrorTitle => 'Can\'t read your saved servers';
+
+  @override
+  String get serversLoadErrorBody =>
+      'Nothing was deleted. The phone\'s secure storage did not answer. Try again; if it keeps failing, clear the list and add your servers again.';
+
+  @override
+  String get serversClearAction => 'Clear saved servers';
+
+  @override
+  String get serversClearTitle => 'Clear saved servers?';
+
+  @override
+  String get serversClearBody =>
+      'Every server saved in this app is removed from it. Nothing changes on the servers themselves.';
+
+  @override
+  String get serversClearConfirm => 'Clear';
+
+  @override
+  String serverSaveFailed(String error) {
+    return 'The server could not be saved: $error';
+  }
 }

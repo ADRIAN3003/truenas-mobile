@@ -15,13 +15,17 @@ final instancesProvider =
     );
 
 class InstancesNotifier extends AsyncNotifier<List<ServerInstance>> {
+  /// Changes run one after the other, each on the list the one before left,
+  /// so two saves close together (a new server and a refreshed certificate
+  /// pin) cannot overwrite each other.
+  Future<void> _queue = Future.value();
+
   @override
   Future<List<ServerInstance>> build() =>
       ref.read(instanceRepositoryProvider).load();
 
   /// Adds [instance], or replaces the saved one with the same id.
-  Future<void> upsert(ServerInstance instance) async {
-    final current = await future;
+  Future<void> upsert(ServerInstance instance) => _change((current) {
     final index = current.indexWhere((e) => e.id == instance.id);
     final next = [...current];
     if (index == -1) {
@@ -29,12 +33,43 @@ class InstancesNotifier extends AsyncNotifier<List<ServerInstance>> {
     } else {
       next[index] = instance;
     }
-    await _persist(next);
+    return next;
+  });
+
+  Future<void> remove(String id) =>
+      _change((current) => current.where((e) => e.id != id).toList());
+
+  /// Reads the saved servers again after a failed read.
+  void retry() => ref.invalidateSelf();
+
+  /// Forgets every saved server, for when they cannot be read at all.
+  Future<void> clear() async {
+    final result = _queue.then((_) => _persist(const []));
+    _queue = result.catchError((_) {});
+    await result;
   }
 
-  Future<void> remove(String id) async {
-    final current = await future;
-    await _persist(current.where((e) => e.id != id).toList());
+  Future<void> _change(
+    List<ServerInstance> Function(List<ServerInstance> current) edit,
+  ) {
+    final result = _queue.then((_) async {
+      await _persist(edit(await _current()));
+    });
+    _queue = result.catchError((_) {});
+    return result;
+  }
+
+  /// The saved servers. When the first read failed it is tried again here
+  /// and, if that fails too, the error is thrown: a list that could not be
+  /// read is never replaced by one that has only the new server.
+  Future<List<ServerInstance>> _current() async {
+    try {
+      return await future;
+    } catch (_) {
+      final loaded = await ref.read(instanceRepositoryProvider).load();
+      state = AsyncData(loaded);
+      return loaded;
+    }
   }
 
   Future<void> _persist(List<ServerInstance> next) async {

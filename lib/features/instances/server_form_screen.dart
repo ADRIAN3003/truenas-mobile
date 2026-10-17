@@ -108,7 +108,17 @@ class _ServerFormScreenState extends ConsumerState<ServerFormScreen> {
     if (previous != null && previous.url != instance.url) {
       instance = instance.copyWith(pinnedFingerprint: () => null);
     }
-    await ref.read(instancesProvider.notifier).upsert(instance);
+    final l10n = AppLocalizations.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    try {
+      await ref.read(instancesProvider.notifier).upsert(instance);
+    } catch (error) {
+      // Stay on the form so what was typed is not lost.
+      messenger.showSnackBar(
+        SnackBar(content: Text(l10n.serverSaveFailed('$error'))),
+      );
+      return;
+    }
     if (mounted) Navigator.pop(context);
   }
 

@@ -7,12 +7,14 @@ import 'package:truenas_mobile/app.dart';
 import 'package:truenas_mobile/core/instances/instance_repository.dart';
 import 'package:truenas_mobile/core/instances/instances_provider.dart';
 import 'package:truenas_mobile/core/instances/server_instance.dart';
+import 'package:truenas_mobile/core/security/biometric_auth.dart';
 import 'package:truenas_mobile/core/settings/app_settings.dart';
 import 'package:truenas_mobile/core/settings/settings_provider.dart';
 import 'package:truenas_mobile/core/settings/system_language.dart';
 import 'package:truenas_mobile/features/updates/updates_provider.dart';
 import 'package:truenas_mobile/shared/haptics.dart';
 
+import '../../support/biometric_fakes.dart';
 import '../../support/language_fakes.dart';
 import '../../support/memory_store.dart';
 import '../../support/update_fakes.dart';
@@ -366,6 +368,89 @@ void main() {
       expect(find.text('AB:CD:EF'), findsNothing);
       final servers = await InstanceRepository(serverStore).load();
       expect(servers.firstWhere((s) => s.id == 'a').pinnedFingerprint, isNull);
+    });
+  });
+
+  group('app lock', () {
+    testWidgets('is not offered on a phone that cannot ask', (tester) async {
+      await open(
+        tester,
+        overrides: [
+          biometricAuthProvider.overrideWithValue(
+            FakeBiometricAuth(available: false),
+          ),
+        ],
+      );
+      expect(find.text('App lock'), findsNothing);
+    });
+
+    testWidgets('turns on after the phone confirms, and names Face ID', (
+      tester,
+    ) async {
+      final auth = FakeBiometricAuth();
+      await open(
+        tester,
+        overrides: [biometricAuthProvider.overrideWithValue(auth)],
+      );
+      expect(find.textContaining('Face ID'), findsOneWidget);
+      await tester.tap(find.text('App lock'));
+      await tester.pumpAndSettle();
+      expect(auth.prompts, hasLength(1));
+      expect((await saved()).appLock, isTrue);
+    });
+
+    testWidgets('stays off when the prompt is cancelled', (tester) async {
+      final auth = FakeBiometricAuth(passes: false);
+      await open(
+        tester,
+        overrides: [biometricAuthProvider.overrideWithValue(auth)],
+      );
+      await tester.tap(find.text('App lock'));
+      await tester.pumpAndSettle();
+      expect(auth.prompts, hasLength(1));
+      expect((await saved()).appLock, isFalse);
+    });
+
+    testWidgets('asks again before turning off', (tester) async {
+      final auth = FakeBiometricAuth(biometric: BiometricKind.fingerprint);
+      await open(
+        tester,
+        overrides: [
+          biometricAuthProvider.overrideWithValue(auth),
+          initialSettingsProvider.overrideWithValue(
+            const AppSettings(appLock: true),
+          ),
+        ],
+      );
+      expect(find.textContaining('fingerprint'), findsOneWidget);
+      auth.passes = false;
+      await tester.tap(find.text('App lock'));
+      await tester.pumpAndSettle();
+      expect(container.read(settingsProvider).appLock, isTrue);
+
+      auth.passes = true;
+      await tester.tap(find.text('App lock'));
+      await tester.pumpAndSettle();
+      expect(container.read(settingsProvider).appLock, isFalse);
+    });
+
+    testWidgets('can still be turned off once the phone cannot ask', (
+      tester,
+    ) async {
+      final auth = FakeBiometricAuth(available: false);
+      await open(
+        tester,
+        overrides: [
+          biometricAuthProvider.overrideWithValue(auth),
+          initialSettingsProvider.overrideWithValue(
+            const AppSettings(appLock: true),
+          ),
+        ],
+      );
+      await tester.tap(find.text('App lock'));
+      await tester.pumpAndSettle();
+      expect(auth.prompts, isEmpty);
+      expect(container.read(settingsProvider).appLock, isFalse);
     });
   });
 }

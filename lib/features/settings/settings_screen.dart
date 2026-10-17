@@ -5,6 +5,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/instances/default_server.dart';
 import '../../core/instances/instances_provider.dart';
+import '../../core/security/biometric_auth.dart';
 import '../../core/settings/app_settings.dart';
 import '../../core/settings/settings_provider.dart';
 import '../../core/settings/system_language.dart';
@@ -146,6 +147,13 @@ class SettingsScreen extends ConsumerWidget {
             ],
           ),
           SectionHeader(l10n.settingsSecurity),
+          // Shown while the phone can ask, and also while the lock is on so
+          // it can always be turned off.
+          if (ref.watch(biometricAvailableProvider).value == true ||
+              settings.appLock) ...[
+            const _AppLockTile(),
+            const SizedBox(height: 12),
+          ],
           GroupedCard(
             children: [
               NavRow(
@@ -221,6 +229,45 @@ class SettingsScreen extends ConsumerWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+/// The app lock switch. Changing it asks the phone for Face ID, a fingerprint
+/// or the passcode first, so nobody who picks up an unlocked phone can switch
+/// the lock off, and a lock that cannot be passed is never turned on.
+class _AppLockTile extends ConsumerWidget {
+  const _AppLockTile();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    final on = ref.watch(settingsProvider.select((s) => s.appLock));
+    final hint = switch (ref.watch(biometricKindProvider).value) {
+      BiometricKind.face => l10n.settingsAppLockHintFace,
+      BiometricKind.fingerprint => l10n.settingsAppLockHintFingerprint,
+      _ => l10n.settingsAppLockHintOther,
+    };
+    return GroupedCard(
+      indent: 16,
+      children: [
+        AppSwitchTile(
+          title: Text(l10n.settingsAppLock),
+          subtitle: Text(hint),
+          value: on,
+          onChanged: (next) async {
+            final auth = ref.read(biometricAuthProvider);
+            final notifier = ref.read(settingsProvider.notifier);
+            final reason = l10n.appLockChangeReason;
+            // With nothing left to ask (the biometrics were removed from the
+            // phone), turning the lock off must still be possible.
+            final canAsk = await auth.isAvailable();
+            if (canAsk && !await auth.authenticate(reason)) return;
+            if (!canAsk && next) return;
+            await notifier.update((s) => s.copyWith(appLock: next));
+          },
+        ),
+      ],
     );
   }
 }

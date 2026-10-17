@@ -6,6 +6,7 @@ import 'core/settings/settings_provider.dart';
 import 'core/settings/system_language.dart';
 import 'features/instances/instances_screen.dart';
 import 'features/instances/open_default_server.dart';
+import 'features/lock/app_lock_gate.dart';
 import 'features/updates/update_prompt.dart';
 import 'l10n/generated/app_localizations.dart';
 import 'shared/theme.dart';
@@ -34,6 +35,7 @@ class TrueNasMobileApp extends ConsumerWidget {
         ThemeChoice.light => ThemeMode.light,
         ThemeChoice.dark => ThemeMode.dark,
       },
+      builder: (context, child) => AppLockGate(child: child!),
       home: const UpdateAutoCheck(
         child: OpenDefaultServer(child: InstancesScreen()),
       ),

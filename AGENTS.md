@@ -131,6 +131,16 @@ README covers what the app does; this file covers how to work on it.
   `systemLanguagePageProvider`) and the stored `language` is ignored. Android
   12 and older, and tests, keep the in-app picker. A new language goes in the
   ARB files, `locales_config.xml` and `Info.plist`.
+- App lock (`lib/core/security/biometric_auth.dart`, `lib/features/lock/`):
+  setting `appLock`, off by default, offered in Settings > Security only when
+  `BiometricAuth.isAvailable` (a biometric or a passcode is set). `AppLockGate`
+  sits in `MaterialApp.builder`, above the navigator, and locks at start and on
+  `hidden`/`paused`; `inactive` only shows the cover so the app switcher
+  snapshot is blank. Changing the setting asks the phone first. `local_auth`
+  needs `FlutterFragmentActivity`, an AppCompat launch theme and `USE_BIOMETRIC`
+  on Android and `NSFaceIDUsageDescription` on iOS (all set). Tests use
+  `FakeBiometricAuth`; the default provider is `NoBiometricAuth`, `main`
+  overrides it.
 - Apps tab "Update all" upgrades the apps with updates one after another
   (`app.upgrade` is a job per app), after listing them in a confirmation.
 - Android release APKs must be signed with a fixed key, or Android refuses

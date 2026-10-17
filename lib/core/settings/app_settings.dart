@@ -17,6 +17,7 @@ class AppSettings {
     this.checkForUpdates = true,
     this.skippedVersion,
     this.defaultServerId,
+    this.appLock = false,
   });
 
   factory AppSettings.fromJson(Map<String, dynamic> json) => AppSettings(
@@ -33,6 +34,7 @@ class AppSettings {
     checkForUpdates: json['checkForUpdates'] as bool? ?? true,
     skippedVersion: json['skippedVersion'] as String?,
     defaultServerId: json['defaultServerId'] as String?,
+    appLock: json['appLock'] as bool? ?? false,
   );
 
   /// Language codes the app is translated into.
@@ -71,6 +73,10 @@ class AppSettings {
   /// default). See `defaultServer` in `default_server.dart`.
   final String? defaultServerId;
 
+  /// Ask for Face ID, a fingerprint or the device passcode when the app opens
+  /// and each time it comes back from the background.
+  final bool appLock;
+
   AppSettings copyWith({
     ThemeChoice? theme,
     String? Function()? language,
@@ -81,6 +87,7 @@ class AppSettings {
     bool? checkForUpdates,
     String? Function()? skippedVersion,
     String? Function()? defaultServerId,
+    bool? appLock,
   }) => AppSettings(
     theme: theme ?? this.theme,
     language: language != null ? language() : this.language,
@@ -95,6 +102,7 @@ class AppSettings {
     defaultServerId: defaultServerId != null
         ? defaultServerId()
         : this.defaultServerId,
+    appLock: appLock ?? this.appLock,
   );
 
   Map<String, dynamic> toJson() => {
@@ -107,6 +115,7 @@ class AppSettings {
     'checkForUpdates': checkForUpdates,
     'skippedVersion': skippedVersion,
     'defaultServerId': defaultServerId,
+    'appLock': appLock,
   };
 }
 

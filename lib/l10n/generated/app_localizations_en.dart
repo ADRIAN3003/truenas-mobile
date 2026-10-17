@@ -1973,6 +1973,36 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsSecurity => 'Security';
 
   @override
+  String get settingsAppLock => 'App lock';
+
+  @override
+  String get settingsAppLockHintFace =>
+      'Ask for Face ID or the device passcode when the app opens or comes back from the background.';
+
+  @override
+  String get settingsAppLockHintFingerprint =>
+      'Ask for a fingerprint or the device passcode when the app opens or comes back from the background.';
+
+  @override
+  String get settingsAppLockHintOther =>
+      'Ask for biometrics or the device passcode when the app opens or comes back from the background.';
+
+  @override
+  String get appLockReason => 'Unlock TrueNAS Mobile';
+
+  @override
+  String get appLockChangeReason => 'Confirm it\'s you to change the app lock';
+
+  @override
+  String get appLockTitle => 'TrueNAS Mobile is locked';
+
+  @override
+  String get appLockFailed => 'Not unlocked. Try again.';
+
+  @override
+  String get appLockUnlock => 'Unlock';
+
+  @override
   String get settingsCertificates => 'Trusted certificates';
 
   @override

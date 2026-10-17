@@ -66,6 +66,24 @@ understands, then discovers the available methods with `core.get_methods`, so
 features appear or hide based on what your server offers. The legacy REST API
 (removed in TrueNAS 26) is never used.
 
+## Supported phones
+
+| | Minimum | Recommended |
+|---|---|---|
+| iOS | 15.0 | 16.2 or newer, 26 for the design the app is drawn after |
+| Android | 7.0 (API 24) | 13 or newer, 16 for live updates |
+
+- **iOS 16.2** is needed for the Live Activity that shows job progress on the
+  lock screen.
+- **iOS 26** is the look the interface follows (liquid glass tab bar, alerts and
+  menus). The app draws that glass itself, so older versions get the same
+  layout.
+- **Android 13** adds the per-app language page and the notification
+  permission prompt. On Android 12 and older the language is picked inside the
+  app.
+- **Android 16** adds live updates, so job progress can show in the status bar
+  and on the lock screen. Older versions show a normal progress notification.
+
 ## Install
 
 Download the latest APK or IPA from the

@@ -20,6 +20,7 @@ enum WidgetTint {
   }
 }
 
+@available(iOS 17.0, *)
 struct StatusWidgetView: View {
   let entry: StatusEntry
   let section: WidgetSection

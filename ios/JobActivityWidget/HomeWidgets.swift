@@ -151,13 +151,3 @@ struct StatusWidget: Widget {
     .supportedFamilies(section.families)
   }
 }
-
-/// The widgets of the app, for the extension's bundle.
-@available(iOS 17.0, *)
-struct HomeWidgets: WidgetBundle {
-  var body: some Widget {
-    StatusWidget(section: .pools)
-    StatusWidget(section: .system)
-    StatusWidget(section: .alerts)
-  }
-}

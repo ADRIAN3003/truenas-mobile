@@ -18,6 +18,9 @@ for Android and iOS that talks to the official TrueNAS middleware API
 - **Dashboard:** live CPU, memory (with ARC), network and pool health, plus
   system info and an alert summary. Alerts can be dismissed and restored, and new ones can be sent to the
   phone as notifications (checked in the background, off by default).
+- **History:** CPU usage and temperature, network traffic per interface, disk
+  temperature per disk and the ZFS cache (ARC) over the last hour, day, week
+  or month, from the server's own reporting. Open it from the dashboard.
 - **Jobs:** running and recent jobs with progress, and abort. Scrubs,
   replications, app and system updates, cloud and rsync tasks also show their
   progress in a card over the server screen (the close button hides it), a
@@ -34,7 +37,7 @@ for Android and iOS that talks to the official TrueNAS middleware API
   really runs; there is no push server). Settings > Notifications > Home
   screen widgets turns the background refresh off.
 - **Storage:** pools with layout, scrub start, pause and stop; datasets and
-  zvols (create, delete); snapshots (create, roll back, delete); disks with
+  zvols (create, delete); snapshots (browse, search, create, roll back, clone, delete); disks with
   temperatures.
 - **Data protection:** periodic snapshot, replication, cloud sync, TrueCloud
   backup and rsync tasks with their last result. Run, stop, enable or

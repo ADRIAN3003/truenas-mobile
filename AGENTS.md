@@ -241,6 +241,21 @@ README covers what the app does; this file covers how to work on it.
   provider shows one. Widget gallery names are in `res/values*/widget_strings.xml`
   and, on iOS, inline in `HomeWidgets.swift` (the extension has no string
   files). Tests: `FakeHomeWidgets` in `test/support/home_widget_fakes.dart`.
+- History charts (`lib/core/api/reporting_api.dart`, `lib/features/reporting/`):
+  `ReportingApi` reads netdata reporting, `reporting.netdata_graphs` +
+  `reporting.netdata_get_data` (25.04) or `reporting.graphs` + `reporting.get_data`
+  (newer), picked from `core.get_methods`. `get_data` takes
+  `[[{name, identifier}], {unit: HOUR|DAY|WEEK|MONTH}]` and answers per graph
+  with `legend` (first entry `time`) and `data` rows `[seconds, v1, v2...]`.
+  Units come from the graph's `vertical_label` (`bytesPerUnit`): network is
+  kilobits per second (sent may be negative), ARC mebibytes; the fallbacks
+  match that. `cpu` has no total, so usage is every column but `idle`. Every
+  interface and disk is fetched in one request, so the pickers switch without
+  asking again; the busiest interface and hottest disk are the default. The
+  entry is a row in the dashboard's gauges card, shown when
+  `ReportingApi.isAvailable`. Fake server: `reporting`, `failingGraphs`,
+  `hiddenGraphs`, `sampleReportingData`. The exact data shape on a real
+  server (legend names, `arcsize` columns) is unconfirmed: check it on a NAS.
 - Saved servers live in secure storage (`SecureKeyValueStore`). Its Android
   default `resetOnError: true` erases everything when one read fails, so it is
   off; a failed read is retried, then shown as an error with Try again and

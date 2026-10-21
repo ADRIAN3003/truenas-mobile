@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 
 import '../../core/models/storage.dart';
 import '../../core/session/truenas_session.dart';
@@ -8,6 +7,7 @@ import '../../shared/theme.dart';
 import '../../shared/ui.dart';
 import '../../shared/formatting.dart';
 import '../../shared/widgets.dart';
+import 'snapshots_screen.dart';
 import 'storage_helpers.dart';
 import '../../shared/dialogs.dart';
 
@@ -308,29 +308,7 @@ class DatasetScreen extends StatefulWidget {
 }
 
 class _DatasetScreenState extends State<DatasetScreen> {
-  List<Snapshot>? _snapshots;
-  Object? _error;
-
   Dataset get _dataset => widget.dataset;
-
-  @override
-  void initState() {
-    super.initState();
-    _load();
-  }
-
-  Future<void> _load() async {
-    try {
-      final snapshots = await widget.session.storage.snapshots(_dataset.id);
-      if (!mounted) return;
-      setState(() {
-        _snapshots = snapshots;
-        _error = null;
-      });
-    } catch (error) {
-      if (mounted) setState(() => _error = error);
-    }
-  }
 
   Future<void> _delete() async {
     final l10n = AppLocalizations.of(context);
@@ -353,76 +331,11 @@ class _DatasetScreenState extends State<DatasetScreen> {
     if (ok && mounted) Navigator.pop(context);
   }
 
-  Future<void> _createSnapshot() async {
-    final l10n = AppLocalizations.of(context);
-    final request = await showAppDialog<(String, bool)>(
-      context: context,
-      builder: (_) => const _CreateSnapshotDialog(),
-    );
-    if (request == null || !mounted) return;
-    final (name, recursive) = request;
-    final ok = await runWithFeedback(
-      context,
-      () => widget.session.storage.createSnapshot(
-        _dataset.id,
-        name,
-        recursive: recursive,
-      ),
-      success: l10n.snapshotCreated,
-    );
-    if (ok) await _load();
-  }
-
-  Future<void> _deleteSnapshot(Snapshot snapshot) async {
-    final l10n = AppLocalizations.of(context);
-    final confirmed = await confirmAction(
-      context,
-      title: l10n.snapshotDeleteTitle(snapshot.name),
-      body: l10n.snapshotDeleteBody,
-      confirmLabel: l10n.delete,
-      cancelLabel: l10n.cancel,
-      destructive: true,
-    );
-    if (!confirmed || !mounted) return;
-    final ok = await runWithFeedback(
-      context,
-      () => widget.session.storage.deleteSnapshot(snapshot.id),
-      success: l10n.snapshotDeleted,
-    );
-    if (ok) await _load();
-  }
-
-  Future<void> _rollback(Snapshot snapshot) async {
-    final l10n = AppLocalizations.of(context);
-    final confirmed = await confirmAction(
-      context,
-      title: l10n.snapshotRollbackTitle(_dataset.shortName),
-      body: l10n.snapshotRollbackBody(snapshot.name),
-      confirmLabel: l10n.snapshotRollback,
-      cancelLabel: l10n.cancel,
-      typeToConfirm: _dataset.shortName,
-      typeToConfirmHint: l10n.typeNameToConfirm(_dataset.shortName),
-      destructive: true,
-    );
-    if (!confirmed || !mounted) return;
-    final ok = await runWithFeedback(
-      context,
-      () => widget.session.storage.rollbackSnapshot(
-        snapshot.id,
-        destroyNewer: true,
-      ),
-      success: l10n.snapshotRolledBack(snapshot.name),
-    );
-    if (ok) await _load();
-  }
-
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
-    final locale = Localizations.localeOf(context).toLanguageTag();
     final dataset = _dataset;
-    final snapshots = _snapshots;
     return Scaffold(
       appBar: AppBar(
         title: Text(dataset.shortName),
@@ -435,181 +348,71 @@ class _DatasetScreenState extends State<DatasetScreen> {
             ),
         ],
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: _createSnapshot,
-        icon: const Icon(Icons.add_a_photo_outlined),
-        label: Text(l10n.snapshotCreate),
-      ),
-      body: AppRefreshIndicator(
-        onRefresh: _load,
-        child: ListView(
-          padding: const EdgeInsets.fromLTRB(16, 8, 16, 88),
-          children: [
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(dataset.id, style: theme.textTheme.titleMedium),
-                    const SizedBox(height: 8),
-                    if (dataset.isVolume)
-                      InfoRow(
-                        l10n.datasetVolsize,
-                        formatBytes(dataset.volsize ?? 0),
-                      ),
-                    InfoRow(l10n.datasetUsed, formatBytes(dataset.used)),
-                    InfoRow(
-                      l10n.datasetAvailable,
-                      formatBytes(dataset.available),
-                    ),
-                    if (dataset.compression != null)
-                      InfoRow(l10n.datasetCompression, dataset.compression!),
-                    if (dataset.compressRatio != null)
-                      InfoRow(
-                        l10n.datasetCompressRatio,
-                        dataset.compressRatio!,
-                      ),
-                    if (dataset.mountpoint != null)
-                      InfoRow(l10n.datasetMountpoint, dataset.mountpoint!),
-                    InfoRow(
-                      l10n.datasetEncryption,
-                      !dataset.encrypted
-                          ? l10n.datasetNotEncrypted
-                          : dataset.locked
-                          ? l10n.datasetLocked
-                          : l10n.datasetEncrypted,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            SectionHeader(l10n.snapshotsTitle),
-            if (snapshots == null && _error == null)
-              const Padding(
-                padding: EdgeInsets.all(24),
-                child: Center(child: CircularProgressIndicator.adaptive()),
-              )
-            else if (snapshots == null)
-              AsyncBody<List<Snapshot>>(
-                value: null,
-                error: _error,
-                onRefresh: _load,
-                builder: (_) => const SizedBox.shrink(),
-              )
-            else if (snapshots.isEmpty)
-              EmptyCard(l10n.snapshotsEmpty)
-            else
-              GroupedCard(
-                indent: 72,
+      body: ListView(
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+        children: [
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  for (final snapshot in snapshots)
-                    ListTile(
-                      leading: const SoftIcon(
-                        Icons.photo_camera_rounded,
-                        AppPalette.tileTeal,
-                      ),
-                      title: Text(snapshot.name),
-                      subtitle: Text(
-                        [
-                          if (snapshot.created != null)
-                            DateFormat.yMMMd(locale)
-                                .add_Hm()
-                                .format(snapshot.created!),
-                          l10n.snapshotSize(
-                            formatBytes(snapshot.used),
-                            formatBytes(snapshot.referenced),
-                          ),
-                        ].join('\n'),
-                      ),
-                      isThreeLine: snapshot.created != null,
-                      trailing: AppPopupMenu<String>(
-                        onSelected: (action) => action == 'rollback'
-                            ? _rollback(snapshot)
-                            : _deleteSnapshot(snapshot),
-                        entries: [
-                          menuEntry('rollback', l10n.snapshotRollback),
-                          menuEntry(
-                            'delete',
-                            l10n.snapshotDelete,
-                            destructive: true,
-                          ),
-                        ],
-                      ),
+                  Text(dataset.id, style: theme.textTheme.titleMedium),
+                  const SizedBox(height: 8),
+                  if (dataset.isVolume)
+                    InfoRow(
+                      l10n.datasetVolsize,
+                      formatBytes(dataset.volsize ?? 0),
                     ),
+                  InfoRow(l10n.datasetUsed, formatBytes(dataset.used)),
+                  InfoRow(
+                    l10n.datasetAvailable,
+                    formatBytes(dataset.available),
+                  ),
+                  if (dataset.compression != null)
+                    InfoRow(l10n.datasetCompression, dataset.compression!),
+                  if (dataset.compressRatio != null)
+                    InfoRow(l10n.datasetCompressRatio, dataset.compressRatio!),
+                  if (dataset.mountpoint != null)
+                    InfoRow(l10n.datasetMountpoint, dataset.mountpoint!),
+                  InfoRow(
+                    l10n.datasetEncryption,
+                    !dataset.encrypted
+                        ? l10n.datasetNotEncrypted
+                        : dataset.locked
+                        ? l10n.datasetLocked
+                        : l10n.datasetEncrypted,
+                  ),
                 ],
               ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _CreateSnapshotDialog extends StatefulWidget {
-  const _CreateSnapshotDialog();
-
-  @override
-  State<_CreateSnapshotDialog> createState() => _CreateSnapshotDialogState();
-}
-
-class _CreateSnapshotDialogState extends State<_CreateSnapshotDialog> {
-  final _formKey = GlobalKey<FormState>();
-  late final _name = TextEditingController(
-    text: 'manual-${DateFormat('yyyy-MM-dd_HH-mm').format(DateTime.now())}',
-  );
-  bool _recursive = false;
-
-  @override
-  void dispose() {
-    _name.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-    return AppDialog(
-      title: Text(l10n.snapshotCreate),
-      content: Form(
-        key: _formKey,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextFormField(
-              key: const Key('snapshotName'),
-              controller: _name,
-              autocorrect: false,
-              decoration: InputDecoration(labelText: l10n.snapshotNameField),
-              validator: (v) => _datasetName.hasMatch(v?.trim() ?? '')
-                  ? null
-                  : l10n.datasetNameInvalid,
             ),
-            CheckboxListTile(
-              contentPadding: EdgeInsets.zero,
-              value: _recursive,
-              title: Text(l10n.snapshotRecursive),
-              onChanged: (v) => setState(() => _recursive = v ?? false),
-            ),
-          ],
-        ),
+          ),
+          const SizedBox(height: 12),
+          GroupedCard(
+            indent: 72,
+            children: [
+              ListTile(
+                leading: const SoftIcon(
+                  Icons.photo_camera_rounded,
+                  AppPalette.tileTeal,
+                ),
+                title: Text(l10n.snapshotsTitle),
+                subtitle: Text(l10n.snapshotsBrowse),
+                trailing: const Icon(Icons.chevron_right_rounded),
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute<void>(
+                    builder: (_) => SnapshotsScreen(
+                      session: widget.session,
+                      dataset: dataset,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
-      actions: [
-        dialogAction(
-          context,
-          label: l10n.cancel,
-          onPressed: () => Navigator.pop(context),
-        ),
-        dialogAction(
-          context,
-          label: l10n.create,
-          primary: true,
-          onPressed: () {
-            if (!_formKey.currentState!.validate()) return;
-            Navigator.pop(context, (_name.text.trim(), _recursive));
-          },
-        ),
-      ],
     );
   }
 }

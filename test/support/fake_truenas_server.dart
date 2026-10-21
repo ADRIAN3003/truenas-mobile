@@ -66,6 +66,9 @@ class FakeTrueNasServer {
   /// `zfs.snapshot` (25.04).
   String snapshotService = 'pool.snapshot';
 
+  /// Whether the snapshot service offers `clone`.
+  bool snapshotClone = true;
+
   /// Every method call received, with its params.
   final calls = <(String, List<dynamic>)>[];
 
@@ -87,6 +90,16 @@ class FakeTrueNasServer {
 
   /// Behave like 25.04: no `service.control`, no NVMe-oF, SMB `ro` field.
   bool legacy = false;
+
+  /// Offer `reporting.*` (history charts). `legacy` gives the 25.04 names
+  /// (`netdata_graphs`, `netdata_get_data`), otherwise `graphs`, `get_data`.
+  bool reporting = true;
+
+  /// Graphs whose `get_data` answers with an error.
+  final failingGraphs = <String>{};
+
+  /// Graphs the server does not list, e.g. `cputemp` on a VM.
+  final hiddenGraphs = <String>{};
 
   /// Services served by `service.query`; control calls change their state.
   final services = <Map<String, dynamic>>[
@@ -549,7 +562,22 @@ class FakeTrueNasServer {
           return;
         }
         if (method.startsWith('$snapshotService.')) {
-          result = _snapshotCall(method.split('.').last, params);
+          try {
+            result = _snapshotCall(method.split('.').last, params);
+          } on StateError catch (e) {
+            socket.add(
+              jsonEncode({
+                'jsonrpc': '2.0',
+                'id': message['id'],
+                'error': {
+                  'code': -32001,
+                  'message': 'Method call error',
+                  'data': {'reason': '[EFAULT] ${e.message}'},
+                },
+              }),
+            );
+            return;
+          }
         }
         final dot = method.lastIndexOf('.');
         if (dot > 0 && protection.containsKey(method.substring(0, dot))) {
@@ -593,7 +621,13 @@ class FakeTrueNasServer {
             final service = params.first as String;
             result = <String, dynamic>{
               if (service == snapshotService)
-                for (final m in ['query', 'create', 'delete', 'rollback'])
+                for (final m in [
+                  'query',
+                  'create',
+                  'delete',
+                  'rollback',
+                  if (snapshotClone) 'clone',
+                ])
                   '$service.$m': <String, dynamic>{},
               if (service == 'core') 'core.bulk': <String, dynamic>{},
               if (service == 'service' && !legacy)
@@ -606,6 +640,12 @@ class FakeTrueNasServer {
                 'virt.instance.query': <String, dynamic>{},
               if (protection.containsKey(service))
                 '$service.query': <String, dynamic>{},
+              if (service == 'reporting' && reporting)
+                for (final m
+                    in legacy
+                        ? ['netdata_graphs', 'netdata_get_data']
+                        : ['graphs', 'get_data'])
+                  'reporting.$m': <String, dynamic>{},
               if (service == 'update')
                 for (final m
                     in legacy
@@ -613,6 +653,38 @@ class FakeTrueNasServer {
                         : ['status', 'run'])
                   'update.$m': <String, dynamic>{},
             };
+          case 'reporting.netdata_graphs' || 'reporting.graphs':
+            result = [
+              for (final g in sampleReportingGraphs)
+                if (!hiddenGraphs.contains(g['name'])) g,
+            ];
+          case 'reporting.netdata_get_data' || 'reporting.get_data':
+            final graphs = params.first as List;
+            final failing = graphs.firstWhere(
+              (g) => failingGraphs.contains((g as Map)['name']),
+              orElse: () => null,
+            );
+            if (failing != null) {
+              socket.add(
+                jsonEncode({
+                  'jsonrpc': '2.0',
+                  'id': message['id'],
+                  'error': {
+                    'code': -32001,
+                    'message': 'Method call error',
+                    'data': {'reason': '[EFAULT] No data'},
+                  },
+                }),
+              );
+              return;
+            }
+            result = [
+              for (final g in graphs)
+                sampleReportingData(
+                  (g as Map)['name'] as String,
+                  g['identifier'] as String?,
+                ),
+            ];
           case 'keychaincredential.query':
             result = [
               {'id': 3, 'name': 'backup-box', 'type': 'SSH_CREDENTIALS'},
@@ -1186,6 +1258,22 @@ class FakeTrueNasServer {
       case 'delete':
         snapshots.removeWhere((s) => s['id'] == params.first);
         return true;
+      case 'rollback':
+        final id = params.first as String;
+        final options = params[1] as Map<String, dynamic>;
+        final target = snapshots.firstWhere((s) => s['id'] == id);
+        final newer = snapshots
+            .where((s) => _created(s) > _created(target))
+            .toList();
+        if (newer.isNotEmpty && options['recursive'] != true) {
+          throw StateError('more recent snapshots exist');
+        }
+        snapshots.removeWhere(newer.contains);
+        return true;
+      case 'clone':
+        final data = params.first as Map<String, dynamic>;
+        datasets.add(_dataset(data['dataset_dst'] as String, 0, 3000));
+        return true;
     }
     return null;
   }
@@ -1216,6 +1304,9 @@ Map<String, dynamic> _dataset(
   'compressratio': {'parsed': '1.50', 'value': '1.50x'},
   if (volume) 'volsize': {'parsed': 1073741824, 'value': '1G'},
 };
+
+int _created(Map<String, dynamic> snapshot) =>
+    (snapshot['properties']['creation']['parsed'][r'$date'] as int);
 
 Map<String, dynamic> _snapshot(String id, int created) => {
   'id': id,
@@ -1301,6 +1392,77 @@ SecurityContext testTlsContext() => SecurityContext()
 const testCertFingerprint =
     'CD:BC:91:D1:63:87:24:89:47:17:6C:6E:32:A3:1B:7E:'
     '7C:DF:18:44:9D:35:4C:BC:49:91:6A:06:1E:DA:6C:F6';
+
+/// What `reporting.netdata_graphs` lists.
+const sampleReportingGraphs = <Map<String, dynamic>>[
+  {
+    'name': 'cpu',
+    'title': 'CPU Usage',
+    'vertical_label': '%CPU',
+    'identifiers': <String>[],
+  },
+  {
+    'name': 'cputemp',
+    'title': 'CPU Temperature',
+    'vertical_label': 'Celsius',
+    'identifiers': <String>[],
+  },
+  {
+    'name': 'interface',
+    'title': 'Network Traffic',
+    'vertical_label': 'Kilobits/s',
+    'identifiers': ['eno1', 'eno2'],
+  },
+  {
+    'name': 'arcsize',
+    'title': 'ARC Size',
+    'vertical_label': 'Mebibytes',
+    'identifiers': <String>[],
+  },
+  {
+    'name': 'disktemp',
+    'title': 'Disk Temperature',
+    'vertical_label': 'Celsius',
+    'identifiers': ['sda', 'sdb'],
+  },
+];
+
+/// First sample of [sampleReportingData], seconds since the epoch.
+const sampleReportingStart = 1700000000;
+
+/// Five samples a minute apart, shaped like `reporting.netdata_get_data`.
+/// `eno1` carries traffic (in kilobits per second) and `eno2` none; `sdb` is
+/// the hotter disk.
+Map<String, dynamic> sampleReportingData(String name, String? identifier) {
+  List<List<num>> rows(List<num> Function(int i) row) => [
+    for (var i = 0; i < 5; i++) [sampleReportingStart + i * 60, ...row(i)],
+  ];
+  final (legend, data) = switch (name) {
+    'cpu' => (
+      ['user', 'system', 'idle'],
+      rows((i) => [10.0 + i, 5.0, 80.0 - i]),
+    ),
+    'cputemp' => (['cpu0', 'cpu1'], rows((i) => [40.0 + i, 42.0 + i])),
+    'interface' => (
+      ['received', 'sent'],
+      rows(
+        (i) => identifier == 'eno1' ? [1000.0 * (i + 1), -100.0] : [0.0, 0.0],
+      ),
+    ),
+    'arcsize' => (['arc_size'], rows((i) => [4096.0 + i])),
+    'disktemp' => (
+      ['temperature_value'],
+      rows((i) => [(identifier == 'sdb' ? 41.0 : 35.0) + i]),
+    ),
+    _ => (<String>[], <List<num>>[]),
+  };
+  return {
+    'name': name,
+    'identifier': identifier,
+    'legend': ['time', ...legend],
+    'data': data,
+  };
+}
 
 /// A `reporting.realtime` sample as TrueNAS 25.04 to 27 send it.
 const sampleRealtimeStats = {

@@ -2526,4 +2526,48 @@ class AppLocalizationsEn extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get historyTitle => 'History';
+
+  @override
+  String get historyRangeHour => 'Hour';
+
+  @override
+  String get historyRangeDay => 'Day';
+
+  @override
+  String get historyRangeWeek => 'Week';
+
+  @override
+  String get historyRangeMonth => 'Month';
+
+  @override
+  String get historyCpuTemperature => 'CPU temperature';
+
+  @override
+  String get historyInterface => 'Interface';
+
+  @override
+  String get historyDisk => 'Disk';
+
+  @override
+  String get historyDiskTemperature => 'Disk temperature';
+
+  @override
+  String get historyArc => 'ZFS cache (ARC)';
+
+  @override
+  String get historyNoData => 'No data for this period yet.';
+
+  @override
+  String historyStats(String average, String peak) {
+    return 'Average $average · peak $peak';
+  }
+
+  @override
+  String get historyUnavailable => 'This server has no history data.';
+
+  @override
+  String get historyChartFailed => 'Could not load this chart.';
 }

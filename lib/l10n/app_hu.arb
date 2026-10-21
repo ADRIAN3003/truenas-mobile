@@ -676,5 +676,19 @@
   "settingsLiveJobsNoExtension": "Az alkalmazás ezen példányában nincs zárolt képernyős bővítmény (az oldalbetöltő eszköz eltávolította), ezért a feladatok csak az alkalmazásban látszanak",
   "settingsLiveJobsDisabled": "Az élő tevékenységek ki vannak kapcsolva az alkalmazásnak az iOS Beállításokban",
   "jobsDismiss": "Elrejtés",
-  "jobsRunningCount": "{count, plural, one{1 feladat fut} other{{count} feladat fut}}"
+  "jobsRunningCount": "{count, plural, one{1 feladat fut} other{{count} feladat fut}}",
+  "historyTitle": "Előzmények",
+  "historyRangeHour": "Óra",
+  "historyRangeDay": "Nap",
+  "historyRangeWeek": "Hét",
+  "historyRangeMonth": "Hónap",
+  "historyCpuTemperature": "CPU hőmérséklete",
+  "historyInterface": "Interfész",
+  "historyDisk": "Lemez",
+  "historyDiskTemperature": "Lemez hőmérséklete",
+  "historyArc": "ZFS gyorsítótár (ARC)",
+  "historyNoData": "Ebben az időszakban még nincs adat.",
+  "historyStats": "Átlag {average} · csúcs {peak}",
+  "historyUnavailable": "A szerver nem ad előzményadatokat.",
+  "historyChartFailed": "Nem sikerült betölteni a diagramot."
 }

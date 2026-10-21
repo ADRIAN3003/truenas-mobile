@@ -15,6 +15,7 @@ import '../../shared/theme.dart';
 import '../../shared/ui.dart';
 import '../../shared/viz_colors.dart';
 import '../../shared/widgets.dart';
+import '../reporting/history_screen.dart';
 
 /// Number of live samples kept for the charts (2 minutes at 2 s each).
 const _historyLength = 60;
@@ -43,6 +44,7 @@ class _DashboardTabState extends State<DashboardTab> {
   StreamSubscription<void>? _reconnects;
   List<PoolSummary>? _pools;
   List<TrueNasAlert>? _alerts;
+  bool _hasHistory = false;
 
   @override
   void initState() {
@@ -71,7 +73,15 @@ class _DashboardTabState extends State<DashboardTab> {
     super.dispose();
   }
 
-  Future<void> _refresh() => Future.wait([_loadPools(), _loadAlerts()]);
+  Future<void> _refresh() =>
+      Future.wait([_loadPools(), _loadAlerts(), _checkHistory()]);
+
+  Future<void> _checkHistory() async {
+    try {
+      final available = await widget.session.reporting.isAvailable();
+      if (mounted) setState(() => _hasHistory = available);
+    } catch (_) {}
+  }
 
   Future<void> _loadPools() async {
     try {
@@ -99,7 +109,20 @@ class _DashboardTabState extends State<DashboardTab> {
     ];
     final live = latest == null
         ? [const _WaitingCard()]
-        : [_GaugesCard(history: _history), _NetworkCard(history: _history)];
+        : [
+            _GaugesCard(
+              history: _history,
+              onOpenHistory: _hasHistory
+                  ? () => Navigator.push(
+                      context,
+                      MaterialPageRoute<void>(
+                        builder: (_) => HistoryScreen(session: widget.session),
+                      ),
+                    )
+                  : null,
+            ),
+            _NetworkCard(history: _history),
+          ];
     final pools = [if (_pools != null) _PoolsCard(pools: _pools!)];
     return AppRefreshIndicator(
       edgeOffset: ChromeInsets.of(context).top,
@@ -347,9 +370,12 @@ class _WaitingCard extends StatelessWidget {
 
 /// CPU and memory rings, with the CPU history underneath.
 class _GaugesCard extends StatelessWidget {
-  const _GaugesCard({required this.history});
+  const _GaugesCard({required this.history, this.onOpenHistory});
 
   final List<RealtimeStats> history;
+
+  /// Opens the history charts; null when the server has none.
+  final VoidCallback? onOpenHistory;
 
   @override
   Widget build(BuildContext context) {
@@ -458,6 +484,34 @@ class _GaugesCard extends StatelessWidget {
                 ],
                 maxY: 100,
                 formatValue: (v) => '${v.round()}%',
+              ),
+            ],
+            if (onOpenHistory != null) ...[
+              const SizedBox(height: 10),
+              const Divider(),
+              InkWell(
+                onTap: onOpenHistory,
+                borderRadius: BorderRadius.circular(8),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.show_chart_rounded,
+                        size: 18,
+                        color: theme.colorScheme.primary,
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          l10n.historyTitle,
+                          style: theme.textTheme.titleSmall,
+                        ),
+                      ),
+                      const Chevron(),
+                    ],
+                  ),
+                ),
               ),
             ],
           ],

@@ -88,6 +88,16 @@ class FakeTrueNasServer {
   /// Behave like 25.04: no `service.control`, no NVMe-oF, SMB `ro` field.
   bool legacy = false;
 
+  /// Offer `reporting.*` (history charts). `legacy` gives the 25.04 names
+  /// (`netdata_graphs`, `netdata_get_data`), otherwise `graphs`, `get_data`.
+  bool reporting = true;
+
+  /// Graphs whose `get_data` answers with an error.
+  final failingGraphs = <String>{};
+
+  /// Graphs the server does not list, e.g. `cputemp` on a VM.
+  final hiddenGraphs = <String>{};
+
   /// Services served by `service.query`; control calls change their state.
   final services = <Map<String, dynamic>>[
     {
@@ -606,6 +616,12 @@ class FakeTrueNasServer {
                 'virt.instance.query': <String, dynamic>{},
               if (protection.containsKey(service))
                 '$service.query': <String, dynamic>{},
+              if (service == 'reporting' && reporting)
+                for (final m
+                    in legacy
+                        ? ['netdata_graphs', 'netdata_get_data']
+                        : ['graphs', 'get_data'])
+                  'reporting.$m': <String, dynamic>{},
               if (service == 'update')
                 for (final m
                     in legacy
@@ -613,6 +629,38 @@ class FakeTrueNasServer {
                         : ['status', 'run'])
                   'update.$m': <String, dynamic>{},
             };
+          case 'reporting.netdata_graphs' || 'reporting.graphs':
+            result = [
+              for (final g in sampleReportingGraphs)
+                if (!hiddenGraphs.contains(g['name'])) g,
+            ];
+          case 'reporting.netdata_get_data' || 'reporting.get_data':
+            final graphs = params.first as List;
+            final failing = graphs.firstWhere(
+              (g) => failingGraphs.contains((g as Map)['name']),
+              orElse: () => null,
+            );
+            if (failing != null) {
+              socket.add(
+                jsonEncode({
+                  'jsonrpc': '2.0',
+                  'id': message['id'],
+                  'error': {
+                    'code': -32001,
+                    'message': 'Method call error',
+                    'data': {'reason': '[EFAULT] No data'},
+                  },
+                }),
+              );
+              return;
+            }
+            result = [
+              for (final g in graphs)
+                sampleReportingData(
+                  (g as Map)['name'] as String,
+                  g['identifier'] as String?,
+                ),
+            ];
           case 'keychaincredential.query':
             result = [
               {'id': 3, 'name': 'backup-box', 'type': 'SSH_CREDENTIALS'},
@@ -1301,6 +1349,77 @@ SecurityContext testTlsContext() => SecurityContext()
 const testCertFingerprint =
     'CD:BC:91:D1:63:87:24:89:47:17:6C:6E:32:A3:1B:7E:'
     '7C:DF:18:44:9D:35:4C:BC:49:91:6A:06:1E:DA:6C:F6';
+
+/// What `reporting.netdata_graphs` lists.
+const sampleReportingGraphs = <Map<String, dynamic>>[
+  {
+    'name': 'cpu',
+    'title': 'CPU Usage',
+    'vertical_label': '%CPU',
+    'identifiers': <String>[],
+  },
+  {
+    'name': 'cputemp',
+    'title': 'CPU Temperature',
+    'vertical_label': 'Celsius',
+    'identifiers': <String>[],
+  },
+  {
+    'name': 'interface',
+    'title': 'Network Traffic',
+    'vertical_label': 'Kilobits/s',
+    'identifiers': ['eno1', 'eno2'],
+  },
+  {
+    'name': 'arcsize',
+    'title': 'ARC Size',
+    'vertical_label': 'Mebibytes',
+    'identifiers': <String>[],
+  },
+  {
+    'name': 'disktemp',
+    'title': 'Disk Temperature',
+    'vertical_label': 'Celsius',
+    'identifiers': ['sda', 'sdb'],
+  },
+];
+
+/// First sample of [sampleReportingData], seconds since the epoch.
+const sampleReportingStart = 1700000000;
+
+/// Five samples a minute apart, shaped like `reporting.netdata_get_data`.
+/// `eno1` carries traffic (in kilobits per second) and `eno2` none; `sdb` is
+/// the hotter disk.
+Map<String, dynamic> sampleReportingData(String name, String? identifier) {
+  List<List<num>> rows(List<num> Function(int i) row) => [
+    for (var i = 0; i < 5; i++) [sampleReportingStart + i * 60, ...row(i)],
+  ];
+  final (legend, data) = switch (name) {
+    'cpu' => (
+      ['user', 'system', 'idle'],
+      rows((i) => [10.0 + i, 5.0, 80.0 - i]),
+    ),
+    'cputemp' => (['cpu0', 'cpu1'], rows((i) => [40.0 + i, 42.0 + i])),
+    'interface' => (
+      ['received', 'sent'],
+      rows(
+        (i) => identifier == 'eno1' ? [1000.0 * (i + 1), -100.0] : [0.0, 0.0],
+      ),
+    ),
+    'arcsize' => (['arc_size'], rows((i) => [4096.0 + i])),
+    'disktemp' => (
+      ['temperature_value'],
+      rows((i) => [(identifier == 'sdb' ? 41.0 : 35.0) + i]),
+    ),
+    _ => (<String>[], <List<num>>[]),
+  };
+  return {
+    'name': name,
+    'identifier': identifier,
+    'legend': ['time', ...legend],
+    'data': data,
+  };
+}
 
 /// A `reporting.realtime` sample as TrueNAS 25.04 to 27 send it.
 const sampleRealtimeStats = {

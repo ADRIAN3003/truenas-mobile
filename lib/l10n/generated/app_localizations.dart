@@ -4159,6 +4159,90 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{count, plural, one{1 job running} other{{count} jobs running}}'**
   String jobsRunningCount(int count);
+
+  /// Title of the usage history screen and the link to it on the dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'History'**
+  String get historyTitle;
+
+  /// Time range segment: the last hour.
+  ///
+  /// In en, this message translates to:
+  /// **'Hour'**
+  String get historyRangeHour;
+
+  /// Time range segment: the last day.
+  ///
+  /// In en, this message translates to:
+  /// **'Day'**
+  String get historyRangeDay;
+
+  /// Time range segment: the last week.
+  ///
+  /// In en, this message translates to:
+  /// **'Week'**
+  String get historyRangeWeek;
+
+  /// Time range segment: the last month.
+  ///
+  /// In en, this message translates to:
+  /// **'Month'**
+  String get historyRangeMonth;
+
+  /// Title of the CPU temperature history chart.
+  ///
+  /// In en, this message translates to:
+  /// **'CPU temperature'**
+  String get historyCpuTemperature;
+
+  /// Label of the network interface picker on the history screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Interface'**
+  String get historyInterface;
+
+  /// Label of the disk picker on the history screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Disk'**
+  String get historyDisk;
+
+  /// Title of the disk temperature history chart.
+  ///
+  /// In en, this message translates to:
+  /// **'Disk temperature'**
+  String get historyDiskTemperature;
+
+  /// Title of the ZFS ARC size history chart.
+  ///
+  /// In en, this message translates to:
+  /// **'ZFS cache (ARC)'**
+  String get historyArc;
+
+  /// Shown in a chart that has no samples in the chosen range.
+  ///
+  /// In en, this message translates to:
+  /// **'No data for this period yet.'**
+  String get historyNoData;
+
+  /// Summary under a history chart line.
+  ///
+  /// In en, this message translates to:
+  /// **'Average {average} · peak {peak}'**
+  String historyStats(String average, String peak);
+
+  /// Shown when the server does not offer reporting methods.
+  ///
+  /// In en, this message translates to:
+  /// **'This server has no history data.'**
+  String get historyUnavailable;
+
+  /// Shown in a history chart whose data request failed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load this chart.'**
+  String get historyChartFailed;
 }
 
 class _AppLocalizationsDelegate

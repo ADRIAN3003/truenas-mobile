@@ -590,7 +590,7 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String snapshotRollbackBody(String name) {
-    return 'A dataset visszaáll a(z) $name pillanatkép állapotára. Az azóta történt összes változás elvész, és az újabb pillanatképek megsemmisülnek.';
+    return 'A dataset visszaáll a(z) $name pillanatkép állapotára. Az azóta történt összes változás elvész.';
   }
 
   @override
@@ -2498,5 +2498,88 @@ class AppLocalizationsHu extends AppLocalizations {
       one: '1 feladat fut',
     );
     return '$_temp0';
+  }
+
+  @override
+  String get snapshotsBrowse => 'Böngészés, visszaállítás és klónozás';
+
+  @override
+  String get snapshotsSearch => 'Pillanatképek keresése';
+
+  @override
+  String get snapshotsNoMatch => 'Nincs találat';
+
+  @override
+  String snapshotsSummary(int count, String used) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count pillanatkép',
+      one: '1 pillanatkép',
+    );
+    return '$_temp0 · $used foglalt';
+  }
+
+  @override
+  String get snapshotSort => 'Rendezés';
+
+  @override
+  String get snapshotSortNewest => 'Legújabb elöl';
+
+  @override
+  String get snapshotSortOldest => 'Legrégebbi elöl';
+
+  @override
+  String get snapshotSortName => 'Név';
+
+  @override
+  String get snapshotSortSize => 'Méret (foglalt)';
+
+  @override
+  String snapshotRollbackNewer(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Ez a(z) $count újabb pillanatkép megsemmisül:',
+      one: 'Ez az újabb pillanatkép megsemmisül:',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String snapshotRollbackMore(int count) {
+    return 'és még $count';
+  }
+
+  @override
+  String get snapshotRollbackClones =>
+      'A pillanatképek klónjainak is megsemmisítése';
+
+  @override
+  String get snapshotRollbackForce => 'Leválasztás kényszerítése';
+
+  @override
+  String get snapshotClone => 'Klónozás';
+
+  @override
+  String snapshotCloneTitle(String name) {
+    return '$name klónozása';
+  }
+
+  @override
+  String get snapshotCloneBody =>
+      'Új datasetet hoz létre a pillanatkép másolataként. Amíg nem változik, nem foglal helyet.';
+
+  @override
+  String get snapshotCloneTarget => 'Új dataset';
+
+  @override
+  String snapshotCloneInvalid(String pool) {
+    return 'Adj meg egy útvonalat a(z) $pool poolon belül, pl. $pool/masolat';
+  }
+
+  @override
+  String snapshotCloned(String name) {
+    return 'Létrehozva: $name';
   }
 }

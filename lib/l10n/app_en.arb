@@ -803,7 +803,7 @@
       }
     }
   },
-  "snapshotRollbackBody": "The dataset returns to its state at snapshot {name}. All changes made since then are lost, and newer snapshots are destroyed.",
+  "snapshotRollbackBody": "The dataset returns to its state at snapshot {name}. Everything changed since then is lost.",
   "@snapshotRollbackBody": {
     "description": "Confirmation body for rolling back.",
     "placeholders": {
@@ -3373,6 +3373,115 @@
     "placeholders": {
       "count": {
         "type": "int"
+      }
+    }
+  },
+  "snapshotsBrowse": "Browse, roll back and clone",
+  "@snapshotsBrowse": {
+    "description": "Subtitle of the snapshots row on a dataset."
+  },
+  "snapshotsSearch": "Search snapshots",
+  "@snapshotsSearch": {
+    "description": "Hint of the snapshot search field."
+  },
+  "snapshotsNoMatch": "No snapshots match",
+  "@snapshotsNoMatch": {
+    "description": "Shown when the search matches no snapshot."
+  },
+  "snapshotsSummary": "{count, plural, =1{1 snapshot} other{{count} snapshots}} · {used} used",
+  "@snapshotsSummary": {
+    "description": "Count and total size of a dataset's snapshots.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "used": {
+        "type": "String"
+      }
+    }
+  },
+  "snapshotSort": "Sort",
+  "@snapshotSort": {
+    "description": "Tooltip and title of the snapshot sort choice."
+  },
+  "snapshotSortNewest": "Newest first",
+  "@snapshotSortNewest": {
+    "description": "Sort option."
+  },
+  "snapshotSortOldest": "Oldest first",
+  "@snapshotSortOldest": {
+    "description": "Sort option."
+  },
+  "snapshotSortName": "Name",
+  "@snapshotSortName": {
+    "description": "Sort option."
+  },
+  "snapshotSortSize": "Size (used)",
+  "@snapshotSortSize": {
+    "description": "Sort option."
+  },
+  "snapshotRollbackNewer": "{count, plural, =1{This newer snapshot will be destroyed:} other{These {count} newer snapshots will be destroyed:}}",
+  "@snapshotRollbackNewer": {
+    "description": "Warning above the list of snapshots a rollback destroys.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "snapshotRollbackMore": "and {count} more",
+  "@snapshotRollbackMore": {
+    "description": "Last line of a shortened list.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "snapshotRollbackClones": "Also destroy clones of those snapshots",
+  "@snapshotRollbackClones": {
+    "description": "Checkbox in the rollback dialog."
+  },
+  "snapshotRollbackForce": "Force unmount",
+  "@snapshotRollbackForce": {
+    "description": "Checkbox in the rollback dialog."
+  },
+  "snapshotClone": "Clone",
+  "@snapshotClone": {
+    "description": "Menu item and button that clones a snapshot."
+  },
+  "snapshotCloneTitle": "Clone {name}",
+  "@snapshotCloneTitle": {
+    "description": "Title of the clone dialog.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "snapshotCloneBody": "Makes a new dataset that starts as a copy of this snapshot. It takes no space until it changes.",
+  "@snapshotCloneBody": {
+    "description": "Body of the clone dialog."
+  },
+  "snapshotCloneTarget": "New dataset",
+  "@snapshotCloneTarget": {
+    "description": "Label of the clone target field."
+  },
+  "snapshotCloneInvalid": "Use a path inside {pool}, like {pool}/copy",
+  "@snapshotCloneInvalid": {
+    "description": "Validation message of the clone target.",
+    "placeholders": {
+      "pool": {
+        "type": "String"
+      }
+    }
+  },
+  "snapshotCloned": "Created {name}",
+  "@snapshotCloned": {
+    "description": "Snackbar after cloning.",
+    "placeholders": {
+      "name": {
+        "type": "String"
       }
     }
   }

@@ -7,6 +7,7 @@ import '../api/json_rpc_client.dart';
 import '../api/method_catalog.dart';
 import '../api/protection_api.dart';
 import '../api/reconnecting_client.dart';
+import '../api/reporting_api.dart';
 import '../api/sharing_api.dart';
 import '../api/shell_session.dart';
 import '../api/storage_api.dart';
@@ -55,6 +56,7 @@ class TrueNasSession {
   late final system = SystemApi(client, catalog);
   late final explorer = ExplorerApi(client);
   late final protection = ProtectionApi(client, catalog);
+  late final reporting = ReportingApi(client, catalog);
 
   /// Opens a terminal: the host shell by default, or a VM, app or container
   /// console through [options].

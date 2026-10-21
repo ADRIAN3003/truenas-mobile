@@ -695,5 +695,19 @@
   "snapshotCloneBody": "Új datasetet hoz létre a pillanatkép másolataként. Amíg nem változik, nem foglal helyet.",
   "snapshotCloneTarget": "Új dataset",
   "snapshotCloneInvalid": "Adj meg egy útvonalat a(z) {pool} poolon belül, pl. {pool}/masolat",
-  "snapshotCloned": "Létrehozva: {name}"
+  "snapshotCloned": "Létrehozva: {name}",
+  "historyTitle": "Előzmények",
+  "historyRangeHour": "Óra",
+  "historyRangeDay": "Nap",
+  "historyRangeWeek": "Hét",
+  "historyRangeMonth": "Hónap",
+  "historyCpuTemperature": "CPU hőmérséklete",
+  "historyInterface": "Interfész",
+  "historyDisk": "Lemez",
+  "historyDiskTemperature": "Lemez hőmérséklete",
+  "historyArc": "ZFS gyorsítótár (ARC)",
+  "historyNoData": "Ebben az időszakban még nincs adat.",
+  "historyStats": "Átlag {average} · csúcs {peak}",
+  "historyUnavailable": "A szerver nem ad előzményadatokat.",
+  "historyChartFailed": "Nem sikerült betölteni a diagramot."
 }

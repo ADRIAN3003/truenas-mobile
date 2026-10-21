@@ -2582,4 +2582,48 @@ class AppLocalizationsHu extends AppLocalizations {
   String snapshotCloned(String name) {
     return 'Létrehozva: $name';
   }
+
+  @override
+  String get historyTitle => 'Előzmények';
+
+  @override
+  String get historyRangeHour => 'Óra';
+
+  @override
+  String get historyRangeDay => 'Nap';
+
+  @override
+  String get historyRangeWeek => 'Hét';
+
+  @override
+  String get historyRangeMonth => 'Hónap';
+
+  @override
+  String get historyCpuTemperature => 'CPU hőmérséklete';
+
+  @override
+  String get historyInterface => 'Interfész';
+
+  @override
+  String get historyDisk => 'Lemez';
+
+  @override
+  String get historyDiskTemperature => 'Lemez hőmérséklete';
+
+  @override
+  String get historyArc => 'ZFS gyorsítótár (ARC)';
+
+  @override
+  String get historyNoData => 'Ebben az időszakban még nincs adat.';
+
+  @override
+  String historyStats(String average, String peak) {
+    return 'Átlag $average · csúcs $peak';
+  }
+
+  @override
+  String get historyUnavailable => 'A szerver nem ad előzményadatokat.';
+
+  @override
+  String get historyChartFailed => 'Nem sikerült betölteni a diagramot.';
 }

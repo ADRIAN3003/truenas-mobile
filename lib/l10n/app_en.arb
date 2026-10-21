@@ -3484,5 +3484,69 @@
         "type": "String"
       }
     }
+  },
+  "historyTitle": "History",
+  "@historyTitle": {
+    "description": "Title of the usage history screen and the link to it on the dashboard."
+  },
+  "historyRangeHour": "Hour",
+  "@historyRangeHour": {
+    "description": "Time range segment: the last hour."
+  },
+  "historyRangeDay": "Day",
+  "@historyRangeDay": {
+    "description": "Time range segment: the last day."
+  },
+  "historyRangeWeek": "Week",
+  "@historyRangeWeek": {
+    "description": "Time range segment: the last week."
+  },
+  "historyRangeMonth": "Month",
+  "@historyRangeMonth": {
+    "description": "Time range segment: the last month."
+  },
+  "historyCpuTemperature": "CPU temperature",
+  "@historyCpuTemperature": {
+    "description": "Title of the CPU temperature history chart."
+  },
+  "historyInterface": "Interface",
+  "@historyInterface": {
+    "description": "Label of the network interface picker on the history screen."
+  },
+  "historyDisk": "Disk",
+  "@historyDisk": {
+    "description": "Label of the disk picker on the history screen."
+  },
+  "historyDiskTemperature": "Disk temperature",
+  "@historyDiskTemperature": {
+    "description": "Title of the disk temperature history chart."
+  },
+  "historyArc": "ZFS cache (ARC)",
+  "@historyArc": {
+    "description": "Title of the ZFS ARC size history chart."
+  },
+  "historyNoData": "No data for this period yet.",
+  "@historyNoData": {
+    "description": "Shown in a chart that has no samples in the chosen range."
+  },
+  "historyStats": "Average {average} · peak {peak}",
+  "@historyStats": {
+    "description": "Summary under a history chart line.",
+    "placeholders": {
+      "average": {
+        "type": "String"
+      },
+      "peak": {
+        "type": "String"
+      }
+    }
+  },
+  "historyUnavailable": "This server has no history data.",
+  "@historyUnavailable": {
+    "description": "Shown when the server does not offer reporting methods."
+  },
+  "historyChartFailed": "Could not load this chart.",
+  "@historyChartFailed": {
+    "description": "Shown in a history chart whose data request failed."
   }
 }

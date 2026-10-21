@@ -66,6 +66,9 @@ class FakeTrueNasServer {
   /// `zfs.snapshot` (25.04).
   String snapshotService = 'pool.snapshot';
 
+  /// Whether the snapshot service offers `clone`.
+  bool snapshotClone = true;
+
   /// Every method call received, with its params.
   final calls = <(String, List<dynamic>)>[];
 
@@ -559,7 +562,22 @@ class FakeTrueNasServer {
           return;
         }
         if (method.startsWith('$snapshotService.')) {
-          result = _snapshotCall(method.split('.').last, params);
+          try {
+            result = _snapshotCall(method.split('.').last, params);
+          } on StateError catch (e) {
+            socket.add(
+              jsonEncode({
+                'jsonrpc': '2.0',
+                'id': message['id'],
+                'error': {
+                  'code': -32001,
+                  'message': 'Method call error',
+                  'data': {'reason': '[EFAULT] ${e.message}'},
+                },
+              }),
+            );
+            return;
+          }
         }
         final dot = method.lastIndexOf('.');
         if (dot > 0 && protection.containsKey(method.substring(0, dot))) {
@@ -603,7 +621,13 @@ class FakeTrueNasServer {
             final service = params.first as String;
             result = <String, dynamic>{
               if (service == snapshotService)
-                for (final m in ['query', 'create', 'delete', 'rollback'])
+                for (final m in [
+                  'query',
+                  'create',
+                  'delete',
+                  'rollback',
+                  if (snapshotClone) 'clone',
+                ])
                   '$service.$m': <String, dynamic>{},
               if (service == 'core') 'core.bulk': <String, dynamic>{},
               if (service == 'service' && !legacy)
@@ -1234,6 +1258,22 @@ class FakeTrueNasServer {
       case 'delete':
         snapshots.removeWhere((s) => s['id'] == params.first);
         return true;
+      case 'rollback':
+        final id = params.first as String;
+        final options = params[1] as Map<String, dynamic>;
+        final target = snapshots.firstWhere((s) => s['id'] == id);
+        final newer = snapshots
+            .where((s) => _created(s) > _created(target))
+            .toList();
+        if (newer.isNotEmpty && options['recursive'] != true) {
+          throw StateError('more recent snapshots exist');
+        }
+        snapshots.removeWhere(newer.contains);
+        return true;
+      case 'clone':
+        final data = params.first as Map<String, dynamic>;
+        datasets.add(_dataset(data['dataset_dst'] as String, 0, 3000));
+        return true;
     }
     return null;
   }
@@ -1264,6 +1304,9 @@ Map<String, dynamic> _dataset(
   'compressratio': {'parsed': '1.50', 'value': '1.50x'},
   if (volume) 'volsize': {'parsed': 1073741824, 'value': '1G'},
 };
+
+int _created(Map<String, dynamic> snapshot) =>
+    (snapshot['properties']['creation']['parsed'][r'$date'] as int);
 
 Map<String, dynamic> _snapshot(String id, int created) => {
   'id': id,

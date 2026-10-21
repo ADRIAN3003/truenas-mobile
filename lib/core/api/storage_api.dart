@@ -93,11 +93,31 @@ class StorageApi {
       _client.call('${await _snapshots()}.delete', [id]);
 
   /// Rolls the dataset back to snapshot [id]. With [destroyNewer], newer
-  /// snapshots are destroyed (ZFS refuses the rollback otherwise).
-  Future<void> rollbackSnapshot(String id, {bool destroyNewer = false}) async =>
-      _client.call('${await _snapshots()}.rollback', [
-        id,
-        {'recursive': destroyNewer},
+  /// snapshots are destroyed (ZFS refuses the rollback otherwise);
+  /// [destroyClones] also destroys clones of those, and [force] unmounts
+  /// what is in the way.
+  Future<void> rollbackSnapshot(
+    String id, {
+    bool destroyNewer = false,
+    bool destroyClones = false,
+    bool force = false,
+  }) async => _client.call('${await _snapshots()}.rollback', [
+    id,
+    {
+      'recursive': destroyNewer,
+      if (destroyClones) 'recursive_clones': true,
+      if (force) 'force': true,
+    },
+  ]);
+
+  /// Whether the server can clone snapshots.
+  Future<bool> canCloneSnapshots() async =>
+      _catalog.has('${await _snapshots()}.clone');
+
+  /// Makes the new dataset [target] (`pool/path`) from snapshot [id].
+  Future<void> cloneSnapshot(String id, String target) async =>
+      _client.call('${await _snapshots()}.clone', [
+        {'snapshot': id, 'dataset_dst': target},
       ]);
 
   /// All disks with their pool and, where available, temperature.

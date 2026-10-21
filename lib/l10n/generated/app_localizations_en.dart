@@ -593,7 +593,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String snapshotRollbackBody(String name) {
-    return 'The dataset returns to its state at snapshot $name. All changes made since then are lost, and newer snapshots are destroyed.';
+    return 'The dataset returns to its state at snapshot $name. Everything changed since then is lost.';
   }
 
   @override
@@ -2525,6 +2525,88 @@ class AppLocalizationsEn extends AppLocalizations {
       one: '1 job running',
     );
     return '$_temp0';
+  }
+
+  @override
+  String get snapshotsBrowse => 'Browse, roll back and clone';
+
+  @override
+  String get snapshotsSearch => 'Search snapshots';
+
+  @override
+  String get snapshotsNoMatch => 'No snapshots match';
+
+  @override
+  String snapshotsSummary(int count, String used) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count snapshots',
+      one: '1 snapshot',
+    );
+    return '$_temp0 · $used used';
+  }
+
+  @override
+  String get snapshotSort => 'Sort';
+
+  @override
+  String get snapshotSortNewest => 'Newest first';
+
+  @override
+  String get snapshotSortOldest => 'Oldest first';
+
+  @override
+  String get snapshotSortName => 'Name';
+
+  @override
+  String get snapshotSortSize => 'Size (used)';
+
+  @override
+  String snapshotRollbackNewer(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'These $count newer snapshots will be destroyed:',
+      one: 'This newer snapshot will be destroyed:',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String snapshotRollbackMore(int count) {
+    return 'and $count more';
+  }
+
+  @override
+  String get snapshotRollbackClones => 'Also destroy clones of those snapshots';
+
+  @override
+  String get snapshotRollbackForce => 'Force unmount';
+
+  @override
+  String get snapshotClone => 'Clone';
+
+  @override
+  String snapshotCloneTitle(String name) {
+    return 'Clone $name';
+  }
+
+  @override
+  String get snapshotCloneBody =>
+      'Makes a new dataset that starts as a copy of this snapshot. It takes no space until it changes.';
+
+  @override
+  String get snapshotCloneTarget => 'New dataset';
+
+  @override
+  String snapshotCloneInvalid(String pool) {
+    return 'Use a path inside $pool, like $pool/copy';
+  }
+
+  @override
+  String snapshotCloned(String name) {
+    return 'Created $name';
   }
 
   @override

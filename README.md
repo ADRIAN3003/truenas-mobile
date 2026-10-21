@@ -31,7 +31,7 @@ for Android and iOS that talks to the official TrueNAS middleware API
   the app is running or kept alive by the phone; when it stops hearing from the
   server it says so. Settings > General > Live job progress turns it off.
 - **Storage:** pools with layout, scrub start, pause and stop; datasets and
-  zvols (create, delete); snapshots (create, roll back, delete); disks with
+  zvols (create, delete); snapshots (browse, search, create, roll back, clone, delete); disks with
   temperatures.
 - **Data protection:** periodic snapshot, replication, cloud sync, TrueCloud
   backup and rsync tasks with their last result. Run, stop, enable or

@@ -37,6 +37,51 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+        <!-- Home screen widgets: pool health, CPU and memory, alerts. -->
+        <receiver
+            android:name=".PoolsWidgetProvider"
+            android:exported="false"
+            android:label="@string/widget_pools_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_pools_info" />
+        </receiver>
+        <receiver
+            android:name=".SystemWidgetProvider"
+            android:exported="false"
+            android:label="@string/widget_system_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_system_info" />
+        </receiver>
+        <receiver
+            android:name=".AlertsWidgetProvider"
+            android:exported="false"
+            android:label="@string/widget_alerts_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_alerts_info" />
+        </receiver>
+        <!-- Asks which server a new widget shows. -->
+        <activity
+            android:name=".WidgetConfigActivity"
+            android:exported="true"
+            android:taskAffinity=""
+            android:excludeFromRecents="true"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
+            </intent-filter>
+        </activity>
         <!-- Hands the downloaded update APK to the system installer. -->
         <provider
             android:name="androidx.core.content.FileProvider"

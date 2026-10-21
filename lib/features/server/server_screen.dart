@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -8,6 +10,9 @@ import '../../core/jobs/job_tracker.dart';
 import '../../core/jobs/live_progress.dart';
 import '../../core/settings/settings_provider.dart';
 import '../../core/session/truenas_session.dart';
+import '../../core/widgets/home_widget_sync.dart';
+import '../../core/widgets/home_widgets.dart';
+import '../../core/notifications/background_alerts.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../shared/connect_dialogs.dart';
 import '../../shared/glass.dart';
@@ -40,6 +45,7 @@ class _ServerScreenState extends ConsumerState<ServerScreen>
     with WidgetsBindingObserver {
   TrueNasSession? _session;
   JobMonitor? _jobs;
+  HomeWidgetSync? _widgets;
   Map<String, dynamic>? _info;
   Object? _error;
   var _tab = 0;
@@ -65,7 +71,11 @@ class _ServerScreenState extends ConsumerState<ServerScreen>
       // A failed attempt is retried by the next call.
       _session?.ensureAlive().catchError((_) {}).whenComplete(() {
         _jobs?.refresh();
+        _widgets?.refresh();
       });
+    } else if (state == AppLifecycleState.paused) {
+      // The widgets show what the app saw last, so save it as it is left.
+      _widgets?.refresh();
     }
   }
 
@@ -73,6 +83,7 @@ class _ServerScreenState extends ConsumerState<ServerScreen>
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     _jobs?.dispose();
+    _widgets?.dispose();
     _session?.close();
     super.dispose();
   }
@@ -84,6 +95,8 @@ class _ServerScreenState extends ConsumerState<ServerScreen>
     _session = null;
     final previousJobs = _jobs;
     _jobs = null;
+    _widgets?.dispose();
+    _widgets = null;
     await previousJobs?.dispose();
     await previous?.close();
     setState(() {
@@ -109,6 +122,23 @@ class _ServerScreenState extends ConsumerState<ServerScreen>
         texts: () => AppLocalizations.of(context).jobTexts,
         lockScreen: ref.read(settingsProvider).liveJobs,
       )..start();
+      if (ref.read(settingsProvider).homeWidgets) {
+        _widgets = HomeWidgetSync(
+          publisher: ref.read(homeWidgetPublisherProvider),
+          session: session,
+          server: () => _instance ?? instance,
+          servers: () => ref.read(instancesProvider).value ?? [instance],
+          locale: () => Localizations.localeOf(context),
+          chosenDefault: () => ref.read(settingsProvider).defaultServerId,
+        )..start();
+        // A widget added since the app started gets its background refresh
+        // from now on.
+        unawaited(
+          ref
+              .read(alertNotificationServiceProvider)
+              .resume(ref.read(settingsProvider)),
+        );
+      }
       if (updated.pinnedFingerprint != instance.pinnedFingerprint ||
           updated.lastApiVersion != instance.lastApiVersion) {
         // Remembering the pin is a courtesy; failing to save it must not

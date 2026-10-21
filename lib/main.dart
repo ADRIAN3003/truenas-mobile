@@ -14,6 +14,7 @@ import 'core/security/biometric_auth.dart';
 import 'core/settings/app_settings.dart';
 import 'core/settings/settings_provider.dart';
 import 'core/settings/system_language.dart';
+import 'core/widgets/home_widgets.dart';
 import 'features/instances/open_default_server.dart';
 import 'features/lock/app_lock_gate.dart';
 import 'features/updates/updates_provider.dart';
@@ -37,6 +38,7 @@ Future<void> main() async {
                 : PlatformDispatcher.instance.locale,
           ),
           store: const SecureKeyValueStore(),
+          widgets: const PlatformHomeWidgets(),
         )
       : null;
   if (alerts != null) unawaited(alerts.resume(settings));
@@ -54,6 +56,10 @@ Future<void> main() async {
           const Duration(milliseconds: 400),
         ),
         liveProgressProvider.overrideWithValue(const PlatformLiveProgress()),
+        if (alerts != null)
+          homeWidgetsBridgeProvider.overrideWithValue(
+            const PlatformHomeWidgets(),
+          ),
       ],
       child: wrapForGlass(const TrueNasMobileApp()),
     ),

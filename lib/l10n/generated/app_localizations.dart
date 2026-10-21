@@ -4159,6 +4159,108 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{count, plural, one{1 job running} other{{count} jobs running}}'**
   String jobsRunningCount(int count);
+
+  /// Title of the pool health home screen widget.
+  ///
+  /// In en, this message translates to:
+  /// **'Pools'**
+  String get homeWidgetPools;
+
+  /// Title of the CPU and memory home screen widget.
+  ///
+  /// In en, this message translates to:
+  /// **'System'**
+  String get homeWidgetSystem;
+
+  /// Title of the alerts home screen widget.
+  ///
+  /// In en, this message translates to:
+  /// **'Alerts'**
+  String get homeWidgetAlerts;
+
+  /// Label of the processor gauge in the home screen widget.
+  ///
+  /// In en, this message translates to:
+  /// **'CPU'**
+  String get homeWidgetCpu;
+
+  /// Label of the memory gauge in the home screen widget.
+  ///
+  /// In en, this message translates to:
+  /// **'RAM'**
+  String get homeWidgetMemory;
+
+  /// Shown before the time a home screen widget last got data.
+  ///
+  /// In en, this message translates to:
+  /// **'Updated'**
+  String get homeWidgetUpdated;
+
+  /// Shown in a home screen widget when the last check could not reach the server.
+  ///
+  /// In en, this message translates to:
+  /// **'Can\'t reach the server'**
+  String get homeWidgetUnreachable;
+
+  /// Shown in a home screen widget when no server is saved.
+  ///
+  /// In en, this message translates to:
+  /// **'Open TrueNAS Mobile to set up'**
+  String get homeWidgetSetup;
+
+  /// Shown in a home screen widget before it has data for the server.
+  ///
+  /// In en, this message translates to:
+  /// **'No data yet. Open the app.'**
+  String get homeWidgetNoData;
+
+  /// Pool widget summary when the server has no pools.
+  ///
+  /// In en, this message translates to:
+  /// **'No pools'**
+  String get homeWidgetNoPools;
+
+  /// Pool widget summary when every pool is healthy.
+  ///
+  /// In en, this message translates to:
+  /// **'All pools healthy'**
+  String get homeWidgetPoolsOk;
+
+  /// Pool widget summary when some pools are not healthy.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{1 pool needs attention} other{{count} pools need attention}}'**
+  String homeWidgetPoolsAttention(int count);
+
+  /// Alerts widget summary when nothing is active.
+  ///
+  /// In en, this message translates to:
+  /// **'No active alerts'**
+  String get homeWidgetAlertsNone;
+
+  /// Alerts widget summary.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{1 active alert} other{{count} active alerts}}'**
+  String homeWidgetAlertsCount(int count);
+
+  /// Memory in use out of the total, in the system widget.
+  ///
+  /// In en, this message translates to:
+  /// **'{used} of {total}'**
+  String homeWidgetMemoryText(String used, String total);
+
+  /// Switch in Settings for refreshing the widgets in the background.
+  ///
+  /// In en, this message translates to:
+  /// **'Home screen widgets'**
+  String get settingsHomeWidgets;
+
+  /// Hint under the home screen widgets switch.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep widgets up to date in the background, about every 15 minutes. They also update while a server is open. Add them from your home screen; the phone decides when a refresh really runs.'**
+  String get settingsHomeWidgetsHint;
 }
 
 class _AppLocalizationsDelegate

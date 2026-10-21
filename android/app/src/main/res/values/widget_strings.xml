@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="widget_pools_label">Pool health</string>
+    <string name="widget_pools_description">How your TrueNAS pools are doing.</string>
+    <string name="widget_system_label">CPU and memory</string>
+    <string name="widget_system_description">CPU and memory use of your TrueNAS.</string>
+    <string name="widget_alerts_label">Alerts</string>
+    <string name="widget_alerts_description">The active alerts on your TrueNAS.</string>
+    <string name="widget_choose_server">Choose a server</string>
+</resources>

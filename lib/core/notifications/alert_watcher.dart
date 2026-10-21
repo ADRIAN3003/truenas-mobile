@@ -5,6 +5,7 @@ import '../instances/instance_repository.dart';
 import '../instances/server_instance.dart';
 import '../models/alert.dart';
 import '../session/truenas_session.dart';
+import '../widgets/home_widget_sync.dart';
 import 'alert_kind_catalog.dart';
 
 /// Shows alerts on the phone. The real one is `LocalAlertNotifier`; tests use
@@ -77,27 +78,37 @@ class AlertWatcher {
   ///
   /// Alerts whose kind is in [muted] are recorded as seen but not announced.
   ///
+  /// With [widgets], the same visit also gathers what the home screen widgets
+  /// show (pools, CPU, memory, alerts) and saves it at the end.
+  ///
   /// A server that cannot be reached is skipped and tried again next time.
   Future<void> check(
     List<ServerInstance> servers, {
     required AlertSeverity minimum,
     bool notify = true,
     Set<String> muted = const {},
+    HomeWidgetCollector? widgets,
   }) async {
     final seen = await _load();
     final next = <String, Set<String>>{};
     final kinds = <AlertKind>[];
     await Future.wait([
       for (final server in servers)
-        _checkOne(server, seen[server.id], minimum, notify, muted).then((
-          result,
-        ) {
+        _checkOne(
+          server,
+          seen[server.id],
+          minimum,
+          notify,
+          muted,
+          widgets,
+        ).then((result) {
           // Unreachable: keep what was known.
           final known = result?.ids ?? seen[server.id];
           if (known != null) next[server.id] = known;
           if (result != null) kinds.addAll(result.kinds);
         }),
     ]);
+    await widgets?.finish(servers);
     try {
       await AlertKindCatalog(store).record(kinds);
     } catch (_) {
@@ -117,6 +128,7 @@ class AlertWatcher {
     AlertSeverity minimum,
     bool notify,
     Set<String> muted,
+    HomeWidgetCollector? widgets,
   ) async {
     TrueNasSession? session;
     try {
@@ -141,6 +153,12 @@ class AlertWatcher {
         onTimeout: () => const [],
       );
       if (fresh.isNotEmpty) await _show(server, fresh);
+      // After the notifications, which matter more when time is short.
+      if (widgets != null) {
+        await widgets
+            .collect(server, session, alerts: alerts)
+            .timeout(timeout, onTimeout: () => widgets.markUnreachable(server));
+      }
       final kinds = [
         for (final alert in alerts)
           if (alert.klass.isNotEmpty) AlertKind(alert.klass),
@@ -148,6 +166,7 @@ class AlertWatcher {
       ];
       return (ids: {for (final alert in active) alert.id}, kinds: kinds);
     } catch (_) {
+      widgets?.markUnreachable(server);
       return null;
     } finally {
       unawaited(session?.close().catchError((_) {}));

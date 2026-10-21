@@ -7,6 +7,8 @@ import '../instances/instance_repository.dart';
 import '../instances/server_instance.dart';
 import '../models/alert.dart';
 import '../settings/app_settings.dart';
+import '../widgets/home_widget_sync.dart';
+import '../widgets/home_widgets.dart';
 import 'alert_kind_catalog.dart';
 import 'alert_watcher.dart';
 import 'local_alert_notifier.dart';
@@ -87,31 +89,41 @@ void alertCallbackDispatcher() {
   });
 }
 
-/// One background check: nothing happens unless the user turned alert
-/// notifications on. Never shows anything in the app, so the app lock has
+/// One background check. It has two jobs: tell about new alerts (when the
+/// user turned alert notifications on) and keep the home screen widgets
+/// current (when the user has put one on a home screen). With neither to do
+/// it does nothing. Never shows anything in the app, so the app lock has
 /// nothing to guard; opening the app from a notification goes through it as
 /// usual.
 Future<void> runBackgroundAlertCheck({
   KeyValueStore store = const SecureKeyValueStore(),
   AlertNotifier? notifier,
+  HomeWidgetsBridge widgets = const PlatformHomeWidgets(),
 }) async {
   final settings = await SettingsRepository(store).load();
-  if (!settings.alertNotifications) return;
+  final forWidgets = settings.homeWidgets && await widgets.hasWidgets();
+  if (!settings.alertNotifications && !forWidgets) return;
   final servers = await InstanceRepository(store).load();
+  Locale locale() => settings.language != null
+      ? Locale(settings.language!)
+      : PlatformDispatcher.instance.locale;
   final watcher = AlertWatcher(
     store: store,
-    notifier:
-        notifier ??
-        LocalAlertNotifier(
-          locale: () => settings.language != null
-              ? Locale(settings.language!)
-              : PlatformDispatcher.instance.locale,
-        ),
+    notifier: notifier ?? LocalAlertNotifier(locale: locale),
   );
   await watcher.check(
     servers,
     minimum: settings.alertLevel,
+    // Without the notifications on, alerts are only recorded as seen.
+    notify: settings.alertNotifications,
     muted: settings.mutedAlertKinds,
+    widgets: forWidgets
+        ? HomeWidgetCollector(
+            publisher: HomeWidgetPublisher(widgets),
+            locale: locale,
+            chosenDefault: settings.defaultServerId,
+          )
+        : null,
   );
 }
 
@@ -133,11 +145,15 @@ class AlertNotificationService {
     required this.scheduler,
     required this.notifier,
     required this.store,
+    this.widgets = const NoHomeWidgets(),
   });
 
   final BackgroundScheduler scheduler;
   final AlertNotifier notifier;
   final KeyValueStore store;
+
+  /// The home screen widgets, which the same background check keeps current.
+  final HomeWidgetsBridge widgets;
 
   bool get isSupported => scheduler.isSupported;
 
@@ -183,7 +199,10 @@ class AlertNotificationService {
     }
   }
 
-  Future<void> turnOff() async {
+  /// Stops the alert check. With [keepForWidgets] the schedule stays, since
+  /// the same check also keeps the home screen widgets current.
+  Future<void> turnOff({bool keepForWidgets = false}) async {
+    if (keepForWidgets) return;
     try {
       await scheduler.cancel();
     } catch (_) {
@@ -191,12 +210,18 @@ class AlertNotificationService {
     }
   }
 
-  /// At app start: schedules the check again when it is on (the phone may
-  /// have dropped it, and the callback handle changes with each app update).
+  /// At app start: schedules the check again when something needs it (the
+  /// phone may have dropped it, and the callback handle changes with each app
+  /// update): alert notifications, or a widget on a home screen. Also called
+  /// when a server is open, which is when a widget added in the meantime
+  /// first gets data.
   Future<void> resume(AppSettings settings) async {
-    if (!settings.alertNotifications || !isSupported) return;
+    if (!isSupported) return;
     try {
-      await scheduler.schedule();
+      if (settings.alertNotifications ||
+          (settings.homeWidgets && await widgets.hasWidgets())) {
+        await scheduler.schedule();
+      }
     } catch (_) {
       // Retried at the next start.
     }

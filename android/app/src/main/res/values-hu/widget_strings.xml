@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="widget_pools_label">Tárolók állapota</string>
+    <string name="widget_pools_description">A TrueNAS tárolóid állapota és telítettsége.</string>
+    <string name="widget_system_label">CPU és RAM</string>
+    <string name="widget_system_description">A TrueNAS processzor- és memóriahasználata.</string>
+    <string name="widget_alerts_label">Riasztások</string>
+    <string name="widget_alerts_description">A TrueNAS aktív riasztásai.</string>
+    <string name="widget_choose_server">Válassz szervert</string>
+</resources>

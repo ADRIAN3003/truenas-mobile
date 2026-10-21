@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/misc.dart' show Override;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:liquid_glass_widgets/liquid_glass_widgets.dart' as lg;
 import 'package:truenas_mobile/core/instances/instance_repository.dart';
@@ -9,12 +10,14 @@ import 'package:truenas_mobile/core/instances/instances_provider.dart';
 import 'package:truenas_mobile/core/instances/server_instance.dart';
 import 'package:truenas_mobile/core/settings/app_settings.dart';
 import 'package:truenas_mobile/core/settings/settings_provider.dart';
+import 'package:truenas_mobile/core/widgets/home_widgets.dart';
 import 'package:truenas_mobile/features/server/server_screen.dart';
 import 'package:truenas_mobile/shared/glass.dart';
 import 'package:truenas_mobile/shared/theme.dart';
 import 'package:truenas_mobile/l10n/generated/app_localizations.dart';
 
 import '../../support/fake_truenas_server.dart';
+import '../../support/home_widget_fakes.dart';
 import '../../support/memory_store.dart';
 
 void main() {
@@ -39,6 +42,7 @@ void main() {
     bool fromList = false,
     String? url,
     AppSettings settings = const AppSettings(),
+    List<Override> overrides = const [],
   }) async {
     tester.view.physicalSize = size;
     tester.view.devicePixelRatio = 1;
@@ -62,6 +66,7 @@ void main() {
             InstanceRepository(store),
           ),
           initialSettingsProvider.overrideWithValue(settings),
+          ...overrides,
         ],
       );
       await container.read(instancesProvider.future);
@@ -125,6 +130,34 @@ void main() {
     await tester.tap(find.byTooltip('App settings'));
     await tester.pumpAndSettle();
     expect(find.text('Appearance'), findsOneWidget);
+    await close(tester);
+  });
+
+  testWidgets('an open server keeps the home screen widgets current', (
+    tester,
+  ) async {
+    final widgets = FakeHomeWidgets();
+    await open(
+      tester,
+      const Size(400, 800),
+      overrides: [homeWidgetsBridgeProvider.overrideWithValue(widgets)],
+    );
+    expect(widgets.servers['1']?['pools']['items'][0]['name'], 'tank');
+    expect(widgets.servers['1']?['alerts']['count'], 1);
+    await close(tester);
+  });
+
+  testWidgets('with widgets switched off nothing is saved for them', (
+    tester,
+  ) async {
+    final widgets = FakeHomeWidgets();
+    await open(
+      tester,
+      const Size(400, 800),
+      settings: const AppSettings(homeWidgets: false),
+      overrides: [homeWidgetsBridgeProvider.overrideWithValue(widgets)],
+    );
+    expect(widgets.document, isNull);
     await close(tester);
   });
 

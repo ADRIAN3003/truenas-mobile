@@ -676,5 +676,22 @@
   "settingsLiveJobsNoExtension": "Az alkalmazás ezen példányában nincs zárolt képernyős bővítmény (az oldalbetöltő eszköz eltávolította), ezért a feladatok csak az alkalmazásban látszanak",
   "settingsLiveJobsDisabled": "Az élő tevékenységek ki vannak kapcsolva az alkalmazásnak az iOS Beállításokban",
   "jobsDismiss": "Elrejtés",
-  "jobsRunningCount": "{count, plural, one{1 feladat fut} other{{count} feladat fut}}"
+  "jobsRunningCount": "{count, plural, one{1 feladat fut} other{{count} feladat fut}}",
+  "homeWidgetPools": "Tárolók",
+  "homeWidgetSystem": "Rendszer",
+  "homeWidgetAlerts": "Riasztások",
+  "homeWidgetCpu": "CPU",
+  "homeWidgetMemory": "RAM",
+  "homeWidgetUpdated": "Frissítve",
+  "homeWidgetUnreachable": "A szerver nem érhető el",
+  "homeWidgetSetup": "Nyisd meg a TrueNAS Mobile-t a beállításhoz",
+  "homeWidgetNoData": "Még nincs adat. Nyisd meg az alkalmazást.",
+  "homeWidgetNoPools": "Nincs tároló",
+  "homeWidgetPoolsOk": "Minden tároló rendben",
+  "homeWidgetPoolsAttention": "{count, plural, other{{count} tároló figyelmet igényel}}",
+  "homeWidgetAlertsNone": "Nincs aktív riasztás",
+  "homeWidgetAlertsCount": "{count, plural, other{{count} aktív riasztás}}",
+  "homeWidgetMemoryText": "{used} / {total}",
+  "settingsHomeWidgets": "Kezdőképernyős widgetek",
+  "settingsHomeWidgetsHint": "Widgetek frissítése a háttérben, nagyjából 15 percenként. Nyitott szervernél is frissülnek. A kezdőképernyőről adhatod hozzá őket; a telefon dönti el, mikor fut le valójában a frissítés."
 }

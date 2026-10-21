@@ -23,6 +23,7 @@ class AppSettings {
     this.alertNotifications = false,
     this.alertLevel = AlertSeverity.critical,
     this.mutedAlertKinds = const {},
+    this.homeWidgets = true,
   });
 
   factory AppSettings.fromJson(Map<String, dynamic> json) => AppSettings(
@@ -49,6 +50,7 @@ class AppSettings {
       for (final id in (json['mutedAlertKinds'] as List?) ?? const [])
         if (id is String && id.isNotEmpty) id,
     },
+    homeWidgets: json['homeWidgets'] as bool? ?? true,
   );
 
   /// Language codes the app is translated into.
@@ -107,6 +109,11 @@ class AppSettings {
   /// notification for. They still show in the Alerts list.
   final Set<String> mutedAlertKinds;
 
+  /// Keep the home screen widgets up to date in the background (about every
+  /// 15 minutes, when the phone allows it). They also update whenever a
+  /// server is open in the app. Does nothing until a widget is added.
+  final bool homeWidgets;
+
   AppSettings copyWith({
     ThemeChoice? theme,
     String? Function()? language,
@@ -122,6 +129,7 @@ class AppSettings {
     bool? alertNotifications,
     AlertSeverity? alertLevel,
     Set<String>? mutedAlertKinds,
+    bool? homeWidgets,
   }) => AppSettings(
     theme: theme ?? this.theme,
     language: language != null ? language() : this.language,
@@ -141,6 +149,7 @@ class AppSettings {
     alertNotifications: alertNotifications ?? this.alertNotifications,
     alertLevel: alertLevel ?? this.alertLevel,
     mutedAlertKinds: mutedAlertKinds ?? this.mutedAlertKinds,
+    homeWidgets: homeWidgets ?? this.homeWidgets,
   );
 
   Map<String, dynamic> toJson() => {
@@ -158,6 +167,7 @@ class AppSettings {
     'alertNotifications': alertNotifications,
     'alertLevel': alertLevel.name,
     'mutedAlertKinds': mutedAlertKinds.toList()..sort(),
+    'homeWidgets': homeWidgets,
   };
 }
 

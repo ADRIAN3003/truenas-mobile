@@ -27,6 +27,12 @@ for Android and iOS that talks to the official TrueNAS middleware API
   Android 16). There is no push server, so the lock screen only moves while
   the app is running or kept alive by the phone; when it stops hearing from the
   server it says so. Settings > General > Live job progress turns it off.
+- **Home screen widgets:** pool health, CPU and memory, and active alerts for
+  one server of your choice, on iOS (iOS 17 and newer) and Android. They show
+  what the app saw last, with the time, and refresh whenever a server is open
+  and about every 15 minutes in the background (the phone decides when that
+  really runs; there is no push server). Settings > Notifications > Home
+  screen widgets turns the background refresh off.
 - **Storage:** pools with layout, scrub start, pause and stop; datasets and
   zvols (create, delete); snapshots (create, roll back, delete); disks with
   temperatures.
@@ -77,6 +83,8 @@ features appear or hide based on what your server offers. The legacy REST API
 
 - **iOS 16.2** is needed for the Live Activity that shows job progress on the
   lock screen.
+- **iOS 17** is needed for the home screen widgets, which let you choose the
+  server when you add one.
 - **iOS 26** is the look the interface follows (liquid glass tab bar, alerts and
   menus). The app draws that glass itself, so older versions get the same
   layout.
@@ -109,7 +117,11 @@ Download the latest APK or IPA from the
   Sideloadly on iOS 27; the same build installed with `flutter install
   --release` (Xcode signing) works. The activity only moves while the app
   runs; there is no push server, so it goes stale some time after the app is
-  left.
+  left. The widgets live in the same extension and share their data with the
+  app through the App Group `group.hu.adrian.truenasmobile`: Xcode registers
+  the group for your team the first time you build with automatic signing, and
+  a sideloading tool has to keep the group when it re-signs, or the widgets
+  stay empty (the app itself works either way).
 
 ## Build from source
 

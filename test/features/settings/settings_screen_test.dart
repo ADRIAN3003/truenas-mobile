@@ -561,7 +561,7 @@ void main() {
         overrides: [
           ...overrides,
           initialSettingsProvider.overrideWithValue(
-            const AppSettings(alertNotifications: true),
+            const AppSettings(alertNotifications: true, homeWidgets: false),
           ),
         ],
       );
@@ -570,6 +570,39 @@ void main() {
       await tester.pumpAndSettle();
       expect(scheduler.scheduled, isFalse);
       expect((await saved()).alertNotifications, isFalse);
+    });
+
+    testWidgets('turn off, but the widgets still need the check', (
+      tester,
+    ) async {
+      await open(
+        tester,
+        overrides: [
+          ...overrides,
+          initialSettingsProvider.overrideWithValue(
+            const AppSettings(alertNotifications: true),
+          ),
+        ],
+      );
+      scheduler.scheduled = true;
+      await tester.tap(find.text('Alert notifications'));
+      await tester.pumpAndSettle();
+      expect(scheduler.scheduled, isTrue);
+      expect((await saved()).alertNotifications, isFalse);
+    });
+
+    testWidgets('home screen widgets can be switched off', (tester) async {
+      await open(tester, overrides: overrides);
+      scheduler.scheduled = true;
+      await tester.scrollUntilVisible(
+        find.text('Home screen widgets'),
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.tap(find.text('Home screen widgets'));
+      await tester.pumpAndSettle();
+      expect((await saved()).homeWidgets, isFalse);
+      expect(scheduler.scheduled, isFalse);
     });
 
     testWidgets('choose the lowest level that notifies', (tester) async {

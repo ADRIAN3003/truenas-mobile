@@ -146,8 +146,8 @@ struct StatusWidget: Widget {
     ) { entry in
       StatusWidgetView(entry: entry, section: section)
     }
-    .configurationDisplayName(section.galleryName)
-    .description(section.galleryDescription)
+    .configurationDisplayName(LocalizedStringKey(section.galleryName))
+    .description(LocalizedStringKey(section.galleryDescription))
     .supportedFamilies(section.families)
   }
 }

@@ -1091,7 +1091,7 @@ abstract class AppLocalizations {
   /// Confirmation body for rolling back.
   ///
   /// In en, this message translates to:
-  /// **'The dataset returns to its state at snapshot {name}. All changes made since then are lost, and newer snapshots are destroyed.'**
+  /// **'The dataset returns to its state at snapshot {name}. Everything changed since then is lost.'**
   String snapshotRollbackBody(String name);
 
   /// Snackbar after rolling back.
@@ -4159,6 +4159,120 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{count, plural, one{1 job running} other{{count} jobs running}}'**
   String jobsRunningCount(int count);
+
+  /// Subtitle of the snapshots row on a dataset.
+  ///
+  /// In en, this message translates to:
+  /// **'Browse, roll back and clone'**
+  String get snapshotsBrowse;
+
+  /// Hint of the snapshot search field.
+  ///
+  /// In en, this message translates to:
+  /// **'Search snapshots'**
+  String get snapshotsSearch;
+
+  /// Shown when the search matches no snapshot.
+  ///
+  /// In en, this message translates to:
+  /// **'No snapshots match'**
+  String get snapshotsNoMatch;
+
+  /// Count and total size of a dataset's snapshots.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 snapshot} other{{count} snapshots}} · {used} used'**
+  String snapshotsSummary(int count, String used);
+
+  /// Tooltip and title of the snapshot sort choice.
+  ///
+  /// In en, this message translates to:
+  /// **'Sort'**
+  String get snapshotSort;
+
+  /// Sort option.
+  ///
+  /// In en, this message translates to:
+  /// **'Newest first'**
+  String get snapshotSortNewest;
+
+  /// Sort option.
+  ///
+  /// In en, this message translates to:
+  /// **'Oldest first'**
+  String get snapshotSortOldest;
+
+  /// Sort option.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get snapshotSortName;
+
+  /// Sort option.
+  ///
+  /// In en, this message translates to:
+  /// **'Size (used)'**
+  String get snapshotSortSize;
+
+  /// Warning above the list of snapshots a rollback destroys.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{This newer snapshot will be destroyed:} other{These {count} newer snapshots will be destroyed:}}'**
+  String snapshotRollbackNewer(int count);
+
+  /// Last line of a shortened list.
+  ///
+  /// In en, this message translates to:
+  /// **'and {count} more'**
+  String snapshotRollbackMore(int count);
+
+  /// Checkbox in the rollback dialog.
+  ///
+  /// In en, this message translates to:
+  /// **'Also destroy clones of those snapshots'**
+  String get snapshotRollbackClones;
+
+  /// Checkbox in the rollback dialog.
+  ///
+  /// In en, this message translates to:
+  /// **'Force unmount'**
+  String get snapshotRollbackForce;
+
+  /// Menu item and button that clones a snapshot.
+  ///
+  /// In en, this message translates to:
+  /// **'Clone'**
+  String get snapshotClone;
+
+  /// Title of the clone dialog.
+  ///
+  /// In en, this message translates to:
+  /// **'Clone {name}'**
+  String snapshotCloneTitle(String name);
+
+  /// Body of the clone dialog.
+  ///
+  /// In en, this message translates to:
+  /// **'Makes a new dataset that starts as a copy of this snapshot. It takes no space until it changes.'**
+  String get snapshotCloneBody;
+
+  /// Label of the clone target field.
+  ///
+  /// In en, this message translates to:
+  /// **'New dataset'**
+  String get snapshotCloneTarget;
+
+  /// Validation message of the clone target.
+  ///
+  /// In en, this message translates to:
+  /// **'Use a path inside {pool}, like {pool}/copy'**
+  String snapshotCloneInvalid(String pool);
+
+  /// Snackbar after cloning.
+  ///
+  /// In en, this message translates to:
+  /// **'Created {name}'**
+  String snapshotCloned(String name);
 }
 
 class _AppLocalizationsDelegate

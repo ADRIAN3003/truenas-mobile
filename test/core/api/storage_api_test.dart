@@ -9,9 +9,13 @@ void main() {
   late FakeTrueNasServer server;
   late TrueNasSession session;
 
-  Future<void> connect({String snapshotService = 'pool.snapshot'}) async {
+  Future<void> connect({
+    String snapshotService = 'pool.snapshot',
+    bool clone = true,
+  }) async {
     server = await FakeTrueNasServer.start();
     server.snapshotService = snapshotService;
+    server.snapshotClone = clone;
     final (s, _) = await connectToInstance(
       ServerInstance(
         id: '1',
@@ -97,6 +101,8 @@ void main() {
         destroyNewer: true,
       );
       await session.storage.deleteSnapshot('tank/media@auto-1');
+      expect(await session.storage.canCloneSnapshots(), isTrue);
+      await session.storage.cloneSnapshot('tank/media@auto-2', 'tank/copy');
       final methods = server.calls.map((c) => c.$1).toList();
       expect(
         methods,
@@ -105,11 +111,39 @@ void main() {
           '$service.create',
           '$service.rollback',
           '$service.delete',
+          '$service.clone',
         ]),
       );
-      expect(server.calls.last.$2, ['tank/media@auto-1']);
+      Object? paramsOf(String method) =>
+          server.calls.firstWhere((c) => c.$1 == '$service.$method').$2;
+      expect(paramsOf('delete'), ['tank/media@auto-1']);
+      expect(paramsOf('rollback'), [
+        'tank/media@manual',
+        {'recursive': true},
+      ]);
+      expect(paramsOf('clone'), [
+        {'snapshot': 'tank/media@auto-2', 'dataset_dst': 'tank/copy'},
+      ]);
     });
   }
+
+  test('rollback sends clone and force options only when asked', () async {
+    await connect();
+    await session.storage.rollbackSnapshot(
+      'tank/media@auto-2',
+      destroyClones: true,
+      force: true,
+    );
+    expect(server.calls.last.$2, [
+      'tank/media@auto-2',
+      {'recursive': false, 'recursive_clones': true, 'force': true},
+    ]);
+  });
+
+  test('clone is hidden when the server has no clone method', () async {
+    await connect(clone: false);
+    expect(await session.storage.canCloneSnapshots(), isFalse);
+  });
 
   test('disks include pool and temperature', () async {
     await connect();

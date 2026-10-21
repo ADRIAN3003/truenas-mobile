@@ -7,9 +7,9 @@ struct JobActivityWidgetBundle: WidgetBundle {
     JobActivityLiveActivity()
     // Choosing a server for a widget needs iOS 17.
     if #available(iOS 17.0, *) {
-      StatusWidget(section: .pools)
-      StatusWidget(section: .system)
-      StatusWidget(section: .alerts)
+      PoolsWidget()
+      SystemWidget()
+      AlertsWidget()
     }
   }
 }

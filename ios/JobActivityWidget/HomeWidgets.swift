@@ -136,18 +136,31 @@ struct StatusProvider: AppIntentTimelineProvider {
 
 // MARK: - Widgets
 
+/// The configuration all three widgets share. A `Widget` needs an `init()`,
+/// so each has a small type of its own instead of a stored `section`.
 @available(iOS 17.0, *)
-struct StatusWidget: Widget {
-  let section: WidgetSection
-
-  var body: some WidgetConfiguration {
-    AppIntentConfiguration(
-      kind: section.kind, intent: SelectServerIntent.self, provider: StatusProvider()
-    ) { entry in
-      StatusWidgetView(entry: entry, section: section)
-    }
-    .configurationDisplayName(LocalizedStringKey(section.galleryName))
-    .description(LocalizedStringKey(section.galleryDescription))
-    .supportedFamilies(section.families)
+func statusConfiguration(_ section: WidgetSection) -> some WidgetConfiguration {
+  AppIntentConfiguration(
+    kind: section.kind, intent: SelectServerIntent.self, provider: StatusProvider()
+  ) { entry in
+    StatusWidgetView(entry: entry, section: section)
   }
+  .configurationDisplayName(LocalizedStringKey(section.galleryName))
+  .description(LocalizedStringKey(section.galleryDescription))
+  .supportedFamilies(section.families)
+}
+
+@available(iOS 17.0, *)
+struct PoolsWidget: Widget {
+  var body: some WidgetConfiguration { statusConfiguration(.pools) }
+}
+
+@available(iOS 17.0, *)
+struct SystemWidget: Widget {
+  var body: some WidgetConfiguration { statusConfiguration(.system) }
+}
+
+@available(iOS 17.0, *)
+struct AlertsWidget: Widget {
+  var body: some WidgetConfiguration { statusConfiguration(.alerts) }
 }

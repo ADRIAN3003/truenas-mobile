@@ -219,7 +219,7 @@ README covers what the app does; this file covers how to work on it.
   works in the background check's headless engine (the App Group
   `group.hu.adrian.truenasmobile` on iOS, the `HomeWidgetPreferences` file on
   Android); it keeps what it knew of a server it could not reach (marked
-  `unreachable`) and drops removed servers. Two writers: `HomeWidgetSync` in
+  `unreachable`) and drops removed servers. `HomeWidgetListSync` (wraps the first screen in `app.dart`) publishes the saved server list from app start and on every list or setting change, so a widget's server picker is never empty before a server was opened. Two writers of the data: `HomeWidgetSync` in
   `ServerScreen` (on open, every minute, on resume and pause) and the
   background alert check (`AlertWatcher.check(widgets:)`, same visit, same
   session). That check now also runs for widgets: `runBackgroundAlertCheck`

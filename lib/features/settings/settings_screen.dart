@@ -294,7 +294,7 @@ class _NotificationsCard extends ConsumerWidget {
                   return;
                 }
               } else {
-                await service.turnOff();
+                await service.turnOff(keepForWidgets: settings.homeWidgets);
               }
               await notifier.update((s) => s.copyWith(alertNotifications: on));
             },
@@ -343,6 +343,22 @@ class _NotificationsCard extends ConsumerWidget {
           value: settings.liveJobs,
           onChanged: (on) => notifier.update((s) => s.copyWith(liveJobs: on)),
         ),
+        if (alertsSupported)
+          AppSwitchTile(
+            title: Text(l10n.settingsHomeWidgets),
+            subtitle: Text(l10n.settingsHomeWidgetsHint),
+            value: settings.homeWidgets,
+            onChanged: (on) async {
+              final service = ref.read(alertNotificationServiceProvider);
+              final next = settings.copyWith(homeWidgets: on);
+              await notifier.update((s) => s.copyWith(homeWidgets: on));
+              if (on) {
+                await service.resume(next);
+              } else if (!next.alertNotifications) {
+                await service.turnOff();
+              }
+            },
+          ),
       ],
     );
   }

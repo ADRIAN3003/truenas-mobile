@@ -709,5 +709,22 @@
   "historyNoData": "Ebben az időszakban még nincs adat.",
   "historyStats": "Átlag {average} · csúcs {peak}",
   "historyUnavailable": "A szerver nem ad előzményadatokat.",
-  "historyChartFailed": "Nem sikerült betölteni a diagramot."
+  "historyChartFailed": "Nem sikerült betölteni a diagramot.",
+  "homeWidgetPools": "Tárolók",
+  "homeWidgetSystem": "Rendszer",
+  "homeWidgetAlerts": "Riasztások",
+  "homeWidgetCpu": "CPU",
+  "homeWidgetMemory": "RAM",
+  "homeWidgetUpdated": "Frissítve",
+  "homeWidgetUnreachable": "A szerver nem érhető el",
+  "homeWidgetSetup": "Nyisd meg a TrueNAS Mobile-t a beállításhoz",
+  "homeWidgetNoData": "Még nincs adat. Nyisd meg az alkalmazást.",
+  "homeWidgetNoPools": "Nincs tároló",
+  "homeWidgetPoolsOk": "Minden tároló rendben",
+  "homeWidgetPoolsAttention": "{count, plural, other{{count} tároló figyelmet igényel}}",
+  "homeWidgetAlertsNone": "Nincs aktív riasztás",
+  "homeWidgetAlertsCount": "{count, plural, other{{count} aktív riasztás}}",
+  "homeWidgetMemoryText": "{used} / {total}",
+  "settingsHomeWidgets": "Kezdőképernyős widgetek",
+  "settingsHomeWidgetsHint": "Widgetek frissítése a háttérben, nagyjából 15 percenként. Nyitott szervernél is frissülnek. A kezdőképernyőről adhatod hozzá őket; a telefon dönti el, mikor fut le valójában a frissítés."
 }

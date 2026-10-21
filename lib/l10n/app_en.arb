@@ -3548,5 +3548,91 @@
   "historyChartFailed": "Could not load this chart.",
   "@historyChartFailed": {
     "description": "Shown in a history chart whose data request failed."
+  },
+  "homeWidgetPools": "Pools",
+  "@homeWidgetPools": {
+    "description": "Title of the pool health home screen widget."
+  },
+  "homeWidgetSystem": "System",
+  "@homeWidgetSystem": {
+    "description": "Title of the CPU and memory home screen widget."
+  },
+  "homeWidgetAlerts": "Alerts",
+  "@homeWidgetAlerts": {
+    "description": "Title of the alerts home screen widget."
+  },
+  "homeWidgetCpu": "CPU",
+  "@homeWidgetCpu": {
+    "description": "Label of the processor gauge in the home screen widget."
+  },
+  "homeWidgetMemory": "RAM",
+  "@homeWidgetMemory": {
+    "description": "Label of the memory gauge in the home screen widget."
+  },
+  "homeWidgetUpdated": "Updated",
+  "@homeWidgetUpdated": {
+    "description": "Shown before the time a home screen widget last got data."
+  },
+  "homeWidgetUnreachable": "Can't reach the server",
+  "@homeWidgetUnreachable": {
+    "description": "Shown in a home screen widget when the last check could not reach the server."
+  },
+  "homeWidgetSetup": "Open TrueNAS Mobile to set up",
+  "@homeWidgetSetup": {
+    "description": "Shown in a home screen widget when no server is saved."
+  },
+  "homeWidgetNoData": "No data yet. Open the app.",
+  "@homeWidgetNoData": {
+    "description": "Shown in a home screen widget before it has data for the server."
+  },
+  "homeWidgetNoPools": "No pools",
+  "@homeWidgetNoPools": {
+    "description": "Pool widget summary when the server has no pools."
+  },
+  "homeWidgetPoolsOk": "All pools healthy",
+  "@homeWidgetPoolsOk": {
+    "description": "Pool widget summary when every pool is healthy."
+  },
+  "homeWidgetPoolsAttention": "{count, plural, one{1 pool needs attention} other{{count} pools need attention}}",
+  "@homeWidgetPoolsAttention": {
+    "description": "Pool widget summary when some pools are not healthy.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "homeWidgetAlertsNone": "No active alerts",
+  "@homeWidgetAlertsNone": {
+    "description": "Alerts widget summary when nothing is active."
+  },
+  "homeWidgetAlertsCount": "{count, plural, one{1 active alert} other{{count} active alerts}}",
+  "@homeWidgetAlertsCount": {
+    "description": "Alerts widget summary.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "homeWidgetMemoryText": "{used} of {total}",
+  "@homeWidgetMemoryText": {
+    "description": "Memory in use out of the total, in the system widget.",
+    "placeholders": {
+      "used": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsHomeWidgets": "Home screen widgets",
+  "@settingsHomeWidgets": {
+    "description": "Switch in Settings for refreshing the widgets in the background."
+  },
+  "settingsHomeWidgetsHint": "Keep widgets up to date in the background, about every 15 minutes. They also update while a server is open. Add them from your home screen; the phone decides when a refresh really runs.",
+  "@settingsHomeWidgetsHint": {
+    "description": "Hint under the home screen widgets switch."
   }
 }

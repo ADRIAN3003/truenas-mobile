@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Home screen widgets. -->
+    <color name="widget_bg">#FFFFFF</color>
+    <color name="widget_text">#111827</color>
+    <color name="widget_text_secondary">#6B7280</color>
+    <color name="widget_track">#E5E7EB</color>
+    <color name="widget_ok">#2E9E5B</color>
+    <color name="widget_warn">#F08C00</color>
+    <color name="widget_bad">#E03131</color>
+    <color name="widget_info">#2F6FED</color>
+</resources>

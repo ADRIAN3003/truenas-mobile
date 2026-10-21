@@ -210,6 +210,37 @@ README covers what the app does; this file covers how to work on it.
   the job (`AppBulkRun`, found again on open via
   `WorkloadsApi.activeBulkRun`); its id is `AppBulkRun.jobId`. Gated on
   `core.bulk`. Tests: `FakeTrueNasServer.holdBulk` keeps a job running.
+- Home screen widgets (`lib/core/widgets/`, setting `homeWidgets`, on by
+  default): pool health, CPU and memory, active alerts. `serverWidgetData`
+  turns pools, alerts and one `reporting.realtime` sample into JSON with the
+  text already localized (plurals worked out in Dart, so Swift and Kotlin only
+  draw). `HomeWidgetPublisher` merges it into one document (`snapshot.v1`:
+  `labels`, `defaultId`, `servers`) through the `home_widget` plugin, which also
+  works in the background check's headless engine (the App Group
+  `group.hu.adrian.truenasmobile` on iOS, the `HomeWidgetPreferences` file on
+  Android); it keeps what it knew of a server it could not reach (marked
+  `unreachable`) and drops removed servers. Two writers: `HomeWidgetSync` in
+  `ServerScreen` (on open, every minute, on resume and pause) and the
+  background alert check (`AlertWatcher.check(widgets:)`, same visit, same
+  session). That check now also runs for widgets: `runBackgroundAlertCheck`
+  does something when alert notifications are on or the setting is on and
+  `HomeWidgetsBridge.hasWidgets()` (a widget is on a home screen);
+  `AlertNotificationService.resume` schedules on the same condition and
+  `turnOff(keepForWidgets:)` leaves the schedule alone. iOS: widgets are in the
+  `JobActivityWidget` extension (`HomeWidgets.swift`, `HomeWidgetViews.swift`,
+  `HomeWidgetData.swift`), `AppIntentConfiguration` with a server picker, so
+  iOS 17+ only (`if #available` in the bundle); both targets have an App Group
+  entitlement (`Runner.entitlements`, `JobActivityWidget.entitlements`, set in
+  the hand-edited `project.pbxproj`). The widget kinds (`TrueNASPools`,
+  `TrueNASSystem`, `TrueNASAlerts`) must match `_iosKinds` in
+  `home_widgets.dart`; the Android providers (`HomeWidgets.kt`,
+  `PoolsWidgetProvider` and friends, `WidgetConfigActivity` for the server
+  choice) must match `_androidProviders`. Android uses plain `RemoteViews`
+  layouts (`res/layout/widget_*.xml`): a progress bar cannot be tinted in a
+  RemoteViews below Android 12, so each bar exists once per colour and the
+  provider shows one. Widget gallery names are in `res/values*/widget_strings.xml`
+  and, on iOS, inline in `HomeWidgets.swift` (the extension has no string
+  files). Tests: `FakeHomeWidgets` in `test/support/home_widget_fakes.dart`.
 - History charts (`lib/core/api/reporting_api.dart`, `lib/features/reporting/`):
   `ReportingApi` reads netdata reporting, `reporting.netdata_graphs` +
   `reporting.netdata_get_data` (25.04) or `reporting.graphs` + `reporting.get_data`

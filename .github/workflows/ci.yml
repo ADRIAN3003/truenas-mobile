@@ -78,3 +78,6 @@ jobs:
           test "$(plutil -extract CFBundleVersion raw "$APPEX/Info.plist")" = "$(plutil -extract CFBundleVersion raw "$APP/Info.plist")"
           strings "$APPEX/JobActivityWidget" | grep -q JobActivityAttributes
           strings "$APP/Runner" | grep -q JobActivityAttributes
+          # The home screen widgets are in the same extension.
+          strings "$APPEX/JobActivityWidget" | grep -q SelectServerIntent
+          strings "$APPEX/JobActivityWidget" | grep -q StatusWidgetView

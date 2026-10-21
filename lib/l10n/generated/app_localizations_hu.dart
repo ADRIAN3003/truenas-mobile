@@ -2626,4 +2626,72 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get historyChartFailed => 'Nem sikerült betölteni a diagramot.';
+
+  @override
+  String get homeWidgetPools => 'Tárolók';
+
+  @override
+  String get homeWidgetSystem => 'Rendszer';
+
+  @override
+  String get homeWidgetAlerts => 'Riasztások';
+
+  @override
+  String get homeWidgetCpu => 'CPU';
+
+  @override
+  String get homeWidgetMemory => 'RAM';
+
+  @override
+  String get homeWidgetUpdated => 'Frissítve';
+
+  @override
+  String get homeWidgetUnreachable => 'A szerver nem érhető el';
+
+  @override
+  String get homeWidgetSetup => 'Nyisd meg a TrueNAS Mobile-t a beállításhoz';
+
+  @override
+  String get homeWidgetNoData => 'Még nincs adat. Nyisd meg az alkalmazást.';
+
+  @override
+  String get homeWidgetNoPools => 'Nincs tároló';
+
+  @override
+  String get homeWidgetPoolsOk => 'Minden tároló rendben';
+
+  @override
+  String homeWidgetPoolsAttention(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count tároló figyelmet igényel',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get homeWidgetAlertsNone => 'Nincs aktív riasztás';
+
+  @override
+  String homeWidgetAlertsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count aktív riasztás',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String homeWidgetMemoryText(String used, String total) {
+    return '$used / $total';
+  }
+
+  @override
+  String get settingsHomeWidgets => 'Kezdőképernyős widgetek';
+
+  @override
+  String get settingsHomeWidgetsHint =>
+      'Widgetek frissítése a háttérben, nagyjából 15 percenként. Nyitott szervernél is frissülnek. A kezdőképernyőről adhatod hozzá őket; a telefon dönti el, mikor fut le valójában a frissítés.';
 }

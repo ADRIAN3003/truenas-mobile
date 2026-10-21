@@ -12,6 +12,9 @@
 		A10000000000000000000003 /* JobActivityWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000002 /* JobActivityWidgetBundle.swift */; };
 		A10000000000000000000004 /* JobActivityLiveActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000003 /* JobActivityLiveActivity.swift */; };
 		A10000000000000000000005 /* LiveProgressPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000005 /* LiveProgressPlugin.swift */; };
+		A10000000000000000000007 /* HomeWidgetData.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000007 /* HomeWidgetData.swift */; };
+		A10000000000000000000008 /* HomeWidgets.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000008 /* HomeWidgets.swift */; };
+		A10000000000000000000009 /* HomeWidgetViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000009 /* HomeWidgetViews.swift */; };
 		A10000000000000000000006 /* JobActivityWidget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = A20000000000000000000006 /* JobActivityWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */ = {isa = PBXBuildFile; fileRef = 1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */; };
 		331C808B294A63AB00263BE5 /* RunnerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 331C807B294A618700263BE5 /* RunnerTests.swift */; };
@@ -88,6 +91,11 @@
 		A20000000000000000000003 /* JobActivityLiveActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JobActivityLiveActivity.swift; sourceTree = "<group>"; };
 		A20000000000000000000004 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A20000000000000000000005 /* LiveProgressPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveProgressPlugin.swift; sourceTree = "<group>"; };
+		A20000000000000000000007 /* HomeWidgetData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeWidgetData.swift; sourceTree = "<group>"; };
+		A20000000000000000000008 /* HomeWidgets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeWidgets.swift; sourceTree = "<group>"; };
+		A20000000000000000000009 /* HomeWidgetViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeWidgetViews.swift; sourceTree = "<group>"; };
+		A2000000000000000000000A /* Runner.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Runner.entitlements; sourceTree = "<group>"; };
+		A2000000000000000000000B /* JobActivityWidget.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = JobActivityWidget.entitlements; sourceTree = "<group>"; };
 		A20000000000000000000006 /* JobActivityWidget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = JobActivityWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -165,6 +173,7 @@
 				7884E8672EC3CC0400C636F2 /* SceneDelegate.swift */,
 				74858FAD1ED2DC5600515810 /* Runner-Bridging-Header.h */,
 				A20000000000000000000005 /* LiveProgressPlugin.swift */,
+				A2000000000000000000000A /* Runner.entitlements */,
 			);
 			path = Runner;
 			sourceTree = "<group>";
@@ -175,6 +184,10 @@
 				A20000000000000000000002 /* JobActivityWidgetBundle.swift */,
 				A20000000000000000000003 /* JobActivityLiveActivity.swift */,
 				A20000000000000000000004 /* Info.plist */,
+				A20000000000000000000007 /* HomeWidgetData.swift */,
+				A20000000000000000000008 /* HomeWidgets.swift */,
+				A20000000000000000000009 /* HomeWidgetViews.swift */,
+				A2000000000000000000000B /* JobActivityWidget.entitlements */,
 			);
 			path = JobActivityWidget;
 			sourceTree = "<group>";
@@ -384,6 +397,9 @@
 			files = (
 				A10000000000000000000003 /* JobActivityWidgetBundle.swift in Sources */,
 				A10000000000000000000004 /* JobActivityLiveActivity.swift in Sources */,
+				A10000000000000000000007 /* HomeWidgetData.swift in Sources */,
+				A10000000000000000000008 /* HomeWidgets.swift in Sources */,
+				A10000000000000000000009 /* HomeWidgetViews.swift in Sources */,
 				A10000000000000000000002 /* JobActivityAttributes.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -481,6 +497,7 @@
 			baseConfigurationReference = 7AFA3C8E1D35360C0083082E /* Release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements;
 				CLANG_ENABLE_MODULES = YES;
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
 				ENABLE_BITCODE = NO;
@@ -662,6 +679,7 @@
 			baseConfigurationReference = 9740EEB21CF90195004384FC /* Debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements;
 				CLANG_ENABLE_MODULES = YES;
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
 				ENABLE_BITCODE = NO;
@@ -684,6 +702,7 @@
 			baseConfigurationReference = 7AFA3C8E1D35360C0083082E /* Release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements;
 				CLANG_ENABLE_MODULES = YES;
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
 				ENABLE_BITCODE = NO;
@@ -707,6 +726,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
+				CODE_SIGN_ENTITLEMENTS = JobActivityWidget/JobActivityWidget.entitlements;
 				INFOPLIST_FILE = JobActivityWidget/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.2;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -730,6 +750,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
+				CODE_SIGN_ENTITLEMENTS = JobActivityWidget/JobActivityWidget.entitlements;
 				INFOPLIST_FILE = JobActivityWidget/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.2;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -752,6 +773,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
+				CODE_SIGN_ENTITLEMENTS = JobActivityWidget/JobActivityWidget.entitlements;
 				INFOPLIST_FILE = JobActivityWidget/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.2;
 				LD_RUNPATH_SEARCH_PATHS = (

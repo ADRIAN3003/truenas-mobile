@@ -2652,4 +2652,74 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get historyChartFailed => 'Could not load this chart.';
+
+  @override
+  String get homeWidgetPools => 'Pools';
+
+  @override
+  String get homeWidgetSystem => 'System';
+
+  @override
+  String get homeWidgetAlerts => 'Alerts';
+
+  @override
+  String get homeWidgetCpu => 'CPU';
+
+  @override
+  String get homeWidgetMemory => 'RAM';
+
+  @override
+  String get homeWidgetUpdated => 'Updated';
+
+  @override
+  String get homeWidgetUnreachable => 'Can\'t reach the server';
+
+  @override
+  String get homeWidgetSetup => 'Open TrueNAS Mobile to set up';
+
+  @override
+  String get homeWidgetNoData => 'No data yet. Open the app.';
+
+  @override
+  String get homeWidgetNoPools => 'No pools';
+
+  @override
+  String get homeWidgetPoolsOk => 'All pools healthy';
+
+  @override
+  String homeWidgetPoolsAttention(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count pools need attention',
+      one: '1 pool needs attention',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get homeWidgetAlertsNone => 'No active alerts';
+
+  @override
+  String homeWidgetAlertsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count active alerts',
+      one: '1 active alert',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String homeWidgetMemoryText(String used, String total) {
+    return '$used of $total';
+  }
+
+  @override
+  String get settingsHomeWidgets => 'Home screen widgets';
+
+  @override
+  String get settingsHomeWidgetsHint =>
+      'Keep widgets up to date in the background, about every 15 minutes. They also update while a server is open. Add them from your home screen; the phone decides when a refresh really runs.';
 }

@@ -32,10 +32,13 @@ for Android and iOS that talks to the official TrueNAS middleware API
   server it says so. Settings > General > Live job progress turns it off.
 - **Home screen widgets:** pool health, CPU and memory, and active alerts for
   one server of your choice, on iOS (iOS 17 and newer) and Android. They show
-  what the app saw last, with the time, and refresh whenever a server is open
-  and about every 15 minutes in the background (the phone decides when that
-  really runs; there is no push server). Settings > Notifications > Home
-  screen widgets turns the background refresh off.
+  what they last saw, with the time. On iOS a widget signs in to its server
+  itself each time the phone refreshes it (about every 15 minutes; the phone
+  decides how often that really is, there is no push server), so it keeps
+  moving while the app is closed, and when the server cannot be reached it
+  keeps the old numbers and says since when. On Android the app's background
+  check refreshes them. Settings > Notifications > Home screen widgets turns
+  all of this off.
 - **Storage:** pools with layout, scrub start, pause and stop; datasets and
   zvols (create, delete); snapshots (browse, search, create, roll back, clone, delete); disks with
   temperatures.
@@ -125,7 +128,12 @@ Download the latest APK or IPA from the
   the group for your team the first time you build with automatic signing, and
   a sideloading tool has to keep the group when it re-signs, or the widgets
   stay empty and say so (the app itself works either way). Sideloadly drops
-  the group; installing with `flutter install --release` keeps it.
+  the group; installing with `flutter install --release` keeps it. For the
+  widgets to fetch their own data the app also puts the saved servers' sign-in
+  details in a Keychain group shared with the extension
+  (`<team>.hu.adrian.truenasmobile.shared`, readable after the first unlock,
+  this phone only); without that group they only show what the app saved.
+  Accounts that need a 2FA code cannot sign in from a widget.
 
 ## Build from source
 

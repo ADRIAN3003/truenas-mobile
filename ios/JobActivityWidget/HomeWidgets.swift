@@ -72,10 +72,11 @@ struct StatusEntry: TimelineEntry {
   }
 }
 
-/// How soon the widget asks to be drawn again. The app tells the widgets when
-/// there is news; this is only a safety net.
-private func nextRefresh() -> Date {
-  Date().addingTimeInterval(15 * 60)
+/// How soon the widget asks to be drawn again, and so to look at its server
+/// again: the phone decides how often it really does (a widget has a daily
+/// budget), sooner after a failed visit.
+private func nextRefresh(after entry: StatusEntry) -> Date {
+  Date().addingTimeInterval(entry.server?.unreachable == true ? 5 * 60 : 15 * 60)
 }
 
 // MARK: - Server choice (iOS 17 and newer)
@@ -148,9 +149,9 @@ struct StatusProvider: AppIntentTimelineProvider {
   func timeline(for configuration: SelectServerIntent, in context: Context) async
     -> Timeline<StatusEntry>
   {
-    Timeline(
-      entries: [StatusEntry.current(serverId: configuration.server?.id)],
-      policy: .after(nextRefresh()))
+    // The widget asks the server itself; see WidgetFetch.swift.
+    let entry = await WidgetRefresher.entry(serverId: configuration.server?.id)
+    return Timeline(entries: [entry], policy: .after(nextRefresh(after: entry)))
   }
 }
 

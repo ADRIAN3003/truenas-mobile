@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:home_widget/home_widget.dart';
 
@@ -24,6 +25,11 @@ abstract interface class HomeWidgetsBridge {
 
   /// Whether the user has put any of the widgets on a home screen.
   Future<bool> hasWidgets();
+
+  /// Hands the sign-in details of the saved servers to the iOS widgets, which
+  /// fetch their own data (see [HomeWidgetPublisher.publish]). Null removes
+  /// them. Never throws.
+  Future<void> writeCredentials(String? json);
 }
 
 /// For platforms without widgets, and as the default in tests.
@@ -41,10 +47,19 @@ class NoHomeWidgets implements HomeWidgetsBridge {
 
   @override
   Future<bool> hasWidgets() async => false;
+
+  @override
+  Future<void> writeCredentials(String? json) async {}
 }
 
 /// The iOS App Group the app and the widget extension share.
 const homeWidgetAppGroup = 'group.hu.adrian.truenasmobile';
+
+/// The native side that keeps the servers' sign-in details in a Keychain
+/// group the widget extension can read (`WidgetCredentialsPlugin.swift`).
+const _credentialsChannel = MethodChannel(
+  'hu.adrian.truenasmobile/widget_credentials',
+);
 
 /// The storage key of the document.
 const _documentKey = 'snapshot.v1';
@@ -98,6 +113,28 @@ class PlatformHomeWidgets implements HomeWidgetsBridge {
         iOSName: ios ? name : null,
         qualifiedAndroidName: ios ? null : name,
       );
+    }
+  }
+
+  /// What was last handed over, so the Keychain is not written every minute.
+  static String? _lastCredentials;
+
+  @override
+  Future<void> writeCredentials(String? json) async {
+    // Only iOS widgets fetch by themselves; Android's are kept current by the
+    // background check.
+    if (defaultTargetPlatform != TargetPlatform.iOS) return;
+    if (json == _lastCredentials) return;
+    try {
+      if (json == null) {
+        await _credentialsChannel.invokeMethod<void>('clear');
+      } else {
+        await _credentialsChannel.invokeMethod<void>('save', json);
+      }
+      _lastCredentials = json;
+    } catch (_) {
+      // No such native side (the background engine) or no Keychain group (a
+      // sideloaded install): the widgets then rely on what the app saves.
     }
   }
 
@@ -155,21 +192,47 @@ class HomeWidgetPublisher {
           'servers': entries,
         }),
       );
+      await bridge.writeCredentials(_credentials(servers));
       await bridge.reload();
     } catch (_) {
       // The widgets keep showing what they had.
     }
   }
 
-  /// Forgets everything, as when the last server is removed.
+  /// Forgets everything, as when the last server is removed or the widgets
+  /// are switched off.
   Future<void> clear() async {
     try {
       await bridge.write(
         jsonEncode({'v': 1, 'labels': const {}, 'servers': const []}),
       );
+      await bridge.writeCredentials(null);
       await bridge.reload();
     } catch (_) {}
   }
+
+  /// Just what a widget needs to sign in by itself. The iOS widget extension
+  /// is its own process, and the phone may not wake the app to refresh it, so
+  /// it asks the server directly; the details live in a Keychain group shared
+  /// with it, never in the App Group's plain preferences.
+  String? _credentials(List<ServerInstance> servers) => servers.isEmpty
+      ? null
+      : jsonEncode({
+          'v': 1,
+          'servers': [
+            for (final server in servers)
+              {
+                'id': server.id,
+                'name': server.name,
+                'url': server.url,
+                'authMethod': server.authMethod.name,
+                'username': server.username,
+                'secret': server.secret,
+                'pinnedFingerprint': server.pinnedFingerprint,
+                'apiVersion': server.lastApiVersion,
+              },
+          ],
+        });
 
   Map<String, Map<String, dynamic>> _parse(String? raw) {
     if (raw == null || raw.isEmpty) return {};

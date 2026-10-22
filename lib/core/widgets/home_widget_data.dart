@@ -126,6 +126,11 @@ String _shorten(String text) {
   return line.length <= 110 ? line : '${line.substring(0, 109).trimRight()}…';
 }
 
+/// A plural message as a template with `{count}` in it, for a widget that
+/// works the count out itself (the iOS ones fetch their own data).
+String _countTemplate(String Function(int count) message) =>
+    message(2).replaceFirst('2', '{count}');
+
 /// The words the widgets use for everything that is not about one server.
 Map<String, String> homeWidgetLabels(AppLocalizations l10n) => {
   'pools': l10n.homeWidgetPools,
@@ -137,4 +142,12 @@ Map<String, String> homeWidgetLabels(AppLocalizations l10n) => {
   'unreachable': l10n.homeWidgetUnreachable,
   'setup': l10n.homeWidgetSetup,
   'noData': l10n.homeWidgetNoData,
+  'noPools': l10n.homeWidgetNoPools,
+  'poolsOk': l10n.homeWidgetPoolsOk,
+  'poolsAttentionOne': l10n.homeWidgetPoolsAttention(1),
+  'poolsAttentionMany': _countTemplate(l10n.homeWidgetPoolsAttention),
+  'alertsNone': l10n.homeWidgetAlertsNone,
+  'alertsCountOne': l10n.homeWidgetAlertsCount(1),
+  'alertsCountMany': _countTemplate(l10n.homeWidgetAlertsCount),
+  'memoryText': l10n.homeWidgetMemoryText('{used}', '{total}'),
 };

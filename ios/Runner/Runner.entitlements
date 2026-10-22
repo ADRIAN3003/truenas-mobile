@@ -6,5 +6,10 @@
 	<array>
 		<string>group.hu.adrian.truenasmobile</string>
 	</array>
+	<key>keychain-access-groups</key>
+	<array>
+		<string>$(AppIdentifierPrefix)hu.adrian.truenasmobile</string>
+		<string>$(AppIdentifierPrefix)hu.adrian.truenasmobile.shared</string>
+	</array>
 </dict>
 </plist>

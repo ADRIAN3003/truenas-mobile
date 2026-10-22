@@ -85,11 +85,18 @@ enum WidgetStore {
   static let appGroup = "group.hu.adrian.truenasmobile"
   static let key = "snapshot.v1"
 
+  /// False when this install has no App Group (a sideloading tool dropped
+  /// the entitlement): the app then saves its data in its own sandbox, where
+  /// the widgets cannot see it.
+  static var groupAvailable: Bool {
+    FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: appGroup) != nil
+  }
+
   static func load() -> WidgetDocument? {
-    // Without the group entitlement (a sideloading tool dropped it) there is
-    // no shared container; do not open the suite at all then.
+    // Without the group there is no shared container; do not open the suite
+    // at all then.
     guard
-      FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: appGroup) != nil,
+      groupAvailable,
       let defaults = UserDefaults(suiteName: appGroup),
       let json = defaults.string(forKey: key),
       let data = json.data(using: .utf8)

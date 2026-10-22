@@ -34,6 +34,19 @@ struct StatusWidgetView: View {
       }
   }
 
+  /// Why there is nothing to show. A missing App Group is a signing problem
+  /// of the install, which no amount of opening the app fixes.
+  private var setupText: String {
+    if !entry.groupAvailable {
+      let hu = Locale.preferredLanguages.first?.hasPrefix("hu") == true
+      return hu
+        ? "Ez a telepítés nem fér a megosztott App Group-hoz. Telepítsd Xcode aláírással."
+        : "This install has no App Group access. Install it with Xcode signing."
+    }
+    return entry.document?.label("setup", "Open TrueNAS Mobile to set up")
+      ?? "Open TrueNAS Mobile to set up"
+  }
+
   @ViewBuilder
   private var content: some View {
     if let server = entry.server, let document = entry.document {
@@ -51,8 +64,7 @@ struct StatusWidgetView: View {
       VStack(alignment: .leading, spacing: 8) {
         HeaderRow(symbol: section.symbol, title: "TrueNAS")
         Spacer(minLength: 0)
-        Text(verbatim: entry.document?.label("setup", "Open TrueNAS Mobile to set up")
-          ?? "Open TrueNAS Mobile to set up")
+        Text(verbatim: setupText)
           .font(.footnote)
           .foregroundStyle(.secondary)
         Spacer(minLength: 0)

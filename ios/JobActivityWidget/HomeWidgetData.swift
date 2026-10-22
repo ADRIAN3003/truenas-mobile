@@ -86,7 +86,11 @@ enum WidgetStore {
   static let key = "snapshot.v1"
 
   static func load() -> WidgetDocument? {
-    guard let defaults = UserDefaults(suiteName: appGroup),
+    // Without the group entitlement (a sideloading tool dropped it) there is
+    // no shared container; do not open the suite at all then.
+    guard
+      FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: appGroup) != nil,
+      let defaults = UserDefaults(suiteName: appGroup),
       let json = defaults.string(forKey: key),
       let data = json.data(using: .utf8)
     else { return nil }

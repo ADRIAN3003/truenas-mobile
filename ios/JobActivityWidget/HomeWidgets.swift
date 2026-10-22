@@ -84,6 +84,12 @@ struct ServerEntity: AppEntity {
   var id: String
   var name: String
 
+  /// Shows the app's default server (see `WidgetDocument.server(id:)`).
+  static var followApp: ServerEntity {
+    let hu = Locale.preferredLanguages.first?.hasPrefix("hu") == true
+    return ServerEntity(id: "", name: hu ? "Alapértelmezett szerver" : "Default server")
+  }
+
   var displayRepresentation: DisplayRepresentation {
     DisplayRepresentation(title: "\(name)")
   }
@@ -99,8 +105,18 @@ struct ServerEntityQuery: EntityQuery {
     all()
   }
 
+  func defaultResult() async -> ServerEntity? {
+    ServerEntity.followApp
+  }
+
+  /// "Follow the app" first, so the picker always has something to offer,
+  /// even when the App Group cannot be read (a sideloading tool dropped it)
+  /// or the app has not saved a server list yet.
   private func all() -> [ServerEntity] {
-    (WidgetStore.load()?.servers ?? []).map { ServerEntity(id: $0.id, name: $0.name) }
+    let servers = (WidgetStore.load()?.servers ?? []).map {
+      ServerEntity(id: $0.id, name: $0.name)
+    }
+    return [ServerEntity.followApp] + servers
   }
 }
 

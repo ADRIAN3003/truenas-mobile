@@ -43,12 +43,14 @@ void main() {
     String? url,
     AppSettings settings = const AppSettings(),
     List<Override> overrides = const [],
+    void Function(FakeTrueNasServer server)? before,
   }) async {
     tester.view.physicalSize = size;
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
     await tester.runAsync(() async {
       server = await FakeTrueNasServer.start();
+      before?.call(server);
       final store = MemoryStore();
       await InstanceRepository(store).save([
         ServerInstance(
@@ -172,6 +174,43 @@ void main() {
     await open(tester, const Size(400, 800));
     expect(find.byType(NavigationBar), findsOneWidget);
     expect(find.byType(NavigationRail), findsNothing);
+    await close(tester);
+  });
+
+  testWidgets('the Apps tab shows how many apps have an update', (
+    tester,
+  ) async {
+    await open(tester, const Size(400, 800));
+    expect(
+      find.descendant(
+        of: find.byType(NavigationBar),
+        matching: find.byType(Badge),
+      ),
+      findsOneWidget,
+    );
+    expect(
+      find.descendant(of: find.byType(Badge), matching: find.text('1')),
+      findsOneWidget,
+    );
+    await close(tester);
+  });
+
+  testWidgets('with no update waiting the Apps tab has no badge', (
+    tester,
+  ) async {
+    await open(
+      tester,
+      const Size(400, 800),
+      before: (server) => server.apps.single['upgrade_available'] = false,
+    );
+    expect(tester.widget<Badge>(find.byType(Badge)).isLabelVisible, isFalse);
+    await close(tester);
+  });
+
+  testWidgets('the glass tab bar carries the same badge', (tester) async {
+    await open(tester, const Size(400, 800), platform: TargetPlatform.iOS);
+    expect(find.byType(Badge), findsWidgets);
+    expect(find.text('1'), findsWidgets);
     await close(tester);
   });
 

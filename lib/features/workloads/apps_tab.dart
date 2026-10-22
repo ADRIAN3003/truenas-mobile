@@ -57,9 +57,13 @@ const _vmActions = [
 
 /// Docker apps, virtual machines and containers.
 class AppsTab extends StatefulWidget {
-  const AppsTab({super.key, required this.session});
+  const AppsTab({super.key, required this.session, this.onUpdateCount});
 
   final TrueNasSession session;
+
+  /// Told how many apps have an update each time the list is loaded, so the
+  /// tab's badge follows what this tab shows.
+  final ValueChanged<int>? onUpdateCount;
 
   @override
   State<AppsTab> createState() => _AppsTabState();
@@ -101,6 +105,7 @@ class _AppsTabState extends State<AppsTab> with LoadState<AppsTab, _Workloads> {
       _api.containerActions(),
       _api.canBulk(),
     ).wait;
+    widget.onUpdateCount?.call(apps.where((a) => a.upgradeAvailable).length);
     return _Workloads(
       apps: apps,
       vms: vms,

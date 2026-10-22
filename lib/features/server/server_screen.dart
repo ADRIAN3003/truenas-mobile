@@ -50,6 +50,11 @@ class _ServerScreenState extends ConsumerState<ServerScreen>
   Object? _error;
   var _tab = 0;
 
+  /// Apps with an update, shown as a badge on the Apps tab. The tab reports it
+  /// when it loads; this keeps it current while that tab is not open.
+  var _appUpdates = 0;
+  Timer? _appUpdateTimer;
+
   ServerInstance? get _instance => ref
       .read(instancesProvider)
       .value
@@ -72,6 +77,7 @@ class _ServerScreenState extends ConsumerState<ServerScreen>
       _session?.ensureAlive().catchError((_) {}).whenComplete(() {
         _jobs?.refresh();
         _widgets?.refresh();
+        _refreshAppUpdates();
       });
     } else if (state == AppLifecycleState.paused) {
       // The widgets show what the app saw last, so save it as it is left.
@@ -82,10 +88,28 @@ class _ServerScreenState extends ConsumerState<ServerScreen>
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    _appUpdateTimer?.cancel();
     _jobs?.dispose();
     _widgets?.dispose();
     _session?.close();
     super.dispose();
+  }
+
+  void _setAppUpdates(int count) {
+    if (mounted && count != _appUpdates) setState(() => _appUpdates = count);
+  }
+
+  /// Counts the apps with an update. Not being able to ask (the server is out
+  /// of reach, or has no apps) leaves the badge as it was.
+  Future<void> _refreshAppUpdates() async {
+    final session = _session;
+    if (session == null) return;
+    try {
+      final apps = await session.workloads.apps();
+      if (session == _session) {
+        _setAppUpdates(apps.where((a) => a.upgradeAvailable).length);
+      }
+    } catch (_) {}
   }
 
   Future<void> _connect() async {
@@ -93,6 +117,8 @@ class _ServerScreenState extends ConsumerState<ServerScreen>
     if (instance == null) return;
     final previous = _session;
     _session = null;
+    _appUpdateTimer?.cancel();
+    _appUpdates = 0;
     final previousJobs = _jobs;
     _jobs = null;
     _widgets?.dispose();
@@ -114,6 +140,10 @@ class _ServerScreenState extends ConsumerState<ServerScreen>
         return;
       }
       _session = session;
+      _appUpdateTimer = Timer.periodic(
+        const Duration(minutes: 5),
+        (_) => _refreshAppUpdates(),
+      );
       _jobs = JobMonitor(
         source: SessionJobSource(session),
         progress: ref.read(liveProgressProvider),
@@ -254,10 +284,19 @@ class _ServerScreenState extends ConsumerState<ServerScreen>
           ),
           StorageTab(session: session),
           SharesTab(session: session),
-          AppsTab(session: session),
+          AppsTab(session: session, onUpdateCount: _setAppUpdates),
           MoreTab(session: session, serverName: instance?.name ?? ''),
         ],
       );
+      const appsTab = 3;
+      // The count of apps with an update, on the Apps tab's icon.
+      Widget badged(int index, IconData icon) => index == appsTab
+          ? Badge.count(
+              count: _appUpdates,
+              isLabelVisible: _appUpdates > 0,
+              child: Icon(icon),
+            )
+          : Icon(icon);
       void select(int index) {
         if (index != _tab) Haptics.selection();
         setState(() => _tab = index);
@@ -283,10 +322,11 @@ class _ServerScreenState extends ConsumerState<ServerScreen>
                       ? NavigationRailLabelType.none
                       : NavigationRailLabelType.all,
                   destinations: [
-                    for (final (icon, selected, label) in destinations)
+                    for (final (i, (icon, selected, label))
+                        in destinations.indexed)
                       NavigationRailDestination(
-                        icon: Icon(icon),
-                        selectedIcon: Icon(selected),
+                        icon: badged(i, icon),
+                        selectedIcon: badged(i, selected),
                         label: Text(label),
                       ),
                   ],
@@ -329,6 +369,7 @@ class _ServerScreenState extends ConsumerState<ServerScreen>
               GlassTopEdge(height: insets.top - 8),
               GlassTabBar(
                 destinations: destinations,
+                badges: {appsTab: _appUpdates},
                 selectedIndex: _tab,
                 onSelected: select,
               ),
@@ -351,10 +392,10 @@ class _ServerScreenState extends ConsumerState<ServerScreen>
             selectedIndex: _tab,
             onDestinationSelected: select,
             destinations: [
-              for (final (icon, selected, label) in destinations)
+              for (final (i, (icon, selected, label)) in destinations.indexed)
                 NavigationDestination(
-                  icon: Icon(icon),
-                  selectedIcon: Icon(selected),
+                  icon: badged(i, icon),
+                  selectedIcon: badged(i, selected),
                   label: label,
                 ),
             ],

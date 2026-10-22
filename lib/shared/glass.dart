@@ -57,10 +57,16 @@ class GlassTabBar extends StatelessWidget {
     required this.destinations,
     required this.selectedIndex,
     required this.onSelected,
+    this.badges = const {},
   });
 
   /// Icon, selected icon and label per tab.
   final List<(IconData, IconData, String)> destinations;
+
+  /// Count to show on a tab's icon, by tab index; none for zero or a tab left
+  /// out. A plain [Badge] rather than the package's glass one, which would be
+  /// glass inside the glass bar.
+  final Map<int, int> badges;
   final int selectedIndex;
   final ValueChanged<int> onSelected;
 
@@ -114,10 +120,11 @@ class GlassTabBar extends StatelessWidget {
                 selectedIndex: selectedIndex,
                 onTabSelected: onSelected,
                 tabs: [
-                  for (final (icon, selected, label) in destinations)
+                  for (final (i, (icon, selected, label))
+                      in destinations.indexed)
                     lg.GlassTab(
-                      icon: Icon(icon),
-                      activeIcon: Icon(selected),
+                      icon: _badged(Icon(icon), badges[i] ?? 0),
+                      activeIcon: _badged(Icon(selected), badges[i] ?? 0),
                       label: label,
                     ),
                 ],
@@ -129,6 +136,9 @@ class GlassTabBar extends StatelessWidget {
     );
   }
 }
+
+Widget _badged(Widget icon, int count) =>
+    count > 0 ? Badge.count(count: count, child: icon) : icon;
 
 /// A progressively blurred band under the transparent top bar that keeps the
 /// title legible over content scrolling beneath it.

@@ -3,10 +3,12 @@ import Foundation
 /// What the app saved for the home screen widgets: one JSON document in the
 /// App Group, written by `HomeWidgetPublisher` on the Dart side. The text is
 /// already in the user's language.
-struct WidgetDocument: Decodable {
+struct WidgetDocument: Codable {
   var labels: [String: String] = [:]
   var defaultId: String?
   var servers: [WidgetServer] = []
+
+  init() {}
 
   init(from decoder: Decoder) throws {
     let c = try decoder.container(keyedBy: CodingKeys.self)
@@ -21,6 +23,15 @@ struct WidgetDocument: Decodable {
     labels[key] ?? fallback
   }
 
+  /// Puts [server] in its place in the list, or at the end.
+  mutating func replace(_ server: WidgetServer) {
+    if let index = servers.firstIndex(where: { $0.id == server.id }) {
+      servers[index] = server
+    } else {
+      servers.append(server)
+    }
+  }
+
   /// The chosen server, else the app's default one, else the first.
   func server(id: String?) -> WidgetServer? {
     if let id = id, let match = servers.first(where: { $0.id == id }) { return match }
@@ -29,7 +40,7 @@ struct WidgetDocument: Decodable {
   }
 }
 
-struct WidgetServer: Decodable {
+struct WidgetServer: Codable {
   var id: String
   var name: String
   /// Milliseconds since 1970 of the last successful look.
@@ -45,13 +56,13 @@ struct WidgetServer: Decodable {
 }
 
 /// Levels are "ok", "warn" or "bad".
-struct PoolsData: Decodable {
+struct PoolsData: Codable {
   var level: String
   var summary: String
   var items: [PoolItem]
 }
 
-struct PoolItem: Decodable {
+struct PoolItem: Codable {
   var name: String
   var status: String
   /// Percent used, 0 to 100.
@@ -59,7 +70,7 @@ struct PoolItem: Decodable {
   var level: String
 }
 
-struct SystemData: Decodable {
+struct SystemData: Codable {
   /// Percent, 0 to 100.
   var cpu: Double?
   var memory: Double?
@@ -67,14 +78,14 @@ struct SystemData: Decodable {
   var temperature: String?
 }
 
-struct AlertsData: Decodable {
+struct AlertsData: Codable {
   var level: String
   var count: Int
   var summary: String
   var items: [AlertItem]
 }
 
-struct AlertItem: Decodable {
+struct AlertItem: Codable {
   var level: String
   var text: String
 }
@@ -102,6 +113,18 @@ enum WidgetStore {
       let data = json.data(using: .utf8)
     else { return nil }
     return try? JSONDecoder().decode(WidgetDocument.self, from: data)
+  }
+
+  /// Saves [document] for the app and the other widgets. Nothing happens
+  /// without the App Group.
+  static func save(_ document: WidgetDocument) {
+    guard
+      groupAvailable,
+      let defaults = UserDefaults(suiteName: appGroup),
+      let data = try? JSONEncoder().encode(document),
+      let json = String(data: data, encoding: .utf8)
+    else { return }
+    defaults.set(json, forKey: key)
   }
 
   /// What the widget gallery shows before the app has saved anything.

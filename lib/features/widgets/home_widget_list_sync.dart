@@ -31,7 +31,12 @@ class _HomeWidgetListSyncState extends ConsumerState<HomeWidgetListSync> {
   }
 
   Future<void> _publish() async {
-    if (!mounted || !ref.read(settingsProvider).homeWidgets) return;
+    if (!mounted) return;
+    if (!ref.read(settingsProvider).homeWidgets) {
+      // Widgets switched off: the iOS ones must not keep the sign-in details.
+      await ref.read(homeWidgetsBridgeProvider).writeCredentials(null);
+      return;
+    }
     final servers = ref.read(instancesProvider).value;
     // A list that could not be read is not "no servers".
     if (servers == null) return;

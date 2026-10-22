@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:ui';
 
 import 'package:flutter_test/flutter_test.dart';
@@ -284,6 +285,68 @@ void main() {
         labels: const {},
       );
       expect(bridge.servers.keys, ['a']);
+    });
+
+    test(
+      'the iOS widgets get what they need to sign in by themselves',
+      () async {
+        final a = serverAt('a', 'A', url: 'https://nas.example.com').copyWith(
+          pinnedFingerprint: () => 'AB:CD',
+          lastApiVersion: 'v25.04.2',
+        );
+        await publisher.publish(
+          servers: [a],
+          fresh: const {},
+          labels: const {},
+        );
+        final saved = jsonDecode(bridge.credentials!) as Map<String, dynamic>;
+        expect(saved['servers'], [
+          {
+            'id': 'a',
+            'name': 'A',
+            'url': 'https://nas.example.com',
+            'authMethod': 'password',
+            'username': 'truenas_admin',
+            'secret': 'secret',
+            'pinnedFingerprint': 'AB:CD',
+            'apiVersion': 'v25.04.2',
+          },
+        ]);
+        // The shared preferences never hold the secret.
+        expect(bridge.document, isNot(contains('secret')));
+      },
+    );
+
+    test('no servers, or clearing, takes the sign-in details away', () async {
+      await publisher.publish(
+        servers: [serverAt('a', 'A')],
+        fresh: const {},
+        labels: const {},
+      );
+      expect(bridge.credentials, isNotNull);
+      await publisher.publish(servers: const [], fresh: const {}, labels: {});
+      expect(bridge.credentials, isNull);
+      await publisher.publish(
+        servers: [serverAt('a', 'A')],
+        fresh: const {},
+        labels: const {},
+      );
+      await publisher.clear();
+      expect(bridge.credentials, isNull);
+    });
+  });
+
+  group('the words a widget works out itself', () {
+    test('plurals come as templates, with the count left open', () {
+      final en = homeWidgetLabels(l10n);
+      expect(en['poolsAttentionOne'], '1 pool needs attention');
+      expect(en['poolsAttentionMany'], '{count} pools need attention');
+      expect(en['alertsCountOne'], '1 active alert');
+      expect(en['alertsCountMany'], '{count} active alerts');
+      expect(en['memoryText'], '{used} of {total}');
+      expect(en['poolsOk'], 'All pools healthy');
+      final hu = homeWidgetLabels(localizationsFor(const Locale('hu')));
+      expect(hu['alertsCountMany'], '{count} aktív riasztás');
     });
   });
 

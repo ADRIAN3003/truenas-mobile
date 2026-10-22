@@ -12,6 +12,12 @@ class FakeHomeWidgets implements HomeWidgetsBridge {
   String? document;
   int reloads = 0;
 
+  /// What the iOS widgets were handed to sign in with, as JSON.
+  String? credentials;
+
+  /// Every handover, in order (null is a removal).
+  final credentialWrites = <String?>[];
+
   /// The saved document as JSON, or an empty map.
   Map<String, dynamic> get json =>
       document == null ? {} : jsonDecode(document!) as Map<String, dynamic>;
@@ -33,4 +39,10 @@ class FakeHomeWidgets implements HomeWidgetsBridge {
 
   @override
   Future<bool> hasWidgets() async => installed;
+
+  @override
+  Future<void> writeCredentials(String? json) async {
+    credentials = json;
+    credentialWrites.add(json);
+  }
 }

@@ -105,6 +105,7 @@ class HomeWidgetSync {
     required this.locale,
     required this.chosenDefault,
     this.interval = const Duration(minutes: 1),
+    this.lookLimit = const Duration(seconds: 40),
   });
 
   final HomeWidgetPublisher publisher;
@@ -115,6 +116,9 @@ class HomeWidgetSync {
   final String? Function() chosenDefault;
   final Duration interval;
 
+  /// The longest one look may take before the next one is allowed to start.
+  final Duration lookLimit;
+
   Timer? _timer;
   Future<void>? _running;
   var _disposed = false;
@@ -124,9 +128,12 @@ class HomeWidgetSync {
     _timer = Timer.periodic(interval, (_) => unawaited(refresh()));
   }
 
-  /// Looks again now. A look already under way is not repeated.
-  Future<void> refresh() =>
-      _running ??= _refresh().whenComplete(() => _running = null);
+  /// Looks again now. A look already under way is not repeated, unless it has
+  /// hung (a socket the phone cut while the app was away can leave a call
+  /// waiting for a long time).
+  Future<void> refresh() => _running ??= _refresh()
+      .timeout(lookLimit, onTimeout: () {})
+      .whenComplete(() => _running = null);
 
   Future<void> _refresh() async {
     if (_disposed) return;

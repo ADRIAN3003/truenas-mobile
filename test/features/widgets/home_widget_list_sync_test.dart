@@ -76,5 +76,15 @@ void main() {
       _server('a', 'Home'),
     ], settings: const AppSettings(homeWidgets: false));
     expect(widgets.document, isNull);
+    // But whatever the iOS widgets held to sign in with is taken away.
+    expect(widgets.credentialWrites, isNotEmpty);
+    expect(widgets.credentialWrites.every((json) => json == null), isTrue);
+  });
+
+  testWidgets('the iOS widgets get the sign-in details of saved servers', (
+    tester,
+  ) async {
+    await start(tester, [_server('a', 'Home')]);
+    expect(widgets.credentials, contains('"secret":"key"'));
   });
 }

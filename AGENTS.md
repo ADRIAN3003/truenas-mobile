@@ -241,6 +241,31 @@ README covers what the app does; this file covers how to work on it.
   provider shows one. Widget gallery names are in `res/values*/widget_strings.xml`
   and, on iOS, inline in `HomeWidgets.swift` (the extension has no string
   files). Tests: `FakeHomeWidgets` in `test/support/home_widget_fakes.dart`.
+  **iOS widgets fetch their own data** (`WidgetFetch.swift`): the phone rarely
+  runs the app's BGAppRefreshTask, and a widget that only shows what the app
+  saved went stale, and after one failed background run said "can't reach" for
+  good. So each `timeline` call (every 15 min, 5 after a failure; skipped when
+  the data is under a minute old, since the three widgets reload together)
+  signs in over its own WebSocket (`/api/<lastApiVersion|current>`,
+  `auth.login_ex`, `pool.query`, `alert.list`, one `reporting.realtime`
+  sample, system trust plus the pinned fingerprint), shapes the result like
+  `serverWidgetData` (`WidgetShape`; keep the two in step, and the plural
+  templates `poolsAttentionMany` etc. in `homeWidgetLabels`), merges it into
+  `snapshot.v1` and keeps the old numbers when the server is down (footer: "Can't
+  reach the server · 14:02"). The sign-in details reach the extension through
+  `HomeWidgetsBridge.writeCredentials` ->
+  `WidgetCredentialsPlugin.swift` -> a Keychain item in the shared group
+  `$(AppIdentifierPrefix)hu.adrian.truenasmobile.shared` (`Shared/WidgetKeychain.swift`,
+  compiled into both targets; `keychain-access-groups` in both entitlements,
+  the app's own group listed FIRST so flutter_secure_storage's default group,
+  and with it the saved servers, does not change; `AppIdentifierPrefix` in both
+  Info.plists). Never put the secret in the App Group's plain preferences.
+  Written on every `publish` (deduplicated), removed when the widgets are
+  switched off or the last server is deleted. A 2FA account cannot sign in
+  there. Without the Keychain group (re-signed install) the widgets fall back
+  to what the app saved. Untested on a real phone as of writing: check the
+  widget refreshes with the app closed, over Tailscale, and the pinned
+  certificate case.
 - History charts (`lib/core/api/reporting_api.dart`, `lib/features/reporting/`):
   `ReportingApi` reads netdata reporting, `reporting.netdata_graphs` +
   `reporting.netdata_get_data` (25.04) or `reporting.graphs` + `reporting.get_data`

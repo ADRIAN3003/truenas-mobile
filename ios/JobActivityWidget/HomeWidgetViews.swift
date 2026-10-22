@@ -98,10 +98,19 @@ struct FooterRow: View {
 
   var body: some View {
     if server.unreachable == true {
-      Text(verbatim: document.label("unreachable", "Can't reach the server"))
-        .font(.caption2)
-        .foregroundStyle(.orange)
-        .lineLimit(1)
+      // What is shown is the last look, so say when that was.
+      Group {
+        if let date = server.updatedDate {
+          Text(verbatim: document.label("unreachable", "Can't reach the server") + " · ")
+            + Text(date, style: .time)
+        } else {
+          Text(verbatim: document.label("unreachable", "Can't reach the server"))
+        }
+      }
+      .font(.caption2)
+      .foregroundStyle(.orange)
+      .lineLimit(1)
+      .minimumScaleFactor(0.8)
     } else if let date = server.updatedDate {
       HStack(spacing: 3) {
         Text(verbatim: document.label("updated", "Updated"))

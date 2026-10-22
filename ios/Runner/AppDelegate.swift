@@ -32,5 +32,9 @@ import workmanager_apple
     if let registrar = engineBridge.pluginRegistry.registrar(forPlugin: "LiveProgressPlugin") {
       LiveProgressPlugin.register(with: registrar)
     }
+    // Sign-in details for the home screen widgets, which fetch their own data.
+    if let registrar = engineBridge.pluginRegistry.registrar(forPlugin: "WidgetCredentialsPlugin") {
+      WidgetCredentialsPlugin.register(with: registrar)
+    }
   }
 }

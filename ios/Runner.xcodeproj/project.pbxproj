@@ -15,6 +15,10 @@
 		A10000000000000000000007 /* HomeWidgetData.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000007 /* HomeWidgetData.swift */; };
 		A10000000000000000000008 /* HomeWidgets.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000008 /* HomeWidgets.swift */; };
 		A10000000000000000000009 /* HomeWidgetViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000009 /* HomeWidgetViews.swift */; };
+		A1000000000000000000000A /* WidgetKeychain.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000000000000000000000C /* WidgetKeychain.swift */; };
+		A1000000000000000000000B /* WidgetKeychain.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000000000000000000000C /* WidgetKeychain.swift */; };
+		A1000000000000000000000C /* WidgetCredentialsPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000000000000000000000D /* WidgetCredentialsPlugin.swift */; };
+		A1000000000000000000000D /* WidgetFetch.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000000000000000000000E /* WidgetFetch.swift */; };
 		A10000000000000000000006 /* JobActivityWidget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = A20000000000000000000006 /* JobActivityWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */ = {isa = PBXBuildFile; fileRef = 1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */; };
 		331C808B294A63AB00263BE5 /* RunnerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 331C807B294A618700263BE5 /* RunnerTests.swift */; };
@@ -94,6 +98,9 @@
 		A20000000000000000000007 /* HomeWidgetData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeWidgetData.swift; sourceTree = "<group>"; };
 		A20000000000000000000008 /* HomeWidgets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeWidgets.swift; sourceTree = "<group>"; };
 		A20000000000000000000009 /* HomeWidgetViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeWidgetViews.swift; sourceTree = "<group>"; };
+		A2000000000000000000000C /* WidgetKeychain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetKeychain.swift; sourceTree = "<group>"; };
+		A2000000000000000000000D /* WidgetCredentialsPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetCredentialsPlugin.swift; sourceTree = "<group>"; };
+		A2000000000000000000000E /* WidgetFetch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetFetch.swift; sourceTree = "<group>"; };
 		A2000000000000000000000A /* Runner.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Runner.entitlements; sourceTree = "<group>"; };
 		A2000000000000000000000B /* JobActivityWidget.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = JobActivityWidget.entitlements; sourceTree = "<group>"; };
 		A20000000000000000000006 /* JobActivityWidget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = JobActivityWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -173,6 +180,7 @@
 				7884E8672EC3CC0400C636F2 /* SceneDelegate.swift */,
 				74858FAD1ED2DC5600515810 /* Runner-Bridging-Header.h */,
 				A20000000000000000000005 /* LiveProgressPlugin.swift */,
+				A2000000000000000000000D /* WidgetCredentialsPlugin.swift */,
 				A2000000000000000000000A /* Runner.entitlements */,
 			);
 			path = Runner;
@@ -187,6 +195,7 @@
 				A20000000000000000000007 /* HomeWidgetData.swift */,
 				A20000000000000000000008 /* HomeWidgets.swift */,
 				A20000000000000000000009 /* HomeWidgetViews.swift */,
+				A2000000000000000000000E /* WidgetFetch.swift */,
 				A2000000000000000000000B /* JobActivityWidget.entitlements */,
 			);
 			path = JobActivityWidget;
@@ -196,6 +205,7 @@
 			isa = PBXGroup;
 			children = (
 				A20000000000000000000001 /* JobActivityAttributes.swift */,
+				A2000000000000000000000C /* WidgetKeychain.swift */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
@@ -387,7 +397,9 @@
 				1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */,
 				7884E8682EC3CC0700C636F2 /* SceneDelegate.swift in Sources */,
 				A10000000000000000000005 /* LiveProgressPlugin.swift in Sources */,
+				A1000000000000000000000C /* WidgetCredentialsPlugin.swift in Sources */,
 				A10000000000000000000001 /* JobActivityAttributes.swift in Sources */,
+				A1000000000000000000000A /* WidgetKeychain.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -400,7 +412,9 @@
 				A10000000000000000000007 /* HomeWidgetData.swift in Sources */,
 				A10000000000000000000008 /* HomeWidgets.swift in Sources */,
 				A10000000000000000000009 /* HomeWidgetViews.swift in Sources */,
+				A1000000000000000000000D /* WidgetFetch.swift in Sources */,
 				A10000000000000000000002 /* JobActivityAttributes.swift in Sources */,
+				A1000000000000000000000B /* WidgetKeychain.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

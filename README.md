@@ -124,7 +124,8 @@ Download the latest APK or IPA from the
   app through the App Group `group.hu.adrian.truenasmobile`: Xcode registers
   the group for your team the first time you build with automatic signing, and
   a sideloading tool has to keep the group when it re-signs, or the widgets
-  stay empty (the app itself works either way).
+  stay empty and say so (the app itself works either way). Sideloadly drops
+  the group; installing with `flutter install --release` keeps it.
 
 ## Build from source
 

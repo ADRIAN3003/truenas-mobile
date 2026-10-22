@@ -59,12 +59,16 @@ struct StatusEntry: TimelineEntry {
   let date: Date
   let document: WidgetDocument?
   let server: WidgetServer?
+  /// False when the install lacks the App Group, so the data cannot arrive.
+  let groupAvailable: Bool
 
   static func current(serverId: String?, preview: Bool = false) -> StatusEntry {
     let document = WidgetStore.load()
     // A gallery preview of a widget with no data yet shows a sample.
     let shown = (preview && document?.servers.isEmpty != false) ? WidgetStore.sample : document
-    return StatusEntry(date: Date(), document: shown, server: shown?.server(id: serverId))
+    return StatusEntry(
+      date: Date(), document: shown, server: shown?.server(id: serverId),
+      groupAvailable: WidgetStore.groupAvailable)
   }
 }
 

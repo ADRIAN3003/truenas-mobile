@@ -50,6 +50,7 @@ struct WidgetServer: Codable {
   var system: SystemData?
   var alerts: AlertsData?
   var jobs: JobsData?
+  var apps: AppsData?
 
   var updatedDate: Date? {
     updatedAt.map { Date(timeIntervalSince1970: $0 / 1000) }
@@ -77,6 +78,12 @@ struct SystemData: Codable {
   var memory: Double?
   var memoryText: String?
   var temperature: String?
+}
+
+/// How many apps have an update.
+struct AppsData: Codable {
+  var updates: Int
+  var summary: String
 }
 
 /// The scrubs and cloud syncs that wait or run.
@@ -153,7 +160,11 @@ enum WidgetStore {
       "system":{"cpu":18,"memory":46,"memoryText":"14.7 GiB of 32.0 GiB","temperature":"48 °C"},\
       "alerts":{"level":"warn","count":2,"summary":"2 active alerts","items":[\
       {"level":"warn","text":"Scrub of pool tank is overdue"},\
-      {"level":"ok","text":"An update is available"}]}}]}
+      {"level":"ok","text":"An update is available"}]},\
+      "jobs":{"items":[\
+      {"kind":"scrub","title":"Scrub · tank","percent":42,"detail":"Scrubbing"},\
+      {"kind":"cloudSync","title":"Cloud sync","percent":null,"detail":"Waiting"}]},\
+      "apps":{"updates":3,"summary":"3 apps have updates"}}]}
       """
     return try? JSONDecoder().decode(WidgetDocument.self, from: Data(json.utf8))
   }()

@@ -724,6 +724,9 @@
   "homeWidgetPoolsAttention": "{count, plural, other{{count} tároló figyelmet igényel}}",
   "homeWidgetAlertsNone": "Nincs aktív riasztás",
   "homeWidgetAlertsCount": "{count, plural, other{{count} aktív riasztás}}",
+  "homeWidgetAppsNone": "Minden alkalmazás naprakész",
+  "homeWidgetAppsUpdates": "{count, plural, other{{count} alkalmazáshoz van frissítés}}",
+  "homeWidgetIdle": "Nem fut scrub vagy felhő szinkron",
   "homeWidgetMemoryText": "{used} / {total}",
   "settingsHomeWidgets": "Kezdőképernyős widgetek",
   "settingsHomeWidgetsHint": "Widgetek frissítése a háttérben, nagyjából 15 percenként. Nyitott szervernél is frissülnek. A kezdőképernyőről adhatod hozzá őket; a telefon dönti el, mikor fut le valójában a frissítés."

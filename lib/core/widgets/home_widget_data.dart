@@ -4,6 +4,7 @@ import '../instances/server_instance.dart';
 import '../jobs/tracked_job.dart';
 import '../models/alert.dart';
 import '../models/job.dart';
+import '../models/workloads.dart';
 import '../models/pool_summary.dart';
 import '../models/realtime_stats.dart';
 
@@ -15,8 +16,8 @@ enum WidgetLevel { ok, warn, bad }
 /// are already worked out, so the Swift and Kotlin sides only draw it.
 ///
 /// Every part is optional: a server that has not answered yet has none, and
-/// the widget says so. [jobs] are the jobs that are waiting or running; null
-/// when the server could not be asked.
+/// the widget says so. [jobs] are the jobs that are waiting or running, [apps]
+/// the installed apps; null when the server could not be asked.
 Map<String, dynamic> serverWidgetData({
   required ServerInstance server,
   required DateTime now,
@@ -25,6 +26,7 @@ Map<String, dynamic> serverWidgetData({
   required RealtimeStats? stats,
   required AppLocalizations l10n,
   List<TrueNasJob>? jobs,
+  List<TrueNasApp>? apps,
 }) {
   final active = [
     for (final alert in alerts)
@@ -79,6 +81,7 @@ Map<String, dynamic> serverWidgetData({
             : '${stats.cpuTemperature!.round()} °C',
       },
     'jobs': jobs == null ? null : {'items': _jobItems(jobs, l10n)},
+    'apps': apps == null ? null : _apps(apps, l10n),
     'alerts': {
       'level': alertLevel.name,
       'count': active.length,
@@ -105,6 +108,18 @@ const _maxAlerts = 4;
 
 /// The work a widget reports on: scrubs and cloud syncs (and backups).
 const _widgetJobKinds = {JobKind.scrub, JobKind.cloudSync, JobKind.cloudBackup};
+
+/// How many apps have an update, for the activity widget. The iOS widgets
+/// count them themselves (`WidgetShape.apps`); keep the two in step.
+Map<String, dynamic> _apps(List<TrueNasApp> apps, AppLocalizations l10n) {
+  final updates = apps.where((a) => a.upgradeAvailable).length;
+  return {
+    'updates': updates,
+    'summary': updates == 0
+        ? l10n.homeWidgetAppsNone
+        : l10n.homeWidgetAppsUpdates(updates),
+  };
+}
 
 /// How many running jobs a widget can use.
 const _maxJobs = 3;
@@ -196,6 +211,10 @@ Map<String, String> homeWidgetLabels(AppLocalizations l10n) => {
   'alertsCountOne': l10n.homeWidgetAlertsCount(1),
   'alertsCountMany': _countTemplate(l10n.homeWidgetAlertsCount),
   'memoryText': l10n.homeWidgetMemoryText('{used}', '{total}'),
+  'appsNone': l10n.homeWidgetAppsNone,
+  'appsUpdatesOne': l10n.homeWidgetAppsUpdates(1),
+  'appsUpdatesMany': _countTemplate(l10n.homeWidgetAppsUpdates),
+  'idle': l10n.homeWidgetIdle,
   'jobScrub': l10n.jobKindScrub,
   'jobCloudSync': l10n.jobKindCloudSync,
   'jobCloudBackup': l10n.jobKindCloudBackup,

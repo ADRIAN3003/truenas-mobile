@@ -8,6 +8,7 @@ import 'package:truenas_mobile/core/models/alert.dart';
 import 'package:truenas_mobile/core/models/job.dart';
 import 'package:truenas_mobile/core/models/pool_summary.dart';
 import 'package:truenas_mobile/core/models/realtime_stats.dart';
+import 'package:truenas_mobile/core/models/workloads.dart';
 import 'package:truenas_mobile/core/notifications/alert_watcher.dart';
 import 'package:truenas_mobile/core/notifications/background_alerts.dart';
 import 'package:truenas_mobile/core/settings/app_settings.dart';
@@ -40,6 +41,7 @@ void main() {
     List<TrueNasAlert> alerts = const [],
     RealtimeStats? stats,
     List<TrueNasJob>? jobs,
+    List<TrueNasApp>? apps,
     AppLocalizations? strings,
   }) => serverWidgetData(
     server: serverAt('1', 'Home'),
@@ -48,8 +50,15 @@ void main() {
     alerts: alerts,
     stats: stats,
     jobs: jobs,
+    apps: apps,
     l10n: strings ?? l10n,
   );
+
+  TrueNasApp app(String name, {bool upgrade = false}) => TrueNasApp.fromJson({
+    'name': name,
+    'state': 'RUNNING',
+    'upgrade_available': upgrade,
+  });
 
   TrueNasJob job(
     int id,
@@ -220,6 +229,22 @@ void main() {
           'detail': 'Uploading',
         },
       ]);
+    });
+
+    test('apps with an update are counted', () {
+      final apps = data(
+        apps: [app('a', upgrade: true), app('b'), app('c', upgrade: true)],
+      )['apps'];
+      expect(apps, {'updates': 2, 'summary': '2 apps have updates'});
+      expect(
+        data(apps: [app('a', upgrade: true)])['apps']['summary'],
+        '1 app has an update',
+      );
+      expect(data(apps: [app('a')])['apps'], {
+        'updates': 0,
+        'summary': 'Apps up to date',
+      });
+      expect(data()['apps'], isNull);
     });
 
     test('no running jobs is an empty list, an unknown answer is null', () {
@@ -410,6 +435,9 @@ void main() {
       expect(en['jobScrub'], 'Scrub');
       expect(en['jobCloudSync'], 'Cloud sync');
       expect(en['jobWaiting'], 'Waiting');
+      expect(en['appsUpdatesOne'], '1 app has an update');
+      expect(en['appsUpdatesMany'], '{count} apps have updates');
+      expect(en['idle'], 'No scrub or cloud sync running');
       final hu = homeWidgetLabels(localizationsFor(const Locale('hu')));
       expect(hu['alertsCountMany'], '{count} aktív riasztás');
     });
@@ -451,6 +479,7 @@ void main() {
       expect(saved['system']['memory'], 37.5);
       expect(saved['alerts']['count'], 1);
       expect(saved['alerts']['level'], 'bad');
+      expect(saved['apps'], {'updates': 1, 'summary': '1 app has an update'});
       expect(saved['jobs']['items'], [
         {
           'kind': 'scrub',

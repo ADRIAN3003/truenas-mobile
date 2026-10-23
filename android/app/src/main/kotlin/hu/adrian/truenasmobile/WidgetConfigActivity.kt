@@ -47,6 +47,7 @@ class WidgetConfigActivity : Activity() {
             PoolsWidgetProvider::class.java,
             SystemWidgetProvider::class.java,
             AlertsWidgetProvider::class.java,
+            ActivityWidgetProvider::class.java,
         )) {
             if (manager.getAppWidgetInfo(widgetId)?.provider?.className == provider.name) {
                 sendBroadcast(

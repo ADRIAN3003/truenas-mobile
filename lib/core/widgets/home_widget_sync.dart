@@ -5,6 +5,7 @@ import '../../l10n/generated/app_localizations.dart';
 import '../instances/server_instance.dart';
 import '../models/alert.dart';
 import '../models/job.dart';
+import '../models/workloads.dart';
 import '../models/realtime_stats.dart';
 import '../session/truenas_session.dart';
 import 'home_widget_data.dart';
@@ -53,11 +54,12 @@ class HomeWidgetCollector {
     List<TrueNasAlert>? alerts,
   }) async {
     try {
-      final (pools, current, stats, jobs) = await (
+      final (pools, current, stats, jobs, apps) = await (
         session.pools(),
         alerts == null ? session.alerts() : Future.value(alerts),
         _stats(session),
         _jobs(session),
+        _apps(session),
       ).wait;
       _fresh[server.id] = serverWidgetData(
         server: server,
@@ -66,6 +68,7 @@ class HomeWidgetCollector {
         alerts: current,
         stats: stats,
         jobs: jobs,
+        apps: apps,
         l10n: localizationsFor(locale()),
       );
     } catch (_) {
@@ -88,6 +91,16 @@ class HomeWidgetCollector {
   Future<List<TrueNasJob>?> _jobs(TrueNasSession session) async {
     try {
       return await session.activeJobs();
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// The installed apps, or null when the server has none to give (an
+  /// install without the apps service, say).
+  Future<List<TrueNasApp>?> _apps(TrueNasSession session) async {
+    try {
+      return await session.workloads.apps();
     } catch (_) {
       return null;
     }

@@ -13,7 +13,7 @@ import org.json.JSONObject
 import java.util.Date
 
 /**
- * The home screen widgets: pool health, CPU and memory, and alerts. They only
+ * The home screen widgets: pool health, CPU and memory, alerts, and activity. They only
  * draw what the app saved (see `lib/core/widgets/` on the Dart side): one JSON
  * document in the `home_widget` plugin's preferences, with the text already in
  * the user's language. Each widget shows one server, chosen when it is added.
@@ -67,7 +67,7 @@ object WidgetStore {
         document?.optJSONObject("labels")?.optString(key)?.takeIf { it.isNotEmpty() } ?: fallback
 }
 
-/** Draws one kind of widget; the three below only say which. */
+/** Draws one kind of widget; the four below only say which. */
 abstract class StatusWidgetProvider : AppWidgetProvider() {
     protected abstract val layout: Int
     protected abstract fun fill(
@@ -283,17 +283,10 @@ class AlertsWidgetProvider : StatusWidgetProvider() {
         Triple(R.id.alert3, R.id.alert3_dot, R.id.alert3_text),
     )
 
-    /** Row, title, value and bar of the scrubs and cloud syncs that run. */
-    private val jobRows = listOf(
-        listOf(R.id.job1, R.id.job1_title, R.id.job1_value, R.id.job1_bar),
-        listOf(R.id.job2, R.id.job2_title, R.id.job2_value, R.id.job2_bar),
-    )
-
     override fun hideBody(views: RemoteViews) {
         views.setTextViewText(R.id.count, "")
         views.setTextViewText(R.id.summary, "")
         rows.forEach { views.setViewVisibility(it.first, View.GONE) }
-        jobRows.forEach { views.setViewVisibility(it[0], View.GONE) }
     }
 
     override fun fill(context: Context, views: RemoteViews, document: JSONObject, server: JSONObject) {
@@ -310,12 +303,9 @@ class AlertsWidgetProvider : StatusWidgetProvider() {
             else color(context, alerts.optString("level")),
         )
         views.setTextViewText(R.id.summary, alerts.optString("summary"))
-        val jobs = server.optJSONObject("jobs")?.optJSONArray("items").objects()
-        // The jobs take the room of the last alert.
-        val alertRows = if (jobs.isEmpty()) rows.size else rows.size - 1
         val items = alerts.optJSONArray("items").objects()
         rows.forEachIndexed { index, (row, dot, text) ->
-            val item = if (index < alertRows) items.getOrNull(index) else null
+            val item = items.getOrNull(index)
             if (item == null) {
                 views.setViewVisibility(row, View.GONE)
                 return@forEachIndexed
@@ -324,15 +314,61 @@ class AlertsWidgetProvider : StatusWidgetProvider() {
             views.setTextColor(dot, color(context, item.optString("level")))
             views.setTextViewText(text, item.optString("text"))
         }
+    }
+}
+
+/** Apps with an update, and the scrubs and cloud syncs that run. */
+class ActivityWidgetProvider : StatusWidgetProvider() {
+    override val layout = R.layout.widget_activity
+
+    /** Row, title, value and bar of the jobs that run. */
+    private val jobRows = listOf(
+        listOf(R.id.job1, R.id.job1_title, R.id.job1_value, R.id.job1_bar),
+        listOf(R.id.job2, R.id.job2_title, R.id.job2_value, R.id.job2_bar),
+    )
+
+    override fun hideBody(views: RemoteViews) {
+        views.setTextViewText(R.id.count, "")
+        views.setTextViewText(R.id.summary, "")
+        views.setViewVisibility(R.id.idle, View.GONE)
+        jobRows.forEach { views.setViewVisibility(it[0], View.GONE) }
+    }
+
+    override fun fill(context: Context, views: RemoteViews, document: JSONObject, server: JSONObject) {
+        val apps = server.optJSONObject("apps")
+        val jobs = server.optJSONObject("jobs")
+        if (apps == null && jobs == null) {
+            hideBody(views)
+            views.setTextViewText(R.id.summary, WidgetStore.label(document, "noData", "No data yet. Open the app."))
+            return
+        }
+        if (apps == null) {
+            views.setTextViewText(R.id.count, "")
+            views.setTextViewText(R.id.summary, "")
+        } else {
+            val updates = apps.optInt("updates")
+            views.setTextViewText(R.id.count, updates.toString())
+            views.setTextColor(
+                R.id.count,
+                context.getColor(if (updates == 0) R.color.widget_ok else R.color.widget_warn),
+            )
+            views.setTextViewText(R.id.summary, apps.optString("summary"))
+        }
+        val items = jobs?.optJSONArray("items").objects()
+        val idle = jobs != null && items.isEmpty()
+        views.setViewVisibility(R.id.idle, if (idle) View.VISIBLE else View.GONE)
+        if (idle) {
+            views.setTextViewText(R.id.idle, WidgetStore.label(document, "idle", "No scrub or cloud sync running"))
+        }
         jobRows.forEachIndexed { index, (row, title, value, bar) ->
-            val job = jobs.getOrNull(index)
+            val job = items.getOrNull(index)
             if (job == null) {
                 views.setViewVisibility(row, View.GONE)
                 return@forEachIndexed
             }
             views.setViewVisibility(row, View.VISIBLE)
             views.setTextViewText(title, job.optString("title"))
-            if (job.isNull("percent") || !job.has("percent")) {
+            if (job.isNull("percent")) {
                 // Not started, or no progress to report: say what it is doing.
                 views.setTextViewText(value, job.optString("detail"))
                 views.setViewVisibility(bar, View.GONE)

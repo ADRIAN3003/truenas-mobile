@@ -10,6 +10,7 @@ struct JobActivityWidgetBundle: WidgetBundle {
       PoolsWidget()
       SystemWidget()
       AlertsWidget()
+      ActivityWidget()
     }
   }
 }

@@ -4442,6 +4442,24 @@ abstract class AppLocalizations {
   /// **'{count, plural, one{1 active alert} other{{count} active alerts}}'**
   String homeWidgetAlertsCount(int count);
 
+  /// Activity widget summary when no app has an update.
+  ///
+  /// In en, this message translates to:
+  /// **'Apps up to date'**
+  String get homeWidgetAppsNone;
+
+  /// Activity widget summary when apps have updates.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{1 app has an update} other{{count} apps have updates}}'**
+  String homeWidgetAppsUpdates(int count);
+
+  /// Activity widget text when no scrub or cloud sync is running.
+  ///
+  /// In en, this message translates to:
+  /// **'No scrub or cloud sync running'**
+  String get homeWidgetIdle;
+
   /// Memory in use out of the total, in the system widget.
   ///
   /// In en, this message translates to:

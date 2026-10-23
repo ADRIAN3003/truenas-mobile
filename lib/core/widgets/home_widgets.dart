@@ -65,13 +65,19 @@ const _credentialsChannel = MethodChannel(
 const _documentKey = 'snapshot.v1';
 
 /// The kinds of the iOS widgets, as `JobActivityWidget` declares them.
-const _iosKinds = ['TrueNASPools', 'TrueNASSystem', 'TrueNASAlerts'];
+const _iosKinds = [
+  'TrueNASPools',
+  'TrueNASSystem',
+  'TrueNASAlerts',
+  'TrueNASActivity',
+];
 
 /// The Android widget providers.
 const _androidProviders = [
   'hu.adrian.truenasmobile.PoolsWidgetProvider',
   'hu.adrian.truenasmobile.SystemWidgetProvider',
   'hu.adrian.truenasmobile.AlertsWidgetProvider',
+  'hu.adrian.truenasmobile.ActivityWidgetProvider',
 ];
 
 /// Saves the widgets' data through the `home_widget` plugin, which works in

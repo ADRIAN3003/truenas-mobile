@@ -2684,6 +2684,22 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String get homeWidgetAppsNone => 'Minden alkalmazás naprakész';
+
+  @override
+  String homeWidgetAppsUpdates(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count alkalmazáshoz van frissítés',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get homeWidgetIdle => 'Nem fut scrub vagy felhő szinkron';
+
+  @override
   String homeWidgetMemoryText(String used, String total) {
     return '$used / $total';
   }

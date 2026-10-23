@@ -3615,6 +3615,23 @@
       }
     }
   },
+  "homeWidgetAppsNone": "Apps up to date",
+  "@homeWidgetAppsNone": {
+    "description": "Activity widget summary when no app has an update."
+  },
+  "homeWidgetAppsUpdates": "{count, plural, one{1 app has an update} other{{count} apps have updates}}",
+  "@homeWidgetAppsUpdates": {
+    "description": "Activity widget summary when apps have updates.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "homeWidgetIdle": "No scrub or cloud sync running",
+  "@homeWidgetIdle": {
+    "description": "Activity widget text when no scrub or cloud sync is running."
+  },
   "homeWidgetMemoryText": "{used} of {total}",
   "@homeWidgetMemoryText": {
     "description": "Memory in use out of the total, in the system widget.",

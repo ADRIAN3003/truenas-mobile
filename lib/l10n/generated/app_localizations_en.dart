@@ -2712,6 +2712,23 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get homeWidgetAppsNone => 'Apps up to date';
+
+  @override
+  String homeWidgetAppsUpdates(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count apps have updates',
+      one: '1 app has an update',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get homeWidgetIdle => 'No scrub or cloud sync running';
+
+  @override
   String homeWidgetMemoryText(String used, String total) {
     return '$used of $total';
   }

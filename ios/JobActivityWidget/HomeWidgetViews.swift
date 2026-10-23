@@ -56,6 +56,7 @@ struct StatusWidgetView: View {
         case .pools: PoolsBody(server: server, document: document, family: family)
         case .system: SystemBody(server: server, document: document, family: family)
         case .alerts: AlertsBody(server: server, document: document, family: family)
+        case .activity: ActivityBody(server: server, document: document, family: family)
         }
         Spacer(minLength: 0)
         FooterRow(server: server, document: document)
@@ -278,15 +279,6 @@ struct AlertsBody: View {
   let document: WidgetDocument
   let family: WidgetFamily
 
-  /// The scrubs and cloud syncs that wait or run.
-  private var runningJobs: [JobItem] { server.jobs?.items ?? [] }
-
-  /// How many alerts fit: fewer when the jobs take the room.
-  private var alertLines: Int {
-    guard family == .systemLarge else { return 2 }
-    return runningJobs.isEmpty ? 4 : 3
-  }
-
   var body: some View {
     if let alerts = server.alerts {
       if family == .systemSmall {
@@ -310,7 +302,7 @@ struct AlertsBody: View {
               .lineLimit(1)
           }
           ForEach(
-            Array(alerts.items.prefix(alertLines).enumerated()),
+            Array(alerts.items.prefix(family == .systemLarge ? 4 : 2).enumerated()),
             id: \.offset
           ) { _, item in
             HStack(alignment: .top, spacing: 6) {
@@ -320,13 +312,8 @@ struct AlertsBody: View {
                 .padding(.top, 4)
               Text(verbatim: item.text)
                 .font(.caption)
-                .lineLimit(family == .systemLarge && runningJobs.isEmpty ? 3 : 2)
+                .lineLimit(family == .systemLarge ? 3 : 2)
             }
-          }
-          // Only the large widget has room for the jobs under the alerts.
-          if family == .systemLarge && !runningJobs.isEmpty {
-            Spacer(minLength: 0)
-            JobsSection(items: runningJobs)
           }
         }
       }
@@ -336,15 +323,67 @@ struct AlertsBody: View {
   }
 }
 
-/// What is scrubbing or syncing now, each with a bar that fills.
-struct JobsSection: View {
-  let items: [JobItem]
+// MARK: - Activity
+
+/// Apps with an update, and the scrubs and cloud syncs that run.
+struct ActivityBody: View {
+  let server: WidgetServer
+  let document: WidgetDocument
+  let family: WidgetFamily
+
+  private var jobs: [JobItem] { server.jobs?.items ?? [] }
 
   var body: some View {
-    VStack(alignment: .leading, spacing: 6) {
-      Divider()
-      ForEach(Array(items.prefix(3).enumerated()), id: \.offset) { _, item in
-        JobRow(item: item)
+    if server.apps == nil && server.jobs == nil {
+      NoData(document: document)
+    } else if family == .systemSmall {
+      VStack(alignment: .leading, spacing: 6) {
+        AppsSummary(apps: server.apps, compact: true)
+        if let job = jobs.first {
+          JobRow(item: job, showDetail: false)
+        } else if server.jobs != nil {
+          Text(verbatim: document.label("idle", "No scrub or cloud sync running"))
+            .font(.caption2)
+            .foregroundStyle(.secondary)
+            .lineLimit(2)
+        }
+      }
+    } else {
+      HStack(alignment: .top, spacing: 12) {
+        AppsSummary(apps: server.apps, compact: false)
+          .frame(maxWidth: .infinity, alignment: .leading)
+        VStack(alignment: .leading, spacing: 6) {
+          ForEach(Array(jobs.prefix(3).enumerated()), id: \.offset) { _, item in
+            JobRow(item: item)
+          }
+          if jobs.isEmpty && server.jobs != nil {
+            Text(verbatim: document.label("idle", "No scrub or cloud sync running"))
+              .font(.caption)
+              .foregroundStyle(.secondary)
+              .lineLimit(3)
+          }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+      }
+    }
+  }
+}
+
+/// The number of apps with an update, in the colour of the answer.
+struct AppsSummary: View {
+  let apps: AppsData?
+  let compact: Bool
+
+  var body: some View {
+    if let apps = apps {
+      VStack(alignment: .leading, spacing: 4) {
+        Text(verbatim: "\(apps.updates)")
+          .font(.system(size: compact ? 30 : 40, weight: .semibold, design: .rounded))
+          .foregroundStyle(apps.updates == 0 ? Color.green : Color.orange)
+        Text(verbatim: apps.summary)
+          .font(compact ? .caption.weight(.semibold) : .subheadline.weight(.semibold))
+          .lineLimit(2)
+          .minimumScaleFactor(0.8)
       }
     }
   }
@@ -352,6 +391,7 @@ struct JobsSection: View {
 
 struct JobRow: View {
   let item: JobItem
+  var showDetail = true
 
   private var symbol: String {
     item.kind == "scrub" ? "arrow.triangle.2.circlepath" : "icloud.and.arrow.up"
@@ -377,7 +417,7 @@ struct JobRow: View {
         ProgressView(value: min(max(percent / 100, 0), 1))
           .tint(.blue)
       }
-      if let detail = item.detail, !detail.isEmpty {
+      if showDetail, let detail = item.detail, !detail.isEmpty {
         Text(verbatim: detail)
           .font(.caption2)
           .foregroundStyle(.secondary)

@@ -211,7 +211,7 @@ README covers what the app does; this file covers how to work on it.
   `WorkloadsApi.activeBulkRun`); its id is `AppBulkRun.jobId`. Gated on
   `core.bulk`. Tests: `FakeTrueNasServer.holdBulk` keeps a job running.
 - Home screen widgets (`lib/core/widgets/`, setting `homeWidgets`, on by
-  default): pool health, CPU and memory, active alerts. `serverWidgetData`
+  default): pool health, CPU and memory, active alerts, activity (apps with updates, running scrubs and cloud syncs). `serverWidgetData`
   turns pools, alerts and one `reporting.realtime` sample into JSON with the
   text already localized (plurals worked out in Dart, so Swift and Kotlin only
   draw). `HomeWidgetPublisher` merges it into one document (`snapshot.v1`:
@@ -232,7 +232,7 @@ README covers what the app does; this file covers how to work on it.
   iOS 17+ only (`if #available` in the bundle); both targets have an App Group
   entitlement (`Runner.entitlements`, `JobActivityWidget.entitlements`, set in
   the hand-edited `project.pbxproj`). The widget kinds (`TrueNASPools`,
-  `TrueNASSystem`, `TrueNASAlerts`) must match `_iosKinds` in
+  `TrueNASSystem`, `TrueNASAlerts`, `TrueNASActivity`) must match `_iosKinds` in
   `home_widgets.dart`; the Android providers (`HomeWidgets.kt`,
   `PoolsWidgetProvider` and friends, `WidgetConfigActivity` for the server
   choice) must match `_androidProviders`. Android uses plain `RemoteViews`
@@ -263,15 +263,17 @@ README covers what the app does; this file covers how to work on it.
   Written on every `publish` (deduplicated), removed when the widgets are
   switched off or the last server is deleted. A 2FA account cannot sign in
   there. Without the Keychain group (re-signed install) the widgets fall back
-  to what the app saved. **Running jobs** (scrubs, cloud syncs, cloud backups):
-  `jobs.items` (`{kind, title, percent, detail}`, at most 3; `jobs` is null when
-  the server could not list them) comes from `core.get_jobs` filtered to
-  WAITING/RUNNING (`_jobItems` in `home_widget_data.dart`, `WidgetShape.jobs`
-  in Swift; keep them in step, the kind names come from `TrackedJob`). Only the
-  largest alerts widget draws them: iOS `.systemLarge` (`JobsSection`, takes the
-  room of the fourth alert) and the Android alerts layout (`job1`/`job2` rows,
-  take the room of the third alert). The labels `jobScrub`, `jobCloudSync`,
-  `jobCloudBackup`, `jobWaiting` reuse the job strings. Untested on a real phone
+  to what the app saved. **Activity widget** (`TrueNASActivity` / `ActivityWidgetProvider`, small
+  and medium on iOS): `apps` (`{updates, summary}`, from `app.query`'s
+  `upgrade_available`; `_apps` in `home_widget_data.dart`, `WidgetShape.apps`)
+  and `jobs.items` (`{kind, title, percent, detail}` for scrubs, cloud syncs
+  and cloud backups, at most 3; from `core.get_jobs` filtered to
+  WAITING/RUNNING; `_jobItems`, `WidgetShape.jobs`). Either is null when the
+  server could not be asked, and keep the Dart and Swift shaping in step. New
+  widgets must be added to `_iosKinds`/`_androidProviders`, the iOS bundle, the
+  manifest and `WidgetConfigActivity`'s provider list. The labels `appsNone`,
+  `appsUpdatesOne/Many`, `idle`, `jobScrub`, `jobCloudSync`, `jobCloudBackup`,
+  `jobWaiting` are in `homeWidgetLabels`. Untested on a real phone
   as of writing: check the
   widget refreshes with the app closed, over Tailscale, and the pinned
   certificate case.

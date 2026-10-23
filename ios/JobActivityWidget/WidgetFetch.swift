@@ -178,6 +178,8 @@ struct WidgetSnapshot {
   var alerts: AlertsData
   /// Nil when the server could not list its jobs.
   var jobs: JobsData?
+  /// Nil when the server has no apps to list.
+  var apps: AppsData?
   /// Nil when the server sent no CPU/memory sample in time.
   var system: SystemData?
 }
@@ -202,6 +204,7 @@ enum WidgetFetcher {
       // Not worth failing the visit for: the widget then shows no jobs.
       let active: [Any] = ["state", "in", ["WAITING", "RUNNING"]]
       let jobs = try? await rpc.call("core.get_jobs", [[active]]) as? [[String: Any]]
+      let apps = try? await rpc.call("app.query") as? [[String: Any]]
       // Last, because a server that sends no sample is waited for until the
       // timeout and then hung up on, which ends the visit.
       let fields = try? await withTimeout(sampleTimeout, close: rpc.close) {
@@ -212,6 +215,7 @@ enum WidgetFetcher {
         pools: WidgetShape.pools(pools, label: label),
         alerts: WidgetShape.alerts(alerts, label: label),
         jobs: jobs.map { WidgetShape.jobs($0, label: label) },
+        apps: apps.map { WidgetShape.apps($0, label: label) },
         system: fields.map { WidgetShape.system($0, label: label) })
     }
   }
@@ -308,6 +312,19 @@ enum WidgetShape {
       AlertItem(level: severity(row), text: shorten(plain(message(row))))
     }
     return AlertsData(level: level, count: active.count, summary: summary, items: Array(items))
+  }
+
+  /// How many of [rows] (the installed apps) have an update, like `_apps` in
+  /// `home_widget_data.dart`.
+  static func apps(_ rows: [[String: Any]], label: (String, String) -> String) -> AppsData {
+    let updates = rows.filter { $0["upgrade_available"] as? Bool == true }.count
+    let summary =
+      updates == 0
+      ? label("appsNone", "Apps up to date")
+      : counted(
+        updates, label: label, one: ("appsUpdatesOne", "1 app has an update"),
+        many: ("appsUpdatesMany", "{count} apps have updates"))
+    return AppsData(updates: updates, summary: summary)
   }
 
   /// The scrubs and cloud syncs among [rows] (the jobs that wait or run), like
@@ -473,6 +490,7 @@ enum WidgetRefresher {
       server.pools = snapshot.pools
       server.alerts = snapshot.alerts
       server.jobs = snapshot.jobs
+      server.apps = snapshot.apps
       // A server that sent no sample keeps the last one.
       if let system = snapshot.system { server.system = system }
       server.updatedAt = Date().timeIntervalSince1970 * 1000

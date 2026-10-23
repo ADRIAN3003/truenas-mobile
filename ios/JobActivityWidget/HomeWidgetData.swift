@@ -49,6 +49,7 @@ struct WidgetServer: Codable {
   var pools: PoolsData?
   var system: SystemData?
   var alerts: AlertsData?
+  var jobs: JobsData?
 
   var updatedDate: Date? {
     updatedAt.map { Date(timeIntervalSince1970: $0 / 1000) }
@@ -76,6 +77,20 @@ struct SystemData: Codable {
   var memory: Double?
   var memoryText: String?
   var temperature: String?
+}
+
+/// The scrubs and cloud syncs that wait or run.
+struct JobsData: Codable {
+  var items: [JobItem]
+}
+
+struct JobItem: Codable {
+  /// "scrub", "cloudSync" or "cloudBackup".
+  var kind: String
+  var title: String
+  /// 0 to 100, or nil while the job reports none (or has not started).
+  var percent: Double?
+  var detail: String?
 }
 
 struct AlertsData: Codable {

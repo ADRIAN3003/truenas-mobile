@@ -263,7 +263,16 @@ README covers what the app does; this file covers how to work on it.
   Written on every `publish` (deduplicated), removed when the widgets are
   switched off or the last server is deleted. A 2FA account cannot sign in
   there. Without the Keychain group (re-signed install) the widgets fall back
-  to what the app saved. Untested on a real phone as of writing: check the
+  to what the app saved. **Running jobs** (scrubs, cloud syncs, cloud backups):
+  `jobs.items` (`{kind, title, percent, detail}`, at most 3; `jobs` is null when
+  the server could not list them) comes from `core.get_jobs` filtered to
+  WAITING/RUNNING (`_jobItems` in `home_widget_data.dart`, `WidgetShape.jobs`
+  in Swift; keep them in step, the kind names come from `TrackedJob`). Only the
+  largest alerts widget draws them: iOS `.systemLarge` (`JobsSection`, takes the
+  room of the fourth alert) and the Android alerts layout (`job1`/`job2` rows,
+  take the room of the third alert). The labels `jobScrub`, `jobCloudSync`,
+  `jobCloudBackup`, `jobWaiting` reuse the job strings. Untested on a real phone
+  as of writing: check the
   widget refreshes with the app closed, over Tailscale, and the pinned
   certificate case.
 - History charts (`lib/core/api/reporting_api.dart`, `lib/features/reporting/`):

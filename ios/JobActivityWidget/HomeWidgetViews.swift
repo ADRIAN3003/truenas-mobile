@@ -278,6 +278,15 @@ struct AlertsBody: View {
   let document: WidgetDocument
   let family: WidgetFamily
 
+  /// The scrubs and cloud syncs that wait or run.
+  private var runningJobs: [JobItem] { server.jobs?.items ?? [] }
+
+  /// How many alerts fit: fewer when the jobs take the room.
+  private var alertLines: Int {
+    guard family == .systemLarge else { return 2 }
+    return runningJobs.isEmpty ? 4 : 3
+  }
+
   var body: some View {
     if let alerts = server.alerts {
       if family == .systemSmall {
@@ -301,7 +310,7 @@ struct AlertsBody: View {
               .lineLimit(1)
           }
           ForEach(
-            Array(alerts.items.prefix(family == .systemLarge ? 4 : 2).enumerated()),
+            Array(alerts.items.prefix(alertLines).enumerated()),
             id: \.offset
           ) { _, item in
             HStack(alignment: .top, spacing: 6) {
@@ -311,13 +320,69 @@ struct AlertsBody: View {
                 .padding(.top, 4)
               Text(verbatim: item.text)
                 .font(.caption)
-                .lineLimit(family == .systemLarge ? 3 : 2)
+                .lineLimit(family == .systemLarge && runningJobs.isEmpty ? 3 : 2)
             }
+          }
+          // Only the large widget has room for the jobs under the alerts.
+          if family == .systemLarge && !runningJobs.isEmpty {
+            Spacer(minLength: 0)
+            JobsSection(items: runningJobs)
           }
         }
       }
     } else {
       NoData(document: document)
+    }
+  }
+}
+
+/// What is scrubbing or syncing now, each with a bar that fills.
+struct JobsSection: View {
+  let items: [JobItem]
+
+  var body: some View {
+    VStack(alignment: .leading, spacing: 6) {
+      Divider()
+      ForEach(Array(items.prefix(3).enumerated()), id: \.offset) { _, item in
+        JobRow(item: item)
+      }
+    }
+  }
+}
+
+struct JobRow: View {
+  let item: JobItem
+
+  private var symbol: String {
+    item.kind == "scrub" ? "arrow.triangle.2.circlepath" : "icloud.and.arrow.up"
+  }
+
+  var body: some View {
+    VStack(alignment: .leading, spacing: 2) {
+      HStack(spacing: 4) {
+        Image(systemName: symbol)
+          .font(.caption2)
+          .foregroundStyle(.blue)
+        Text(verbatim: item.title)
+          .font(.caption.weight(.medium))
+          .lineLimit(1)
+        Spacer(minLength: 4)
+        if let percent = item.percent {
+          Text(verbatim: "\(Int(percent.rounded()))%")
+            .font(.caption2.monospacedDigit())
+            .foregroundStyle(.secondary)
+        }
+      }
+      if let percent = item.percent {
+        ProgressView(value: min(max(percent / 100, 0), 1))
+          .tint(.blue)
+      }
+      if let detail = item.detail, !detail.isEmpty {
+        Text(verbatim: detail)
+          .font(.caption2)
+          .foregroundStyle(.secondary)
+          .lineLimit(1)
+      }
     }
   }
 }

@@ -176,6 +176,8 @@ final class WidgetRpc: NSObject, URLSessionDelegate {
 struct WidgetSnapshot {
   var pools: PoolsData
   var alerts: AlertsData
+  /// Nil when the server could not list its jobs.
+  var jobs: JobsData?
   /// Nil when the server sent no CPU/memory sample in time.
   var system: SystemData?
 }
@@ -197,6 +199,9 @@ enum WidgetFetcher {
       try await login(rpc, credential)
       let pools = (try await rpc.call("pool.query") as? [[String: Any]]) ?? []
       let alerts = (try await rpc.call("alert.list") as? [[String: Any]]) ?? []
+      // Not worth failing the visit for: the widget then shows no jobs.
+      let active: [Any] = ["state", "in", ["WAITING", "RUNNING"]]
+      let jobs = try? await rpc.call("core.get_jobs", [[active]]) as? [[String: Any]]
       // Last, because a server that sends no sample is waited for until the
       // timeout and then hung up on, which ends the visit.
       let fields = try? await withTimeout(sampleTimeout, close: rpc.close) {
@@ -206,6 +211,7 @@ enum WidgetFetcher {
       return WidgetSnapshot(
         pools: WidgetShape.pools(pools, label: label),
         alerts: WidgetShape.alerts(alerts, label: label),
+        jobs: jobs.map { WidgetShape.jobs($0, label: label) },
         system: fields.map { WidgetShape.system($0, label: label) })
     }
   }
@@ -304,6 +310,48 @@ enum WidgetShape {
     return AlertsData(level: level, count: active.count, summary: summary, items: Array(items))
   }
 
+  /// The scrubs and cloud syncs among [rows] (the jobs that wait or run), like
+  /// `_jobItems` in `home_widget_data.dart`.
+  static func jobs(_ rows: [[String: Any]], label: (String, String) -> String) -> JobsData {
+    var items: [JobItem] = []
+    for row in rows {
+      let state = (row["state"] as? String ?? "").uppercased()
+      guard state == "RUNNING" || state == "WAITING" else { continue }
+      // `core.bulk` counts as the method it runs.
+      let arguments = row["arguments"] as? [Any] ?? []
+      let first = arguments.first as? String
+      var method = row["method"] as? String ?? ""
+      if method == "core.bulk", let first = first { method = first }
+      let kind: String
+      let name: String
+      if method.hasPrefix("pool.scrub") {
+        kind = "scrub"
+        name = label("jobScrub", "Scrub")
+      } else if method == "cloudsync.sync" {
+        kind = "cloudSync"
+        name = label("jobCloudSync", "Cloud sync")
+      } else if method == "cloud_backup.sync" {
+        kind = "cloudBackup"
+        name = label("jobCloudBackup", "Cloud backup")
+      } else {
+        continue
+      }
+      let target = (kind == "scrub" && row["method"] as? String != "core.bulk") ? first : nil
+      let progress = row["progress"] as? [String: Any] ?? [:]
+      let running = state == "RUNNING"
+      let percent = running ? (progress["percent"] as? NSNumber).map { $0.doubleValue } : nil
+      items.append(
+        JobItem(
+          kind: kind, title: target.map { "\(name) · \($0)" } ?? name,
+          percent: percent.map { round1(min(max($0, 0), 100)) },
+          detail: running
+            ? shorten(progress["description"] as? String ?? "", 80) : label("jobWaiting", "Waiting")
+        ))
+      if items.count == 3 { break }
+    }
+    return JobsData(items: items)
+  }
+
   static func system(_ fields: [String: Any], label: (String, String) -> String) -> SystemData {
     let cpu = (fields["cpu"] as? [String: Any])?["cpu"] as? [String: Any] ?? [:]
     let memory = fields["memory"] as? [String: Any] ?? [:]
@@ -361,11 +409,11 @@ enum WidgetShape {
   }
 
   /// A widget has little room: the first line or so.
-  private static func shorten(_ text: String) -> String {
+  private static func shorten(_ text: String, _ limit: Int = 110) -> String {
     let first = text.split(separator: "\n", omittingEmptySubsequences: false).first
     let line = String(first ?? "").trimmingCharacters(in: .whitespaces)
-    guard line.count > 110 else { return line }
-    return String(line.prefix(109)).trimmingCharacters(in: .whitespaces) + "…"
+    guard line.count > limit else { return line }
+    return String(line.prefix(limit - 1)).trimmingCharacters(in: .whitespaces) + "…"
   }
 
   private static func number(_ value: Any?) -> Double {
@@ -424,6 +472,7 @@ enum WidgetRefresher {
       }
       server.pools = snapshot.pools
       server.alerts = snapshot.alerts
+      server.jobs = snapshot.jobs
       // A server that sent no sample keeps the last one.
       if let system = snapshot.system { server.system = system }
       server.updatedAt = Date().timeIntervalSince1970 * 1000

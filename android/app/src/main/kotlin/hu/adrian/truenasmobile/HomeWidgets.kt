@@ -283,10 +283,17 @@ class AlertsWidgetProvider : StatusWidgetProvider() {
         Triple(R.id.alert3, R.id.alert3_dot, R.id.alert3_text),
     )
 
+    /** Row, title, value and bar of the scrubs and cloud syncs that run. */
+    private val jobRows = listOf(
+        listOf(R.id.job1, R.id.job1_title, R.id.job1_value, R.id.job1_bar),
+        listOf(R.id.job2, R.id.job2_title, R.id.job2_value, R.id.job2_bar),
+    )
+
     override fun hideBody(views: RemoteViews) {
         views.setTextViewText(R.id.count, "")
         views.setTextViewText(R.id.summary, "")
         rows.forEach { views.setViewVisibility(it.first, View.GONE) }
+        jobRows.forEach { views.setViewVisibility(it[0], View.GONE) }
     }
 
     override fun fill(context: Context, views: RemoteViews, document: JSONObject, server: JSONObject) {
@@ -303,9 +310,12 @@ class AlertsWidgetProvider : StatusWidgetProvider() {
             else color(context, alerts.optString("level")),
         )
         views.setTextViewText(R.id.summary, alerts.optString("summary"))
+        val jobs = server.optJSONObject("jobs")?.optJSONArray("items").objects()
+        // The jobs take the room of the last alert.
+        val alertRows = if (jobs.isEmpty()) rows.size else rows.size - 1
         val items = alerts.optJSONArray("items").objects()
         rows.forEachIndexed { index, (row, dot, text) ->
-            val item = items.getOrNull(index)
+            val item = if (index < alertRows) items.getOrNull(index) else null
             if (item == null) {
                 views.setViewVisibility(row, View.GONE)
                 return@forEachIndexed
@@ -313,6 +323,25 @@ class AlertsWidgetProvider : StatusWidgetProvider() {
             views.setViewVisibility(row, View.VISIBLE)
             views.setTextColor(dot, color(context, item.optString("level")))
             views.setTextViewText(text, item.optString("text"))
+        }
+        jobRows.forEachIndexed { index, (row, title, value, bar) ->
+            val job = jobs.getOrNull(index)
+            if (job == null) {
+                views.setViewVisibility(row, View.GONE)
+                return@forEachIndexed
+            }
+            views.setViewVisibility(row, View.VISIBLE)
+            views.setTextViewText(title, job.optString("title"))
+            if (job.isNull("percent") || !job.has("percent")) {
+                // Not started, or no progress to report: say what it is doing.
+                views.setTextViewText(value, job.optString("detail"))
+                views.setViewVisibility(bar, View.GONE)
+            } else {
+                val percent = job.optDouble("percent", 0.0)
+                views.setTextViewText(value, "${percent.toInt()}%")
+                views.setViewVisibility(bar, View.VISIBLE)
+                views.setProgressBar(bar, 100, percent.toInt().coerceIn(0, 100), false)
+            }
         }
     }
 }

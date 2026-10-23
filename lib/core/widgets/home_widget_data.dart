@@ -1,7 +1,9 @@
 import '../../l10n/generated/app_localizations.dart';
 import '../../shared/formatting.dart';
 import '../instances/server_instance.dart';
+import '../jobs/tracked_job.dart';
 import '../models/alert.dart';
+import '../models/job.dart';
 import '../models/pool_summary.dart';
 import '../models/realtime_stats.dart';
 
@@ -13,7 +15,8 @@ enum WidgetLevel { ok, warn, bad }
 /// are already worked out, so the Swift and Kotlin sides only draw it.
 ///
 /// Every part is optional: a server that has not answered yet has none, and
-/// the widget says so.
+/// the widget says so. [jobs] are the jobs that are waiting or running; null
+/// when the server could not be asked.
 Map<String, dynamic> serverWidgetData({
   required ServerInstance server,
   required DateTime now,
@@ -21,6 +24,7 @@ Map<String, dynamic> serverWidgetData({
   required List<TrueNasAlert> alerts,
   required RealtimeStats? stats,
   required AppLocalizations l10n,
+  List<TrueNasJob>? jobs,
 }) {
   final active = [
     for (final alert in alerts)
@@ -74,6 +78,7 @@ Map<String, dynamic> serverWidgetData({
             ? null
             : '${stats.cpuTemperature!.round()} °C',
       },
+    'jobs': jobs == null ? null : {'items': _jobItems(jobs, l10n)},
     'alerts': {
       'level': alertLevel.name,
       'count': active.length,
@@ -98,6 +103,45 @@ Map<String, dynamic> serverWidgetData({
 /// How many alert lines a widget can use.
 const _maxAlerts = 4;
 
+/// The work a widget reports on: scrubs and cloud syncs (and backups).
+const _widgetJobKinds = {JobKind.scrub, JobKind.cloudSync, JobKind.cloudBackup};
+
+/// How many running jobs a widget can use.
+const _maxJobs = 3;
+
+/// The scrubs and cloud syncs among [jobs] that are waiting or running, as
+/// `{kind, title, percent, detail}`. `percent` is null while the job has not
+/// reported any (or has not started), and `detail` is the server's own words
+/// about it. The iOS widgets work this out themselves (`WidgetShape.jobs`);
+/// keep the two in step.
+List<Map<String, dynamic>> _jobItems(
+  List<TrueNasJob> jobs,
+  AppLocalizations l10n,
+) {
+  final items = <Map<String, dynamic>>[];
+  for (final job in jobs) {
+    if (!job.state.isActive) continue;
+    final tracked = TrackedJob.of(job);
+    if (tracked == null || !_widgetJobKinds.contains(tracked.kind)) continue;
+    final name = switch (tracked.kind) {
+      JobKind.scrub => l10n.jobKindScrub,
+      JobKind.cloudBackup => l10n.jobKindCloudBackup,
+      _ => l10n.jobKindCloudSync,
+    };
+    final running = job.state == JobState.running;
+    items.add({
+      'kind': tracked.kind.name,
+      'title': tracked.target == null ? name : '$name · ${tracked.target}',
+      'percent': running && job.percent != null
+          ? _round(job.percent!.clamp(0.0, 100.0).toDouble())
+          : null,
+      'detail': running ? _shorten(job.progressText, 80) : l10n.jobStateWaiting,
+    });
+    if (items.length == _maxJobs) break;
+  }
+  return items;
+}
+
 /// A pool is orange when it is nearly full or not entirely healthy, and red
 /// when ZFS says it is down or faulted.
 Map<String, dynamic> _pool(PoolSummary pool) {
@@ -121,9 +165,11 @@ Map<String, dynamic> _pool(PoolSummary pool) {
 double _round(double value) => (value * 10).round() / 10;
 
 /// Widgets have little room: the first line or so of an alert.
-String _shorten(String text) {
+String _shorten(String text, [int limit = 110]) {
   final line = text.split('\n').first.trim();
-  return line.length <= 110 ? line : '${line.substring(0, 109).trimRight()}…';
+  return line.length <= limit
+      ? line
+      : '${line.substring(0, limit - 1).trimRight()}…';
 }
 
 /// A plural message as a template with `{count}` in it, for a widget that
@@ -150,4 +196,8 @@ Map<String, String> homeWidgetLabels(AppLocalizations l10n) => {
   'alertsCountOne': l10n.homeWidgetAlertsCount(1),
   'alertsCountMany': _countTemplate(l10n.homeWidgetAlertsCount),
   'memoryText': l10n.homeWidgetMemoryText('{used}', '{total}'),
+  'jobScrub': l10n.jobKindScrub,
+  'jobCloudSync': l10n.jobKindCloudSync,
+  'jobCloudBackup': l10n.jobKindCloudBackup,
+  'jobWaiting': l10n.jobStateWaiting,
 };

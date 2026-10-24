@@ -4445,7 +4445,7 @@ abstract class AppLocalizations {
   /// Activity widget summary when no app has an update.
   ///
   /// In en, this message translates to:
-  /// **'Apps up to date'**
+  /// **'All apps are up to date'**
   String get homeWidgetAppsNone;
 
   /// Activity widget summary when apps have updates.

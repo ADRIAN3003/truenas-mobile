@@ -377,9 +377,17 @@ struct AppsSummary: View {
   var body: some View {
     if let apps = apps {
       VStack(alignment: .leading, spacing: 4) {
-        Text(verbatim: "\(apps.updates)")
-          .font(.system(size: compact ? 30 : 40, weight: .semibold, design: .rounded))
-          .foregroundStyle(apps.updates == 0 ? Color.green : Color.orange)
+        // With nothing to update a "0" over "apps up to date" reads as no app
+        // being up to date, so a tick stands in for the number.
+        if apps.updates == 0 {
+          Image(systemName: "checkmark.circle.fill")
+            .font(.system(size: compact ? 30 : 40))
+            .foregroundStyle(.green)
+        } else {
+          Text(verbatim: "\(apps.updates)")
+            .font(.system(size: compact ? 30 : 40, weight: .semibold, design: .rounded))
+            .foregroundStyle(.orange)
+        }
         Text(verbatim: apps.summary)
           .font(compact ? .caption.weight(.semibold) : .subheadline.weight(.semibold))
           .lineLimit(2)

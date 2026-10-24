@@ -347,7 +347,8 @@ class ActivityWidgetProvider : StatusWidgetProvider() {
             views.setTextViewText(R.id.summary, "")
         } else {
             val updates = apps.optInt("updates")
-            views.setTextViewText(R.id.count, updates.toString())
+            // A tick, not "0": "0" over "apps up to date" reads as none being so.
+            views.setTextViewText(R.id.count, if (updates == 0) "✓" else updates.toString())
             views.setTextColor(
                 R.id.count,
                 context.getColor(if (updates == 0) R.color.widget_ok else R.color.widget_warn),

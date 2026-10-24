@@ -2712,7 +2712,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get homeWidgetAppsNone => 'Apps up to date';
+  String get homeWidgetAppsNone => 'All apps are up to date';
 
   @override
   String homeWidgetAppsUpdates(int count) {

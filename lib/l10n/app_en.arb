@@ -3615,7 +3615,7 @@
       }
     }
   },
-  "homeWidgetAppsNone": "Apps up to date",
+  "homeWidgetAppsNone": "All apps are up to date",
   "@homeWidgetAppsNone": {
     "description": "Activity widget summary when no app has an update."
   },

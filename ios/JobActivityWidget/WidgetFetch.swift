@@ -320,7 +320,7 @@ enum WidgetShape {
     let updates = rows.filter { $0["upgrade_available"] as? Bool == true }.count
     let summary =
       updates == 0
-      ? label("appsNone", "Apps up to date")
+      ? label("appsNone", "All apps are up to date")
       : counted(
         updates, label: label, one: ("appsUpdatesOne", "1 app has an update"),
         many: ("appsUpdatesMany", "{count} apps have updates"))

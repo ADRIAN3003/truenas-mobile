@@ -242,7 +242,7 @@ void main() {
       );
       expect(data(apps: [app('a')])['apps'], {
         'updates': 0,
-        'summary': 'Apps up to date',
+        'summary': 'All apps are up to date',
       });
       expect(data()['apps'], isNull);
     });

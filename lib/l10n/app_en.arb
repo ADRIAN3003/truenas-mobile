@@ -73,6 +73,76 @@
   "@fieldAddressHint": {
     "description": "Example address shown in the empty address field."
   },
+  "wolSection": "Wake-on-LAN",
+  "@wolSection": {
+    "description": "Heading of the Wake-on-LAN part of the server form."
+  },
+  "wolIntro": "Optional. Wakes this server from the server list with a magic packet when it is asleep or off. Wake-on-LAN must be switched on in the NAS's BIOS or UEFI.",
+  "@wolIntro": {
+    "description": "Explains the Wake-on-LAN part of the server form."
+  },
+  "wolMac": "MAC address",
+  "@wolMac": {
+    "description": "Field label for the MAC address of the NAS's network card."
+  },
+  "wolMacHint": "AA:BB:CC:DD:EE:FF",
+  "@wolMacHint": {
+    "description": "Example MAC address in the empty field."
+  },
+  "wolMacInvalid": "Enter a MAC address like AA:BB:CC:DD:EE:FF",
+  "@wolMacInvalid": {
+    "description": "Error under a MAC address that cannot be read."
+  },
+  "wolBroadcast": "Broadcast address",
+  "@wolBroadcast": {
+    "description": "Field label for where the magic packet is sent."
+  },
+  "wolBroadcastHelp": "Empty means 255.255.255.255. If the NAS does not wake, use your network's own, such as 192.168.1.255.",
+  "@wolBroadcastHelp": {
+    "description": "Help under the broadcast address field."
+  },
+  "wolPort": "Port",
+  "@wolPort": {
+    "description": "Field label for the UDP port of the magic packet."
+  },
+  "wolPortInvalid": "Enter a port from 1 to 65535",
+  "@wolPortInvalid": {
+    "description": "Error under an invalid port."
+  },
+  "wolFetch": "Get the MAC address from the server",
+  "@wolFetch": {
+    "description": "Button that reads the MAC address from the running server."
+  },
+  "wolFetchNone": "The server reported no network card with a MAC address.",
+  "@wolFetchNone": {
+    "description": "Shown when the server lists no MAC address."
+  },
+  "wolChooseCard": "Which network card wakes the server?",
+  "@wolChooseCard": {
+    "description": "Title of the choice between network cards."
+  },
+  "wolWake": "Wake up",
+  "@wolWake": {
+    "description": "Button and tooltip that sends the magic packet."
+  },
+  "wolSent": "Wake-up sent to {name}. It can take a minute to start.",
+  "@wolSent": {
+    "description": "Shown after the magic packet was sent.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "wolFailed": "Could not send the wake-up: {error}",
+  "@wolFailed": {
+    "description": "Shown when the magic packet could not be sent.",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "fieldUsername": "Username",
   "@fieldUsername": {
     "description": "Label of the username field."

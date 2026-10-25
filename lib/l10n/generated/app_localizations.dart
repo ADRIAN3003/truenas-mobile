@@ -200,6 +200,96 @@ abstract class AppLocalizations {
   /// **'nas.local or https://192.168.1.10'**
   String get fieldAddressHint;
 
+  /// Heading of the Wake-on-LAN part of the server form.
+  ///
+  /// In en, this message translates to:
+  /// **'Wake-on-LAN'**
+  String get wolSection;
+
+  /// Explains the Wake-on-LAN part of the server form.
+  ///
+  /// In en, this message translates to:
+  /// **'Optional. Wakes this server from the server list with a magic packet when it is asleep or off. Wake-on-LAN must be switched on in the NAS\'s BIOS or UEFI.'**
+  String get wolIntro;
+
+  /// Field label for the MAC address of the NAS's network card.
+  ///
+  /// In en, this message translates to:
+  /// **'MAC address'**
+  String get wolMac;
+
+  /// Example MAC address in the empty field.
+  ///
+  /// In en, this message translates to:
+  /// **'AA:BB:CC:DD:EE:FF'**
+  String get wolMacHint;
+
+  /// Error under a MAC address that cannot be read.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a MAC address like AA:BB:CC:DD:EE:FF'**
+  String get wolMacInvalid;
+
+  /// Field label for where the magic packet is sent.
+  ///
+  /// In en, this message translates to:
+  /// **'Broadcast address'**
+  String get wolBroadcast;
+
+  /// Help under the broadcast address field.
+  ///
+  /// In en, this message translates to:
+  /// **'Empty means 255.255.255.255. If the NAS does not wake, use your network\'s own, such as 192.168.1.255.'**
+  String get wolBroadcastHelp;
+
+  /// Field label for the UDP port of the magic packet.
+  ///
+  /// In en, this message translates to:
+  /// **'Port'**
+  String get wolPort;
+
+  /// Error under an invalid port.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a port from 1 to 65535'**
+  String get wolPortInvalid;
+
+  /// Button that reads the MAC address from the running server.
+  ///
+  /// In en, this message translates to:
+  /// **'Get the MAC address from the server'**
+  String get wolFetch;
+
+  /// Shown when the server lists no MAC address.
+  ///
+  /// In en, this message translates to:
+  /// **'The server reported no network card with a MAC address.'**
+  String get wolFetchNone;
+
+  /// Title of the choice between network cards.
+  ///
+  /// In en, this message translates to:
+  /// **'Which network card wakes the server?'**
+  String get wolChooseCard;
+
+  /// Button and tooltip that sends the magic packet.
+  ///
+  /// In en, this message translates to:
+  /// **'Wake up'**
+  String get wolWake;
+
+  /// Shown after the magic packet was sent.
+  ///
+  /// In en, this message translates to:
+  /// **'Wake-up sent to {name}. It can take a minute to start.'**
+  String wolSent(String name);
+
+  /// Shown when the magic packet could not be sent.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not send the wake-up: {error}'**
+  String wolFailed(String error);
+
   /// Label of the username field.
   ///
   /// In en, this message translates to:

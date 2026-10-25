@@ -65,6 +65,59 @@ class AppLocalizationsHu extends AppLocalizations {
   String get fieldAddressHint => 'nas.local vagy https://192.168.1.10';
 
   @override
+  String get wolSection => 'Ébresztés hálózaton (Wake-on-LAN)';
+
+  @override
+  String get wolIntro =>
+      'Nem kötelező. Egy varázscsomaggal felébreszti ezt a szervert a szerverlistából, ha alszik vagy ki van kapcsolva. A NAS BIOS-ában vagy UEFI-jében be kell kapcsolni a Wake-on-LAN-t.';
+
+  @override
+  String get wolMac => 'MAC-cím';
+
+  @override
+  String get wolMacHint => 'AA:BB:CC:DD:EE:FF';
+
+  @override
+  String get wolMacInvalid =>
+      'Adj meg egy MAC-címet, például AA:BB:CC:DD:EE:FF';
+
+  @override
+  String get wolBroadcast => 'Szórási cím';
+
+  @override
+  String get wolBroadcastHelp =>
+      'Üresen 255.255.255.255. Ha a NAS nem ébred fel, használd a hálózatod saját címét, például 192.168.1.255.';
+
+  @override
+  String get wolPort => 'Port';
+
+  @override
+  String get wolPortInvalid => 'Adj meg egy portot 1 és 65535 között';
+
+  @override
+  String get wolFetch => 'MAC-cím lekérése a szervertől';
+
+  @override
+  String get wolFetchNone =>
+      'A szerver nem jelentett hálózati kártyát MAC-címmel.';
+
+  @override
+  String get wolChooseCard => 'Melyik hálózati kártya ébreszti a szervert?';
+
+  @override
+  String get wolWake => 'Ébresztés';
+
+  @override
+  String wolSent(String name) {
+    return 'Az ébresztés elment ide: $name. Egy percbe is telhet, mire elindul.';
+  }
+
+  @override
+  String wolFailed(String error) {
+    return 'Nem sikerült elküldeni az ébresztést: $error';
+  }
+
+  @override
   String get fieldUsername => 'Felhasználónév';
 
   @override

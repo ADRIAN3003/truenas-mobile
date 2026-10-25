@@ -292,6 +292,17 @@ README covers what the app does; this file covers how to work on it.
   `ReportingApi.isAvailable`. Fake server: `reporting`, `failingGraphs`,
   `hiddenGraphs`, `sampleReportingData`. The exact data shape on a real
   server (legend names, `arcsize` columns) is unconfirmed: check it on a NAS.
+- Wake-on-LAN (`lib/core/wol/wake_on_lan.dart`): optional per server
+  (`ServerInstance.wol`, a `WakeOnLanSettings` with MAC, broadcast address and
+  port; null until a MAC is entered, and damaged data only loses the feature,
+  never the server). `UdpWakeOnLanSender` sends the magic packet three times
+  over a broadcast `RawDatagramSocket`; tests override
+  `wakeOnLanSenderProvider` with `FakeWakeOnLanSender`
+  (`test/support/wol_fakes.dart`). `wakeServer` (power button in the server
+  card and on the connect error screen) sends it and shows a snackbar. The form
+  can read the MAC from `interface.query` (`state.hardware_link_address`).
+  iOS needs the local network permission (`NSLocalNetworkUsageDescription`,
+  already set); never promise delivery, a sleeping NAS may ignore it.
 - Disk health (`lib/features/storage/disk_screen.dart`, `StorageApi.smartResults`
   and `runSmartTest`): `smart.test.results` filtered on `["disk","=",name]`
   gives `tests` (newest first, `num` 1 is the newest; `status` SUCCESS, RUNNING,

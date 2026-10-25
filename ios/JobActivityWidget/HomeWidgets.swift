@@ -5,7 +5,7 @@ import WidgetKit
 /// The three home screen widgets. Each shows one server; the user picks
 /// which one when adding the widget (iOS 17 and newer).
 enum WidgetSection {
-  case pools, system, alerts
+  case pools, system, alerts, activity
 
   /// Must match `_iosKinds` in `home_widgets.dart`.
   var kind: String {
@@ -13,6 +13,7 @@ enum WidgetSection {
     case .pools: return "TrueNASPools"
     case .system: return "TrueNASSystem"
     case .alerts: return "TrueNASAlerts"
+    case .activity: return "TrueNASActivity"
     }
   }
 
@@ -21,6 +22,7 @@ enum WidgetSection {
     case .pools: return "externaldrive.fill"
     case .system: return "cpu"
     case .alerts: return "bell.fill"
+    case .activity: return "arrow.triangle.2.circlepath"
     }
   }
 
@@ -39,6 +41,7 @@ enum WidgetSection {
     case .pools: return hu ? "Tárolók állapota" : "Pool health"
     case .system: return hu ? "CPU és RAM" : "CPU and memory"
     case .alerts: return hu ? "Riasztások" : "Alerts"
+    case .activity: return hu ? "Tevékenység" : "Activity"
     }
   }
 
@@ -51,6 +54,10 @@ enum WidgetSection {
       return hu ? "A TrueNAS processzor- és memóriahasználata." : "CPU and memory use of your TrueNAS."
     case .alerts:
       return hu ? "A TrueNAS aktív riasztásai." : "The active alerts on your TrueNAS."
+    case .activity:
+      return hu
+        ? "Frissítésre váró alkalmazások, futó scrub és felhő szinkron."
+        : "Apps with updates, and running scrubs and cloud syncs."
     }
   }
 }
@@ -184,4 +191,9 @@ struct SystemWidget: Widget {
 @available(iOS 17.0, *)
 struct AlertsWidget: Widget {
   var body: some WidgetConfiguration { statusConfiguration(.alerts) }
+}
+
+@available(iOS 17.0, *)
+struct ActivityWidget: Widget {
+  var body: some WidgetConfiguration { statusConfiguration(.activity) }
 }

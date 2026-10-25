@@ -2775,6 +2775,22 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String get homeWidgetAppsNone => 'Minden alkalmazás naprakész';
+
+  @override
+  String homeWidgetAppsUpdates(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count alkalmazáshoz van frissítés',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get homeWidgetIdle => 'Nem fut scrub vagy felhő szinkron';
+
+  @override
   String homeWidgetMemoryText(String used, String total) {
     return '$used / $total';
   }
@@ -2785,4 +2801,26 @@ class AppLocalizationsHu extends AppLocalizations {
   @override
   String get settingsHomeWidgetsHint =>
       'Widgetek frissítése a háttérben, nagyjából 15 percenként. Nyitott szervernél is frissülnek. A kezdőképernyőről adhatod hozzá őket; a telefon dönti el, mikor fut le valójában a frissítés.';
+
+  @override
+  String get updateInstallLater => 'Telepítés, újraindítás később';
+
+  @override
+  String get updateInstallLaterBody =>
+      'A szerver letölti és telepíti a frissítést, de tovább fut. A következő újraindításkor lép életbe.';
+
+  @override
+  String get updateStartedNoRestart =>
+      'A frissítés elindult. A befejezéshez indítsd újra a szervert.';
+
+  @override
+  String get updateRestartNow => 'Újraindítás most';
+
+  @override
+  String get updateChangelog => 'Változások';
+
+  @override
+  String updateDownloadSize(String size) {
+    return 'Letöltés mérete: $size';
+  }
 }

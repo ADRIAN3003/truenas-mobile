@@ -133,15 +133,16 @@ class SystemApi {
     );
   }
 
-  /// Downloads and applies the update, then reboots. Returns the job id;
+  /// Downloads and applies the update, then reboots unless [reboot] is off
+  /// (the update then takes effect at the next restart). Returns the job id;
   /// the connection drops when the server restarts.
-  Future<int> applyUpdate() async {
+  Future<int> applyUpdate({bool reboot = true}) async {
     final method = await _catalog.has('update.run')
         ? 'update.run'
         : 'update.update';
     return asInt(
       await _client.call(method, [
-        {'reboot': true},
+        {'reboot': reboot},
       ]),
     );
   }

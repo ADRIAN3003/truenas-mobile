@@ -6,5 +6,7 @@
     <string name="widget_system_description">CPU and memory use of your TrueNAS.</string>
     <string name="widget_alerts_label">Alerts</string>
     <string name="widget_alerts_description">The active alerts on your TrueNAS.</string>
+    <string name="widget_activity_label">Activity</string>
+    <string name="widget_activity_description">Apps with updates, and running scrubs and cloud syncs.</string>
     <string name="widget_choose_server">Choose a server</string>
 </resources>

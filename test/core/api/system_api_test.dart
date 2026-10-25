@@ -117,8 +117,17 @@ void main() {
     expect(update.available, isTrue);
     expect(update.version, '25.10.8');
     expect(update.releaseNotesUrl, 'https://example.com/notes');
+    expect(update.sizeBytes, 1073741824);
+    expect(update.changelog, 'Fixes for SMB and apps.');
+    expect(update.rebootRequired, isFalse);
     await session.system.applyUpdate();
     expect(paramsOf('update.run').single, {'reboot': true});
+    await session.system.applyUpdate(reboot: false);
+    expect(server.calls.where((c) => c.$1 == 'update.run').last.$2.single, {
+      'reboot': false,
+    });
+    server.rebootRequired = true;
+    expect((await session.system.checkForUpdate()).rebootRequired, isTrue);
   });
 
   test('update check uses update.check_available on 25.04', () async {
@@ -130,6 +139,8 @@ void main() {
     expect(paramsOf('update.update').single, {'reboot': true});
     server.availableUpdate = null;
     expect((await session.system.checkForUpdate()).available, isFalse);
+    server.rebootRequired = true;
+    expect((await session.system.checkForUpdate()).rebootRequired, isTrue);
   });
 
   test('boot environments are newest first and can be changed', () async {

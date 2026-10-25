@@ -56,6 +56,7 @@ struct StatusWidgetView: View {
         case .pools: PoolsBody(server: server, document: document, family: family)
         case .system: SystemBody(server: server, document: document, family: family)
         case .alerts: AlertsBody(server: server, document: document, family: family)
+        case .activity: ActivityBody(server: server, document: document, family: family)
         }
         Spacer(minLength: 0)
         FooterRow(server: server, document: document)
@@ -318,6 +319,134 @@ struct AlertsBody: View {
       }
     } else {
       NoData(document: document)
+    }
+  }
+}
+
+// MARK: - Activity
+
+/// Apps with an update, and the scrubs and cloud syncs that run.
+struct ActivityBody: View {
+  let server: WidgetServer
+  let document: WidgetDocument
+  let family: WidgetFamily
+
+  private var jobs: [JobItem] { server.jobs?.items ?? [] }
+
+  var body: some View {
+    if server.apps == nil && server.jobs == nil {
+      NoData(document: document)
+    } else if family == .systemSmall {
+      VStack(alignment: .leading, spacing: 6) {
+        AppsSummary(apps: server.apps, compact: true)
+        if let job = jobs.first {
+          JobRow(item: job, showDetail: false)
+        } else if server.jobs != nil {
+          Text(verbatim: document.label("idle", "No scrub or cloud sync running"))
+            .font(.caption2)
+            .foregroundStyle(.secondary)
+            .lineLimit(2)
+        }
+      }
+    } else {
+      HStack(alignment: .top, spacing: 12) {
+        AppsSummary(apps: server.apps, compact: false)
+          .frame(maxWidth: .infinity, alignment: .leading)
+        // Three jobs with a detail line each are taller than the widget, so
+        // from three on the rows are compact.
+        let shown = Array(jobs.prefix(3))
+        VStack(alignment: .leading, spacing: shown.count > 2 ? 4 : 6) {
+          ForEach(Array(shown.enumerated()), id: \.offset) { _, item in
+            JobRow(item: item, compact: shown.count > 2)
+          }
+          if jobs.isEmpty && server.jobs != nil {
+            Text(verbatim: document.label("idle", "No scrub or cloud sync running"))
+              .font(.caption)
+              .foregroundStyle(.secondary)
+              .lineLimit(3)
+          }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+      }
+    }
+  }
+}
+
+/// The number of apps with an update, in the colour of the answer.
+struct AppsSummary: View {
+  let apps: AppsData?
+  let compact: Bool
+
+  var body: some View {
+    if let apps = apps {
+      VStack(alignment: .leading, spacing: 4) {
+        // With nothing to update a "0" over "apps up to date" reads as no app
+        // being up to date, so a tick stands in for the number.
+        if apps.updates == 0 {
+          Image(systemName: "checkmark.circle.fill")
+            .font(.system(size: compact ? 30 : 40))
+            .foregroundStyle(.green)
+        } else {
+          Text(verbatim: "\(apps.updates)")
+            .font(.system(size: compact ? 30 : 40, weight: .semibold, design: .rounded))
+            .foregroundStyle(.orange)
+        }
+        Text(verbatim: apps.summary)
+          .font(compact ? .caption.weight(.semibold) : .subheadline.weight(.semibold))
+          .lineLimit(2)
+          .minimumScaleFactor(0.8)
+      }
+    }
+  }
+}
+
+struct JobRow: View {
+  let item: JobItem
+  var showDetail = true
+  /// Two lines at most: the detail only shows (beside the title) while there
+  /// is no percentage, so three rows fit a medium widget.
+  var compact = false
+
+  private var symbol: String {
+    item.kind == "scrub" ? "arrow.triangle.2.circlepath" : "icloud.and.arrow.up"
+  }
+
+  private var detail: String? {
+    guard let detail = item.detail, !detail.isEmpty else { return nil }
+    return detail
+  }
+
+  var body: some View {
+    VStack(alignment: .leading, spacing: 2) {
+      HStack(spacing: 4) {
+        Image(systemName: symbol)
+          .font(.caption2)
+          .foregroundStyle(.blue)
+        Text(verbatim: item.title)
+          .font(.caption.weight(.medium))
+          .lineLimit(1)
+        Spacer(minLength: 4)
+        if let percent = item.percent {
+          Text(verbatim: "\(Int(percent.rounded()))%")
+            .font(.caption2.monospacedDigit())
+            .foregroundStyle(.secondary)
+        } else if compact, showDetail, let detail {
+          Text(verbatim: detail)
+            .font(.caption2)
+            .foregroundStyle(.secondary)
+            .lineLimit(1)
+        }
+      }
+      if let percent = item.percent {
+        ProgressView(value: min(max(percent / 100, 0), 1))
+          .tint(.blue)
+      }
+      if !compact, showDetail, let detail {
+        Text(verbatim: detail)
+          .font(.caption2)
+          .foregroundStyle(.secondary)
+          .lineLimit(1)
+      }
     }
   }
 }

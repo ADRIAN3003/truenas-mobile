@@ -37,7 +37,7 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <!-- Home screen widgets: pool health, CPU and memory, alerts. -->
+        <!-- Home screen widgets: pool health, CPU and memory, alerts, activity. -->
         <receiver
             android:name=".PoolsWidgetProvider"
             android:exported="false"
@@ -70,6 +70,17 @@
             <meta-data
                 android:name="android.appwidget.provider"
                 android:resource="@xml/widget_alerts_info" />
+        </receiver>
+        <receiver
+            android:name=".ActivityWidgetProvider"
+            android:exported="false"
+            android:label="@string/widget_activity_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_activity_info" />
         </receiver>
         <!-- Asks which server a new widget shows. -->
         <activity

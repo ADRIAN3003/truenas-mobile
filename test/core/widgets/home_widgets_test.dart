@@ -5,8 +5,10 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:truenas_mobile/core/instances/instance_repository.dart';
 import 'package:truenas_mobile/core/instances/server_instance.dart';
 import 'package:truenas_mobile/core/models/alert.dart';
+import 'package:truenas_mobile/core/models/job.dart';
 import 'package:truenas_mobile/core/models/pool_summary.dart';
 import 'package:truenas_mobile/core/models/realtime_stats.dart';
+import 'package:truenas_mobile/core/models/workloads.dart';
 import 'package:truenas_mobile/core/notifications/alert_watcher.dart';
 import 'package:truenas_mobile/core/notifications/background_alerts.dart';
 import 'package:truenas_mobile/core/settings/app_settings.dart';
@@ -38,6 +40,8 @@ void main() {
     List<PoolSummary> pools = const [],
     List<TrueNasAlert> alerts = const [],
     RealtimeStats? stats,
+    List<TrueNasJob>? jobs,
+    List<TrueNasApp>? apps,
     AppLocalizations? strings,
   }) => serverWidgetData(
     server: serverAt('1', 'Home'),
@@ -45,8 +49,31 @@ void main() {
     pools: pools,
     alerts: alerts,
     stats: stats,
+    jobs: jobs,
+    apps: apps,
     l10n: strings ?? l10n,
   );
+
+  TrueNasApp app(String name, {bool upgrade = false}) => TrueNasApp.fromJson({
+    'name': name,
+    'state': 'RUNNING',
+    'upgrade_available': upgrade,
+  });
+
+  TrueNasJob job(
+    int id,
+    String method, {
+    String state = 'RUNNING',
+    Object? percent = 40,
+    String text = 'Scrubbing',
+    List<Object?> arguments = const [],
+  }) => TrueNasJob.fromJson({
+    'id': id,
+    'method': method,
+    'state': state,
+    'arguments': arguments,
+    'progress': {'percent': percent, 'description': text},
+  });
 
   PoolSummary pool(
     String name, {
@@ -169,6 +196,66 @@ void main() {
       expect(system['memoryText'], '16.0 GiB of 32.0 GiB');
       expect(system['temperature'], '41 °C');
       expect(data().containsKey('system'), isFalse);
+    });
+
+    test('running scrubs and cloud syncs are listed with their progress', () {
+      final jobs = data(
+        jobs: [
+          job(1, 'pool.scrub.run', arguments: ['tank'], percent: 42.46),
+          job(2, 'cloudsync.sync', state: 'WAITING', percent: 0),
+          job(3, 'cloud_backup.sync', text: 'Uploading', percent: null),
+          job(4, 'rsynctask.run'),
+          job(5, 'pool.dataset.query'),
+          job(6, 'pool.scrub.run', state: 'SUCCESS', arguments: ['old']),
+        ],
+      )['jobs'];
+      expect(jobs['items'], [
+        {
+          'kind': 'scrub',
+          'title': 'Scrub · tank',
+          'percent': 42.5,
+          'detail': 'Scrubbing',
+        },
+        {
+          'kind': 'cloudSync',
+          'title': 'Cloud sync',
+          'percent': null,
+          'detail': 'Waiting',
+        },
+        {
+          'kind': 'cloudBackup',
+          'title': 'Cloud backup',
+          'percent': null,
+          'detail': 'Uploading',
+        },
+      ]);
+    });
+
+    test('apps with an update are counted', () {
+      final apps = data(
+        apps: [app('a', upgrade: true), app('b'), app('c', upgrade: true)],
+      )['apps'];
+      expect(apps, {'updates': 2, 'summary': '2 apps have updates'});
+      expect(
+        data(apps: [app('a', upgrade: true)])['apps']['summary'],
+        '1 app has an update',
+      );
+      expect(data(apps: [app('a')])['apps'], {
+        'updates': 0,
+        'summary': 'All apps are up to date',
+      });
+      expect(data()['apps'], isNull);
+    });
+
+    test('no running jobs is an empty list, an unknown answer is null', () {
+      expect(data(jobs: const [])['jobs'], {'items': isEmpty});
+      expect(data().containsKey('jobs'), isTrue);
+      expect(data()['jobs'], isNull);
+    });
+
+    test('at most three jobs, and none for a finished one', () {
+      final items = [for (var i = 1; i <= 5; i++) job(i, 'cloudsync.sync')];
+      expect(data(jobs: items)['jobs']['items'], hasLength(3));
     });
 
     test('text is in the chosen language', () {
@@ -345,6 +432,12 @@ void main() {
       expect(en['alertsCountMany'], '{count} active alerts');
       expect(en['memoryText'], '{used} of {total}');
       expect(en['poolsOk'], 'All pools healthy');
+      expect(en['jobScrub'], 'Scrub');
+      expect(en['jobCloudSync'], 'Cloud sync');
+      expect(en['jobWaiting'], 'Waiting');
+      expect(en['appsUpdatesOne'], '1 app has an update');
+      expect(en['appsUpdatesMany'], '{count} apps have updates');
+      expect(en['idle'], 'No scrub or cloud sync running');
       final hu = homeWidgetLabels(localizationsFor(const Locale('hu')));
       expect(hu['alertsCountMany'], '{count} aktív riasztás');
     });
@@ -386,6 +479,15 @@ void main() {
       expect(saved['system']['memory'], 37.5);
       expect(saved['alerts']['count'], 1);
       expect(saved['alerts']['level'], 'bad');
+      expect(saved['apps'], {'updates': 1, 'summary': '1 app has an update'});
+      expect(saved['jobs']['items'], [
+        {
+          'kind': 'scrub',
+          'title': 'Scrub · tank',
+          'percent': 40.0,
+          'detail': 'Scrubbing',
+        },
+      ]);
       expect(bridge.json['labels']['cpu'], 'CPU');
       expect(bridge.reloads, 1);
     });

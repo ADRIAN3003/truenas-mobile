@@ -38,7 +38,9 @@ for Android and iOS that talks to the official TrueNAS middleware API
   moving while the app is closed, and when the server cannot be reached it
   keeps the old numbers and says since when. On Android the app's background
   check refreshes them. Settings > Notifications > Home screen widgets turns
-  all of this off.
+  all of this off. The Activity widget (small and medium on iOS) shows how many
+  apps have an update and lists the pool scrubs and cloud syncs that are
+  running, with a progress bar.
 - **Storage:** pools with layout, scrub start, pause and stop; datasets and
   zvols (create, delete); snapshots (browse, search, create, roll back, clone, delete); disks with
   temperatures, their S.M.A.R.T. self-test log and a button to run a short,

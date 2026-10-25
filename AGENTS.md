@@ -211,7 +211,7 @@ README covers what the app does; this file covers how to work on it.
   `WorkloadsApi.activeBulkRun`); its id is `AppBulkRun.jobId`. Gated on
   `core.bulk`. Tests: `FakeTrueNasServer.holdBulk` keeps a job running.
 - Home screen widgets (`lib/core/widgets/`, setting `homeWidgets`, on by
-  default): pool health, CPU and memory, active alerts. `serverWidgetData`
+  default): pool health, CPU and memory, active alerts, activity (apps with updates, running scrubs and cloud syncs). `serverWidgetData`
   turns pools, alerts and one `reporting.realtime` sample into JSON with the
   text already localized (plurals worked out in Dart, so Swift and Kotlin only
   draw). `HomeWidgetPublisher` merges it into one document (`snapshot.v1`:
@@ -232,7 +232,7 @@ README covers what the app does; this file covers how to work on it.
   iOS 17+ only (`if #available` in the bundle); both targets have an App Group
   entitlement (`Runner.entitlements`, `JobActivityWidget.entitlements`, set in
   the hand-edited `project.pbxproj`). The widget kinds (`TrueNASPools`,
-  `TrueNASSystem`, `TrueNASAlerts`) must match `_iosKinds` in
+  `TrueNASSystem`, `TrueNASAlerts`, `TrueNASActivity`) must match `_iosKinds` in
   `home_widgets.dart`; the Android providers (`HomeWidgets.kt`,
   `PoolsWidgetProvider` and friends, `WidgetConfigActivity` for the server
   choice) must match `_androidProviders`. Android uses plain `RemoteViews`
@@ -263,7 +263,18 @@ README covers what the app does; this file covers how to work on it.
   Written on every `publish` (deduplicated), removed when the widgets are
   switched off or the last server is deleted. A 2FA account cannot sign in
   there. Without the Keychain group (re-signed install) the widgets fall back
-  to what the app saved. Untested on a real phone as of writing: check the
+  to what the app saved. **Activity widget** (`TrueNASActivity` / `ActivityWidgetProvider`, small
+  and medium on iOS): `apps` (`{updates, summary}`, from `app.query`'s
+  `upgrade_available`; `_apps` in `home_widget_data.dart`, `WidgetShape.apps`)
+  and `jobs.items` (`{kind, title, percent, detail}` for scrubs, cloud syncs
+  and cloud backups, at most 3; from `core.get_jobs` filtered to
+  WAITING/RUNNING; `_jobItems`, `WidgetShape.jobs`). Either is null when the
+  server could not be asked, and keep the Dart and Swift shaping in step. New
+  widgets must be added to `_iosKinds`/`_androidProviders`, the iOS bundle, the
+  manifest and `WidgetConfigActivity`'s provider list. The labels `appsNone`,
+  `appsUpdatesOne/Many`, `idle`, `jobScrub`, `jobCloudSync`, `jobCloudBackup`,
+  `jobWaiting` are in `homeWidgetLabels`. Untested on a real phone
+  as of writing: check the
   widget refreshes with the app closed, over Tailscale, and the pinned
   certificate case.
 - History charts (`lib/core/api/reporting_api.dart`, `lib/features/reporting/`):
@@ -291,6 +302,14 @@ README covers what the app does; this file covers how to work on it.
   runs. The exact payloads are written from the middleware source and unconfirmed
   on a real NAS: check them on one. Fake server: `smart`, `smartTests`,
   `smartProgress`, `smartRejection`.
+- System updates and power (`SystemApi`, `lib/features/system/updates_screen.dart`,
+  `power_actions.dart`): `UpdateInfo` is normalised across `update.status`
+  (code `REBOOT_REQUIRED`, `new_version.filesize/changelog`, both optional) and
+  `update.check_available`. The Updates screen can install and restart or
+  install and restart later (`applyUpdate(reboot: false)`), and shows "Restart
+  now" once an update waits for a restart. Reboot and shutdown both go through
+  `confirmPower` (More tab and Updates screen). The job's live progress is the
+  existing `JobKind.systemUpdate`.
 - Saved servers live in secure storage (`SecureKeyValueStore`). Its Android
   default `resetOnError: true` erases everything when one read fails, so it is
   off; a failed read is retried, then shown as an error with Try again and

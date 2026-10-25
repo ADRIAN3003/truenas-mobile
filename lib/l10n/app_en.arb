@@ -3746,6 +3746,23 @@
       }
     }
   },
+  "homeWidgetAppsNone": "All apps are up to date",
+  "@homeWidgetAppsNone": {
+    "description": "Activity widget summary when no app has an update."
+  },
+  "homeWidgetAppsUpdates": "{count, plural, one{1 app has an update} other{{count} apps have updates}}",
+  "@homeWidgetAppsUpdates": {
+    "description": "Activity widget summary when apps have updates.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "homeWidgetIdle": "No scrub or cloud sync running",
+  "@homeWidgetIdle": {
+    "description": "Activity widget text when no scrub or cloud sync is running."
+  },
   "homeWidgetMemoryText": "{used} of {total}",
   "@homeWidgetMemoryText": {
     "description": "Memory in use out of the total, in the system widget.",
@@ -3765,5 +3782,34 @@
   "settingsHomeWidgetsHint": "Keep widgets up to date in the background, about every 15 minutes. They also update while a server is open. Add them from your home screen; the phone decides when a refresh really runs.",
   "@settingsHomeWidgetsHint": {
     "description": "Hint under the home screen widgets switch."
+  },
+  "updateInstallLater": "Install, restart later",
+  "@updateInstallLater": {
+    "description": "Button that installs a system update without restarting."
+  },
+  "updateInstallLaterBody": "The server downloads and installs the update but keeps running. It takes effect the next time the server restarts.",
+  "@updateInstallLaterBody": {
+    "description": "Confirmation body."
+  },
+  "updateStartedNoRestart": "Update started. Restart the server to finish it.",
+  "@updateStartedNoRestart": {
+    "description": "Snackbar."
+  },
+  "updateRestartNow": "Restart now",
+  "@updateRestartNow": {
+    "description": "Button shown when an update is installed and waits for a restart."
+  },
+  "updateChangelog": "Changes",
+  "@updateChangelog": {
+    "description": "Expandable list of what an update changes."
+  },
+  "updateDownloadSize": "Download size: {size}",
+  "@updateDownloadSize": {
+    "description": "Size of a system update download.",
+    "placeholders": {
+      "size": {
+        "type": "String"
+      }
+    }
   }
 }

@@ -6,5 +6,7 @@
     <string name="widget_system_description">A TrueNAS processzor- és memóriahasználata.</string>
     <string name="widget_alerts_label">Riasztások</string>
     <string name="widget_alerts_description">A TrueNAS aktív riasztásai.</string>
+    <string name="widget_activity_label">Tevékenység</string>
+    <string name="widget_activity_description">Frissítésre váró alkalmazások, futó scrub és felhő szinkron.</string>
     <string name="widget_choose_server">Válassz szervert</string>
 </resources>

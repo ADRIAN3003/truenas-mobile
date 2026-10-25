@@ -6,9 +6,11 @@ import '../../l10n/generated/app_localizations.dart';
 import '../../shared/theme.dart';
 import '../../shared/ui.dart';
 import '../../shared/formatting.dart';
+import 'disk_screen.dart';
 import 'storage_helpers.dart';
 
-/// All disks with size, model, pool and temperature.
+/// All disks with size, model, pool and temperature; a tap opens the disk's
+/// S.M.A.R.T. results.
 class DisksScreen extends StatefulWidget {
   const DisksScreen({super.key, required this.session});
 
@@ -93,9 +95,24 @@ class _DisksScreenState extends State<DisksScreen> {
         ].join('\n'),
       ),
       isThreeLine: true,
-      trailing: temperature == null
-          ? null
-          : Text(l10n.cpuTemperature(temperature.toStringAsFixed(0))),
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (temperature != null)
+            Text(l10n.cpuTemperature(temperature.toStringAsFixed(0))),
+          const SizedBox(width: 4),
+          const Chevron(),
+        ],
+      ),
+      onTap: () async {
+        await Navigator.push(
+          context,
+          MaterialPageRoute<void>(
+            builder: (_) => DiskScreen(session: widget.session, disk: disk),
+          ),
+        );
+        _load();
+      },
     );
   }
 }

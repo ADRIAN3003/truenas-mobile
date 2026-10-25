@@ -422,6 +422,97 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get diskTemperature => 'Temperature';
+
+  @override
+  String get diskSmartTitle => 'S.M.A.R.T.';
+
+  @override
+  String get diskSmartOff =>
+      'S.M.A.R.T. monitoring is switched off for this disk.';
+
+  @override
+  String get diskSmartUnavailable =>
+      'This server does not report S.M.A.R.T. test results.';
+
+  @override
+  String get diskSmartNoTests => 'No self-test has run yet.';
+
+  @override
+  String get diskSmartLastPassed => 'Last self-test passed';
+
+  @override
+  String get diskSmartLastFailed => 'Last self-test failed';
+
+  @override
+  String get diskSmartLastAborted => 'Last self-test was aborted';
+
+  @override
+  String diskSmartRunning(String percent) {
+    return '$percent% done';
+  }
+
+  @override
+  String get diskSmartRun => 'Run a test';
+
+  @override
+  String get diskSmartRunTitle => 'Run a self-test';
+
+  @override
+  String diskSmartStarted(String test, String disk) {
+    return '$test test started on $disk';
+  }
+
+  @override
+  String get smartTestShort => 'Short';
+
+  @override
+  String get smartTestShortHint => 'a few minutes';
+
+  @override
+  String get smartTestLong => 'Long';
+
+  @override
+  String get smartTestLongHint => 'hours';
+
+  @override
+  String get smartTestConveyance => 'Conveyance';
+
+  @override
+  String get smartTestConveyanceHint => 'a few minutes, ATA only';
+
+  @override
+  String get smartTestOffline => 'Offline';
+
+  @override
+  String get smartTestOfflineHint => 'ATA only';
+
+  @override
+  String get diskSmartHistory => 'Self-test history';
+
+  @override
+  String get smartStatusPassed => 'Passed';
+
+  @override
+  String get smartStatusRunning => 'Running';
+
+  @override
+  String get smartStatusAborted => 'Aborted';
+
+  @override
+  String get smartStatusFailed => 'Failed';
+
+  @override
+  String diskSmartLifetime(int hours) {
+    return 'After $hours power-on hours';
+  }
+
+  @override
+  String diskSmartFirstError(int lba) {
+    return 'First error at block $lba';
+  }
+
+  @override
   String get scrubTitle => 'Scrub';
 
   @override

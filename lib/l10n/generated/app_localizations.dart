@@ -806,6 +806,168 @@ abstract class AppLocalizations {
   /// **'{rpm} rpm'**
   String diskRpm(int rpm);
 
+  /// Label of the disk temperature on the disk screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Temperature'**
+  String get diskTemperature;
+
+  /// Title of the S.M.A.R.T. card on the disk screen.
+  ///
+  /// In en, this message translates to:
+  /// **'S.M.A.R.T.'**
+  String get diskSmartTitle;
+
+  /// Shown when S.M.A.R.T. is switched off for a disk.
+  ///
+  /// In en, this message translates to:
+  /// **'S.M.A.R.T. monitoring is switched off for this disk.'**
+  String get diskSmartOff;
+
+  /// Shown when the server has no S.M.A.R.T. test API.
+  ///
+  /// In en, this message translates to:
+  /// **'This server does not report S.M.A.R.T. test results.'**
+  String get diskSmartUnavailable;
+
+  /// Shown when a disk has no self-test log entries.
+  ///
+  /// In en, this message translates to:
+  /// **'No self-test has run yet.'**
+  String get diskSmartNoTests;
+
+  /// Summary line when the newest finished self-test passed.
+  ///
+  /// In en, this message translates to:
+  /// **'Last self-test passed'**
+  String get diskSmartLastPassed;
+
+  /// Summary line when the newest finished self-test failed.
+  ///
+  /// In en, this message translates to:
+  /// **'Last self-test failed'**
+  String get diskSmartLastFailed;
+
+  /// Summary line when the newest finished self-test was aborted.
+  ///
+  /// In en, this message translates to:
+  /// **'Last self-test was aborted'**
+  String get diskSmartLastAborted;
+
+  /// Progress of the running self-test.
+  ///
+  /// In en, this message translates to:
+  /// **'{percent}% done'**
+  String diskSmartRunning(String percent);
+
+  /// Button that starts a S.M.A.R.T. self-test.
+  ///
+  /// In en, this message translates to:
+  /// **'Run a test'**
+  String get diskSmartRun;
+
+  /// Title of the sheet that picks the kind of self-test.
+  ///
+  /// In en, this message translates to:
+  /// **'Run a self-test'**
+  String get diskSmartRunTitle;
+
+  /// Snackbar after starting a self-test.
+  ///
+  /// In en, this message translates to:
+  /// **'{test} test started on {disk}'**
+  String diskSmartStarted(String test, String disk);
+
+  /// Name of the short S.M.A.R.T. self-test.
+  ///
+  /// In en, this message translates to:
+  /// **'Short'**
+  String get smartTestShort;
+
+  /// What the short self-test does.
+  ///
+  /// In en, this message translates to:
+  /// **'a few minutes'**
+  String get smartTestShortHint;
+
+  /// Name of the long S.M.A.R.T. self-test.
+  ///
+  /// In en, this message translates to:
+  /// **'Long'**
+  String get smartTestLong;
+
+  /// What the long self-test does.
+  ///
+  /// In en, this message translates to:
+  /// **'hours'**
+  String get smartTestLongHint;
+
+  /// Name of the conveyance S.M.A.R.T. self-test.
+  ///
+  /// In en, this message translates to:
+  /// **'Conveyance'**
+  String get smartTestConveyance;
+
+  /// What the conveyance self-test does.
+  ///
+  /// In en, this message translates to:
+  /// **'a few minutes, ATA only'**
+  String get smartTestConveyanceHint;
+
+  /// Name of the offline S.M.A.R.T. data collection.
+  ///
+  /// In en, this message translates to:
+  /// **'Offline'**
+  String get smartTestOffline;
+
+  /// What the offline data collection does.
+  ///
+  /// In en, this message translates to:
+  /// **'ATA only'**
+  String get smartTestOfflineHint;
+
+  /// Heading above the list of past self-tests.
+  ///
+  /// In en, this message translates to:
+  /// **'Self-test history'**
+  String get diskSmartHistory;
+
+  /// Self-test status: finished without error.
+  ///
+  /// In en, this message translates to:
+  /// **'Passed'**
+  String get smartStatusPassed;
+
+  /// Self-test status: still running.
+  ///
+  /// In en, this message translates to:
+  /// **'Running'**
+  String get smartStatusRunning;
+
+  /// Self-test status: stopped before it finished.
+  ///
+  /// In en, this message translates to:
+  /// **'Aborted'**
+  String get smartStatusAborted;
+
+  /// Self-test status: found a problem.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed'**
+  String get smartStatusFailed;
+
+  /// When a self-test ran, in power-on hours of the disk.
+  ///
+  /// In en, this message translates to:
+  /// **'After {hours} power-on hours'**
+  String diskSmartLifetime(int hours);
+
+  /// Block address of the first error a self-test found.
+  ///
+  /// In en, this message translates to:
+  /// **'First error at block {lba}'**
+  String diskSmartFirstError(int lba);
+
   /// Title of the scrub card.
   ///
   /// In en, this message translates to:

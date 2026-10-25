@@ -551,6 +551,137 @@
       }
     }
   },
+  "diskTemperature": "Temperature",
+  "@diskTemperature": {
+    "description": "Label of the disk temperature on the disk screen."
+  },
+  "diskSmartTitle": "S.M.A.R.T.",
+  "@diskSmartTitle": {
+    "description": "Title of the S.M.A.R.T. card on the disk screen."
+  },
+  "diskSmartOff": "S.M.A.R.T. monitoring is switched off for this disk.",
+  "@diskSmartOff": {
+    "description": "Shown when S.M.A.R.T. is switched off for a disk."
+  },
+  "diskSmartUnavailable": "This server does not report S.M.A.R.T. test results.",
+  "@diskSmartUnavailable": {
+    "description": "Shown when the server has no S.M.A.R.T. test API."
+  },
+  "diskSmartNoTests": "No self-test has run yet.",
+  "@diskSmartNoTests": {
+    "description": "Shown when a disk has no self-test log entries."
+  },
+  "diskSmartLastPassed": "Last self-test passed",
+  "@diskSmartLastPassed": {
+    "description": "Summary line when the newest finished self-test passed."
+  },
+  "diskSmartLastFailed": "Last self-test failed",
+  "@diskSmartLastFailed": {
+    "description": "Summary line when the newest finished self-test failed."
+  },
+  "diskSmartLastAborted": "Last self-test was aborted",
+  "@diskSmartLastAborted": {
+    "description": "Summary line when the newest finished self-test was aborted."
+  },
+  "diskSmartRunning": "{percent}% done",
+  "@diskSmartRunning": {
+    "description": "Progress of the running self-test.",
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "diskSmartRun": "Run a test",
+  "@diskSmartRun": {
+    "description": "Button that starts a S.M.A.R.T. self-test."
+  },
+  "diskSmartRunTitle": "Run a self-test",
+  "@diskSmartRunTitle": {
+    "description": "Title of the sheet that picks the kind of self-test."
+  },
+  "diskSmartStarted": "{test} test started on {disk}",
+  "@diskSmartStarted": {
+    "description": "Snackbar after starting a self-test.",
+    "placeholders": {
+      "test": {
+        "type": "String"
+      },
+      "disk": {
+        "type": "String"
+      }
+    }
+  },
+  "smartTestShort": "Short",
+  "@smartTestShort": {
+    "description": "Name of the short S.M.A.R.T. self-test."
+  },
+  "smartTestShortHint": "a few minutes",
+  "@smartTestShortHint": {
+    "description": "What the short self-test does."
+  },
+  "smartTestLong": "Long",
+  "@smartTestLong": {
+    "description": "Name of the long S.M.A.R.T. self-test."
+  },
+  "smartTestLongHint": "hours",
+  "@smartTestLongHint": {
+    "description": "What the long self-test does."
+  },
+  "smartTestConveyance": "Conveyance",
+  "@smartTestConveyance": {
+    "description": "Name of the conveyance S.M.A.R.T. self-test."
+  },
+  "smartTestConveyanceHint": "a few minutes, ATA only",
+  "@smartTestConveyanceHint": {
+    "description": "What the conveyance self-test does."
+  },
+  "smartTestOffline": "Offline",
+  "@smartTestOffline": {
+    "description": "Name of the offline S.M.A.R.T. data collection."
+  },
+  "smartTestOfflineHint": "ATA only",
+  "@smartTestOfflineHint": {
+    "description": "What the offline data collection does."
+  },
+  "diskSmartHistory": "Self-test history",
+  "@diskSmartHistory": {
+    "description": "Heading above the list of past self-tests."
+  },
+  "smartStatusPassed": "Passed",
+  "@smartStatusPassed": {
+    "description": "Self-test status: finished without error."
+  },
+  "smartStatusRunning": "Running",
+  "@smartStatusRunning": {
+    "description": "Self-test status: still running."
+  },
+  "smartStatusAborted": "Aborted",
+  "@smartStatusAborted": {
+    "description": "Self-test status: stopped before it finished."
+  },
+  "smartStatusFailed": "Failed",
+  "@smartStatusFailed": {
+    "description": "Self-test status: found a problem."
+  },
+  "diskSmartLifetime": "After {hours} power-on hours",
+  "@diskSmartLifetime": {
+    "description": "When a self-test ran, in power-on hours of the disk.",
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "diskSmartFirstError": "First error at block {lba}",
+  "@diskSmartFirstError": {
+    "description": "Block address of the first error a self-test found.",
+    "placeholders": {
+      "lba": {
+        "type": "int"
+      }
+    }
+  },
   "scrubTitle": "Scrub",
   "@scrubTitle": {
     "description": "Title of the scrub card."

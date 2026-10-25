@@ -1,5 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:truenas_mobile/core/api/api_exception.dart';
 import 'package:truenas_mobile/core/api/storage_api.dart';
+import 'package:truenas_mobile/core/models/storage.dart';
 import 'package:truenas_mobile/core/instances/server_instance.dart';
 import 'package:truenas_mobile/core/session/truenas_session.dart';
 
@@ -153,5 +155,70 @@ void main() {
     expect(disks.first.pool, 'tank');
     expect(disks.last.isSsd, isTrue);
     expect(disks.last.temperature, isNull);
+  });
+
+  test('smart results are parsed newest first with progress', () async {
+    await connect();
+    server.smartProgress = 40;
+    final disk = (await session.storage.disks()).first;
+    final results = await session.storage.smartResults(disk);
+    expect(results.tests.map((t) => t.number), [1, 2]);
+    expect(results.tests.first.passed, isTrue);
+    expect(results.tests.last.failed, isTrue);
+    expect(results.tests.last.lbaOfFirstError, 4096);
+    expect(results.progress, 40);
+    expect(results.running, isTrue);
+    expect(results.lastFinished?.description, 'Short offline');
+    expect(server.calls.last.$2, [
+      [
+        ['disk', '=', 'sda'],
+      ],
+    ]);
+  });
+
+  test('a disk without a log has no results', () async {
+    await connect();
+    final disk = (await session.storage.disks()).last;
+    final results = await session.storage.smartResults(disk);
+    expect(results.tests, isEmpty);
+    expect(results.running, isFalse);
+    expect(results.lastFinished, isNull);
+  });
+
+  test('a self-test is started with the disk identifier and type', () async {
+    await connect();
+    final disk = (await session.storage.disks()).first;
+    await session.storage.runSmartTest(disk, SmartTestType.long);
+    expect(server.calls.last.$1, 'smart.test.manual_test');
+    expect(server.calls.last.$2, [
+      [
+        {'identifier': '{serial}S1', 'type': 'LONG'},
+      ],
+    ]);
+  });
+
+  test('a rejected self-test throws the server reason', () async {
+    await connect();
+    server.smartRejection = 'Disk is busy';
+    final disk = (await session.storage.disks()).first;
+    await expectLater(
+      session.storage.runSmartTest(disk, SmartTestType.short),
+      throwsA(
+        isA<ApiException>().having((e) => e.message, 'message', 'Disk is busy'),
+      ),
+    );
+  });
+
+  test('smart support follows the method catalog', () async {
+    await connect();
+    expect(await session.storage.canReadSmart(), isTrue);
+    expect(await session.storage.canRunSmartTests(), isTrue);
+  });
+
+  test('smart support is off when the server lacks the methods', () async {
+    await connect();
+    server.smart = false;
+    expect(await session.storage.canReadSmart(), isFalse);
+    expect(await session.storage.canRunSmartTests(), isFalse);
   });
 }

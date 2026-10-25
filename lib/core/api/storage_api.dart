@@ -1,3 +1,4 @@
+import 'api_exception.dart';
 import '../models/json.dart';
 import '../models/storage.dart';
 import 'method_catalog.dart';
@@ -130,17 +131,56 @@ class StorageApi {
       },
     ]) as List<dynamic>;
     final disks = result.map((e) => Disk.fromJson(asMap(e))).toList();
-    Map<String, dynamic> temperatures = const {};
-    try {
-      temperatures = asMap(await _client.call('disk.temperatures'));
-    } catch (_) {}
+    final temperatures = await diskTemperatures();
     return [
-      for (final disk in disks)
-        disk.withTemperature(switch (temperatures[disk.name]) {
-          final num t => t.toDouble(),
-          _ => null,
-        }),
+      for (final disk in disks) disk.withTemperature(temperatures[disk.name]),
     ];
+  }
+
+  /// Degrees Celsius per disk name; empty when the server cannot say.
+  Future<Map<String, double>> diskTemperatures() async {
+    try {
+      final result = asMap(await _client.call('disk.temperatures'));
+      return {
+        for (final entry in result.entries)
+          if (entry.value is num) entry.key: (entry.value as num).toDouble(),
+      };
+    } catch (_) {
+      return const {};
+    }
+  }
+
+  /// Whether the server can list the self-test log (`smart.test.results`).
+  Future<bool> canReadSmart() async => _catalog.has('smart.test.results');
+
+  /// Whether the server can start self-tests (`smart.test.manual_test`).
+  Future<bool> canRunSmartTests() async =>
+      _catalog.has('smart.test.manual_test');
+
+  /// The self-test log of [disk], newest test first.
+  Future<SmartResults> smartResults(Disk disk) async {
+    final result = await _client.call('smart.test.results', [
+      [
+        ['disk', '=', disk.name],
+      ],
+    ]) as List<dynamic>;
+    return result.isEmpty
+        ? SmartResults.none
+        : SmartResults.fromJson(asMap(result.first));
+  }
+
+  /// Starts a self-test of [type] on [disk]. The test runs on the disk, not
+  /// as a job, so progress is read back with [smartResults].
+  Future<void> runSmartTest(Disk disk, SmartTestType type) async {
+    final result = await _client.call('smart.test.manual_test', [
+      [
+        {'identifier': disk.identifier ?? disk.name, 'type': type.apiName},
+      ],
+    ]) as List<dynamic>;
+    for (final entry in result) {
+      final error = asMap(entry)['error'];
+      if (error is String && error.isNotEmpty) throw ApiException(error);
+    }
   }
 }
 

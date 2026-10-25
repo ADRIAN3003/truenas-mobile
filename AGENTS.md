@@ -292,6 +292,14 @@ README covers what the app does; this file covers how to work on it.
   `ReportingApi.isAvailable`. Fake server: `reporting`, `failingGraphs`,
   `hiddenGraphs`, `sampleReportingData`. The exact data shape on a real
   server (legend names, `arcsize` columns) is unconfirmed: check it on a NAS.
+- System updates and power (`SystemApi`, `lib/features/system/updates_screen.dart`,
+  `power_actions.dart`): `UpdateInfo` is normalised across `update.status`
+  (code `REBOOT_REQUIRED`, `new_version.filesize/changelog`, both optional) and
+  `update.check_available`. The Updates screen can install and restart or
+  install and restart later (`applyUpdate(reboot: false)`), and shows "Restart
+  now" once an update waits for a restart. Reboot and shutdown both go through
+  `confirmPower` (More tab and Updates screen). The job's live progress is the
+  existing `JobKind.systemUpdate`.
 - Saved servers live in secure storage (`SecureKeyValueStore`). Its Android
   default `resetOnError: true` erases everything when one read fails, so it is
   off; a failed read is retried, then shown as an error with Try again and

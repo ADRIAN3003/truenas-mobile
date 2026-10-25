@@ -58,6 +58,12 @@ for Android and iOS that talks to the official TrueNAS middleware API
   Notifications > Siri and Shortcuts turns it off. Like the widgets they need
   the Keychain group below (not in a Sideloadly install), and accounts that
   need a 2FA code cannot be used. Android has nothing like it yet.
+- **Error log:** the app keeps a log of what went wrong on the phone: errors
+  it did not expect, connections and sign-ins that failed, calls the server
+  refused, and failed background checks. Settings > About > Error log shows it;
+  copy it or send it through the share sheet when you report a problem. It
+  stays on the phone, and passwords, keys and tokens are left out (server
+  addresses are not, so look it over before sharing).
 - **Storage:** pools with layout, scrub start, pause and stop; datasets and
   zvols (create, delete); snapshots (browse, search, create, roll back, clone, delete); disks with
   temperatures, their S.M.A.R.T. self-test log and a button to run a short,

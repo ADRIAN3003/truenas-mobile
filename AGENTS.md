@@ -313,6 +313,34 @@ README covers what the app does; this file covers how to work on it.
   `ReportingApi.isAvailable`. Fake server: `reporting`, `failingGraphs`,
   `hiddenGraphs`, `sampleReportingData`. The exact data shape on a real
   server (legend names, `arcsize` columns) is unconfirmed: check it on a NAS.
+- Error log (`lib/core/logging/`, `lib/features/settings/log_screen.dart`):
+  `AppLog.instance` (a static, like `Haptics.enabled`, so `core/api` can log
+  without providers) keeps the newest 500 entries in memory and in
+  `app.log` in the app support directory, one JSON line each, so the
+  background check's isolate appends to the same file (`attachLogFile`; the
+  screen calls `reload` on open). `main` calls `logUncaughtErrors` (FlutterError
+  and PlatformDispatcher, chained to the old handlers). Logged today: refused or
+  timed-out RPC calls (method and answer only, **never the params**, they carry
+  passwords and keys), socket errors, failed connects, rejected sign-ins and
+  failed reconnects, failed background checks. Every message and stack goes
+  through `redactSecrets` when written; add a pattern there (with a test in
+  `log_redaction_test.dart`) rather than logging a secret and hoping. Server
+  hosts are kept on purpose. A cancelled prompt or a certificate to confirm is
+  not an error. The same line within 5 s is written once. Export: copy
+  (clipboard) and share (`LogSharer`, a text file through `share_plus`; tests
+  use `FakeLogSharer`, `MemoryLogStore` in `test/support/log_fakes.dart`). Reset
+  `AppLog.instance = AppLog()` in tests that assert on entries.
+- App logs (`lib/features/workloads/app_logs_screen.dart`, `WorkloadsApi.appLogs`):
+  "Logs" in an app's menu and screen follows a container's output without a
+  shell. Containers come from `app.container_console_choices` (as for the
+  shell), the lines from the `app.container_log_follow:{app_name,
+  container_id, tail_lines}` event source through `core.subscribe`; each event
+  has `fields.data` (the line, ANSI codes stripped client side) and optionally
+  `timestamp`. `subscribe` accepts events named with or without the argument
+  suffix, since which one the middleware uses is unconfirmed on a real NAS. A
+  reconnect resubscribes and the server resends the tail, so the screen clears
+  first. Docker apps have no events API, so there is no separate events view.
+  Fake server: `appLogLines`, `pushLogLine`, `logCollectionWithArgs`.
 - Wake-on-LAN (`lib/core/wol/wake_on_lan.dart`): optional per server
   (`ServerInstance.wol`, a `WakeOnLanSettings` with MAC, broadcast address and
   port; null until a MAC is entered, and damaged data only loses the feature,

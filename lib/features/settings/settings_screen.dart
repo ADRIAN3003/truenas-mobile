@@ -8,6 +8,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/instances/default_server.dart';
 import '../../core/jobs/live_progress.dart';
+import '../../core/logging/log_providers.dart';
 import '../../core/instances/instances_provider.dart';
 import '../../core/models/alert.dart';
 import '../../core/notifications/background_alerts.dart';
@@ -23,6 +24,7 @@ import '../../shared/ui.dart';
 import '../../shared/widgets.dart';
 import '../updates/update_screen.dart';
 import 'alert_kinds_screen.dart';
+import 'log_screen.dart';
 
 /// Where the project lives, for the About section.
 final _sourceUri = Uri.parse('https://github.com/ADRIAN3003/truenas-mobile');
@@ -224,6 +226,29 @@ class SettingsScreen extends ConsumerWidget {
           GroupedCard(
             children: [
               const _VersionRow(),
+              NavRow(
+                icon: Icons.fact_check_rounded,
+                color: AppPalette.tileOrange,
+                title: l10n.settingsErrorLog,
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (ref.watch(logEntriesProvider).value?.length
+                        case final count? when count > 0) ...[
+                      Text(
+                        '$count',
+                        style: TextStyle(color: AppPalette.of(context).muted),
+                      ),
+                      const SizedBox(width: 4),
+                    ],
+                    const Chevron(),
+                  ],
+                ),
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute<void>(builder: (_) => const LogScreen()),
+                ),
+              ),
               NavRow(
                 icon: Icons.description_rounded,
                 color: AppPalette.tileSlate,

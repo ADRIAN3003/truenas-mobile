@@ -8,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'app.dart';
 import 'core/instances/instance_repository.dart';
 import 'core/jobs/live_progress.dart';
+import 'core/logging/file_log_store.dart';
 import 'core/notifications/background_alerts.dart';
 import 'core/notifications/local_alert_notifier.dart';
 import 'core/security/biometric_auth.dart';
@@ -22,6 +23,8 @@ import 'shared/glass.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  logUncaughtErrors();
+  await attachLogFile();
   await warmUpGlass();
   // Read the settings first, so the first frame already has the user's theme
   // and language.

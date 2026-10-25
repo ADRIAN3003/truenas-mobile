@@ -1,5 +1,9 @@
+import 'dart:async';
+import 'dart:convert';
+
 import '../models/json.dart';
 import '../models/workloads.dart';
+import 'events.dart';
 import 'job_wait.dart';
 import 'json_rpc_client.dart';
 import 'method_catalog.dart';
@@ -138,6 +142,26 @@ class WorkloadsApi {
     };
   }
 
+  /// The output of one app container: the last [tailLines] lines, then new
+  /// ones as they are written, from the `app.container_log_follow` event
+  /// source (what the web UI's log viewer reads). Cancel to stop following.
+  Stream<AppLogLine> appLogs(
+    String app,
+    String containerId, {
+    int tailLines = 500,
+  }) {
+    final args = jsonEncode({
+      'app_name': app,
+      'container_id': containerId,
+      'tail_lines': tailLines,
+    });
+    return _client
+        .subscribe('app.container_log_follow:$args')
+        .map((update) => AppLogLine.fromFields(update.fields))
+        .where((line) => line != null)
+        .cast<AppLogLine>();
+  }
+
   /// Shell options for an app container, a VM console or a container.
   static Map<String, Object?> appShell(String app, String containerId) => {
     'app_name': app,
@@ -219,4 +243,33 @@ class WorkloadsApi {
       _ => throw UnsupportedError(action.name),
     };
   }
+}
+
+/// One line of an app container's output.
+class AppLogLine {
+  const AppLogLine(this.text, {this.time});
+
+  /// Null when the event carries no text.
+  static AppLogLine? fromFields(Map<String, dynamic>? fields) {
+    final data = fields?['data'];
+    if (data == null) return null;
+    final time = fields?['timestamp'];
+    return AppLogLine(
+      _stripAnsi(data.toString()).trimRight(),
+      time: switch (time) {
+        final Map<String, dynamic> m when m[r'$date'] is int =>
+          DateTime.fromMillisecondsSinceEpoch(m[r'$date'] as int),
+        final String s => DateTime.tryParse(s),
+        _ => null,
+      },
+    );
+  }
+
+  final String text;
+  final DateTime? time;
+
+  /// Colour codes and cursor moves that apps print to a terminal.
+  static final _ansi = RegExp('\x1B\\[[0-9;?]*[ -/]*[@-~]');
+
+  static String _stripAnsi(String text) => text.replaceAll(_ansi, '');
 }

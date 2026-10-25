@@ -2883,4 +2883,72 @@ class AppLocalizationsHu extends AppLocalizations {
   String updateDownloadSize(String size) {
     return 'Letöltés mérete: $size';
   }
+
+  @override
+  String get settingsErrorLog => 'Hibanapló';
+
+  @override
+  String get logTitle => 'Hibanapló';
+
+  @override
+  String get logNote =>
+      'A hibák és a sikertelen kapcsolódások itt, csak ezen a telefonon tárolódnak. A jelszavak és kulcsok kimaradnak, a szerverek címe viszont nem: megosztás előtt nézd át a naplót.';
+
+  @override
+  String get logEmptyTitle => 'Nincs bejegyzés';
+
+  @override
+  String get logEmptyBody => 'Az alkalmazás hibái itt jelennek meg.';
+
+  @override
+  String get logShare => 'Megosztás';
+
+  @override
+  String get logClear => 'Napló törlése';
+
+  @override
+  String get logClearBody =>
+      'Ez minden bejegyzést töröl a telefonon lévő naplóból.';
+
+  @override
+  String get logClearConfirm => 'Törlés';
+
+  @override
+  String get logCopied => 'Napló kimásolva';
+
+  @override
+  String get logShareFailed => 'A napló megosztása nem sikerült';
+
+  @override
+  String get logDetails => 'Részletek';
+
+  @override
+  String get appLogsTitle => 'Naplók';
+
+  @override
+  String get appLogsPickContainer => 'Melyik napló látszódjon';
+
+  @override
+  String get appLogsNoContainers =>
+      'Ennek az alkalmazásnak nincs konténere, aminek a naplóját meg lehetne mutatni.';
+
+  @override
+  String get appLogsEmpty => 'Még nincs kimenet.';
+
+  @override
+  String get appLogsNoMatches => 'Nincs találat.';
+
+  @override
+  String get appLogsFilter => 'Sorok szűrése';
+
+  @override
+  String get appLogsFollow => 'Ugrás a legutolsó sorra';
+
+  @override
+  String get appLogsClear => 'Törlés';
+
+  @override
+  String appLogsLastLines(int count) {
+    return 'Utolsó $count sor';
+  }
 }

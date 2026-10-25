@@ -10,6 +10,8 @@ import 'package:truenas_mobile/core/instances/instance_repository.dart';
 import 'package:truenas_mobile/core/instances/instances_provider.dart';
 import 'package:truenas_mobile/core/instances/server_instance.dart';
 import 'package:truenas_mobile/core/jobs/live_progress.dart';
+import 'package:truenas_mobile/core/logging/app_log.dart';
+import 'package:truenas_mobile/core/logging/log_providers.dart';
 import 'package:truenas_mobile/core/models/alert.dart';
 import 'package:truenas_mobile/core/notifications/alert_kind_catalog.dart';
 import 'package:truenas_mobile/core/notifications/background_alerts.dart';
@@ -106,6 +108,17 @@ void main() {
     }
     // The build number comes from the platform.
     expect(find.text('0.1.2 (3)'), findsOneWidget);
+  });
+
+  testWidgets('the error log opens from About', (tester) async {
+    final log = AppLog();
+    log.warning('rpc', 'pool.query failed');
+    await open(tester, overrides: [appLogProvider.overrideWithValue(log)]);
+    // One entry, counted on the row.
+    expect(find.text('1'), findsOneWidget);
+    await tester.tap(find.text('Error log'));
+    await tester.pumpAndSettle();
+    expect(find.text('pool.query failed'), findsOneWidget);
   });
 
   group('default server', () {

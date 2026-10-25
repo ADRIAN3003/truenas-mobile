@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:truenas_mobile/core/api/events.dart';
 import 'package:truenas_mobile/core/instances/server_instance.dart';
+import 'package:truenas_mobile/core/logging/app_log.dart';
 import 'package:truenas_mobile/core/session/truenas_session.dart';
 
 import '../../support/fake_truenas_server.dart';
@@ -8,7 +9,10 @@ import '../../support/fake_truenas_server.dart';
 void main() {
   late FakeTrueNasServer server;
 
-  setUp(() async => server = await FakeTrueNasServer.start());
+  setUp(() async {
+    AppLog.instance = AppLog();
+    server = await FakeTrueNasServer.start();
+  });
   tearDown(() => server.close());
 
   ServerInstance instance({
@@ -64,6 +68,44 @@ void main() {
       ),
       throwsA(isA<ConnectCancelled>()),
     );
+    // Cancelling is the user's choice, not an error.
+    expect(
+      AppLog.instance.entries.where((e) => e.source == 'sign-in'),
+      isEmpty,
+    );
+  });
+
+  test('logs a rejected sign-in without the password', () async {
+    await expectLater(
+      connectToInstance(
+        instance(secret: 'wrong-pw-9'),
+        confirmCertificate: neverTrust,
+        askOtp: noOtp,
+      ),
+      throwsA(isA<LoginRejected>()),
+    );
+    final entry = AppLog.instance.entries.singleWhere(
+      (e) => e.source == 'sign-in',
+    );
+    expect(entry.level, LogLevel.warning);
+    expect(entry.message, contains('Sign-in to "Home" failed'));
+    expect(AppLog.instance.export(), isNot(contains('wrong-pw-9')));
+  });
+
+  test('logs a server that cannot be reached', () async {
+    final url = 'http://127.0.0.1:${server.port}';
+    await server.close();
+    await expectLater(
+      connectToInstance(
+        instance(url: url),
+        confirmCertificate: neverTrust,
+        askOtp: noOtp,
+      ),
+      throwsA(isA<Exception>()),
+    );
+    final entry = AppLog.instance.entries.single;
+    expect(entry.source, 'connect');
+    expect(entry.message, contains('127.0.0.1'));
   });
 
   test('reports rejected credentials', () async {

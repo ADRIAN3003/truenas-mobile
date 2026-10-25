@@ -4777,6 +4777,132 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Download size: {size}'**
   String updateDownloadSize(String size);
+
+  /// Settings row that opens the error log.
+  ///
+  /// In en, this message translates to:
+  /// **'Error log'**
+  String get settingsErrorLog;
+
+  /// Title of the error log screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Error log'**
+  String get logTitle;
+
+  /// Note at the top of the error log.
+  ///
+  /// In en, this message translates to:
+  /// **'Errors and failed connections are kept here, on this phone only. Passwords and keys are left out, but server addresses are not: look through the log before you share it.'**
+  String get logNote;
+
+  /// Empty state title of the error log.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing recorded'**
+  String get logEmptyTitle;
+
+  /// Empty state text of the error log.
+  ///
+  /// In en, this message translates to:
+  /// **'Errors the app runs into show up here.'**
+  String get logEmptyBody;
+
+  /// Tooltip of the button that shares the log.
+  ///
+  /// In en, this message translates to:
+  /// **'Share'**
+  String get logShare;
+
+  /// Tooltip and title of the action that empties the log.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear log'**
+  String get logClear;
+
+  /// Confirmation body.
+  ///
+  /// In en, this message translates to:
+  /// **'This removes every entry from the log on this phone.'**
+  String get logClearBody;
+
+  /// Confirmation button that empties the log.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear'**
+  String get logClearConfirm;
+
+  /// Snackbar after the log was copied.
+  ///
+  /// In en, this message translates to:
+  /// **'Log copied'**
+  String get logCopied;
+
+  /// Snackbar when the share sheet failed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not share the log'**
+  String get logShareFailed;
+
+  /// Label above the stack trace of a log entry.
+  ///
+  /// In en, this message translates to:
+  /// **'Details'**
+  String get logDetails;
+
+  /// Button and menu entry that shows an app container's log.
+  ///
+  /// In en, this message translates to:
+  /// **'Logs'**
+  String get appLogsTitle;
+
+  /// Title of the dialog that picks which app container's log to show.
+  ///
+  /// In en, this message translates to:
+  /// **'Show the log of'**
+  String get appLogsPickContainer;
+
+  /// Snackbar when an app has no container for a log.
+  ///
+  /// In en, this message translates to:
+  /// **'This app has no containers to show a log for.'**
+  String get appLogsNoContainers;
+
+  /// Shown when the container has not printed anything.
+  ///
+  /// In en, this message translates to:
+  /// **'No output yet.'**
+  String get appLogsEmpty;
+
+  /// Shown when the log filter matches nothing.
+  ///
+  /// In en, this message translates to:
+  /// **'No lines match.'**
+  String get appLogsNoMatches;
+
+  /// Tooltip and hint of the log filter.
+  ///
+  /// In en, this message translates to:
+  /// **'Filter lines'**
+  String get appLogsFilter;
+
+  /// Tooltip of the button that scrolls the log to its end and follows it.
+  ///
+  /// In en, this message translates to:
+  /// **'Jump to the latest line'**
+  String get appLogsFollow;
+
+  /// Menu entry that empties the log on screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear'**
+  String get appLogsClear;
+
+  /// Menu entry: how many of the latest log lines to load first.
+  ///
+  /// In en, this message translates to:
+  /// **'Last {count} lines'**
+  String appLogsLastLines(int count);
 }
 
 class _AppLocalizationsDelegate

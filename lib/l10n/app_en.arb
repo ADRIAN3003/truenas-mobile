@@ -3889,5 +3889,95 @@
         "type": "String"
       }
     }
+  },
+  "settingsErrorLog": "Error log",
+  "@settingsErrorLog": {
+    "description": "Settings row that opens the error log."
+  },
+  "logTitle": "Error log",
+  "@logTitle": {
+    "description": "Title of the error log screen."
+  },
+  "logNote": "Errors and failed connections are kept here, on this phone only. Passwords and keys are left out, but server addresses are not: look through the log before you share it.",
+  "@logNote": {
+    "description": "Note at the top of the error log."
+  },
+  "logEmptyTitle": "Nothing recorded",
+  "@logEmptyTitle": {
+    "description": "Empty state title of the error log."
+  },
+  "logEmptyBody": "Errors the app runs into show up here.",
+  "@logEmptyBody": {
+    "description": "Empty state text of the error log."
+  },
+  "logShare": "Share",
+  "@logShare": {
+    "description": "Tooltip of the button that shares the log."
+  },
+  "logClear": "Clear log",
+  "@logClear": {
+    "description": "Tooltip and title of the action that empties the log."
+  },
+  "logClearBody": "This removes every entry from the log on this phone.",
+  "@logClearBody": {
+    "description": "Confirmation body."
+  },
+  "logClearConfirm": "Clear",
+  "@logClearConfirm": {
+    "description": "Confirmation button that empties the log."
+  },
+  "logCopied": "Log copied",
+  "@logCopied": {
+    "description": "Snackbar after the log was copied."
+  },
+  "logShareFailed": "Could not share the log",
+  "@logShareFailed": {
+    "description": "Snackbar when the share sheet failed."
+  },
+  "logDetails": "Details",
+  "@logDetails": {
+    "description": "Label above the stack trace of a log entry."
+  }
+  ,
+  "appLogsTitle": "Logs",
+  "@appLogsTitle": {
+    "description": "Button and menu entry that shows an app container's log."
+  },
+  "appLogsPickContainer": "Show the log of",
+  "@appLogsPickContainer": {
+    "description": "Title of the dialog that picks which app container's log to show."
+  },
+  "appLogsNoContainers": "This app has no containers to show a log for.",
+  "@appLogsNoContainers": {
+    "description": "Snackbar when an app has no container for a log."
+  },
+  "appLogsEmpty": "No output yet.",
+  "@appLogsEmpty": {
+    "description": "Shown when the container has not printed anything."
+  },
+  "appLogsNoMatches": "No lines match.",
+  "@appLogsNoMatches": {
+    "description": "Shown when the log filter matches nothing."
+  },
+  "appLogsFilter": "Filter lines",
+  "@appLogsFilter": {
+    "description": "Tooltip and hint of the log filter."
+  },
+  "appLogsFollow": "Jump to the latest line",
+  "@appLogsFollow": {
+    "description": "Tooltip of the button that scrolls the log to its end and follows it."
+  },
+  "appLogsClear": "Clear",
+  "@appLogsClear": {
+    "description": "Menu entry that empties the log on screen."
+  },
+  "appLogsLastLines": "Last {count} lines",
+  "@appLogsLastLines": {
+    "description": "Menu entry: how many of the latest log lines to load first.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   }
 }

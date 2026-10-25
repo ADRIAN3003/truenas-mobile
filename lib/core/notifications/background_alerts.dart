@@ -5,6 +5,8 @@ import 'package:workmanager/workmanager.dart';
 
 import '../instances/instance_repository.dart';
 import '../instances/server_instance.dart';
+import '../logging/app_log.dart';
+import '../logging/file_log_store.dart';
 import '../models/alert.dart';
 import '../settings/app_settings.dart';
 import '../widgets/home_widget_sync.dart';
@@ -80,11 +82,14 @@ class WorkmanagerScheduler implements BackgroundScheduler {
 @pragma('vm:entry-point')
 void alertCallbackDispatcher() {
   Workmanager().executeTask((task, inputData) async {
+    await attachLogFile();
     try {
       await runBackgroundAlertCheck();
-    } catch (_) {
+    } catch (error, stack) {
       // Nothing to retry sooner than the next scheduled run.
+      AppLog.instance.error('background', error, stack);
     }
+    await AppLog.instance.flush();
     return true;
   });
 }

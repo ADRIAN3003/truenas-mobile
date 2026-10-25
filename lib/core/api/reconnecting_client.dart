@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import '../logging/app_log.dart';
 import 'api_exception.dart';
 import 'json_rpc_client.dart';
 
@@ -83,7 +84,13 @@ class ReconnectingJsonRpcClient implements JsonRpcClient {
     final previous = _current;
     await _forwarding?.cancel();
     unawaited(previous.close().catchError((_) {}));
-    final next = await _reconnect();
+    final JsonRpcClient next;
+    try {
+      next = await _reconnect();
+    } catch (error) {
+      AppLog.instance.warning('connection', 'Reconnecting failed: $error');
+      rethrow;
+    }
     if (_closed) {
       await next.close();
       throw const ApiException('Connection is closed');

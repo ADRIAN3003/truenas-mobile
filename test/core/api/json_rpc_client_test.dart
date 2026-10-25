@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:stream_channel/stream_channel.dart';
 import 'package:truenas_mobile/core/api/api_exception.dart';
 import 'package:truenas_mobile/core/api/json_rpc_client.dart';
+import 'package:truenas_mobile/core/logging/app_log.dart';
 
 void main() {
   late StreamChannelController<dynamic> controller;
@@ -11,6 +12,7 @@ void main() {
   late List<Map<String, dynamic>> sent;
 
   setUp(() {
+    AppLog.instance = AppLog();
     controller = StreamChannelController<dynamic>();
     client = JsonRpcClient(controller.local);
     sent = [];
@@ -53,6 +55,36 @@ void main() {
             .having((e) => e.message, 'message', 'Not authenticated')
             .having((e) => e.code, 'code', -32001),
       ),
+    );
+  });
+
+  test('logs a refused call without its parameters', () async {
+    final future = client.call('auth.login_ex', [
+      {'username': 'root', 'password': 'hunter2'},
+    ]);
+    await pumpEventQueue();
+    reply({
+      'id': sent.single['id'],
+      'error': {'code': 13, 'message': 'Bad password'},
+    });
+    await expectLater(future, throwsA(isA<ApiException>()));
+    final entry = AppLog.instance.entries.single;
+    expect(entry.level, LogLevel.warning);
+    expect(entry.source, 'rpc');
+    expect(entry.message, contains('auth.login_ex failed'));
+    expect(entry.message, contains('Bad password'));
+    expect(entry.message, isNot(contains('hunter2')));
+  });
+
+  test('logs a call that times out', () async {
+    final slow = JsonRpcClient(
+      StreamChannelController<dynamic>().local,
+      timeout: const Duration(milliseconds: 20),
+    );
+    await expectLater(slow.call('pool.scrub'), throwsA(isA<ApiException>()));
+    expect(
+      AppLog.instance.entries.single.message,
+      contains('pool.scrub failed'),
     );
   });
 

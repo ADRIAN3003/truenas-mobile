@@ -2739,4 +2739,26 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get settingsHomeWidgetsHint =>
       'Keep widgets up to date in the background, about every 15 minutes. They also update while a server is open. Add them from your home screen; the phone decides when a refresh really runs.';
+
+  @override
+  String get updateInstallLater => 'Install, restart later';
+
+  @override
+  String get updateInstallLaterBody =>
+      'The server downloads and installs the update but keeps running. It takes effect the next time the server restarts.';
+
+  @override
+  String get updateStartedNoRestart =>
+      'Update started. Restart the server to finish it.';
+
+  @override
+  String get updateRestartNow => 'Restart now';
+
+  @override
+  String get updateChangelog => 'Changes';
+
+  @override
+  String updateDownloadSize(String size) {
+    return 'Download size: $size';
+  }
 }

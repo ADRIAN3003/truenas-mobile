@@ -184,6 +184,40 @@ void main() {
     await disconnect(tester);
   });
 
+  testWidgets('installs an update without restarting', (tester) async {
+    await connect(tester);
+    await tester.pumpWidget(wrap(UpdatesScreen(session: session)));
+    await settle(tester);
+    expect(find.text('Download size: 1.0 GiB'), findsOneWidget);
+
+    await tester.tap(find.text('Install, restart later'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Install, restart later').last);
+    await settle(tester);
+    final run = server.calls.lastWhere((c) => c.$1 == 'update.run');
+    expect(run.$2.single, {'reboot': false});
+    await disconnect(tester);
+  });
+
+  testWidgets('offers a restart once an update is installed', (tester) async {
+    await connect(tester);
+    server.rebootRequired = true;
+    await tester.pumpWidget(
+      wrap(UpdatesScreen(session: session, serverName: 'Home')),
+    );
+    await settle(tester);
+    expect(find.text('An update is installed. Restart to finish.'), findsOne);
+    expect(find.text('Install and restart'), findsNothing);
+
+    await tester.tap(find.text('Restart now'));
+    await tester.pumpAndSettle();
+    expect(find.text('Restart Home?'), findsOneWidget);
+    await tester.tap(find.text('Restart').last);
+    await settle(tester);
+    expect(server.calls.map((c) => c.$1), contains('system.reboot'));
+    await disconnect(tester);
+  });
+
   testWidgets('activates an older boot environment', (tester) async {
     await connect(tester);
     await tester.pumpWidget(wrap(UpdatesScreen(session: session)));

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/models/system.dart';
 import '../../core/session/truenas_session.dart';
@@ -13,14 +13,18 @@ import '../../shared/widgets.dart';
 import '../sharing/sharing_widgets.dart';
 import '../storage/storage_helpers.dart';
 import '../../shared/dialogs.dart';
+import 'power_actions.dart';
 
 typedef _UpdatesData = (String?, UpdateInfo, List<BootEnvironment>);
 
 /// Update status, installing updates, and boot environments.
 class UpdatesScreen extends StatefulWidget {
-  const UpdatesScreen({super.key, required this.session});
+  const UpdatesScreen({super.key, required this.session, this.serverName = ''});
 
   final TrueNasSession session;
+
+  /// The name the user gave this server, for the restart confirmation.
+  final String serverName;
 
   @override
   State<UpdatesScreen> createState() => _UpdatesScreenState();
@@ -56,6 +60,31 @@ class _UpdatesScreenState extends State<UpdatesScreen>
       success: l10n.updateStarted,
     );
   }
+
+  /// Installs without restarting: the update takes effect at the next restart.
+  Future<void> _installLater(UpdateInfo update) async {
+    final l10n = AppLocalizations.of(context);
+    final confirmed = await confirmAction(
+      context,
+      title: l10n.updateInstallTitle(update.version ?? ''),
+      body: l10n.updateInstallLaterBody,
+      confirmLabel: l10n.updateInstallLater,
+      cancelLabel: l10n.cancel,
+    );
+    if (!confirmed || !mounted) return;
+    await runWithFeedback(
+      context,
+      () => _session.system.applyUpdate(reboot: false),
+      success: l10n.updateStartedNoRestart,
+    );
+  }
+
+  Future<void> _restart() => confirmPower(
+    context,
+    _session,
+    serverName: widget.serverName,
+    reboot: true,
+  );
 
   Future<void> _bootEnvAction(BootEnvironment env, String action) async {
     final l10n = AppLocalizations.of(context);
@@ -112,6 +141,8 @@ class _UpdatesScreenState extends State<UpdatesScreen>
                 version: version,
                 update: update,
                 onInstall: () => _install(update),
+                onInstallLater: () => _installLater(update),
+                onRestart: _restart,
               ),
               ...groupedSection(l10n.bootEnvsTitle, indent: 72, [
                 for (final env in envs)
@@ -133,11 +164,15 @@ class _UpdateCard extends StatelessWidget {
     required this.version,
     required this.update,
     required this.onInstall,
+    required this.onInstallLater,
+    required this.onRestart,
   });
 
   final String? version;
   final UpdateInfo update;
   final VoidCallback onInstall;
+  final VoidCallback onInstallLater;
+  final VoidCallback onRestart;
 
   @override
   Widget build(BuildContext context) {
@@ -183,7 +218,21 @@ class _UpdateCard extends StatelessWidget {
                 ),
               ],
             ),
-            if (update.available) ...[
+            if (update.available && update.sizeBytes != null) ...[
+              const SizedBox(height: 8),
+              Text(
+                l10n.updateDownloadSize(formatBytes(update.sizeBytes!)),
+                style: theme.textTheme.bodySmall,
+              ),
+            ],
+            if (update.rebootRequired) ...[
+              const SizedBox(height: 12),
+              FilledButton.icon(
+                onPressed: onRestart,
+                icon: const Icon(Icons.restart_alt),
+                label: Text(l10n.updateRestartNow),
+              ),
+            ] else if (update.available) ...[
               const SizedBox(height: 12),
               Wrap(
                 spacing: 8,
@@ -193,21 +242,41 @@ class _UpdateCard extends StatelessWidget {
                     icon: const Icon(Icons.download),
                     label: Text(l10n.updateInstall),
                   ),
-                  if (notes != null)
-                    TextButton.icon(
-                      icon: const Icon(Icons.copy),
-                      label: Text(l10n.updateReleaseNotes),
-                      onPressed: () async {
-                        final messenger = ScaffoldMessenger.of(context);
-                        await Clipboard.setData(ClipboardData(text: notes));
-                        messenger.showSnackBar(
-                          SnackBar(content: Text(l10n.apiKeyCopied)),
-                        );
-                      },
-                    ),
+                  OutlinedButton(
+                    onPressed: onInstallLater,
+                    child: Text(l10n.updateInstallLater),
+                  ),
                 ],
               ),
             ],
+            if (notes != null)
+              Align(
+                alignment: Alignment.centerLeft,
+                child: TextButton.icon(
+                  icon: const Icon(Icons.open_in_new),
+                  label: Text(l10n.updateReleaseNotes),
+                  onPressed: () {
+                    final uri = Uri.tryParse(notes);
+                    if (uri != null) {
+                      launchUrl(uri, mode: LaunchMode.externalApplication);
+                    }
+                  },
+                ),
+              ),
+            if (update.changelog case final changelog?)
+              ExpansionTile(
+                tilePadding: EdgeInsets.zero,
+                title: Text(l10n.updateChangelog),
+                children: [
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: SelectableText(
+                      changelog,
+                      style: theme.textTheme.bodySmall,
+                    ),
+                  ),
+                ],
+              ),
           ],
         ),
       ),

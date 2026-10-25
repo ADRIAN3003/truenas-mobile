@@ -4477,6 +4477,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Keep widgets up to date in the background, about every 15 minutes. They also update while a server is open. Add them from your home screen; the phone decides when a refresh really runs.'**
   String get settingsHomeWidgetsHint;
+
+  /// Button that installs a system update without restarting.
+  ///
+  /// In en, this message translates to:
+  /// **'Install, restart later'**
+  String get updateInstallLater;
+
+  /// Confirmation body.
+  ///
+  /// In en, this message translates to:
+  /// **'The server downloads and installs the update but keeps running. It takes effect the next time the server restarts.'**
+  String get updateInstallLaterBody;
+
+  /// Snackbar.
+  ///
+  /// In en, this message translates to:
+  /// **'Update started. Restart the server to finish it.'**
+  String get updateStartedNoRestart;
+
+  /// Button shown when an update is installed and waits for a restart.
+  ///
+  /// In en, this message translates to:
+  /// **'Restart now'**
+  String get updateRestartNow;
+
+  /// Expandable list of what an update changes.
+  ///
+  /// In en, this message translates to:
+  /// **'Changes'**
+  String get updateChangelog;
+
+  /// Size of a system update download.
+  ///
+  /// In en, this message translates to:
+  /// **'Download size: {size}'**
+  String updateDownloadSize(String size);
 }
 
 class _AppLocalizationsDelegate

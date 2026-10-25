@@ -2914,4 +2914,34 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get logDetails => 'Részletek';
+
+  @override
+  String get appLogsTitle => 'Naplók';
+
+  @override
+  String get appLogsPickContainer => 'Melyik napló látszódjon';
+
+  @override
+  String get appLogsNoContainers =>
+      'Ennek az alkalmazásnak nincs konténere, aminek a naplóját meg lehetne mutatni.';
+
+  @override
+  String get appLogsEmpty => 'Még nincs kimenet.';
+
+  @override
+  String get appLogsNoMatches => 'Nincs találat.';
+
+  @override
+  String get appLogsFilter => 'Sorok szűrése';
+
+  @override
+  String get appLogsFollow => 'Ugrás a legutolsó sorra';
+
+  @override
+  String get appLogsClear => 'Törlés';
+
+  @override
+  String appLogsLastLines(int count) {
+    return 'Utolsó $count sor';
+  }
 }

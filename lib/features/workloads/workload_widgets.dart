@@ -9,6 +9,7 @@ import '../../shared/viz_colors.dart';
 import '../../shared/widgets.dart';
 import '../shell/shell_screen.dart';
 import '../storage/storage_helpers.dart';
+import 'app_logs_screen.dart';
 import '../../shared/dialogs.dart';
 
 /// State label with icon and colour, for apps, VMs and containers.
@@ -168,6 +169,7 @@ class WorkloadMenu extends StatelessWidget {
     required this.busy,
     required this.onSelected,
     this.onShell,
+    this.onLogs,
   });
 
   final List<WorkloadAction> actions;
@@ -176,6 +178,9 @@ class WorkloadMenu extends StatelessWidget {
 
   /// Adds a Shell entry when set.
   final VoidCallback? onShell;
+
+  /// Adds a Logs entry when set.
+  final VoidCallback? onLogs;
 
   @override
   Widget build(BuildContext context) {
@@ -190,12 +195,17 @@ class WorkloadMenu extends StatelessWidget {
       );
     }
     final onShell = this.onShell;
+    final onLogs = this.onLogs;
     return AppPopupMenu<Object>(
-      enabled: actions.isNotEmpty || onShell != null,
-      onSelected: (value) =>
-          value is WorkloadAction ? onSelected(value) : onShell?.call(),
+      enabled: actions.isNotEmpty || onShell != null || onLogs != null,
+      onSelected: (value) => switch (value) {
+        final WorkloadAction action => onSelected(action),
+        'logs' => onLogs?.call(),
+        _ => onShell?.call(),
+      },
       entries: [
         if (onShell != null) menuEntry<Object>('shell', l10n.shellTitle),
+        if (onLogs != null) menuEntry<Object>('logs', l10n.appLogsTitle),
         for (final action in actions)
           menuEntry<Object>(action, actionLabel(l10n, action)),
       ],
@@ -224,13 +234,16 @@ Future<void> openShell(
   ),
 );
 
-/// Opens a shell in one of [app]'s containers, asking which when it has
-/// several.
-Future<void> openAppShell(
+/// Asks which of [app]'s containers to use, unless it has just one. Null
+/// when it has none (a snackbar says so with [noContainers]) or the user
+/// cancels.
+Future<(String id, String name)?> _pickAppContainer(
   BuildContext context,
   TrueNasSession session,
-  String app,
-) async {
+  String app, {
+  required String title,
+  required String noContainers,
+}) async {
   final l10n = AppLocalizations.of(context);
   final messenger = ScaffoldMessenger.of(context);
   final Map<String, String> containers;
@@ -240,30 +253,77 @@ Future<void> openAppShell(
     messenger.showSnackBar(
       SnackBar(content: Text(describeConnectError(l10n, error))),
     );
-    return;
+    return null;
   }
-  if (!context.mounted) return;
+  if (!context.mounted) return null;
   if (containers.isEmpty) {
-    messenger.showSnackBar(SnackBar(content: Text(l10n.shellNoContainers)));
-    return;
+    messenger.showSnackBar(SnackBar(content: Text(noContainers)));
+    return null;
   }
   final id = containers.length == 1
       ? containers.keys.single
       : (await showAppChoice<String>(
           context: context,
-          title: l10n.shellPickContainer,
+          title: title,
           dialogOnAndroid: true,
           choices: [
             for (final MapEntry(:key, :value) in containers.entries)
               appChoice(key, value),
           ],
         ))?.$1;
-  if (id == null || !context.mounted) return;
+  return id == null ? null : (id, containers[id]!);
+}
+
+/// Opens a shell in one of [app]'s containers, asking which when it has
+/// several.
+Future<void> openAppShell(
+  BuildContext context,
+  TrueNasSession session,
+  String app,
+) async {
+  final l10n = AppLocalizations.of(context);
+  final container = await _pickAppContainer(
+    context,
+    session,
+    app,
+    title: l10n.shellPickContainer,
+    noContainers: l10n.shellNoContainers,
+  );
+  if (container == null || !context.mounted) return;
   await openShell(
     context,
     session,
-    WorkloadsApi.appShell(app, id),
-    '$app · ${containers[id]}',
+    WorkloadsApi.appShell(app, container.$1),
+    '$app · ${container.$2}',
     fallbackCommands: WorkloadsApi.shellFallbacks,
+  );
+}
+
+/// Opens the log of one of [app]'s containers, asking which when it has
+/// several.
+Future<void> openAppLogs(
+  BuildContext context,
+  TrueNasSession session,
+  String app,
+) async {
+  final l10n = AppLocalizations.of(context);
+  final container = await _pickAppContainer(
+    context,
+    session,
+    app,
+    title: l10n.appLogsPickContainer,
+    noContainers: l10n.appLogsNoContainers,
+  );
+  if (container == null || !context.mounted) return;
+  await Navigator.push(
+    context,
+    MaterialPageRoute<void>(
+      builder: (_) => AppLogsScreen(
+        session: session,
+        app: app,
+        containerId: container.$1,
+        title: '$app · ${container.$2}',
+      ),
+    ),
   );
 }

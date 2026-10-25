@@ -2942,4 +2942,34 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get logDetails => 'Details';
+
+  @override
+  String get appLogsTitle => 'Logs';
+
+  @override
+  String get appLogsPickContainer => 'Show the log of';
+
+  @override
+  String get appLogsNoContainers =>
+      'This app has no containers to show a log for.';
+
+  @override
+  String get appLogsEmpty => 'No output yet.';
+
+  @override
+  String get appLogsNoMatches => 'No lines match.';
+
+  @override
+  String get appLogsFilter => 'Filter lines';
+
+  @override
+  String get appLogsFollow => 'Jump to the latest line';
+
+  @override
+  String get appLogsClear => 'Clear';
+
+  @override
+  String appLogsLastLines(int count) {
+    return 'Last $count lines';
+  }
 }

@@ -772,6 +772,8 @@
   "homeWidgetMemoryText": "{used} / {total}",
   "settingsHomeWidgets": "Kezdőképernyős widgetek",
   "settingsHomeWidgetsHint": "Widgetek frissítése a háttérben, nagyjából 15 percenként. Nyitott szervernél is frissülnek. A kezdőképernyőről adhatod hozzá őket; a telefon dönti el, mikor fut le valójában a frissítés.",
+  "settingsShortcuts": "Siri és Parancsok",
+  "settingsShortcutsHint": "A Siri és a Parancsok alkalmazás újraindíthat egy alkalmazást vagy futtathat egy felhő szinkront a szervereiden, anélkül hogy megnyitnád ezt az appot. A widgetekhez tárolt belépési adatokkal jelentkeznek be. A kétlépcsős azonosítású fiókok nem használhatók.",
   "updateInstallLater": "Telepítés, újraindítás később",
   "updateInstallLaterBody": "A szerver letölti és telepíti a frissítést, de tovább fut. A következő újraindításkor lép életbe.",
   "updateStartedNoRestart": "A frissítés elindult. A befejezéshez indítsd újra a szervert.",

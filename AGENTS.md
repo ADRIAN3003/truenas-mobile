@@ -277,6 +277,27 @@ README covers what the app does; this file covers how to work on it.
   as of writing: check the
   widget refreshes with the app closed, over Tailscale, and the pinned
   certificate case.
+- Siri and Shortcuts (iOS 16+, `ios/Runner/ShortcutIntents.swift`): App Intents
+  `StartAppIntent`, `StopAppIntent`, `RestartAppIntent` (`app.start/stop/redeploy`)
+  and `RunCloudSyncIntent` (`cloudsync.sync`), with `AppShortcutsProvider`
+  phrases, in the **Runner** target (not the widget extension: the app's own
+  intent metadata is what Shortcuts reads). They run in the app process but not
+  its Flutter engine; they sign in over `Shared/ServerLink.swift` (the Swift
+  JSON-RPC client, `WidgetCredentialStore.loadForShortcuts()`, compiled into
+  both targets) with the widgets' Keychain credentials. The credentials JSON
+  carries `widgets` and `shortcuts` flags (`HomeWidgetPublisher._credentials`;
+  setting `siriShortcuts`, default on, iOS only in Settings > Notifications):
+  the widget extension ignores them when `widgets` is false, the intents when
+  `shortcuts` is false, and the list sync writes them for Shortcuts alone while
+  the widgets are off. Entities are `<server id>/<app name or task id>` and
+  built from the id alone (no server visit when a shortcut runs); the pickers
+  list them live from every saved server. An intent only starts the job and
+  says so, it never waits for it. Titles and phrases are English (string
+  catalogs would be needed); spoken answers use `ShortcutText.pick` (en/hu).
+  New intent files must be added to `Runner.xcodeproj` by hand. Untested on a
+  real phone as of writing: check Shortcuts lists the actions, Siri asks for the
+  app, Restart asks first, and a wrong-password server says so. Android has
+  none.
 - History charts (`lib/core/api/reporting_api.dart`, `lib/features/reporting/`):
   `ReportingApi` reads netdata reporting, `reporting.netdata_graphs` +
   `reporting.netdata_get_data` (25.04) or `reporting.graphs` + `reporting.get_data`

@@ -15,6 +15,7 @@ void main() {
     expect(settings.shellExtraKeys, isTrue);
     expect(settings.checkForUpdates, isTrue);
     expect(settings.skippedVersion, isNull);
+    expect(settings.siriShortcuts, isTrue);
   });
 
   test('settings round-trip through JSON', () {
@@ -33,6 +34,7 @@ void main() {
       alertNotifications: true,
       alertLevel: AlertSeverity.warning,
       mutedAlertKinds: {'PoolStatus', 'ScrubPaused'},
+      siriShortcuts: false,
     );
     final back = AppSettings.fromJson(settings.toJson());
     expect(back.theme, ThemeChoice.dark);
@@ -48,6 +50,7 @@ void main() {
     expect(back.liveJobs, isFalse);
     expect(back.alertNotifications, isTrue);
     expect(back.alertLevel, AlertSeverity.warning);
+    expect(back.siriShortcuts, isFalse);
     expect(back.mutedAlertKinds, {'PoolStatus', 'ScrubPaused'});
   });
 

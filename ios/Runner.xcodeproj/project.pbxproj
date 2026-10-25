@@ -17,6 +17,9 @@
 		A10000000000000000000009 /* HomeWidgetViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000009 /* HomeWidgetViews.swift */; };
 		A1000000000000000000000A /* WidgetKeychain.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000000000000000000000C /* WidgetKeychain.swift */; };
 		A1000000000000000000000B /* WidgetKeychain.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000000000000000000000C /* WidgetKeychain.swift */; };
+		A10000000000000000000010 /* ServerLink.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000010 /* ServerLink.swift */; };
+		A10000000000000000000011 /* ServerLink.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000010 /* ServerLink.swift */; };
+		A10000000000000000000012 /* ShortcutIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000011 /* ShortcutIntents.swift */; };
 		A1000000000000000000000C /* WidgetCredentialsPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000000000000000000000D /* WidgetCredentialsPlugin.swift */; };
 		A1000000000000000000000D /* WidgetFetch.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000000000000000000000E /* WidgetFetch.swift */; };
 		A10000000000000000000006 /* JobActivityWidget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = A20000000000000000000006 /* JobActivityWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
@@ -99,6 +102,8 @@
 		A20000000000000000000008 /* HomeWidgets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeWidgets.swift; sourceTree = "<group>"; };
 		A20000000000000000000009 /* HomeWidgetViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeWidgetViews.swift; sourceTree = "<group>"; };
 		A2000000000000000000000C /* WidgetKeychain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetKeychain.swift; sourceTree = "<group>"; };
+		A20000000000000000000010 /* ServerLink.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServerLink.swift; sourceTree = "<group>"; };
+		A20000000000000000000011 /* ShortcutIntents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShortcutIntents.swift; sourceTree = "<group>"; };
 		A2000000000000000000000D /* WidgetCredentialsPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetCredentialsPlugin.swift; sourceTree = "<group>"; };
 		A2000000000000000000000E /* WidgetFetch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetFetch.swift; sourceTree = "<group>"; };
 		A2000000000000000000000A /* Runner.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Runner.entitlements; sourceTree = "<group>"; };
@@ -181,6 +186,7 @@
 				74858FAD1ED2DC5600515810 /* Runner-Bridging-Header.h */,
 				A20000000000000000000005 /* LiveProgressPlugin.swift */,
 				A2000000000000000000000D /* WidgetCredentialsPlugin.swift */,
+				A20000000000000000000011 /* ShortcutIntents.swift */,
 				A2000000000000000000000A /* Runner.entitlements */,
 			);
 			path = Runner;
@@ -206,6 +212,7 @@
 			children = (
 				A20000000000000000000001 /* JobActivityAttributes.swift */,
 				A2000000000000000000000C /* WidgetKeychain.swift */,
+				A20000000000000000000010 /* ServerLink.swift */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
@@ -400,6 +407,8 @@
 				A1000000000000000000000C /* WidgetCredentialsPlugin.swift in Sources */,
 				A10000000000000000000001 /* JobActivityAttributes.swift in Sources */,
 				A1000000000000000000000A /* WidgetKeychain.swift in Sources */,
+				A10000000000000000000010 /* ServerLink.swift in Sources */,
+				A10000000000000000000012 /* ShortcutIntents.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -415,6 +424,7 @@
 				A1000000000000000000000D /* WidgetFetch.swift in Sources */,
 				A10000000000000000000002 /* JobActivityAttributes.swift in Sources */,
 				A1000000000000000000000B /* WidgetKeychain.swift in Sources */,
+				A10000000000000000000011 /* ServerLink.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

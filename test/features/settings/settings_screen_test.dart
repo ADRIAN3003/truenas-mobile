@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart'
+    show debugDefaultTargetPlatformOverride;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/misc.dart' show Override;
@@ -616,6 +618,36 @@ void main() {
       await tester.pumpAndSettle();
       expect((await saved()).homeWidgets, isFalse);
       expect(scheduler.scheduled, isFalse);
+    });
+
+    testWidgets('Siri and Shortcuts can be switched off on iOS', (
+      tester,
+    ) async {
+      debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+      try {
+        await open(tester, overrides: overrides);
+        await tester.scrollUntilVisible(
+          find.text('Siri and Shortcuts'),
+          200,
+          scrollable: find.byType(Scrollable).first,
+        );
+        expect((await saved()).siriShortcuts, isTrue);
+        await tester.tap(find.text('Siri and Shortcuts'));
+        await tester.pumpAndSettle();
+        expect((await saved()).siriShortcuts, isFalse);
+      } finally {
+        debugDefaultTargetPlatformOverride = null;
+      }
+    });
+
+    testWidgets('Siri and Shortcuts is not offered off iOS', (tester) async {
+      await open(tester, overrides: overrides);
+      await tester.scrollUntilVisible(
+        find.text('Home screen widgets'),
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
+      expect(find.text('Siri and Shortcuts'), findsNothing);
     });
 
     testWidgets('choose the lowest level that notifies', (tester) async {

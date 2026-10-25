@@ -14,164 +14,6 @@ import Security
 // shapes the data the way `serverWidgetData` in `home_widget_data.dart` does.
 // Keep the two in step.
 
-enum WidgetFetchError: Error {
-  case badAddress
-  case timeout
-  case closed
-  case rejected(String)
-  case server(String)
-}
-
-/// A saved server's sign-in details, as the app puts them in the shared
-/// Keychain group (`HomeWidgetPublisher._credentials`).
-struct WidgetCredential: Decodable {
-  var id: String
-  var name: String?
-  var url: String
-  /// "apiKey" or "password".
-  var authMethod: String
-  var username: String
-  var secret: String
-  /// SHA-256 of a self-signed certificate the user chose to trust, as
-  /// `AB:CD:...`.
-  var pinnedFingerprint: String?
-  var apiVersion: String?
-}
-
-enum WidgetCredentialStore {
-  private struct Saved: Decodable { var servers: [WidgetCredential] }
-
-  static func load() -> [WidgetCredential] {
-    guard
-      let data = WidgetKeychain.load(),
-      let saved = try? JSONDecoder().decode(Saved.self, from: data)
-    else { return [] }
-    return saved.servers
-  }
-}
-
-/// Runs [body], and gives up after [seconds]: [close] is called then, to
-/// release whatever [body] is waiting on.
-func withTimeout<T>(
-  _ seconds: Double, close: @escaping () -> Void, _ body: @escaping () async throws -> T
-) async throws -> T {
-  try await withThrowingTaskGroup(of: T.self) { group in
-    group.addTask { try await body() }
-    group.addTask {
-      try await Task.sleep(nanoseconds: UInt64(seconds * 1_000_000_000))
-      close()
-      throw WidgetFetchError.timeout
-    }
-    guard let first = try await group.next() else { throw WidgetFetchError.closed }
-    group.cancelAll()
-    return first
-  }
-}
-
-/// A minimal JSON-RPC 2.0 client over one WebSocket. Calls go one after the
-/// other, which is all a widget needs.
-final class WidgetRpc: NSObject, URLSessionDelegate {
-  private let pinned: String?
-  private var session: URLSession?
-  private var socket: URLSessionWebSocketTask?
-  private var nextId = 1
-
-  init(pinnedFingerprint: String?) {
-    pinned = pinnedFingerprint?.uppercased()
-    super.init()
-  }
-
-  func open(_ url: URL) {
-    let configuration = URLSessionConfiguration.ephemeral
-    configuration.timeoutIntervalForRequest = 15
-    let session = URLSession(configuration: configuration, delegate: self, delegateQueue: nil)
-    self.session = session
-    let socket = session.webSocketTask(with: url)
-    self.socket = socket
-    socket.resume()
-  }
-
-  func close() {
-    socket?.cancel(with: .goingAway, reason: nil)
-    session?.invalidateAndCancel()
-  }
-
-  /// Calls [method] and returns its `result`.
-  func call(_ method: String, _ params: [Any] = []) async throws -> Any? {
-    guard let socket = socket else { throw WidgetFetchError.closed }
-    let id = nextId
-    nextId += 1
-    let body: [String: Any] = ["jsonrpc": "2.0", "id": id, "method": method, "params": params]
-    let data = try JSONSerialization.data(withJSONObject: body)
-    try await socket.send(.string(String(decoding: data, as: UTF8.self)))
-    while true {
-      guard let object = try await receive(), (object["id"] as? Int) == id else { continue }
-      if let error = object["error"] as? [String: Any] {
-        throw WidgetFetchError.server((error["message"] as? String) ?? method)
-      }
-      return object["result"]
-    }
-  }
-
-  /// The `fields` of the next `collection_update` of [collection], after
-  /// `core.subscribe` for it.
-  func nextUpdate(of collection: String) async throws -> [String: Any] {
-    while true {
-      guard
-        let object = try await receive(),
-        object["method"] as? String == "collection_update",
-        let params = object["params"] as? [String: Any],
-        params["collection"] as? String == collection,
-        let fields = params["fields"] as? [String: Any]
-      else { continue }
-      return fields
-    }
-  }
-
-  private func receive() async throws -> [String: Any]? {
-    guard let socket = socket else { throw WidgetFetchError.closed }
-    let data: Data
-    switch try await socket.receive() {
-    case .string(let text): data = Data(text.utf8)
-    case .data(let bytes): data = bytes
-    @unknown default: return nil
-    }
-    return (try? JSONSerialization.jsonObject(with: data)) as? [String: Any]
-  }
-
-  /// The certificates the system trusts, plus the one the user pinned for this
-  /// server (trust on first use, as in the app).
-  func urlSession(
-    _ session: URLSession, didReceive challenge: URLAuthenticationChallenge,
-    completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void
-  ) {
-    guard
-      challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodServerTrust,
-      let trust = challenge.protectionSpace.serverTrust
-    else {
-      completionHandler(.performDefaultHandling, nil)
-      return
-    }
-    if SecTrustEvaluateWithError(trust, nil)
-      || (pinned != nil && WidgetRpc.fingerprint(of: trust) == pinned)
-    {
-      completionHandler(.useCredential, URLCredential(trust: trust))
-    } else {
-      completionHandler(.cancelAuthenticationChallenge, nil)
-    }
-  }
-
-  /// SHA-256 of the server's own certificate, `AB:CD:...`, as the app shows it.
-  static func fingerprint(of trust: SecTrust) -> String? {
-    guard
-      let chain = SecTrustCopyCertificateChain(trust) as? [SecCertificate],
-      let leaf = chain.first
-    else { return nil }
-    let digest = SHA256.hash(data: SecCertificateCopyData(leaf) as Data)
-    return digest.map { String(format: "%02X", $0) }.joined(separator: ":")
-  }
-}
-
 /// What one visit to a server brings back.
 struct WidgetSnapshot {
   var pools: PoolsData
@@ -193,12 +35,12 @@ enum WidgetFetcher {
   static func snapshot(
     of credential: WidgetCredential, label: @escaping (String, String) -> String
   ) async throws -> WidgetSnapshot {
-    guard let url = socketURL(credential) else { throw WidgetFetchError.badAddress }
+    guard let url = ServerLink.socketURL(credential) else { throw WidgetFetchError.badAddress }
     let rpc = WidgetRpc(pinnedFingerprint: credential.pinnedFingerprint)
     defer { rpc.close() }
     return try await withTimeout(visitTimeout, close: rpc.close) {
       rpc.open(url)
-      try await login(rpc, credential)
+      try await ServerLink.login(rpc, credential)
       let pools = (try await rpc.call("pool.query") as? [[String: Any]]) ?? []
       let alerts = (try await rpc.call("alert.list") as? [[String: Any]]) ?? []
       // Not worth failing the visit for: the widget then shows no jobs.
@@ -218,39 +60,6 @@ enum WidgetFetcher {
         apps: apps.map { WidgetShape.apps($0, label: label) },
         system: fields.map { WidgetShape.system($0, label: label) })
     }
-  }
-
-  private static func login(_ rpc: WidgetRpc, _ credential: WidgetCredential) async throws {
-    let data: [String: Any] =
-      credential.authMethod == "apiKey"
-      ? [
-        "mechanism": "API_KEY_PLAIN", "username": credential.username,
-        "api_key": credential.secret,
-      ]
-      : [
-        "mechanism": "PASSWORD_PLAIN", "username": credential.username,
-        "password": credential.secret,
-      ]
-    let result = try await rpc.call("auth.login_ex", [data]) as? [String: Any]
-    let type = result?["response_type"] as? String
-    // A 2FA account cannot sign in here (there is nobody to ask for the code).
-    guard type == "SUCCESS" else { throw WidgetFetchError.rejected(type ?? "UNKNOWN") }
-  }
-
-  /// `wss://host[:port]/api/<version>`; the version the app last used, else
-  /// `current`.
-  static func socketURL(_ credential: WidgetCredential) -> URL? {
-    let text = credential.url.contains("://") ? credential.url : "https://" + credential.url
-    guard
-      let address = URLComponents(string: text), let host = address.host, !host.isEmpty,
-      address.scheme == "https" || address.scheme == "http"
-    else { return nil }
-    var parts = URLComponents()
-    parts.scheme = address.scheme == "http" ? "ws" : "wss"
-    parts.host = host
-    parts.port = address.port
-    parts.path = "/api/" + (credential.apiVersion ?? "current")
-    return parts.url
   }
 }
 

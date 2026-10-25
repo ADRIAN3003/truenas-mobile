@@ -24,6 +24,7 @@ class AppSettings {
     this.alertLevel = AlertSeverity.critical,
     this.mutedAlertKinds = const {},
     this.homeWidgets = true,
+    this.siriShortcuts = true,
   });
 
   factory AppSettings.fromJson(Map<String, dynamic> json) => AppSettings(
@@ -51,6 +52,7 @@ class AppSettings {
         if (id is String && id.isNotEmpty) id,
     },
     homeWidgets: json['homeWidgets'] as bool? ?? true,
+    siriShortcuts: json['siriShortcuts'] as bool? ?? true,
   );
 
   /// Language codes the app is translated into.
@@ -114,6 +116,11 @@ class AppSettings {
   /// server is open in the app. Does nothing until a widget is added.
   final bool homeWidgets;
 
+  /// Let Siri and the Shortcuts app act on the saved servers (iOS): restart an
+  /// app, run a cloud sync. They sign in with the details the app keeps in a
+  /// Keychain group shared with the widget extension and the app's own intents.
+  final bool siriShortcuts;
+
   AppSettings copyWith({
     ThemeChoice? theme,
     String? Function()? language,
@@ -130,6 +137,7 @@ class AppSettings {
     AlertSeverity? alertLevel,
     Set<String>? mutedAlertKinds,
     bool? homeWidgets,
+    bool? siriShortcuts,
   }) => AppSettings(
     theme: theme ?? this.theme,
     language: language != null ? language() : this.language,
@@ -150,6 +158,7 @@ class AppSettings {
     alertLevel: alertLevel ?? this.alertLevel,
     mutedAlertKinds: mutedAlertKinds ?? this.mutedAlertKinds,
     homeWidgets: homeWidgets ?? this.homeWidgets,
+    siriShortcuts: siriShortcuts ?? this.siriShortcuts,
   );
 
   Map<String, dynamic> toJson() => {
@@ -168,6 +177,7 @@ class AppSettings {
     'alertLevel': alertLevel.name,
     'mutedAlertKinds': mutedAlertKinds.toList()..sort(),
     'homeWidgets': homeWidgets,
+    'siriShortcuts': siriShortcuts,
   };
 }
 

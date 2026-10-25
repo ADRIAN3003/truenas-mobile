@@ -932,7 +932,12 @@ class FakeTrueNasServer {
                 'type': 'PHYSICAL',
                 'description': 'Onboard',
                 'ipv4_dhcp': true,
-                'state': {'link_state': 'LINK_STATE_UP', 'mtu': 1500},
+                'state': {
+                  'link_state': 'LINK_STATE_UP',
+                  'mtu': 1500,
+                  'link_address': '00:11:22:33:44:55',
+                  'hardware_link_address': '00:11:22:33:44:55',
+                },
               },
               {
                 'id': 'enp2s0',
@@ -940,7 +945,11 @@ class FakeTrueNasServer {
                 'type': 'PHYSICAL',
                 'description': '',
                 'ipv4_dhcp': false,
-                'state': {'link_state': 'LINK_STATE_DOWN', 'mtu': 1500},
+                'state': {
+                  'link_state': 'LINK_STATE_DOWN',
+                  'mtu': 1500,
+                  'link_address': 'aa:bb:cc:dd:ee:02',
+                },
               },
             ];
           case 'certificate.query':

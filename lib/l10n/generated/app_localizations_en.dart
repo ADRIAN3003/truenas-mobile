@@ -65,6 +65,58 @@ class AppLocalizationsEn extends AppLocalizations {
   String get fieldAddressHint => 'nas.local or https://192.168.1.10';
 
   @override
+  String get wolSection => 'Wake-on-LAN';
+
+  @override
+  String get wolIntro =>
+      'Optional. Wakes this server from the server list with a magic packet when it is asleep or off. Wake-on-LAN must be switched on in the NAS\'s BIOS or UEFI.';
+
+  @override
+  String get wolMac => 'MAC address';
+
+  @override
+  String get wolMacHint => 'AA:BB:CC:DD:EE:FF';
+
+  @override
+  String get wolMacInvalid => 'Enter a MAC address like AA:BB:CC:DD:EE:FF';
+
+  @override
+  String get wolBroadcast => 'Broadcast address';
+
+  @override
+  String get wolBroadcastHelp =>
+      'Empty means 255.255.255.255. If the NAS does not wake, use your network\'s own, such as 192.168.1.255.';
+
+  @override
+  String get wolPort => 'Port';
+
+  @override
+  String get wolPortInvalid => 'Enter a port from 1 to 65535';
+
+  @override
+  String get wolFetch => 'Get the MAC address from the server';
+
+  @override
+  String get wolFetchNone =>
+      'The server reported no network card with a MAC address.';
+
+  @override
+  String get wolChooseCard => 'Which network card wakes the server?';
+
+  @override
+  String get wolWake => 'Wake up';
+
+  @override
+  String wolSent(String name) {
+    return 'Wake-up sent to $name. It can take a minute to start.';
+  }
+
+  @override
+  String wolFailed(String error) {
+    return 'Could not send the wake-up: $error';
+  }
+
+  @override
   String get fieldUsername => 'Username';
 
   @override

@@ -1,5 +1,6 @@
 import '../api/credentials.dart';
 import '../api/server_address.dart';
+import '../wol/wake_on_lan.dart';
 
 enum AuthMethod { apiKey, password }
 
@@ -16,6 +17,7 @@ class ServerInstance {
     required this.secret,
     this.pinnedFingerprint,
     this.lastApiVersion,
+    this.wol,
   });
 
   factory ServerInstance.fromJson(Map<String, dynamic> json) => ServerInstance(
@@ -27,6 +29,7 @@ class ServerInstance {
     secret: json['secret'] as String,
     pinnedFingerprint: json['pinnedFingerprint'] as String?,
     lastApiVersion: json['lastApiVersion'] as String?,
+    wol: _wolFromJson(json['wol']),
   );
 
   final String id;
@@ -43,6 +46,9 @@ class ServerInstance {
 
   /// API version used on the last successful connection, e.g. `v25.10.5`.
   final String? lastApiVersion;
+
+  /// How to wake this server with a magic packet, when the user set it up.
+  final WakeOnLanSettings? wol;
 
   ServerAddress get address => ServerAddress.tryParse(url)!;
 
@@ -62,6 +68,7 @@ class ServerInstance {
     String? secret,
     String? Function()? pinnedFingerprint,
     String? lastApiVersion,
+    WakeOnLanSettings? Function()? wol,
   }) => ServerInstance(
     id: id,
     name: name ?? this.name,
@@ -73,6 +80,7 @@ class ServerInstance {
         ? pinnedFingerprint()
         : this.pinnedFingerprint,
     lastApiVersion: lastApiVersion ?? this.lastApiVersion,
+    wol: wol != null ? wol() : this.wol,
   );
 
   Map<String, dynamic> toJson() => {
@@ -84,5 +92,13 @@ class ServerInstance {
     'secret': secret,
     'pinnedFingerprint': pinnedFingerprint,
     'lastApiVersion': lastApiVersion,
+    if (wol != null) 'wol': wol!.toJson(),
   };
+}
+
+/// Damaged Wake-on-LAN data only loses that feature, never the server.
+WakeOnLanSettings? _wolFromJson(Object? json) {
+  if (json is! Map) return null;
+  final settings = WakeOnLanSettings.fromJson(Map<String, dynamic>.from(json));
+  return settings.mac.isEmpty ? null : settings;
 }

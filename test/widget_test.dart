@@ -83,6 +83,10 @@ void main() {
   });
 
   testWidgets('adds a server from the form', (tester) async {
+    // Tall enough for the whole form, since a list only builds what shows.
+    tester.view.physicalSize = const Size(800, 2400);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
     final store = MemoryStore();
     await tester.pumpWidget(_app(store));
     await tester.pumpAndSettle();

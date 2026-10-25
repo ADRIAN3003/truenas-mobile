@@ -133,6 +133,7 @@ class NetInterface {
     required this.dhcp,
     this.description,
     this.mtu,
+    this.mac,
   });
 
   factory NetInterface.fromJson(Map<String, dynamic> json) {
@@ -145,6 +146,7 @@ class NetInterface {
       dhcp: json['ipv4_dhcp'] == true,
       description: description.isEmpty ? null : description,
       mtu: state['mtu'] is num ? (state['mtu'] as num).toInt() : null,
+      mac: _macOf(state),
     );
   }
 
@@ -156,6 +158,17 @@ class NetInterface {
   final bool dhcp;
   final String? description;
   final int? mtu;
+
+  /// The card's own MAC address (what Wake-on-LAN needs), when known.
+  final String? mac;
+}
+
+String? _macOf(Map<String, dynamic> state) {
+  for (final key in ['hardware_link_address', 'link_address']) {
+    final value = state[key];
+    if (value is String && value.isNotEmpty) return value;
+  }
+  return null;
 }
 
 /// A certificate from `certificate.query`.

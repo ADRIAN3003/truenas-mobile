@@ -15,6 +15,7 @@ import '../../shared/widgets.dart';
 import '../server/server_screen.dart';
 import '../settings/settings_screen.dart';
 import 'server_form_screen.dart';
+import 'wake_server.dart';
 
 /// Widest the list grows on tablets, so cards stay readable.
 const _maxWidth = 640.0;
@@ -187,6 +188,12 @@ class _ServerCard extends ConsumerWidget {
                         ],
                       ),
                     ),
+                    if (instance.wol != null)
+                      IconButton(
+                        tooltip: l10n.wolWake,
+                        onPressed: () => wakeServer(context, ref, instance),
+                        icon: const Icon(Icons.power_settings_new_rounded),
+                      ),
                     _Menu(instance),
                   ],
                 ),

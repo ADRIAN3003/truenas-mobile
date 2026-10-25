@@ -18,6 +18,7 @@ import '../../shared/connect_dialogs.dart';
 import '../../shared/glass.dart';
 import '../../shared/haptics.dart';
 import '../../shared/widgets.dart';
+import '../instances/wake_server.dart';
 import '../jobs/job_gauge_button.dart';
 import '../jobs/job_progress_banner.dart';
 import '../jobs/job_texts.dart';
@@ -409,6 +410,9 @@ class _ServerScreenState extends ConsumerState<ServerScreen>
           ? _ErrorState(
               message: describeConnectError(l10n, _error!),
               onRetry: _connect,
+              onWake: instance?.wol == null
+                  ? null
+                  : () => wakeServer(context, ref, instance!),
             )
           : Center(
               child: Column(
@@ -425,10 +429,17 @@ class _ServerScreenState extends ConsumerState<ServerScreen>
 }
 
 class _ErrorState extends StatelessWidget {
-  const _ErrorState({required this.message, required this.onRetry});
+  const _ErrorState({
+    required this.message,
+    required this.onRetry,
+    this.onWake,
+  });
 
   final String message;
   final VoidCallback onRetry;
+
+  /// Sends the server's magic packet; null when it has no Wake-on-LAN setup.
+  final VoidCallback? onWake;
 
   @override
   Widget build(BuildContext context) {
@@ -447,6 +458,14 @@ class _ErrorState extends StatelessWidget {
               onPressed: onRetry,
               child: Text(AppLocalizations.of(context).retry),
             ),
+            if (onWake != null) ...[
+              const SizedBox(height: 8),
+              TextButton.icon(
+                onPressed: onWake,
+                icon: const Icon(Icons.power_settings_new_rounded),
+                label: Text(AppLocalizations.of(context).wolWake),
+              ),
+            ],
           ],
         ),
       ),

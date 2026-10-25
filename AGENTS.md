@@ -292,6 +292,17 @@ README covers what the app does; this file covers how to work on it.
   `ReportingApi.isAvailable`. Fake server: `reporting`, `failingGraphs`,
   `hiddenGraphs`, `sampleReportingData`. The exact data shape on a real
   server (legend names, `arcsize` columns) is unconfirmed: check it on a NAS.
+- App logs (`lib/features/workloads/app_logs_screen.dart`, `WorkloadsApi.appLogs`):
+  "Logs" in an app's menu and screen follows a container's output without a
+  shell. Containers come from `app.container_console_choices` (as for the
+  shell), the lines from the `app.container_log_follow:{app_name,
+  container_id, tail_lines}` event source through `core.subscribe`; each event
+  has `fields.data` (the line, ANSI codes stripped client side) and optionally
+  `timestamp`. `subscribe` accepts events named with or without the argument
+  suffix, since which one the middleware uses is unconfirmed on a real NAS. A
+  reconnect resubscribes and the server resends the tail, so the screen clears
+  first. Docker apps have no events API, so there is no separate events view.
+  Fake server: `appLogLines`, `pushLogLine`, `logCollectionWithArgs`.
 - Wake-on-LAN (`lib/core/wol/wake_on_lan.dart`): optional per server
   (`ServerInstance.wol`, a `WakeOnLanSettings` with MAC, broadcast address and
   port; null until a MAC is entered, and damaged data only loses the feature,

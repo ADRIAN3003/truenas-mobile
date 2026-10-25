@@ -292,6 +292,9 @@ class FakeTrueNasServer {
   /// Version offered by the update check, or null when up to date.
   String? availableUpdate = '25.10.8';
 
+  /// An update is installed and waits for a restart.
+  bool rebootRequired = false;
+
   /// Token handed out by `auth.generate_token` and accepted by `/websocket/shell/`.
   String shellToken = 'shell-token';
   List<dynamic>? shellTokenParams;
@@ -973,7 +976,7 @@ class FakeTrueNasServer {
             ];
           case 'update.status':
             result = {
-              'code': 'NORMAL',
+              'code': rebootRequired ? 'REBOOT_REQUIRED' : 'NORMAL',
               'error': null,
               'status': {
                 'current_version': {'version': '25.10.7'},
@@ -982,11 +985,15 @@ class FakeTrueNasServer {
                     : {
                         'version': availableUpdate,
                         'release_notes_url': 'https://example.com/notes',
+                        'filesize': 1073741824,
+                        'changelog': 'Fixes for SMB and apps.',
                       },
               },
             };
           case 'update.check_available':
-            result = availableUpdate == null
+            result = rebootRequired
+                ? {'status': 'REBOOT_REQUIRED'}
+                : availableUpdate == null
                 ? {'status': 'UNAVAILABLE'}
                 : {'status': 'AVAILABLE', 'version': availableUpdate};
           case 'update.run' || 'update.update':

@@ -3721,5 +3721,34 @@
   "settingsHomeWidgetsHint": "Keep widgets up to date in the background, about every 15 minutes. They also update while a server is open. Add them from your home screen; the phone decides when a refresh really runs.",
   "@settingsHomeWidgetsHint": {
     "description": "Hint under the home screen widgets switch."
+  },
+  "updateInstallLater": "Install, restart later",
+  "@updateInstallLater": {
+    "description": "Button that installs a system update without restarting."
+  },
+  "updateInstallLaterBody": "The server downloads and installs the update but keeps running. It takes effect the next time the server restarts.",
+  "@updateInstallLaterBody": {
+    "description": "Confirmation body."
+  },
+  "updateStartedNoRestart": "Update started. Restart the server to finish it.",
+  "@updateStartedNoRestart": {
+    "description": "Snackbar."
+  },
+  "updateRestartNow": "Restart now",
+  "@updateRestartNow": {
+    "description": "Button shown when an update is installed and waits for a restart."
+  },
+  "updateChangelog": "Changes",
+  "@updateChangelog": {
+    "description": "Expandable list of what an update changes."
+  },
+  "updateDownloadSize": "Download size: {size}",
+  "@updateDownloadSize": {
+    "description": "Size of a system update download.",
+    "placeholders": {
+      "size": {
+        "type": "String"
+      }
+    }
   }
 }

@@ -744,5 +744,11 @@
   "homeWidgetIdle": "Nem fut scrub vagy felhő szinkron",
   "homeWidgetMemoryText": "{used} / {total}",
   "settingsHomeWidgets": "Kezdőképernyős widgetek",
-  "settingsHomeWidgetsHint": "Widgetek frissítése a háttérben, nagyjából 15 percenként. Nyitott szervernél is frissülnek. A kezdőképernyőről adhatod hozzá őket; a telefon dönti el, mikor fut le valójában a frissítés."
+  "settingsHomeWidgetsHint": "Widgetek frissítése a háttérben, nagyjából 15 percenként. Nyitott szervernél is frissülnek. A kezdőképernyőről adhatod hozzá őket; a telefon dönti el, mikor fut le valójában a frissítés.",
+  "updateInstallLater": "Telepítés, újraindítás később",
+  "updateInstallLaterBody": "A szerver letölti és telepíti a frissítést, de tovább fut. A következő újraindításkor lép életbe.",
+  "updateStartedNoRestart": "A frissítés elindult. A befejezéshez indítsd újra a szervert.",
+  "updateRestartNow": "Újraindítás most",
+  "updateChangelog": "Változások",
+  "updateDownloadSize": "Letöltés mérete: {size}"
 }

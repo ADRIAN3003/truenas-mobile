@@ -247,6 +247,8 @@ class UpdateInfo {
     required this.rebootRequired,
     this.version,
     this.releaseNotesUrl,
+    this.changelog,
+    this.sizeBytes,
     this.error,
   });
 
@@ -257,9 +259,11 @@ class UpdateInfo {
     final error = asMap(json['error']);
     return UpdateInfo(
       available: newVersion.isNotEmpty,
-      rebootRequired: false,
+      rebootRequired: json['code'] == 'REBOOT_REQUIRED',
       version: newVersion['version'] as String?,
       releaseNotesUrl: newVersion['release_notes_url'] as String?,
+      changelog: _text(newVersion['changelog']),
+      sizeBytes: _bytes(newVersion['filesize']),
       error: json['code'] == 'ERROR' ? error['reason'] as String? : null,
     );
   }
@@ -270,6 +274,8 @@ class UpdateInfo {
     rebootRequired: json['status'] == 'REBOOT_REQUIRED',
     version: json['version'] as String?,
     releaseNotesUrl: json['release_notes_url'] as String?,
+    changelog: _text(json['changelog']),
+    sizeBytes: _bytes(json['filesize']),
   );
 
   final bool available;
@@ -278,8 +284,21 @@ class UpdateInfo {
   final bool rebootRequired;
   final String? version;
   final String? releaseNotesUrl;
+
+  /// What changed, as the server words it. Absent on many servers.
+  final String? changelog;
+
+  /// Size of the download, when the server says.
+  final int? sizeBytes;
   final String? error;
 }
+
+String? _text(Object? value) {
+  final text = value?.toString().trim();
+  return text == null || text.isEmpty ? null : text;
+}
+
+int? _bytes(Object? value) => value is num && value > 0 ? value.toInt() : null;
 
 List<String> _strings(Object? value) => [
   if (value is List)

@@ -352,9 +352,12 @@ struct ActivityBody: View {
       HStack(alignment: .top, spacing: 12) {
         AppsSummary(apps: server.apps, compact: false)
           .frame(maxWidth: .infinity, alignment: .leading)
-        VStack(alignment: .leading, spacing: 6) {
-          ForEach(Array(jobs.prefix(3).enumerated()), id: \.offset) { _, item in
-            JobRow(item: item)
+        // Three jobs with a detail line each are taller than the widget, so
+        // from three on the rows are compact.
+        let shown = Array(jobs.prefix(3))
+        VStack(alignment: .leading, spacing: shown.count > 2 ? 4 : 6) {
+          ForEach(Array(shown.enumerated()), id: \.offset) { _, item in
+            JobRow(item: item, compact: shown.count > 2)
           }
           if jobs.isEmpty && server.jobs != nil {
             Text(verbatim: document.label("idle", "No scrub or cloud sync running"))
@@ -400,9 +403,17 @@ struct AppsSummary: View {
 struct JobRow: View {
   let item: JobItem
   var showDetail = true
+  /// Two lines at most: the detail only shows (beside the title) while there
+  /// is no percentage, so three rows fit a medium widget.
+  var compact = false
 
   private var symbol: String {
     item.kind == "scrub" ? "arrow.triangle.2.circlepath" : "icloud.and.arrow.up"
+  }
+
+  private var detail: String? {
+    guard let detail = item.detail, !detail.isEmpty else { return nil }
+    return detail
   }
 
   var body: some View {
@@ -419,13 +430,18 @@ struct JobRow: View {
           Text(verbatim: "\(Int(percent.rounded()))%")
             .font(.caption2.monospacedDigit())
             .foregroundStyle(.secondary)
+        } else if compact, showDetail, let detail {
+          Text(verbatim: detail)
+            .font(.caption2)
+            .foregroundStyle(.secondary)
+            .lineLimit(1)
         }
       }
       if let percent = item.percent {
         ProgressView(value: min(max(percent / 100, 0), 1))
           .tint(.blue)
       }
-      if showDetail, let detail = item.detail, !detail.isEmpty {
+      if !compact, showDetail, let detail {
         Text(verbatim: detail)
           .font(.caption2)
           .foregroundStyle(.secondary)

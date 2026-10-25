@@ -292,6 +292,16 @@ README covers what the app does; this file covers how to work on it.
   `ReportingApi.isAvailable`. Fake server: `reporting`, `failingGraphs`,
   `hiddenGraphs`, `sampleReportingData`. The exact data shape on a real
   server (legend names, `arcsize` columns) is unconfirmed: check it on a NAS.
+- Disk health (`lib/features/storage/disk_screen.dart`, `StorageApi.smartResults`
+  and `runSmartTest`): `smart.test.results` filtered on `["disk","=",name]`
+  gives `tests` (newest first, `num` 1 is the newest; `status` SUCCESS, RUNNING,
+  ABORTED or a failure) and `current_test.progress`; `smart.test.manual_test`
+  takes `[[{identifier, type: SHORT|LONG|CONVEYANCE|OFFLINE}]]` (the disk's
+  `identifier`) and reports a refusal per disk in `error`, not as an RPC error.
+  Both are gated on `core.get_methods`; the screen polls every 10 s while a test
+  runs. The exact payloads are written from the middleware source and unconfirmed
+  on a real NAS: check them on one. Fake server: `smart`, `smartTests`,
+  `smartProgress`, `smartRejection`.
 - System updates and power (`SystemApi`, `lib/features/system/updates_screen.dart`,
   `power_actions.dart`): `UpdateInfo` is normalised across `update.status`
   (code `REBOOT_REQUIRED`, `new_version.filesize/changelog`, both optional) and

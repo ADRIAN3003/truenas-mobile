@@ -367,6 +367,97 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String get diskTemperature => 'Hőmérséklet';
+
+  @override
+  String get diskSmartTitle => 'S.M.A.R.T.';
+
+  @override
+  String get diskSmartOff =>
+      'A S.M.A.R.T. figyelés ki van kapcsolva ennél a lemeznél.';
+
+  @override
+  String get diskSmartUnavailable =>
+      'Ez a szerver nem ad S.M.A.R.T. tesztadatokat.';
+
+  @override
+  String get diskSmartNoTests => 'Még nem futott önteszt.';
+
+  @override
+  String get diskSmartLastPassed => 'Az utolsó önteszt sikeres volt';
+
+  @override
+  String get diskSmartLastFailed => 'Az utolsó önteszt hibát talált';
+
+  @override
+  String get diskSmartLastAborted => 'Az utolsó öntesztet megszakították';
+
+  @override
+  String diskSmartRunning(String percent) {
+    return '$percent% kész';
+  }
+
+  @override
+  String get diskSmartRun => 'Teszt indítása';
+
+  @override
+  String get diskSmartRunTitle => 'Önteszt indítása';
+
+  @override
+  String diskSmartStarted(String test, String disk) {
+    return '$test teszt elindult: $disk';
+  }
+
+  @override
+  String get smartTestShort => 'Rövid';
+
+  @override
+  String get smartTestShortHint => 'pár perc';
+
+  @override
+  String get smartTestLong => 'Hosszú';
+
+  @override
+  String get smartTestLongHint => 'órákig tart';
+
+  @override
+  String get smartTestConveyance => 'Szállítási';
+
+  @override
+  String get smartTestConveyanceHint => 'pár perc, csak ATA';
+
+  @override
+  String get smartTestOffline => 'Offline';
+
+  @override
+  String get smartTestOfflineHint => 'csak ATA';
+
+  @override
+  String get diskSmartHistory => 'Öntesztek előzményei';
+
+  @override
+  String get smartStatusPassed => 'Sikeres';
+
+  @override
+  String get smartStatusRunning => 'Fut';
+
+  @override
+  String get smartStatusAborted => 'Megszakítva';
+
+  @override
+  String get smartStatusFailed => 'Hibás';
+
+  @override
+  String diskSmartLifetime(int hours) {
+    return '$hours üzemóra után';
+  }
+
+  @override
+  String diskSmartFirstError(int lba) {
+    return 'Az első hiba a(z) $lba. blokknál';
+  }
+
+  @override
   String get scrubTitle => 'Scrub';
 
   @override

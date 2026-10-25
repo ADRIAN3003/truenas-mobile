@@ -3,8 +3,11 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:truenas_mobile/core/instances/server_instance.dart';
+import 'package:truenas_mobile/core/models/storage.dart';
 import 'package:truenas_mobile/core/session/truenas_session.dart';
 import 'package:truenas_mobile/features/storage/datasets_screen.dart';
+import 'package:truenas_mobile/features/storage/disks_screen.dart';
+import 'package:truenas_mobile/features/storage/disk_screen.dart';
 import 'package:truenas_mobile/features/storage/pool_screen.dart';
 import 'package:truenas_mobile/features/storage/snapshots_screen.dart';
 import 'package:truenas_mobile/features/storage/storage_tab.dart';
@@ -68,6 +71,117 @@ void main() {
 
     expect(find.text('tank'), findsOneWidget);
     expect(find.text('Disks'), findsOneWidget);
+    await disconnect(tester);
+  });
+
+  testWidgets('a disk opens with its temperature and self-test log', (
+    tester,
+  ) async {
+    await connect(tester);
+    await tester.pumpWidget(wrap(DisksScreen(session: session)));
+    await settle(tester);
+
+    await tester.tap(find.textContaining('sda'));
+    await settle(tester);
+
+    expect(find.text('34 °C'), findsOneWidget);
+    expect(find.text('Last self-test passed'), findsOneWidget);
+    expect(find.text('Short offline'), findsOneWidget);
+    expect(find.text('Extended offline'), findsOneWidget);
+    expect(find.text('Failed'), findsOneWidget);
+    expect(find.textContaining('First error at block 4096'), findsOneWidget);
+    await disconnect(tester);
+  });
+
+  testWidgets('a self-test can be started from the disk screen', (
+    tester,
+  ) async {
+    await connect(tester);
+    await tester.pumpWidget(
+      wrap(
+        DiskScreen(
+          session: session,
+          disk: const Disk(
+            name: 'sda',
+            identifier: '{serial}S1',
+            size: 4000000000000,
+            isSsd: false,
+          ),
+        ),
+      ),
+    );
+    await settle(tester);
+
+    await tester.tap(find.text('Run a test'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Long · hours'));
+    await tester.pump();
+    await tester.runAsync(
+      () => Future<void>.delayed(const Duration(milliseconds: 100)),
+    );
+    await tester.pump();
+
+    expect(find.text('Long test started on sda'), findsOneWidget);
+    expect(
+      server.calls.any(
+        (c) =>
+            c.$1 == 'smart.test.manual_test' &&
+            (c.$2.first as List).first['type'] == 'LONG',
+      ),
+      isTrue,
+    );
+    // Let the delayed refresh finish before the screen goes.
+    await tester.pump(const Duration(seconds: 3));
+    await disconnect(tester);
+  });
+
+  testWidgets('a running self-test shows progress and blocks a new one', (
+    tester,
+  ) async {
+    await connect(tester);
+    server.smartProgress = 40;
+    await tester.pumpWidget(
+      wrap(
+        DiskScreen(
+          session: session,
+          disk: const Disk(name: 'sda', size: 4000000000000, isSsd: false),
+        ),
+      ),
+    );
+    await settle(tester);
+
+    expect(find.text('40% done'), findsOneWidget);
+    expect(find.text('Running'), findsOneWidget);
+    final button = tester.widget<ButtonStyleButton>(
+      find.ancestor(
+        of: find.text('Run a test'),
+        matching: find.bySubtype<ButtonStyleButton>(),
+      ),
+    );
+    expect(button.onPressed, isNull);
+    await disconnect(tester);
+  });
+
+  testWidgets('the disk screen copes with a server without smart tests', (
+    tester,
+  ) async {
+    await connect(tester);
+    server.smart = false;
+    await tester.pumpWidget(
+      wrap(
+        DiskScreen(
+          session: session,
+          disk: const Disk(name: 'sda', size: 4000000000000, isSsd: false),
+        ),
+      ),
+    );
+    await settle(tester);
+
+    expect(
+      find.text('This server does not report S.M.A.R.T. test results.'),
+      findsOneWidget,
+    );
+    expect(find.text('Run a test'), findsNothing);
     await disconnect(tester);
   });
 

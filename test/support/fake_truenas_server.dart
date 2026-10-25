@@ -95,6 +95,37 @@ class FakeTrueNasServer {
   /// (`netdata_graphs`, `netdata_get_data`), otherwise `graphs`, `get_data`.
   bool reporting = true;
 
+  /// Whether the server has the `smart.test` methods.
+  bool smart = true;
+
+  /// The self-test log of `sda`, newest first.
+  List<Map<String, dynamic>> smartTests = [
+    {
+      'num': 1,
+      'description': 'Short offline',
+      'status': 'SUCCESS',
+      'status_verbose': 'Completed without error',
+      'remaining': 0,
+      'lifetime': 12345,
+      'lba_of_first_error': null,
+    },
+    {
+      'num': 2,
+      'description': 'Extended offline',
+      'status': 'FAILED',
+      'status_verbose': 'Completed: read failure',
+      'remaining': 10,
+      'lifetime': 12000,
+      'lba_of_first_error': 4096,
+    },
+  ];
+
+  /// Percent done of the self-test running on `sda`, null when none runs.
+  double? smartProgress;
+
+  /// Set to make `smart.test.manual_test` answer with this error.
+  String? smartRejection;
+
   /// Graphs whose `get_data` answers with an error.
   final failingGraphs = <String>{};
 
@@ -633,6 +664,9 @@ class FakeTrueNasServer {
                 ])
                   '$service.$m': <String, dynamic>{},
               if (service == 'core') 'core.bulk': <String, dynamic>{},
+              if (service == 'smart.test' && smart)
+                for (final m in ['results', 'manual_test'])
+                  'smart.test.$m': <String, dynamic>{},
               if (service == 'service' && !legacy)
                 'service.control': <String, dynamic>{},
               if (service == 'nvmet.subsys' && !legacy)
@@ -1055,6 +1089,8 @@ class FakeTrueNasServer {
             result = [
               {
                 'name': 'sda',
+                'identifier': '{serial}S1',
+                'togglesmart': true,
                 'size': 4000000000000,
                 'type': 'HDD',
                 'serial': 'S1',
@@ -1069,6 +1105,29 @@ class FakeTrueNasServer {
                 'serial': 'S2',
                 'model': 'Samsung 980',
                 'pool': null,
+              },
+            ];
+          case 'smart.test.results':
+            final disk = ((params.first as List).first as List)[2];
+            result = [
+              if (disk == 'sda')
+                {
+                  'disk': 'sda',
+                  'tests': smartTests,
+                  'current_test': smartProgress == null
+                      ? null
+                      : {'progress': smartProgress},
+                },
+            ];
+          case 'smart.test.manual_test':
+            final test = (params.first as List).first as Map<String, dynamic>;
+            result = [
+              {
+                'disk': test['identifier'],
+                'identifier': test['identifier'],
+                'error': smartRejection,
+                'expected_result_time': null,
+                'job': null,
               },
             ];
           case 'disk.temperatures':

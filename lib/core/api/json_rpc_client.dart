@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:stream_channel/stream_channel.dart';
 
+import '../logging/app_log.dart';
 import 'api_exception.dart';
 
 /// A server-initiated JSON-RPC notification, such as `collection_update`.
@@ -58,13 +59,23 @@ class JsonRpcClient {
         'params': params,
       }),
     );
-    return completer.future.timeout(
-      timeout,
-      onTimeout: () {
-        _pending.remove(id);
-        throw ApiException('Call to $method timed out');
-      },
-    );
+    return completer.future
+        .timeout(
+          timeout,
+          onTimeout: () {
+            _pending.remove(id);
+            throw ApiException('Call to $method timed out');
+          },
+        )
+        .onError<ApiException>((error, stack) {
+          // Only the method and the answer, never the parameters, which
+          // carry passwords and keys. A lost connection is logged once in
+          // [_onDone].
+          if (error.code != null || error.message.endsWith('timed out')) {
+            AppLog.instance.warning('rpc', '$method failed: $error');
+          }
+          throw error;
+        });
   }
 
   Future<void> close() async {
@@ -104,6 +115,9 @@ class JsonRpcClient {
   void _onDone(Object? error) {
     if (_closed) return;
     _closed = true;
+    if (error != null) {
+      AppLog.instance.warning('connection', 'Socket error: $error');
+    }
     final failure = ApiException(
       error == null ? 'Connection closed' : 'Connection lost: $error',
     );

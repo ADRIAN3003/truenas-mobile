@@ -2904,4 +2904,42 @@ class AppLocalizationsEn extends AppLocalizations {
   String updateDownloadSize(String size) {
     return 'Download size: $size';
   }
+
+  @override
+  String get settingsErrorLog => 'Error log';
+
+  @override
+  String get logTitle => 'Error log';
+
+  @override
+  String get logNote =>
+      'Errors and failed connections are kept here, on this phone only. Passwords and keys are left out, but server addresses are not: look through the log before you share it.';
+
+  @override
+  String get logEmptyTitle => 'Nothing recorded';
+
+  @override
+  String get logEmptyBody => 'Errors the app runs into show up here.';
+
+  @override
+  String get logShare => 'Share';
+
+  @override
+  String get logClear => 'Clear log';
+
+  @override
+  String get logClearBody =>
+      'This removes every entry from the log on this phone.';
+
+  @override
+  String get logClearConfirm => 'Clear';
+
+  @override
+  String get logCopied => 'Log copied';
+
+  @override
+  String get logShareFailed => 'Could not share the log';
+
+  @override
+  String get logDetails => 'Details';
 }

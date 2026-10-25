@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:web_socket_channel/io.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
+import '../logging/app_log.dart';
 import 'api_exception.dart';
 import 'api_version.dart';
 import 'certificate_trust.dart';
@@ -69,17 +70,21 @@ class TrueNasConnection {
       );
       await channel.ready.timeout(timeout);
       return TrueNasConnection._(address, version, JsonRpcClient(channel), tls);
-    } on UnsupportedServerException {
+    } on UnsupportedServerException catch (error) {
+      AppLog.instance.warning('connect', '${address.uri.host}: $error');
       rethrow;
-    } on ApiException {
+    } on ApiException catch (error) {
+      AppLog.instance.warning('connect', '${address.uri.host}: $error');
       rethrow;
     } catch (error) {
       final rejection = tls.rejection;
+      // A certificate to confirm is a question for the user, not a failure.
       if (rejection != null) throw rejection;
-      if (error is TimeoutException) {
-        throw ApiException('Timed out connecting to ${address.uri.host}');
-      }
-      throw ApiException('Could not connect to ${address.uri.host}: $error');
+      final failure = error is TimeoutException
+          ? ApiException('Timed out connecting to ${address.uri.host}')
+          : ApiException('Could not connect to ${address.uri.host}: $error');
+      AppLog.instance.warning('connect', failure.toString());
+      throw failure;
     }
   }
 

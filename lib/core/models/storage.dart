@@ -239,10 +239,12 @@ class Disk {
     required this.name,
     required this.size,
     required this.isSsd,
+    this.identifier,
     this.serial,
     this.model,
     this.pool,
     this.rotationRate,
+    this.smartEnabled = true,
     this.temperature,
   });
 
@@ -250,23 +252,31 @@ class Disk {
     name: (json['name'] ?? json['devname'] ?? '').toString(),
     size: asInt(json['size']),
     isSsd: json['type'] == 'SSD',
+    identifier: json['identifier'] as String?,
     serial: json['serial'] as String?,
     model: json['model'] as String?,
     pool: json['pool'] as String?,
     rotationRate: json['rotationrate'] is num
         ? (json['rotationrate'] as num).toInt()
         : null,
+    smartEnabled: json['togglesmart'] != false,
   );
 
   final String name;
   final int size;
   final bool isSsd;
+
+  /// What `smart.test.manual_test` calls the disk.
+  final String? identifier;
   final String? serial;
   final String? model;
 
   /// Pool the disk belongs to, or null when unused.
   final String? pool;
   final int? rotationRate;
+
+  /// Whether S.M.A.R.T. monitoring is switched on for the disk.
+  final bool smartEnabled;
 
   /// Degrees Celsius, when the server reports it.
   final double? temperature;
@@ -275,10 +285,109 @@ class Disk {
     name: name,
     size: size,
     isSsd: isSsd,
+    identifier: identifier,
     serial: serial,
     model: model,
     pool: pool,
     rotationRate: rotationRate,
+    smartEnabled: smartEnabled,
     temperature: value,
   );
+}
+
+/// The kinds of S.M.A.R.T. self-test (`smart.test.manual_test` `type`).
+enum SmartTestType {
+  short('SHORT'),
+  long('LONG'),
+  conveyance('CONVEYANCE'),
+  offline('OFFLINE');
+
+  const SmartTestType(this.apiName);
+
+  final String apiName;
+}
+
+/// One entry of a disk's self-test log (`smart.test.results`).
+class SmartTest {
+  const SmartTest({
+    required this.number,
+    required this.description,
+    required this.status,
+    this.statusVerbose,
+    this.remaining,
+    this.lifetime,
+    this.lbaOfFirstError,
+  });
+
+  factory SmartTest.fromJson(Map<String, dynamic> json) => SmartTest(
+    number: asInt(json['num']),
+    description: (json['description'] ?? '').toString(),
+    status: (json['status'] ?? '').toString(),
+    statusVerbose: json['status_verbose'] as String?,
+    remaining: json['remaining'] is num
+        ? (json['remaining'] as num).toDouble()
+        : null,
+    lifetime: json['lifetime'] is num
+        ? (json['lifetime'] as num).toInt()
+        : null,
+    lbaOfFirstError: json['lba_of_first_error'] is num
+        ? (json['lba_of_first_error'] as num).toInt()
+        : null,
+  );
+
+  final int number;
+
+  /// For example "Short offline".
+  final String description;
+
+  /// `SUCCESS`, `RUNNING`, `ABORTED` or a failure such as `FAILED`.
+  final String status;
+  final String? statusVerbose;
+
+  /// Percent still to do while the test runs.
+  final double? remaining;
+
+  /// Power-on hours when the test ran.
+  final int? lifetime;
+  final int? lbaOfFirstError;
+
+  bool get passed => status == 'SUCCESS';
+  bool get running => status == 'RUNNING';
+  bool get aborted => status == 'ABORTED';
+  bool get failed => !passed && !running && !aborted;
+}
+
+/// A disk's self-test log, newest test first, and the test running now.
+class SmartResults {
+  const SmartResults({required this.tests, this.progress});
+
+  factory SmartResults.fromJson(Map<String, dynamic> json) {
+    final current = json['current_test'];
+    return SmartResults(
+      tests: [
+        for (final test in (json['tests'] as List<dynamic>? ?? const []))
+          SmartTest.fromJson(asMap(test)),
+      ]..sort((a, b) => a.number.compareTo(b.number)),
+      progress: current is Map && current['progress'] is num
+          ? (current['progress'] as num).toDouble()
+          : null,
+    );
+  }
+
+  static const none = SmartResults(tests: []);
+
+  final List<SmartTest> tests;
+
+  /// Percent done of the running test, null when none runs.
+  final double? progress;
+
+  bool get running => progress != null || tests.any((t) => t.running);
+
+  /// The newest test that has finished, running ones skipped.
+  SmartTest? get lastFinished {
+    for (final test in tests) {
+      if (!test.running) return test;
+    }
+    return null;
+  }
 }

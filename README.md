@@ -41,7 +41,8 @@ for Android and iOS that talks to the official TrueNAS middleware API
   all of this off.
 - **Storage:** pools with layout, scrub start, pause and stop; datasets and
   zvols (create, delete); snapshots (browse, search, create, roll back, clone, delete); disks with
-  temperatures.
+  temperatures, their S.M.A.R.T. self-test log and a button to run a short,
+  long, conveyance or offline test.
 - **Data protection:** periodic snapshot, replication, cloud sync, TrueCloud
   backup and rsync tasks with their last result. Run, stop, enable or
   disable any of them, and add, edit or delete every kind.

@@ -3882,4 +3882,46 @@
       }
     }
   }
+  ,
+  "appLogsTitle": "Logs",
+  "@appLogsTitle": {
+    "description": "Button and menu entry that shows an app container's log."
+  },
+  "appLogsPickContainer": "Show the log of",
+  "@appLogsPickContainer": {
+    "description": "Title of the dialog that picks which app container's log to show."
+  },
+  "appLogsNoContainers": "This app has no containers to show a log for.",
+  "@appLogsNoContainers": {
+    "description": "Snackbar when an app has no container for a log."
+  },
+  "appLogsEmpty": "No output yet.",
+  "@appLogsEmpty": {
+    "description": "Shown when the container has not printed anything."
+  },
+  "appLogsNoMatches": "No lines match.",
+  "@appLogsNoMatches": {
+    "description": "Shown when the log filter matches nothing."
+  },
+  "appLogsFilter": "Filter lines",
+  "@appLogsFilter": {
+    "description": "Tooltip and hint of the log filter."
+  },
+  "appLogsFollow": "Jump to the latest line",
+  "@appLogsFollow": {
+    "description": "Tooltip of the button that scrolls the log to its end and follows it."
+  },
+  "appLogsClear": "Clear",
+  "@appLogsClear": {
+    "description": "Menu entry that empties the log on screen."
+  },
+  "appLogsLastLines": "Last {count} lines",
+  "@appLogsLastLines": {
+    "description": "Menu entry: how many of the latest log lines to load first.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
 }

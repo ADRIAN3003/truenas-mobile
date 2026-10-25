@@ -777,5 +777,14 @@
   "updateStartedNoRestart": "A frissítés elindult. A befejezéshez indítsd újra a szervert.",
   "updateRestartNow": "Újraindítás most",
   "updateChangelog": "Változások",
-  "updateDownloadSize": "Letöltés mérete: {size}"
+  "updateDownloadSize": "Letöltés mérete: {size}",
+  "appLogsTitle": "Naplók",
+  "appLogsPickContainer": "Melyik napló látszódjon",
+  "appLogsNoContainers": "Ennek az alkalmazásnak nincs konténere, aminek a naplóját meg lehetne mutatni.",
+  "appLogsEmpty": "Még nincs kimenet.",
+  "appLogsNoMatches": "Nincs találat.",
+  "appLogsFilter": "Sorok szűrése",
+  "appLogsFollow": "Ugrás a legutolsó sorra",
+  "appLogsClear": "Törlés",
+  "appLogsLastLines": "Utolsó {count} sor"
 }

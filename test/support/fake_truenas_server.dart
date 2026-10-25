@@ -514,6 +514,41 @@ class FakeTrueNasServer {
   /// Events passed to `core.subscribe`.
   final subscriptions = <String>[];
 
+  /// What `app.container_log_follow` sends first when subscribed to.
+  var appLogLines = <String>[
+    '2026-10-25T20:00:01Z INFO server started',
+    '2026-10-25T20:00:02Z WARN cache is cold',
+    '\x1B[31m2026-10-25T20:00:03Z ERROR disk not found\x1B[0m',
+  ];
+
+  /// Whether log events carry the arguments in their collection name
+  /// (`app.container_log_follow:{...}`) as well as the plain one.
+  var logCollectionWithArgs = false;
+  String? _logEvent;
+
+  /// Sends one more line to everyone following the log.
+  void pushLogLine(String line) {
+    final event = _logEvent;
+    if (event == null) return;
+    final collection = logCollectionWithArgs
+        ? event
+        : 'app.container_log_follow';
+    for (final socket in _apiSockets) {
+      socket.add(
+        jsonEncode({
+          'jsonrpc': '2.0',
+          'method': 'collection_update',
+          'params': {
+            'msg': 'added',
+            'collection': collection,
+            'id': 1,
+            'fields': {'data': line},
+          },
+        }),
+      );
+    }
+  }
+
   /// Paths of WebSocket connections, e.g. `/api/v25.10.5`.
   final connectedPaths = <String>[];
 
@@ -1167,6 +1202,11 @@ class FakeTrueNasServer {
         socket.add(
           jsonEncode({'jsonrpc': '2.0', 'id': message['id'], 'result': result}),
         );
+        if (message['method'] == 'core.subscribe' &&
+            (params.first as String).startsWith('app.container_log_follow:')) {
+          _logEvent = params.first as String;
+          appLogLines.forEach(pushLogLine);
+        }
         if (message['method'] == 'core.subscribe' &&
             params.first == 'reporting.realtime') {
           notify('reporting.realtime', 'added', sampleRealtimeStats);

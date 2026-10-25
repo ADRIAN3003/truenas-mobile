@@ -444,6 +444,11 @@ class _AppsTabState extends State<AppsTab> with LoadState<AppsTab, _Workloads> {
                             _busy.contains('app:${app.name}') ||
                             _waitingForRun(app),
                         actions: actionsFor(app.state, supported: _appActions),
+                        onLogs:
+                            app.state.isUp || app.state == WorkloadState.crashed
+                            ? () =>
+                                  openAppLogs(context, widget.session, app.name)
+                            : null,
                         onShell: app.state == WorkloadState.running
                             ? () => openAppShell(
                                 context,

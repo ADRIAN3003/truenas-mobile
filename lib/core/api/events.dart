@@ -57,7 +57,10 @@ extension EventSubscriptions on JsonRpcClient {
             return;
           }
           final update = CollectionUpdate.fromJson(params);
-          if (update.collection == collection) controller.add(update);
+          // An event source with arguments may be named with them or without.
+          if (update.collection == collection || update.collection == event) {
+            controller.add(update);
+          }
         }, onDone: controller.close);
         start();
         // A new connection has no subscriptions: ask again.

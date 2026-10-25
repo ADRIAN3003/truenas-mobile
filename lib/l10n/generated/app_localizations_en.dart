@@ -2884,6 +2884,13 @@ class AppLocalizationsEn extends AppLocalizations {
       'Keep widgets up to date in the background, about every 15 minutes. They also update while a server is open. Add them from your home screen; the phone decides when a refresh really runs.';
 
   @override
+  String get settingsShortcuts => 'Siri and Shortcuts';
+
+  @override
+  String get settingsShortcutsHint =>
+      'Let Siri and the Shortcuts app restart an app or run a cloud sync on your servers, without opening this app. They sign in with the details this app keeps for the widgets. Accounts with two-factor authentication can\'t be used.';
+
+  @override
   String get updateInstallLater => 'Install, restart later';
 
   @override

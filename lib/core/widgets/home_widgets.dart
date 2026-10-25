@@ -7,6 +7,7 @@ import 'package:home_widget/home_widget.dart';
 
 import '../instances/default_server.dart';
 import '../instances/server_instance.dart';
+import '../settings/settings_provider.dart';
 
 /// Where the home screen widgets read from. The real one is
 /// [PlatformHomeWidgets]; tests use a fake.
@@ -159,9 +160,15 @@ class PlatformHomeWidgets implements HomeWidgetsBridge {
 /// What the widgets know. Never throws: a widget that cannot be updated is
 /// no reason to fail whatever called this.
 class HomeWidgetPublisher {
-  HomeWidgetPublisher(this.bridge);
+  HomeWidgetPublisher(this.bridge, {bool Function()? shortcuts})
+    : _shortcuts = shortcuts ?? (() => true);
 
   final HomeWidgetsBridge bridge;
+
+  /// Whether Siri and Shortcuts may use the saved servers right now (the
+  /// `siriShortcuts` setting), asked each time the details are handed over so
+  /// a publisher kept for a while never writes an old answer.
+  final bool Function() _shortcuts;
 
   /// Saves [fresh] (the data of servers just looked at, by server id) and
   /// marks [unreachable] servers, keeping what was known about the rest.
@@ -198,11 +205,22 @@ class HomeWidgetPublisher {
           'servers': entries,
         }),
       );
-      await bridge.writeCredentials(_credentials(servers));
+      await bridge.writeCredentials(_credentials(servers, widgets: true));
       await bridge.reload();
     } catch (_) {
       // The widgets keep showing what they had.
     }
+  }
+
+  /// Hands over only the sign-in details, for Siri and Shortcuts while the
+  /// widgets are switched off. The widgets see they are not wanted and ignore
+  /// them. Without Shortcuts there is nothing to keep: they are removed.
+  Future<void> publishCredentials(List<ServerInstance> servers) async {
+    try {
+      await bridge.writeCredentials(
+        _shortcuts() ? _credentials(servers, widgets: false) : null,
+      );
+    } catch (_) {}
   }
 
   /// Forgets everything, as when the last server is removed or the widgets
@@ -221,24 +239,32 @@ class HomeWidgetPublisher {
   /// is its own process, and the phone may not wake the app to refresh it, so
   /// it asks the server directly; the details live in a Keychain group shared
   /// with it, never in the App Group's plain preferences.
-  String? _credentials(List<ServerInstance> servers) => servers.isEmpty
-      ? null
-      : jsonEncode({
-          'v': 1,
-          'servers': [
-            for (final server in servers)
-              {
-                'id': server.id,
-                'name': server.name,
-                'url': server.url,
-                'authMethod': server.authMethod.name,
-                'username': server.username,
-                'secret': server.secret,
-                'pinnedFingerprint': server.pinnedFingerprint,
-                'apiVersion': server.lastApiVersion,
-              },
-          ],
-        });
+  ///
+  /// `widgets` and `shortcuts` say who may use them: the home screen widgets
+  /// (the setting is on) and the Siri / Shortcuts actions. The same details
+  /// serve both, so each side checks its own flag. Null when neither wants them.
+  String? _credentials(List<ServerInstance> servers, {required bool widgets}) {
+    final shortcuts = _shortcuts();
+    if (servers.isEmpty || !(widgets || shortcuts)) return null;
+    return jsonEncode({
+      'v': 1,
+      'widgets': widgets,
+      'shortcuts': shortcuts,
+      'servers': [
+        for (final server in servers)
+          {
+            'id': server.id,
+            'name': server.name,
+            'url': server.url,
+            'authMethod': server.authMethod.name,
+            'username': server.username,
+            'secret': server.secret,
+            'pinnedFingerprint': server.pinnedFingerprint,
+            'apiVersion': server.lastApiVersion,
+          },
+      ],
+    });
+  }
 
   Map<String, Map<String, dynamic>> _parse(String? raw) {
     if (raw == null || raw.isEmpty) return {};
@@ -260,5 +286,8 @@ final homeWidgetsBridgeProvider = Provider<HomeWidgetsBridge>(
 );
 
 final homeWidgetPublisherProvider = Provider<HomeWidgetPublisher>(
-  (ref) => HomeWidgetPublisher(ref.watch(homeWidgetsBridgeProvider)),
+  (ref) => HomeWidgetPublisher(
+    ref.watch(homeWidgetsBridgeProvider),
+    shortcuts: () => ref.read(settingsProvider).siriShortcuts,
+  ),
 );

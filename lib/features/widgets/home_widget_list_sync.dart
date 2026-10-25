@@ -32,12 +32,19 @@ class _HomeWidgetListSyncState extends ConsumerState<HomeWidgetListSync> {
 
   Future<void> _publish() async {
     if (!mounted) return;
-    if (!ref.read(settingsProvider).homeWidgets) {
-      // Widgets switched off: the iOS ones must not keep the sign-in details.
-      await ref.read(homeWidgetsBridgeProvider).writeCredentials(null);
+    final settings = ref.read(settingsProvider);
+    final servers = ref.read(instancesProvider).value;
+    if (!settings.homeWidgets) {
+      // Widgets switched off: the iOS ones must not keep the sign-in details,
+      // but Siri and Shortcuts may still want them. A list that could not be
+      // read is not "no servers", so then those are left as they are.
+      if (servers != null) {
+        await ref.read(homeWidgetPublisherProvider).publishCredentials(servers);
+      } else if (!settings.siriShortcuts) {
+        await ref.read(homeWidgetsBridgeProvider).writeCredentials(null);
+      }
       return;
     }
-    final servers = ref.read(instancesProvider).value;
     // A list that could not be read is not "no servers".
     if (servers == null) return;
     final locale = Localizations.localeOf(context);
@@ -47,7 +54,7 @@ class _HomeWidgetListSyncState extends ConsumerState<HomeWidgetListSync> {
           servers: servers,
           fresh: const {},
           labels: homeWidgetLabels(localizationsFor(locale)),
-          chosenDefault: ref.read(settingsProvider).defaultServerId,
+          chosenDefault: settings.defaultServerId,
         );
   }
 
@@ -55,7 +62,9 @@ class _HomeWidgetListSyncState extends ConsumerState<HomeWidgetListSync> {
   Widget build(BuildContext context) {
     ref.listen(instancesProvider, (_, _) => unawaited(_publish()));
     ref.listen(
-      settingsProvider.select((s) => (s.homeWidgets, s.defaultServerId)),
+      settingsProvider.select(
+        (s) => (s.homeWidgets, s.siriShortcuts, s.defaultServerId),
+      ),
       (_, _) => unawaited(_publish()),
     );
     return widget.child;

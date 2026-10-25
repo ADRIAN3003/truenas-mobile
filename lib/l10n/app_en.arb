@@ -3853,6 +3853,14 @@
   "@settingsHomeWidgetsHint": {
     "description": "Hint under the home screen widgets switch."
   },
+  "settingsShortcuts": "Siri and Shortcuts",
+  "@settingsShortcuts": {
+    "description": "Switch in Settings (iOS) that lets Siri and the Shortcuts app act on the saved servers."
+  },
+  "settingsShortcutsHint": "Let Siri and the Shortcuts app restart an app or run a cloud sync on your servers, without opening this app. They sign in with the details this app keeps for the widgets. Accounts with two-factor authentication can't be used.",
+  "@settingsShortcutsHint": {
+    "description": "Hint under the Siri and Shortcuts switch."
+  },
   "updateInstallLater": "Install, restart later",
   "@updateInstallLater": {
     "description": "Button that installs a system update without restarting."

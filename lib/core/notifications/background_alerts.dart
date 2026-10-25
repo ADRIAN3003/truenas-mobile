@@ -119,7 +119,10 @@ Future<void> runBackgroundAlertCheck({
     muted: settings.mutedAlertKinds,
     widgets: forWidgets
         ? HomeWidgetCollector(
-            publisher: HomeWidgetPublisher(widgets),
+            publisher: HomeWidgetPublisher(
+              widgets,
+              shortcuts: () => settings.siriShortcuts,
+            ),
             locale: locale,
             chosenDefault: settings.defaultServerId,
           )

@@ -2856,6 +2856,13 @@ class AppLocalizationsHu extends AppLocalizations {
       'Widgetek frissítése a háttérben, nagyjából 15 percenként. Nyitott szervernél is frissülnek. A kezdőképernyőről adhatod hozzá őket; a telefon dönti el, mikor fut le valójában a frissítés.';
 
   @override
+  String get settingsShortcuts => 'Siri és Parancsok';
+
+  @override
+  String get settingsShortcutsHint =>
+      'A Siri és a Parancsok alkalmazás újraindíthat egy alkalmazást vagy futtathat egy felhő szinkront a szervereiden, anélkül hogy megnyitnád ezt az appot. A widgetekhez tárolt belépési adatokkal jelentkeznek be. A kétlépcsős azonosítású fiókok nem használhatók.';
+
+  @override
   String get updateInstallLater => 'Telepítés, újraindítás később';
 
   @override

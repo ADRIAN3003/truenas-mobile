@@ -1,5 +1,6 @@
 import 'dart:io' show Platform;
 
+import 'package:flutter/foundation.dart' show defaultTargetPlatform;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -358,6 +359,14 @@ class _NotificationsCard extends ConsumerWidget {
                 await service.turnOff();
               }
             },
+          ),
+        if (defaultTargetPlatform == TargetPlatform.iOS)
+          AppSwitchTile(
+            title: Text(l10n.settingsShortcuts),
+            subtitle: Text(l10n.settingsShortcutsHint),
+            value: settings.siriShortcuts,
+            onChanged: (on) =>
+                notifier.update((s) => s.copyWith(siriShortcuts: on)),
           ),
       ],
     );

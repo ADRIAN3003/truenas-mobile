@@ -46,6 +46,18 @@ for Android and iOS that talks to the official TrueNAS middleware API
   all of this off. The Activity widget (small and medium on iOS) shows how many
   apps have an update and lists the pool scrubs and cloud syncs that are
   running, with a progress bar.
+- **Siri and Shortcuts (iOS 16 and newer):** actions to start, stop or restart
+  an app and to run a cloud sync, in the Shortcuts app (search for TrueNAS
+  Mobile) and by voice ("Restart an app in TrueNAS Mobile", then Siri asks
+  which). They work without opening the app: they sign in to the server
+  themselves, start the job on it and answer; the server does the rest, and the
+  job shows under Jobs. Stop and Restart ask first, unless you switch "Ask
+  first" off in a shortcut that runs by itself. With several servers saved the
+  list names the server next to each app. The phrases are English; what Siri
+  says back follows the phone's language (English or Hungarian). Settings >
+  Notifications > Siri and Shortcuts turns it off. Like the widgets they need
+  the Keychain group below (not in a Sideloadly install), and accounts that
+  need a 2FA code cannot be used. Android has nothing like it yet.
 - **Storage:** pools with layout, scrub start, pause and stop; datasets and
   zvols (create, delete); snapshots (browse, search, create, roll back, clone, delete); disks with
   temperatures, their S.M.A.R.T. self-test log and a button to run a short,
@@ -141,7 +153,10 @@ Download the latest APK or IPA from the
   details in a Keychain group shared with the extension
   (`<team>.hu.adrian.truenasmobile.shared`, readable after the first unlock,
   this phone only); without that group they only show what the app saved.
-  Accounts that need a 2FA code cannot sign in from a widget.
+  Accounts that need a 2FA code cannot sign in from a widget. The Siri and
+  Shortcuts actions read the same details (the app's own `ShortcutIntents.swift`
+  and the extension share `Shared/ServerLink.swift`), so they also need that
+  group.
 
 ## Build from source
 

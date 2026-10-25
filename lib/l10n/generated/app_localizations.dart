@@ -4730,6 +4730,18 @@ abstract class AppLocalizations {
   /// **'Keep widgets up to date in the background, about every 15 minutes. They also update while a server is open. Add them from your home screen; the phone decides when a refresh really runs.'**
   String get settingsHomeWidgetsHint;
 
+  /// Switch in Settings (iOS) that lets Siri and the Shortcuts app act on the saved servers.
+  ///
+  /// In en, this message translates to:
+  /// **'Siri and Shortcuts'**
+  String get settingsShortcuts;
+
+  /// Hint under the Siri and Shortcuts switch.
+  ///
+  /// In en, this message translates to:
+  /// **'Let Siri and the Shortcuts app restart an app or run a cloud sync on your servers, without opening this app. They sign in with the details this app keeps for the widgets. Accounts with two-factor authentication can\'t be used.'**
+  String get settingsShortcutsHint;
+
   /// Button that installs a system update without restarting.
   ///
   /// In en, this message translates to:

@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import '../instances/instance_repository.dart';
 import '../instances/server_instance.dart';
+import '../logging/app_log.dart';
 import '../models/alert.dart';
 import '../session/truenas_session.dart';
 import '../widgets/home_widget_sync.dart';
@@ -165,7 +166,11 @@ class AlertWatcher {
         ...listed,
       ];
       return (ids: {for (final alert in active) alert.id}, kinds: kinds);
-    } catch (_) {
+    } catch (error) {
+      AppLog.instance.warning(
+        'background',
+        'Check of "${server.name}" failed: $error',
+      );
       widgets?.markUnreachable(server);
       return null;
     } finally {

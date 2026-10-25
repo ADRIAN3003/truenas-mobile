@@ -15,6 +15,7 @@ import '../api/system_api.dart';
 import '../api/truenas_connection.dart';
 import '../api/workloads_api.dart';
 import '../instances/server_instance.dart';
+import '../logging/app_log.dart';
 import '../models/alert.dart';
 import '../models/job.dart';
 import '../models/pool_summary.dart';
@@ -244,7 +245,8 @@ Future<(TrueNasSession, ServerInstance)> connectToInstance(
       case LoginNeedsOtp():
         throw const ApiException('Unexpected 2FA state');
     }
-  } catch (_) {
+  } catch (error) {
+    _logSignInFailure('Sign-in to "${current.name}"', error);
     await connection.close();
     rethrow;
   }
@@ -271,8 +273,17 @@ Future<TrueNasConnection> _reconnect(
     }
     if (outcome case LoginFailed(:final reason)) throw LoginRejected(reason);
     return connection;
-  } catch (_) {
+  } catch (error) {
+    _logSignInFailure('Signing in again to "${instance.name}"', error);
     await connection.close();
     rethrow;
   }
+}
+
+/// A rejected login or an unexpected answer. Cancelling a prompt is not one.
+/// The credentials are not part of what is logged.
+void _logSignInFailure(String what, Object error) {
+  if (error is ConnectCancelled) return;
+  final reason = error is LoginRejected ? error.reason : error;
+  AppLog.instance.warning('sign-in', '$what failed: $reason');
 }

@@ -46,6 +46,12 @@ for Android and iOS that talks to the official TrueNAS middleware API
   all of this off. The Activity widget (small and medium on iOS) shows how many
   apps have an update and lists the pool scrubs and cloud syncs that are
   running, with a progress bar.
+- **Error log:** the app keeps a log of what went wrong on the phone: errors
+  it did not expect, connections and sign-ins that failed, calls the server
+  refused, and failed background checks. Settings > About > Error log shows it;
+  copy it or send it through the share sheet when you report a problem. It
+  stays on the phone, and passwords, keys and tokens are left out (server
+  addresses are not, so look it over before sharing).
 - **Storage:** pools with layout, scrub start, pause and stop; datasets and
   zvols (create, delete); snapshots (browse, search, create, roll back, clone, delete); disks with
   temperatures, their S.M.A.R.T. self-test log and a button to run a short,

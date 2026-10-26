@@ -19,6 +19,9 @@ void main() {
           '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10">'
               '<rect transform="none" width="10" height="10" '
               'style="fill:#08f;transform: none"/></svg>',
+        '/wide.svg' =>
+          '<svg xmlns="http://www.w3.org/2000/svg" width="300" height="100" '
+              'viewBox="0 0 300 100"><rect width="300" height="100"/></svg>',
         _ => 'not an svg',
       });
       request.response.close();
@@ -28,7 +31,14 @@ void main() {
 
   Future<void> show(WidgetTester tester, String path) async {
     await tester.pumpWidget(
-      MaterialApp(home: AppIcon(url: 'http://127.0.0.1:${server.port}$path')),
+      MaterialApp(
+        home: Scaffold(
+          body: ListTile(
+            leading: AppIcon(url: 'http://127.0.0.1:${server.port}$path'),
+            title: const Text('App'),
+          ),
+        ),
+      ),
     );
     for (var i = 0; i < 20; i++) {
       await tester.runAsync(
@@ -63,5 +73,15 @@ void main() {
     expect(find.byType(SvgPicture), findsNothing);
     expect(find.byType(IconTile), findsOneWidget);
     expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('a wide icon stays in its square', (tester) async {
+    await show(tester, '/wide.svg');
+    expect(find.byType(SvgPicture), findsOneWidget);
+    expect(tester.getSize(find.byType(AppIcon)), const Size(40, 40));
+    expect(
+      tester.getSize(find.byType(SvgPicture)).width,
+      lessThanOrEqualTo(40),
+    );
   });
 }

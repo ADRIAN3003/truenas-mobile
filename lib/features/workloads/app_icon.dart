@@ -32,19 +32,21 @@ class AppIcon extends StatelessWidget {
             builder: (context, snapshot) {
               final loader = snapshot.data;
               if (loader == null) return fallback;
-              return SvgPicture(loader, width: size, height: size);
+              return SvgPicture(loader, fit: BoxFit.contain);
             },
           )
         : Image.network(
             url,
-            width: size,
-            height: size,
             fit: BoxFit.contain,
             errorBuilder: (_, _, _) => fallback,
           );
-    // Decorative: the app's name is always next to it.
+    // Decorative: the app's name is always next to it. A wide logo is
+    // scaled down into the square rather than given its own width.
     return ExcludeSemantics(
-      child: ClipRRect(borderRadius: BorderRadius.circular(8), child: image),
+      child: SizedBox.square(
+        dimension: size,
+        child: ClipRRect(borderRadius: BorderRadius.circular(8), child: image),
+      ),
     );
   }
 }

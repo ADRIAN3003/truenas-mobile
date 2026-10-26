@@ -33,13 +33,31 @@ bool useNativeGlass(BuildContext context) =>
 
 /// Fades native glass out under dialogs, sheets and other pop-up routes, which
 /// it would otherwise bleed through (a native view sits above Flutter's
-/// surface), and swaps it for the Flutter look-alikes while the user drags a
-/// page back (the native views do not follow the page being dragged). Add it
-/// to the app's `navigatorObservers`.
+/// surface), and pauses it for the whole of a page transition, a drag back
+/// included (the native views do not follow a page that is moving). Add it to
+/// the app's `navigatorObservers`.
 NavigatorObserver glassNavigatorObserver() => _GlassObserver();
 
 class _GlassObserver extends nlg.LiquidGlassNavigatorObserver {
   VoidCallback? _release;
+
+  @override
+  void didPush(Route<dynamic> route, Route<dynamic>? previousRoute) {
+    super.didPush(route, previousRoute);
+    _pauseWhileMoving(route);
+  }
+
+  @override
+  void didPop(Route<dynamic> route, Route<dynamic>? previousRoute) {
+    super.didPop(route, previousRoute);
+    _pauseWhileMoving(route);
+  }
+
+  @override
+  void didReplace({Route<dynamic>? newRoute, Route<dynamic>? oldRoute}) {
+    super.didReplace(newRoute: newRoute, oldRoute: oldRoute);
+    _pauseWhileMoving(newRoute);
+  }
 
   @override
   void didStartUserGesture(
@@ -54,6 +72,27 @@ class _GlassObserver extends nlg.LiquidGlassNavigatorObserver {
     _release?.call();
     _release = null;
   }
+
+  /// Pauses native glass until [route]'s transition animation has ended. Pop-up
+  /// routes are left to the package, which fades the views under them.
+  void _pauseWhileMoving(Route<dynamic>? route) {
+    if (route is! TransitionRoute || route is PopupRoute) return;
+    final animation = route.animation;
+    if (animation == null || animation.isCompleted || animation.isDismissed) {
+      return;
+    }
+    final release = pauseNativeGlass();
+    late final AnimationStatusListener onStatus;
+    onStatus = (status) {
+      if (!status.isCompleted && !status.isDismissed) return;
+      // A route is built once, offstage and at the end of its animation, to
+      // measure heroes; it then reports completed without having moved.
+      if (route is ModalRoute && route.offstage) return;
+      animation.removeStatusListener(onStatus);
+      release();
+    };
+    animation.addStatusListener(onStatus);
+  }
 }
 
 // How many reasons there are to draw the Flutter look-alikes instead of the
@@ -64,12 +103,16 @@ final _pauses = ValueNotifier<int>(0);
 @visibleForTesting
 int get nativeGlassPauses => _pauses.value;
 
-/// Draws the Flutter look-alikes of the tab bar, switch, slider and segments in
-/// place of the native views until the returned callback is called. A native
+/// Forgets every pause, for a test that ended mid-transition.
+@visibleForTesting
+void resetNativeGlassPauses() => _pauses.value = 0;
+
+/// Draws the Flutter look-alikes of the switch, slider and segments in place of
+/// the native views (and hides the tab bar, whose look-alike would flip to the
+/// native bar when this ends) until the returned callback is called. A native
 /// view is a real UIView above Flutter's surface: it does not follow a page
-/// that is being dragged and it shows through anything Flutter paints over it
-/// (the app lock cover). Calls stack; the callback may be called more than
-/// once.
+/// that is moving and it shows through anything Flutter paints over it (the app
+/// lock cover). Calls stack; the callback may be called more than once.
 VoidCallback pauseNativeGlass() {
   _pauses.value++;
   var released = false;
@@ -99,22 +142,19 @@ class _KeyboardWatcher extends ValueNotifier<bool> with WidgetsBindingObserver {
       .any((view) => view.viewInsets.bottom > 0);
 }
 
-/// [native] on an iPhone with native glass, unless it is paused (and, with
-/// [keyboardSensitive], while the keyboard is up); [fallback] otherwise.
+/// [native] on an iPhone with native glass, unless it is paused or the keyboard
+/// is up; [fallback] otherwise.
 Widget _nativeOrFallback(
   BuildContext context, {
   required Widget Function() native,
   required Widget Function() fallback,
-  bool keyboardSensitive = true,
 }) {
   if (!useNativeGlass(context)) return fallback();
   final ValueListenable<bool> keyboard = _keyboardUp;
   return ListenableBuilder(
-    listenable: Listenable.merge([_pauses, if (keyboardSensitive) keyboard]),
+    listenable: Listenable.merge([_pauses, keyboard]),
     builder: (context, _) =>
-        _pauses.value > 0 || (keyboardSensitive && keyboard.value)
-        ? fallback()
-        : native(),
+        _pauses.value > 0 || keyboard.value ? fallback() : native(),
   );
 }
 
@@ -169,13 +209,15 @@ class GlassTabBar extends StatelessWidget {
   final ValueChanged<int> onSelected;
 
   @override
-  Widget build(BuildContext context) => _nativeOrFallback(
-    context,
-    // The bar is not moved by the keyboard, only by pauses.
-    keyboardSensitive: false,
-    native: () => _buildNative(context),
-    fallback: () => _buildShader(context),
-  );
+  Widget build(BuildContext context) => useNativeGlass(context)
+      // Not the shader bar while paused: it would flip to the native one when
+      // the page stops moving. The keyboard does not move this bar.
+      ? ValueListenableBuilder<int>(
+          valueListenable: _pauses,
+          builder: (context, pauses, _) =>
+              pauses > 0 ? const SizedBox.shrink() : _buildNative(context),
+        )
+      : _buildShader(context);
 
   double _width(BuildContext context) =>
       math.min(MediaQuery.sizeOf(context).width - 24, 440.0);

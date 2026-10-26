@@ -68,10 +68,21 @@ Future<JobWatchResult> watchJobs(
       const [],
     );
   }
-  final fresh = await session.jobsAfter(before.maxId);
-  final earlier = before.active.isEmpty
+  var floor = before.maxId;
+  var remembered = before.active;
+  var fresh = await session.jobsAfter(floor);
+  // Job ids start again from 1 when the middleware restarts (a reboot), so
+  // nothing would be above the old highest id for a long time. Every job the
+  // server lists then started after the last look, and the remembered ids
+  // belong to jobs that are gone (or to new ones that reuse them).
+  if (fresh.isEmpty && await _restarted(session, floor)) {
+    floor = 0;
+    remembered = const {};
+    fresh = await session.jobsAfter(0);
+  }
+  final earlier = remembered.isEmpty
       ? const <TrueNasJob>[]
-      : await session.jobsById(before.active);
+      : await session.jobsById(remembered);
   final all = [...earlier, ...fresh]..sort((a, b) => a.id.compareTo(b.id));
   final active = <int>{};
   final finished = <TrackedJob>[];
@@ -87,10 +98,14 @@ Future<JobWatchResult> watchJobs(
     }
   }
   // A job the server no longer lists (purged) is forgotten.
-  return JobWatchResult(
-    JobWatchState(_highest(before.maxId, all), active),
-    finished,
-  );
+  return JobWatchResult(JobWatchState(_highest(floor, all), active), finished);
+}
+
+/// Whether the newest job the server lists is older than [maxId], which only
+/// happens when its ids started again.
+Future<bool> _restarted(TrueNasSession session, int maxId) async {
+  final newest = await session.jobs(limit: 1);
+  return newest.isNotEmpty && newest.first.id < maxId;
 }
 
 bool _watched(TrueNasJob job) {

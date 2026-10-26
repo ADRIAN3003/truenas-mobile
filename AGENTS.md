@@ -216,7 +216,9 @@ README covers what the app does; this file covers how to work on it.
   `watchJobs` keeps `jobwatch.v1` per server: the highest job id seen and the
   watched jobs that were still running. Next time it asks `core.get_jobs` for
   ids above that (jobs that started and ended in between) and for the
-  remembered ones by id. A first look, and the moment the feature is turned
+  remembered ones by id. Job ids start again from 1 when the NAS
+  restarts: nothing above the old highest id and a newest job below it means
+  that, and then every listed job is new. A first look, and the moment the feature is turned
   on, only record. With the setting off it still records, so switching it on
   does not replay old jobs. A job that ended while the app was open is
   reported too if the check runs later (the app does not mark it as seen).

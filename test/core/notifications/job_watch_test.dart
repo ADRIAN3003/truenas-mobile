@@ -94,6 +94,27 @@ void main() {
   });
 
   test(
+    'jobs are still found after the NAS restarts and ids start over',
+    () async {
+      server.jobs.add(
+        job(200, 'replication.run', state: 'RUNNING', arguments: [1]),
+      );
+      await check();
+      // A reboot: the old jobs are gone and the new ones count from 1 again.
+      server.jobs
+        ..clear()
+        ..add(job(3, 'pool.scrub.run', arguments: ['tank']));
+      await check();
+      expect(notifier.shownJobs, ['Home: job 3 done']);
+      await check();
+      expect(notifier.shownJobs, hasLength(1));
+      server.jobs.add(job(4, 'cloudsync.sync', state: 'FAILED'));
+      await check();
+      expect(notifier.shownJobs, ['Home: job 3 done', 'Home: job 4 failed']);
+    },
+  );
+
+  test(
     'other jobs, aborted ones and long finished ones are not news',
     () async {
       await check();

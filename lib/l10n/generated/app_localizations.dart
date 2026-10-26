@@ -4921,6 +4921,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Last {count} lines'**
   String appLogsLastLines(int count);
+
+  /// Overall S.M.A.R.T. verdict: nothing wrong found.
+  ///
+  /// In en, this message translates to:
+  /// **'Healthy'**
+  String get diskSmartHealthy;
+
+  /// Overall S.M.A.R.T. verdict: signs of wear or an old failure.
+  ///
+  /// In en, this message translates to:
+  /// **'Needs attention'**
+  String get diskSmartAttention;
+
+  /// Overall S.M.A.R.T. verdict: the disk reports a failure now.
+  ///
+  /// In en, this message translates to:
+  /// **'Failing'**
+  String get diskSmartFailing;
+
+  /// Label for how long the disk has been running.
+  ///
+  /// In en, this message translates to:
+  /// **'Power-on time'**
+  String get diskSmartPowerOn;
+
+  /// Label for the disk age read from the self-test log, shown when the attribute table is missing.
+  ///
+  /// In en, this message translates to:
+  /// **'Power-on time at last test'**
+  String get diskSmartPowerOnAtTest;
+
+  /// Number of power-on hours.
+  ///
+  /// In en, this message translates to:
+  /// **'{hours} h'**
+  String diskSmartHours(int hours);
+
+  /// S.M.A.R.T. attribute: sectors moved to spare area.
+  ///
+  /// In en, this message translates to:
+  /// **'Reallocated sectors'**
+  String get diskSmartReallocated;
+
+  /// S.M.A.R.T. attribute: sectors waiting to be moved.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending sectors'**
+  String get diskSmartPending;
+
+  /// S.M.A.R.T. attribute: sectors that could not be read.
+  ///
+  /// In en, this message translates to:
+  /// **'Uncorrectable sectors'**
+  String get diskSmartUncorrectable;
+
+  /// Warning when the newest finished self-test failed.
+  ///
+  /// In en, this message translates to:
+  /// **'The last self-test failed: {test}'**
+  String diskSmartFailedWarning(String test);
+
+  /// Warning when an older self-test failed but a later one passed.
+  ///
+  /// In en, this message translates to:
+  /// **'An earlier self-test failed: {test}'**
+  String diskSmartEarlierFailedWarning(String test);
 }
 
 class _AppLocalizationsDelegate

@@ -366,7 +366,19 @@ README covers what the app does; this file covers how to work on it.
   Both are gated on `core.get_methods`; the screen polls every 10 s while a test
   runs. The exact payloads are written from the middleware source and unconfirmed
   on a real NAS: check them on one. Fake server: `smart`, `smartTests`,
-  `smartProgress`, `smartRejection`.
+  `smartProgress`, `smartRejection`. **SMART detail** (same screen): `disk.smart_attributes(name)`, gated on
+  `core.get_methods` and optional (it may be a private method on some releases,
+  and NVMe disks have no ATA table), returns smartctl's table, each row
+  `{id, name, value, worst, thresh, when_failed, raw: {value, string}}`; the
+  raw count is the first number in `raw.string` (drives pack hours and minutes
+  into `raw.value`). `SmartAttributes` reads power-on hours (9), reallocated
+  (5), pending (197) and uncorrectable (198) sectors. `smartHealth` gives the
+  overall verdict: critical when an attribute is failing now or the newest
+  finished self-test failed, warning for bad sectors, a past attribute failure
+  or an older failed test. Without the attribute call the card still shows the
+  verdict from the log and the power-on hours of the newest test. Shape
+  unconfirmed on a real NAS. Fake server: `smartAttributes`,
+  `smartAttributeRows`.
 - System updates and power (`SystemApi`, `lib/features/system/updates_screen.dart`,
   `power_actions.dart`): `UpdateInfo` is normalised across `update.status`
   (code `REBOOT_REQUIRED`, `new_version.filesize/changelog`, both optional) and

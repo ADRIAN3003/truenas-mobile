@@ -135,6 +135,95 @@ void main() {
     await disconnect(tester);
   });
 
+  testWidgets('the disk screen shows health, hours, sectors and the failure', (
+    tester,
+  ) async {
+    await connect(tester);
+    await tester.pumpWidget(
+      wrap(
+        DiskScreen(
+          session: session,
+          disk: const Disk(name: 'sda', size: 4000000000000, isSsd: false),
+        ),
+      ),
+    );
+    await settle(tester);
+
+    // The default log has a passed short test after a failed extended one.
+    expect(find.text('Needs attention'), findsOneWidget);
+    expect(find.text('12345 h'), findsOneWidget);
+    expect(find.text('Reallocated sectors'), findsOneWidget);
+    expect(find.text('Pending sectors'), findsOneWidget);
+    expect(
+      find.textContaining('An earlier self-test failed: Extended offline'),
+      findsOneWidget,
+    );
+    await disconnect(tester);
+  });
+
+  testWidgets('bad sectors and a newest failed test are flagged', (
+    tester,
+  ) async {
+    await connect(tester);
+    server.smartTests = [
+      {
+        'num': 1,
+        'description': 'Short offline',
+        'status': 'FAILED',
+        'status_verbose': 'Completed: read failure',
+        'lifetime': 12400,
+        'lba_of_first_error': 77,
+      },
+    ];
+    server.smartAttributeRows = [
+      for (final row in server.smartAttributeRows)
+        row['id'] == 5
+            ? {
+                ...row,
+                'raw': {'value': 8, 'string': '8'},
+              }
+            : row,
+    ];
+    await tester.pumpWidget(
+      wrap(
+        DiskScreen(
+          session: session,
+          disk: const Disk(name: 'sda', size: 4000000000000, isSsd: false),
+        ),
+      ),
+    );
+    await settle(tester);
+
+    expect(find.text('Failing'), findsOneWidget);
+    expect(
+      find.textContaining('The last self-test failed: Short offline'),
+      findsOneWidget,
+    );
+    expect(find.text('8'), findsOneWidget);
+    await disconnect(tester);
+  });
+
+  testWidgets('without the attribute call the log still gives hours', (
+    tester,
+  ) async {
+    await connect(tester);
+    server.smartAttributes = false;
+    await tester.pumpWidget(
+      wrap(
+        DiskScreen(
+          session: session,
+          disk: const Disk(name: 'sda', size: 4000000000000, isSsd: false),
+        ),
+      ),
+    );
+    await settle(tester);
+
+    expect(find.text('Power-on time at last test'), findsOneWidget);
+    expect(find.text('12345 h'), findsOneWidget);
+    expect(find.text('Reallocated sectors'), findsNothing);
+    await disconnect(tester);
+  });
+
   testWidgets('a running self-test shows progress and blocks a new one', (
     tester,
   ) async {

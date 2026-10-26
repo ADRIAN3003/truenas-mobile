@@ -107,6 +107,20 @@ README covers what the app does; this file covers how to work on it.
   `Scaffold`/`AppBar` with our own `GlassTopEdge` and `ChromeInsets`, instead
   of `GlassScaffold`/`GlassAppBar`), buttons, text fields and snackbars (a
   `GlassToast` needs a live context and would sit over the tab bar).
+- Native glass (`useNativeGlass` in `glass.dart`, package `native_liquid_glass`):
+  on iOS 26 and later the tab bar, `AppSwitch`, `AppSlider` and `AppSegments`
+  (without icons) are Apple's own UIKit views (`UITabBar`, `UISwitch`,
+  `UISlider`, `UISegmentedControl`) hosted as platform views, so the system
+  draws the glass and it follows what the user set in Settings (Reduce
+  Transparency, the iOS 27 glass look), which the shader look-alikes cannot
+  read. Older iOS, Android and tests keep the `liquid_glass_widgets` / Material
+  versions. Costs: a native view sits above Flutter's surface, so
+  `glassNavigatorObserver()` (in `MaterialApp.navigatorObservers`) hides it
+  under pushed routes and dialogs; the UISlider reports no end of drag
+  (`onChangeEnd` is not called); the switch, slider and segments follow the
+  device's light or dark appearance, only the tab bar follows the app's theme;
+  tests cannot run them (no iOS), so check them on a phone. Dialogs, sheets,
+  menus and glass panels stay on `liquid_glass_widgets`.
 - Haptics go through `lib/shared/haptics.dart` (switched off by
   `Haptics.enabled`, which the settings notifier keeps in step). Use
   `AppRefreshIndicator`, `AppSwitch` and `AppSwitchTile` (in `ui.dart`)

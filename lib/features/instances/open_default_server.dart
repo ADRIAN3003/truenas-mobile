@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/instances/default_server.dart';
 import '../../core/instances/instances_provider.dart';
+import '../../core/notifications/alert_taps.dart';
 import '../../core/settings/settings_provider.dart';
 import '../server/server_screen.dart';
 
@@ -30,6 +31,8 @@ class _OpenDefaultServerState extends ConsumerState<OpenDefaultServer> {
 
   Future<void> _run() async {
     if (!ref.read(openDefaultServerProvider)) return;
+    // A tapped alert notification opens its own server instead.
+    if (ref.read(pendingAlertServerProvider) != null) return;
     final servers = await ref.read(instancesProvider.future);
     if (!mounted) return;
     final server = defaultServer(

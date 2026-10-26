@@ -44,6 +44,7 @@ void main() {
     AppSettings settings = const AppSettings(),
     List<Override> overrides = const [],
     void Function(FakeTrueNasServer server)? before,
+    bool openAlertsOnStart = false,
   }) async {
     tester.view.physicalSize = size;
     tester.view.devicePixelRatio = 1;
@@ -99,7 +100,7 @@ void main() {
                       ),
                     ),
                   )
-                : const ServerScreen('1'),
+                : ServerScreen('1', openAlertsOnStart: openAlertsOnStart),
           ),
         ),
       ),
@@ -124,6 +125,16 @@ void main() {
       await server.close();
     });
   }
+
+  testWidgets('a tapped alert notification lands on the alerts list', (
+    tester,
+  ) async {
+    await open(tester, const Size(400, 800), openAlertsOnStart: true);
+    await tester.pumpAndSettle();
+    expect(find.text('Alerts'), findsWidgets);
+    expect(find.text('Pool tank state is DEGRADED'), findsOneWidget);
+    await close(tester);
+  });
 
   testWidgets('the app settings are one tap away inside a server', (
     tester,

@@ -56,6 +56,15 @@ class _ProtectionScreenState extends State<ProtectionScreen>
           success: l10n.taskStarted(task.name),
         );
       case 'stop':
+        final confirmed = await confirmAction(
+          context,
+          title: l10n.stopTitle(task.name),
+          body: l10n.taskStopBody,
+          confirmLabel: l10n.taskStop,
+          cancelLabel: l10n.cancel,
+          destructive: true,
+        );
+        if (!confirmed || !mounted) return;
         await runWithFeedback(
           context,
           () => _session.protection.abort(task),

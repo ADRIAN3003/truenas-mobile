@@ -1638,6 +1638,9 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String get taskStopBody => 'Most leáll, és később újra lehet indítani.';
+
+  @override
   String taskStopped(String name) {
     return 'Leállítva: $name';
   }

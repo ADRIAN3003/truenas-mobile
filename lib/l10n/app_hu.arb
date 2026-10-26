@@ -456,6 +456,7 @@
   "taskRunNow": "Futtatás most",
   "taskStop": "Leállítás",
   "taskStarted": "Elindítva: {name}",
+  "taskStopBody": "Most leáll, és később újra lehet indítani.",
   "taskStopped": "Leállítva: {name}",
   "taskEnabledMessage": "Engedélyezve: {name}",
   "taskDisabledMessage": "Letiltva: {name}",

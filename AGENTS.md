@@ -190,7 +190,12 @@ README covers what the app does; this file covers how to work on it.
   later `BGTaskScheduler.register` (what Dart's `registerPeriodicTask` does the
   first time) raises an exception that kills the app, so the id in `AppDelegate`,
   `Info.plist` and `_taskName` must match); `turnOn` never throws, it returns
-  an `AlertTurnOn`; Android `POST_NOTIFICATIONS`, core library
+  an `AlertTurnOn`; a tap on a notification opens that server's alerts: the
+  payload is the server id, `main` initialises the plugin at start
+  (`LocalAlertNotifier.listenForTaps`: taps while running, and the launch
+  notification) and hands it to `pendingAlertServerProvider`, which
+  `OpenAlertFromNotification` (inside `OpenDefaultServer`, which steps aside
+  for it) turns into `ServerScreen(openAlertsOnStart: true)`; Android `POST_NOTIFICATIONS`, core library
   desugaring, and the `ic_stat_alert` icon kept by `res/raw/keep.xml`. Tests
   fake the phone with `FakeAlertNotifier`/`FakeBackgroundScheduler`
   (`test/support/alert_fakes.dart`) and the service provider is off unless

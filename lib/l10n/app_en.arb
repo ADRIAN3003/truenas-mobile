@@ -2310,6 +2310,10 @@
       }
     }
   },
+  "taskStopBody": "It stops now and can be run again later.",
+  "@taskStopBody": {
+    "description": "Confirmation body for stopping a running replication, sync or other data protection task."
+  },
   "taskStopped": "Stopped {name}",
   "@taskStopped": {
     "description": "Snackbar.",

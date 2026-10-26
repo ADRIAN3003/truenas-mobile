@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/security/biometric_auth.dart';
 import '../../core/settings/settings_provider.dart';
 import '../../l10n/generated/app_localizations.dart';
+import '../../shared/glass.dart';
 import '../../shared/theme.dart';
 
 /// How long a cold start shows the lock screen before the phone's prompt
@@ -38,6 +39,10 @@ class _AppLockGateState extends ConsumerState<AppLockGate>
   bool _authenticating = false;
   bool _failed = false;
 
+  /// Held while the cover is up, so native glass views (which sit above
+  /// everything Flutter paints) do not show through it.
+  VoidCallback? _releaseGlass;
+
   bool get _enabled => ref.read(settingsProvider).appLock;
 
   @override
@@ -45,6 +50,7 @@ class _AppLockGateState extends ConsumerState<AppLockGate>
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _locked = _enabled;
+    _syncGlass();
     if (_locked) {
       WidgetsBinding.instance.addPostFrameCallback((_) async {
         final delay = ref.read(lockPromptDelayProvider);
@@ -57,6 +63,7 @@ class _AppLockGateState extends ConsumerState<AppLockGate>
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    _releaseGlass?.call();
     super.dispose();
   }
 
@@ -79,6 +86,18 @@ class _AppLockGateState extends ConsumerState<AppLockGate>
       case AppLifecycleState.detached:
         break;
     }
+    _syncGlass();
+  }
+
+  bool get _showing => _enabled && (_locked || _covered);
+
+  void _syncGlass() {
+    if (_showing) {
+      _releaseGlass ??= pauseNativeGlass();
+    } else {
+      _releaseGlass?.call();
+      _releaseGlass = null;
+    }
   }
 
   Future<void> _unlock() async {
@@ -87,7 +106,10 @@ class _AppLockGateState extends ConsumerState<AppLockGate>
     // A phone with neither a biometric nor a passcode cannot ask: there is
     // nothing to lock with, so do not lock the user out.
     if (!await auth.isAvailable()) {
-      if (mounted) setState(() => _locked = false);
+      if (mounted) {
+        setState(() => _locked = false);
+        _syncGlass();
+      }
       return;
     }
     if (!mounted) return;
@@ -106,13 +128,17 @@ class _AppLockGateState extends ConsumerState<AppLockGate>
         _failed = true;
       }
     });
+    _syncGlass();
   }
 
   @override
   Widget build(BuildContext context) {
     // Turning the lock on or off inside the app never locks that session.
     ref.listen(settingsProvider.select((s) => s.appLock), (_, on) {
-      if (!on) setState(() => _locked = false);
+      if (!on) {
+        setState(() => _locked = false);
+        _syncGlass();
+      }
     });
     final enabled = ref.watch(settingsProvider.select((s) => s.appLock));
     final showing = enabled && (_locked || _covered);

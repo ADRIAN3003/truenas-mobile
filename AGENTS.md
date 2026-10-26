@@ -375,6 +375,16 @@ README covers what the app does; this file covers how to work on it.
   now" once an update waits for a restart. Reboot and shutdown both go through
   `confirmPower` (More tab and Updates screen). The job's live progress is the
   existing `JobKind.systemUpdate`.
+- All-servers overview (`lib/core/overview/server_overview.dart`,
+  `lib/features/instances/servers_overview_screen.dart`): the grid button in the
+  server list's app bar (shown with two or more servers) opens one card per
+  saved server with its pools, active alerts and waiting/running jobs.
+  `ServerOverviewLoader` signs in with `connectQuietly` (no prompts: a server
+  that needs a certificate trust or a 2FA code is shown as "open it once", a
+  refused sign-in and an unreachable server have their own text), keeps one
+  session per server while the screen is open, and looks again every 30 s, on
+  resume and on pull to refresh. Pool health comes from `PoolSummary.condition`,
+  shared with the home screen widgets.
 - Saved servers live in secure storage (`SecureKeyValueStore`). Its Android
   default `resetOnError: true` erases everything when one read fails, so it is
   off; a failed read is retried, then shown as an error with Try again and

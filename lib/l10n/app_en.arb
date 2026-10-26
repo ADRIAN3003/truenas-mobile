@@ -4001,5 +4001,98 @@
         "type": "int"
       }
     }
+  },
+  "overviewTitle": "Overview",
+  "@overviewTitle": {
+    "description": "Title of the screen that shows every saved server at once, and the tooltip of the button that opens it."
+  },
+  "overviewAllFine": "Everything looks fine",
+  "@overviewAllFine": {
+    "description": "Top of the overview when no server needs attention."
+  },
+  "overviewNeedAttention": "{count, plural, one{1 server needs attention} other{{count} servers need attention}}",
+  "@overviewNeedAttention": {
+    "description": "Top of the overview: how many servers have a problem or cannot be reached.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "overviewLevelOk": "Healthy",
+  "@overviewLevelOk": {
+    "description": "Status label on a server in the overview."
+  },
+  "overviewLevelAttention": "Attention",
+  "@overviewLevelAttention": {
+    "description": "Status label on a server in the overview: something is not quite right."
+  },
+  "overviewLevelProblem": "Problem",
+  "@overviewLevelProblem": {
+    "description": "Status label on a server in the overview: a pool is down or an alert is critical."
+  },
+  "overviewLevelOffline": "Offline",
+  "@overviewLevelOffline": {
+    "description": "Status label on a server in the overview that could not be reached."
+  },
+  "overviewPoolsHealthy": "{count, plural, one{1 pool healthy} other{{count} pools healthy}}",
+  "@overviewPoolsHealthy": {
+    "description": "Overview row: all pools of a server are fine.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "overviewPoolsAttention": "{count, plural, one{1 pool needs attention} other{{count} pools need attention}}",
+  "@overviewPoolsAttention": {
+    "description": "Overview row: some pools are degraded, nearly full or down.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "overviewNoPools": "No pools",
+  "@overviewNoPools": {
+    "description": "Overview row: the server has no storage pool."
+  },
+  "overviewAlerts": "{count, plural, one{1 active alert} other{{count} active alerts}}",
+  "@overviewAlerts": {
+    "description": "Overview row: how many alerts are active on a server.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "overviewAlertsCritical": "{count} critical",
+  "@overviewAlertsCritical": {
+    "description": "Overview row: how many of the active alerts are critical.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "overviewNoAlerts": "No active alerts",
+  "@overviewNoAlerts": {
+    "description": "Overview row: the server has no active alert."
+  },
+  "overviewNoJobs": "Nothing running",
+  "@overviewNoJobs": {
+    "description": "Overview row: no scrub, sync or other job is running on the server."
+  },
+  "overviewNeedsYou": "Open this server once to trust its certificate or enter the 2FA code.",
+  "@overviewNeedsYou": {
+    "description": "Overview: a server that cannot be looked at without asking the user something."
+  },
+  "overviewLoginRejected": "The server refused the saved sign-in.",
+  "@overviewLoginRejected": {
+    "description": "Overview: the saved credentials were rejected."
+  },
+  "overviewUnreachable": "Can't reach the server.",
+  "@overviewUnreachable": {
+    "description": "Overview: the server did not answer."
   }
 }

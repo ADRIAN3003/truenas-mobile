@@ -803,5 +803,22 @@
   "appLogsFilter": "Sorok szűrése",
   "appLogsFollow": "Ugrás a legutolsó sorra",
   "appLogsClear": "Törlés",
-  "appLogsLastLines": "Utolsó {count} sor"
+  "appLogsLastLines": "Utolsó {count} sor",
+  "overviewTitle": "Áttekintés",
+  "overviewAllFine": "Minden rendben",
+  "overviewNeedAttention": "{count, plural, other{{count} szerver figyelmet igényel}}",
+  "overviewLevelOk": "Rendben",
+  "overviewLevelAttention": "Figyelem",
+  "overviewLevelProblem": "Hiba",
+  "overviewLevelOffline": "Nem elérhető",
+  "overviewPoolsHealthy": "{count, plural, other{{count} tároló rendben}}",
+  "overviewPoolsAttention": "{count, plural, other{{count} tároló figyelmet igényel}}",
+  "overviewNoPools": "Nincs tároló",
+  "overviewAlerts": "{count, plural, other{{count} aktív riasztás}}",
+  "overviewAlertsCritical": "{count} kritikus",
+  "overviewNoAlerts": "Nincs aktív riasztás",
+  "overviewNoJobs": "Nem fut semmi",
+  "overviewNeedsYou": "Nyisd meg egyszer ezt a szervert, hogy elfogadd a tanúsítványát vagy megadd a 2FA-kódot.",
+  "overviewLoginRejected": "A szerver elutasította a mentett bejelentkezést.",
+  "overviewUnreachable": "A szerver nem érhető el."
 }

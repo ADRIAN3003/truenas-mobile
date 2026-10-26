@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import '../../core/models/protection.dart';
@@ -8,6 +9,7 @@ import '../../shared/theme.dart';
 import '../../shared/ui.dart';
 import '../../shared/viz_colors.dart';
 import '../../shared/widgets.dart';
+import '../server/add_shortcut.dart';
 import '../sharing/sharing_widgets.dart';
 import '../storage/storage_helpers.dart';
 import 'task_editors.dart';
@@ -18,16 +20,16 @@ typedef _Tasks = Map<ProtectionKind, List<ProtectionTask>>;
 /// Periodic snapshots, replication, cloud sync, cloud backup and rsync
 /// tasks: their last result, enable/disable, run now, and adding or
 /// editing snapshot, replication and cloud sync tasks.
-class ProtectionScreen extends StatefulWidget {
+class ProtectionScreen extends ConsumerStatefulWidget {
   const ProtectionScreen({super.key, required this.session});
 
   final TrueNasSession session;
 
   @override
-  State<ProtectionScreen> createState() => _ProtectionScreenState();
+  ConsumerState<ProtectionScreen> createState() => _ProtectionScreenState();
 }
 
-class _ProtectionScreenState extends State<ProtectionScreen>
+class _ProtectionScreenState extends ConsumerState<ProtectionScreen>
     with LoadState<ProtectionScreen, _Tasks> {
   TrueNasSession get _session => widget.session;
 
@@ -70,6 +72,9 @@ class _ProtectionScreenState extends State<ProtectionScreen>
           () => _session.protection.abort(task),
           success: l10n.taskStopped(task.name),
         );
+      case 'shortcut':
+        await addCloudSyncShortcut(context, ref, _session, task);
+        return;
       case 'edit':
         await _edit(task.kind, task);
         return;
@@ -192,6 +197,9 @@ class _ProtectionScreenState extends State<ProtectionScreen>
                   for (final task in list)
                     _TaskTile(
                       task: task,
+                      canAddShortcut:
+                          canAddShortcut(ref) &&
+                          task.kind == ProtectionKind.cloudSync,
                       onToggle: (v) => _setEnabled(task, v),
                       onAction: (a) => _action(task, a),
                     ),
@@ -249,11 +257,15 @@ String scheduleLabel(AppLocalizations l10n, Object? schedule) =>
 class _TaskTile extends StatelessWidget {
   const _TaskTile({
     required this.task,
+    required this.canAddShortcut,
     required this.onToggle,
     required this.onAction,
   });
 
   final ProtectionTask task;
+
+  /// Whether the menu offers a home screen shortcut that runs the task.
+  final bool canAddShortcut;
   final ValueChanged<bool> onToggle;
   final ValueChanged<String> onAction;
 
@@ -353,6 +365,7 @@ class _TaskTile extends StatelessWidget {
                 menuEntry('stop', l10n.taskStop)
               else if (!running)
                 menuEntry('run', l10n.taskRunNow),
+              if (canAddShortcut) menuEntry('shortcut', l10n.shortcutAdd),
               if (task.kind != ProtectionKind.snapshot)
                 menuEntry('edit', l10n.edit),
               menuEntry('delete', l10n.delete, destructive: true),

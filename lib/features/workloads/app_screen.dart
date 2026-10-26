@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -9,22 +10,23 @@ import '../../core/session/truenas_session.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../shared/theme.dart';
 import '../../shared/ui.dart';
+import '../server/add_shortcut.dart';
 import '../storage/storage_helpers.dart';
 import 'app_icon.dart';
 import 'workload_widgets.dart';
 
 /// One app: version, upgrade, web interfaces, images and actions.
-class AppScreen extends StatefulWidget {
+class AppScreen extends ConsumerStatefulWidget {
   const AppScreen({super.key, required this.session, required this.app});
 
   final TrueNasSession session;
   final TrueNasApp app;
 
   @override
-  State<AppScreen> createState() => _AppScreenState();
+  ConsumerState<AppScreen> createState() => _AppScreenState();
 }
 
-class _AppScreenState extends State<AppScreen> {
+class _AppScreenState extends ConsumerState<AppScreen> {
   late TrueNasApp _app = widget.app;
   bool _busy = false;
 
@@ -150,6 +152,17 @@ class _AppScreenState extends State<AppScreen> {
                               ),
                               icon: const Icon(Icons.article_outlined),
                               label: Text(l10n.appLogsTitle),
+                            ),
+                          if (canAddShortcut(ref))
+                            OutlinedButton.icon(
+                              onPressed: () => addAppShortcut(
+                                context,
+                                ref,
+                                widget.session,
+                                app.name,
+                              ),
+                              icon: const Icon(Icons.add_to_home_screen),
+                              label: Text(l10n.shortcutAdd),
                             ),
                           if (app.state == WorkloadState.running)
                             OutlinedButton.icon(

@@ -803,5 +803,13 @@
   "appLogsFilter": "Sorok szűrése",
   "appLogsFollow": "Ugrás a legutolsó sorra",
   "appLogsClear": "Törlés",
-  "appLogsLastLines": "Utolsó {count} sor"
+  "appLogsLastLines": "Utolsó {count} sor",
+  "shortcutAdd": "Hozzáadás a kezdőképernyőhöz",
+  "shortcutPickTitle": "{name} parancsikon",
+  "shortcutLabelStart": "{name} indítása",
+  "shortcutLabelStop": "{name} leállítása",
+  "shortcutLabelRestart": "{name} újraindítása",
+  "shortcutLabelSync": "{name} szinkronizálása",
+  "shortcutUnsupported": "Ez az indítóképernyő nem tud parancsikonokat hozzáadni.",
+  "shortcutTaskMissing": "Ez a szinkronizálási feladat már nem létezik."
 }

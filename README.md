@@ -57,7 +57,14 @@ for Android and iOS that talks to the official TrueNAS middleware API
   says back follows the phone's language (English or Hungarian). Settings >
   Notifications > Siri and Shortcuts turns it off. Like the widgets they need
   the Keychain group below (not in a Sideloadly install), and accounts that
-  need a 2FA code cannot be used. Android has nothing like it yet.
+  need a 2FA code cannot be used.
+- **Home screen shortcuts (Android):** the Android counterpart. On an app's
+  page, "Add to home screen" pins a shortcut that starts, stops or restarts it;
+  in Data protection, a cloud sync's menu pins one that runs it. Tapping a
+  shortcut opens the app on that server and does it (Stop and Restart still ask
+  first), then says how it went. Unlike Siri it opens the app, so 2FA accounts
+  and a locked app work as usual. It needs a launcher that can pin shortcuts;
+  without one the entry is hidden. Android has no Quick Settings tile for it.
 - **Error log:** the app keeps a log of what went wrong on the phone: errors
   it did not expect, connections and sign-ins that failed, calls the server
   refused, and failed background checks. Settings > About > Error log shows it;

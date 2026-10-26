@@ -4001,5 +4001,62 @@
         "type": "int"
       }
     }
+  },
+  "shortcutAdd": "Add to home screen",
+  "@shortcutAdd": {
+    "description": "Button or menu entry that puts a shortcut on the Android home screen."
+  },
+  "shortcutPickTitle": "Shortcut for {name}",
+  "@shortcutPickTitle": {
+    "description": "Title of the choice of what the shortcut does, for an app.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "shortcutLabelStart": "Start {name}",
+  "@shortcutLabelStart": {
+    "description": "Label of a home screen shortcut that starts an app.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "shortcutLabelStop": "Stop {name}",
+  "@shortcutLabelStop": {
+    "description": "Label of a home screen shortcut that stops an app.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "shortcutLabelRestart": "Restart {name}",
+  "@shortcutLabelRestart": {
+    "description": "Label of a home screen shortcut that restarts an app.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "shortcutLabelSync": "Sync {name}",
+  "@shortcutLabelSync": {
+    "description": "Label of a home screen shortcut that runs a cloud sync task.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "shortcutUnsupported": "This launcher can't add shortcuts.",
+  "@shortcutUnsupported": {
+    "description": "Snackbar when the Android launcher cannot pin shortcuts."
+  },
+  "shortcutTaskMissing": "That sync task no longer exists.",
+  "@shortcutTaskMissing": {
+    "description": "Snackbar when a shortcut's cloud sync task was deleted."
   }
 }

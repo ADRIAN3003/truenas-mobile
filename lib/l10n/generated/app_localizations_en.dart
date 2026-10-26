@@ -2992,4 +2992,38 @@ class AppLocalizationsEn extends AppLocalizations {
   String appLogsLastLines(int count) {
     return 'Last $count lines';
   }
+
+  @override
+  String get shortcutAdd => 'Add to home screen';
+
+  @override
+  String shortcutPickTitle(String name) {
+    return 'Shortcut for $name';
+  }
+
+  @override
+  String shortcutLabelStart(String name) {
+    return 'Start $name';
+  }
+
+  @override
+  String shortcutLabelStop(String name) {
+    return 'Stop $name';
+  }
+
+  @override
+  String shortcutLabelRestart(String name) {
+    return 'Restart $name';
+  }
+
+  @override
+  String shortcutLabelSync(String name) {
+    return 'Sync $name';
+  }
+
+  @override
+  String get shortcutUnsupported => 'This launcher can\'t add shortcuts.';
+
+  @override
+  String get shortcutTaskMissing => 'That sync task no longer exists.';
 }

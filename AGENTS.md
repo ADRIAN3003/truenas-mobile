@@ -301,8 +301,28 @@ README covers what the app does; this file covers how to work on it.
   catalogs would be needed); spoken answers use `ShortcutText.pick` (en/hu).
   New intent files must be added to `Runner.xcodeproj` by hand. Untested on a
   real phone as of writing: check Shortcuts lists the actions, Siri asks for the
-  app, Restart asks first, and a wrong-password server says so. Android has
-  none.
+  app, Restart asks first, and a wrong-password server says so.
+- Android home screen shortcuts (`lib/core/quick_actions/`, `MainActivity.kt`):
+  the Android counterpart of the above, but through the app, not around it. A
+  pinned launcher shortcut (`ShortcutManagerCompat.requestPinShortcut`, made
+  from "Add to home screen" on `AppScreen` and in a cloud sync's menu in
+  `ProtectionScreen`, hidden where `canPinQuickActionProvider` is false) carries
+  an intent with `serverId`, `kind` (`QuickActionKind`: start/stop/restart app,
+  run cloud sync) and `target` (app name or task id), action
+  `hu.adrian.truenasmobile.QUICK_ACTION`. `MainActivity` hands it to Dart over
+  `hu.adrian.truenasmobile/quick_actions` (`launchAction` once at start,
+  `action` from `onNewIntent`); `pendingQuickActionProvider` ->
+  `OpenQuickAction` (inside `OpenDefaultServer`, which steps aside) ->
+  `ServerScreen(quickAction:)`, which runs `runQuickAction` once connected,
+  reusing `runWorkloadAction` so Stop and Restart ask first. It opens the
+  app because the saved servers sit in Android secure storage (a Keystore key)
+  that Kotlin cannot read; so there is no headless run and no Quick Settings
+  tile (a tile would need a configured target). `TrueNasSession.instanceId`
+  names the server for the shortcut. Tests use `FakeQuickActions`
+  (`test/support/quick_action_fakes.dart`); the default provider is
+  `NoQuickActions`, `main` overrides it on Android. Untested on a real phone as
+  of writing: check the launcher's pin prompt, a tap with the app closed and
+  open, and that a stale shortcut (server or task removed) says so.
 - History charts (`lib/core/api/reporting_api.dart`, `lib/features/reporting/`):
   `ReportingApi` reads netdata reporting, `reporting.netdata_graphs` +
   `reporting.netdata_get_data` (25.04) or `reporting.graphs` + `reporting.get_data`

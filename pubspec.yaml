@@ -50,7 +50,6 @@ dependencies:
   flutter_svg: ^2.3.0
   url_launcher: ^6.3.3
   liquid_glass_widgets: ^1.13.0
-  native_liquid_glass: ^0.3.1
   package_info_plus: ^10.2.2
   local_auth: ^3.0.2
   workmanager: ^0.10.10

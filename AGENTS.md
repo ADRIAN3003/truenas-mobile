@@ -107,31 +107,14 @@ README covers what the app does; this file covers how to work on it.
   `Scaffold`/`AppBar` with our own `GlassTopEdge` and `ChromeInsets`, instead
   of `GlassScaffold`/`GlassAppBar`), buttons, text fields and snackbars (a
   `GlassToast` needs a live context and would sit over the tab bar).
-- Native glass (`useNativeGlass` in `glass.dart`, package `native_liquid_glass`):
-  on iOS 26 and later the tab bar, `AppSwitch`, `AppSlider` and `AppSegments`
-  (without icons) are Apple's own UIKit views (`UITabBar`, `UISwitch`,
-  `UISlider`, `UISegmentedControl`) hosted as platform views, so the system
-  draws the glass and it follows what the user set in Settings (Reduce
-  Transparency, the iOS 27 glass look), which the shader look-alikes cannot
-  read. Older iOS, Android and tests keep the `liquid_glass_widgets` / Material
-  versions. Costs: a native view sits above Flutter's surface, so
-  `glassNavigatorObserver()` (in `MaterialApp.navigatorObservers`) hides it
-  under pushed routes and dialogs; the UISlider reports no end of drag
-  (`onChangeEnd` is not called); the switch, slider and segments follow the
-  device's light or dark appearance, only the tab bar follows the app's theme;
-  tests cannot run them (no iOS), so check them on a phone. A native view also
-  ignores a page that is moving and shows through Flutter's own cover, so
-  `pauseNativeGlass()` (glass.dart; calls stack) swaps the switch, slider and
-  segments for the Flutter look-alikes, and hides the tab bar (its look-alike
-  would flip to the native bar afterwards), for the whole of every page
-  transition (the observer holds it until the route's animation ends, ignoring
-  the offstage first frame that reports completed; a back drag holds it from
-  `didStartUserGesture` to `didStopUserGesture`) and while the app lock cover is
-  up (`AppLockGate`); the switch, slider and segments also use the look-alikes
-  while the keyboard is up (read from the platform views, since a `Scaffold`
-  zeroes its body's `viewInsets`). New native glass
-  goes through `_nativeOrFallback`. Not yet seen on a phone. Dialogs, sheets,
-  menus and glass panels stay on `liquid_glass_widgets`.
+- Native UIKit glass (the `native_liquid_glass` package: `UITabBar`, `UISwitch`,
+  `UISlider` and `UISegmentedControl` as platform views, PRs #73 to #75) was
+  tried and dropped. A native view sits above Flutter's surface, so it showed
+  through the lock cover, did not follow a page being dragged or sliding in,
+  and trailed the page while the keyboard moved it; the workarounds (swapping
+  in look-alikes, hiding the tab bar) flipped between two looks. Do not bring
+  it back without a way around that. The iOS 27 system glass slider cannot be
+  read by the shader look-alikes either.
 - Haptics go through `lib/shared/haptics.dart` (switched off by
   `Haptics.enabled`, which the settings notifier keeps in step). Use
   `AppRefreshIndicator`, `AppSwitch` and `AppSwitchTile` (in `ui.dart`)

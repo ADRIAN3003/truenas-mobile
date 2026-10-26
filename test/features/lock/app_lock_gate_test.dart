@@ -8,7 +8,6 @@ import 'package:truenas_mobile/core/security/biometric_auth.dart';
 import 'package:truenas_mobile/core/settings/app_settings.dart';
 import 'package:truenas_mobile/core/settings/settings_provider.dart';
 import 'package:truenas_mobile/features/lock/app_lock_gate.dart';
-import 'package:truenas_mobile/shared/glass.dart';
 
 import '../../support/biometric_fakes.dart';
 import '../../support/memory_store.dart';
@@ -16,10 +15,7 @@ import '../../support/memory_store.dart';
 void main() {
   late FakeBiometricAuth auth;
 
-  setUp(() {
-    auth = FakeBiometricAuth();
-    resetNativeGlassPauses();
-  });
+  setUp(() => auth = FakeBiometricAuth());
 
   Future<void> open(
     WidgetTester tester, {
@@ -70,17 +66,6 @@ void main() {
     await foreground(tester);
     expect(find.text('TrueNAS Mobile is locked'), findsNothing);
     expect(auth.prompts, isEmpty);
-  });
-
-  testWidgets('native glass is paused while the cover is up', (tester) async {
-    expect(nativeGlassPauses, 0);
-    await open(tester);
-    expect(nativeGlassPauses, 0);
-    await background(tester);
-    expect(find.text('TrueNAS Mobile is locked'), findsOneWidget);
-    expect(nativeGlassPauses, 1);
-    await foreground(tester);
-    expect(nativeGlassPauses, 0);
   });
 
   testWidgets('asks at start and opens the app once it passes', (tester) async {

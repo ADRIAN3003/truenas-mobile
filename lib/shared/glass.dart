@@ -96,8 +96,11 @@ class GlassTabBar extends StatelessWidget {
         alignment: Alignment.bottomCenter,
         child: SafeArea(
           top: false,
+          // The native view reserves 20 points of overflow for its glow and
+          // sits that much higher than the shader bar, so it takes no gap of
+          // its own: it then rests about where the shader bar did.
           child: Padding(
-            padding: const EdgeInsets.only(bottom: _barGap),
+            padding: EdgeInsets.zero,
             child: nlg.LiquidGlassTabBar(
               width: width,
               height: _barHeight,

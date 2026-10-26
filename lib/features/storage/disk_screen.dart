@@ -28,6 +28,7 @@ class DiskScreen extends StatefulWidget {
 class _DiskScreenState extends State<DiskScreen> {
   late Disk _disk = widget.disk;
   SmartResults? _smart;
+  SmartAttributes? _attributes;
   Object? _smartError;
   bool _canRead = true;
   bool _canRun = true;
@@ -59,6 +60,11 @@ class _DiskScreenState extends State<DiskScreen> {
         smartError = error;
       }
     }
+    // The attribute table is a bonus: without it the card shows what the
+    // self-test log says.
+    final attributes = await storage.canReadSmartAttributes()
+        ? await storage.smartAttributes(_disk)
+        : null;
     if (!mounted) return;
     setState(() {
       _disk = _disk.withTemperature(
@@ -67,6 +73,7 @@ class _DiskScreenState extends State<DiskScreen> {
       _canRead = canRead;
       _canRun = canRun;
       _smart = smart;
+      _attributes = attributes;
       _smartError = smartError;
     });
     // Tests carry on in the disk, so follow a running one.
@@ -171,6 +178,10 @@ class _DiskScreenState extends State<DiskScreen> {
   Widget _smartCard(AppLocalizations l10n) {
     final theme = Theme.of(context);
     final smart = _smart;
+    final health = smartHealth(smart, _attributes);
+    final failed = smart?.lastFailed;
+    final failedIsNewest =
+        failed != null && identical(failed, smart!.lastFinished);
     final Widget summary;
     if (!_canRead) {
       summary = Text(l10n.diskSmartUnavailable);
@@ -222,9 +233,28 @@ class _DiskScreenState extends State<DiskScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(l10n.diskSmartTitle, style: theme.textTheme.titleMedium),
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    l10n.diskSmartTitle,
+                    style: theme.textTheme.titleMedium,
+                  ),
+                ),
+                if (health != null)
+                  StatusPill(
+                    label: _healthLabel(l10n, health),
+                    tone: _healthTone(health),
+                  ),
+              ],
+            ),
             const SizedBox(height: 8),
             summary,
+            if (failed != null) ...[
+              const SizedBox(height: 12),
+              _failedTestBanner(l10n, failed, newestFailed: failedIsNewest),
+            ],
+            ..._facts(l10n),
             if (_canRead && !_disk.smartEnabled) ...[
               const SizedBox(height: 8),
               Text(
@@ -248,6 +278,110 @@ class _DiskScreenState extends State<DiskScreen> {
     );
   }
 
+  /// The numbers that say how worn the disk is, when the server gave them.
+  List<Widget> _facts(AppLocalizations l10n) {
+    final attributes = _attributes;
+    final results = _smart;
+    // The log notes the power-on hours of every test, which is the next best
+    // thing when the attribute table is not there.
+    final loggedHours = results?.tests
+        .map((t) => t.lifetime)
+        .whereType<int>()
+        .fold<int?>(null, (a, b) => a == null || b > a ? b : a);
+    final rows = <(String, String, StatusTone)>[
+      if (attributes?.powerOnHours != null)
+        (
+          l10n.diskSmartPowerOn,
+          l10n.diskSmartHours(attributes!.powerOnHours!),
+          StatusTone.neutral,
+        )
+      else if (loggedHours != null)
+        (
+          l10n.diskSmartPowerOnAtTest,
+          l10n.diskSmartHours(loggedHours),
+          StatusTone.neutral,
+        ),
+      if (attributes?.reallocatedSectors != null)
+        (
+          l10n.diskSmartReallocated,
+          '${attributes!.reallocatedSectors}',
+          attributes.reallocatedSectors! > 0
+              ? StatusTone.warning
+              : StatusTone.good,
+        ),
+      if (attributes?.pendingSectors != null)
+        (
+          l10n.diskSmartPending,
+          '${attributes!.pendingSectors}',
+          attributes.pendingSectors! > 0 ? StatusTone.warning : StatusTone.good,
+        ),
+      if (attributes?.uncorrectableSectors != null)
+        (
+          l10n.diskSmartUncorrectable,
+          '${attributes!.uncorrectableSectors}',
+          attributes.uncorrectableSectors! > 0
+              ? StatusTone.warning
+              : StatusTone.good,
+        ),
+    ];
+    if (rows.isEmpty) return const [];
+    final palette = AppPalette.of(context);
+    return [
+      const SizedBox(height: 12),
+      for (final (label, value, tone) in rows)
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 4),
+          child: Row(
+            children: [
+              Expanded(
+                child: Text(label, style: TextStyle(color: palette.muted)),
+              ),
+              Text(
+                value,
+                style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  color: tone == StatusTone.neutral || tone == StatusTone.good
+                      ? null
+                      : palette.tone(tone).$1,
+                ),
+              ),
+            ],
+          ),
+        ),
+    ];
+  }
+
+  Widget _failedTestBanner(
+    AppLocalizations l10n,
+    SmartTest test, {
+    required bool newestFailed,
+  }) {
+    final tone = newestFailed ? StatusTone.critical : StatusTone.warning;
+    final (color, background) = AppPalette.of(context).tone(tone);
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: background,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(Icons.warning_amber_rounded, color: color),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              newestFailed
+                  ? l10n.diskSmartFailedWarning(test.description)
+                  : l10n.diskSmartEarlierFailedWarning(test.description),
+              style: TextStyle(color: color),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _testTile(AppLocalizations l10n, SmartTest test) => ListTile(
     title: Text(test.description),
     subtitle: Text(
@@ -264,6 +398,19 @@ class _DiskScreenState extends State<DiskScreen> {
     ),
   );
 }
+
+String _healthLabel(AppLocalizations l10n, SmartHealth health) =>
+    switch (health) {
+      SmartHealth.good => l10n.diskSmartHealthy,
+      SmartHealth.warning => l10n.diskSmartAttention,
+      SmartHealth.critical => l10n.diskSmartFailing,
+    };
+
+StatusTone _healthTone(SmartHealth health) => switch (health) {
+  SmartHealth.good => StatusTone.good,
+  SmartHealth.warning => StatusTone.warning,
+  SmartHealth.critical => StatusTone.critical,
+};
 
 String _statusLabel(AppLocalizations l10n, SmartTest test) => test.passed
     ? l10n.smartStatusPassed

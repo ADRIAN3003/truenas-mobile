@@ -120,6 +120,35 @@ class FakeTrueNasServer {
     },
   ];
 
+  /// Whether the server has `disk.smart_attributes`.
+  bool smartAttributes = true;
+
+  /// The attribute table of `sda`, as smartctl prints it.
+  List<Map<String, dynamic>> smartAttributeRows = [
+    _attribute(5, 'Reallocated_Sector_Ct', 100, 36, 0),
+    _attribute(9, 'Power_On_Hours', 90, 0, 12345, string: '12345'),
+    _attribute(197, 'Current_Pending_Sector', 100, 0, 0),
+    _attribute(198, 'Offline_Uncorrectable', 100, 0, 0),
+  ];
+
+  static Map<String, dynamic> _attribute(
+    int id,
+    String name,
+    int value,
+    int thresh,
+    int raw, {
+    String? string,
+    String whenFailed = '',
+  }) => {
+    'id': id,
+    'name': name,
+    'value': value,
+    'worst': value,
+    'thresh': thresh,
+    'when_failed': whenFailed,
+    'raw': {'value': raw, 'string': string ?? '$raw'},
+  };
+
   /// Percent done of the self-test running on `sda`, null when none runs.
   double? smartProgress;
 
@@ -725,6 +754,8 @@ class FakeTrueNasServer {
               if (service == 'smart.test' && smart)
                 for (final m in ['results', 'manual_test'])
                   'smart.test.$m': <String, dynamic>{},
+              if (service == 'disk' && smartAttributes)
+                'disk.smart_attributes': <String, dynamic>{},
               if (service == 'service' && !legacy)
                 'service.control': <String, dynamic>{},
               if (service == 'nvmet.subsys' && !legacy)
@@ -1210,6 +1241,8 @@ class FakeTrueNasServer {
                 'job': null,
               },
             ];
+          case 'disk.smart_attributes':
+            result = params.first == 'sda' ? smartAttributeRows : [];
           case 'disk.temperatures':
             result = {'sda': 34, 'nvme0n1': null};
           case 'alert.list':

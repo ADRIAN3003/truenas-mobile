@@ -108,8 +108,8 @@ class GlassTabBar extends StatelessWidget {
                 for (final (i, (icon, selected, label)) in destinations.indexed)
                   nlg.LiquidGlassTabItem(
                     label: label,
-                    icon: nlg.NativeLiquidGlassIcon.iconData(icon),
-                    selectedIcon: nlg.NativeLiquidGlassIcon.iconData(selected),
+                    icon: _nativeIcon(icon, selected: false),
+                    selectedIcon: _nativeIcon(selected, selected: true),
                     iosBadgeValue: (badges[i] ?? 0) > 0 ? '${badges[i]}' : null,
                   ),
               ],
@@ -179,6 +179,28 @@ class GlassTabBar extends StatelessWidget {
       ),
     );
   }
+}
+
+/// The tab's icon as an SF Symbol, which UIKit draws at the right size. The
+/// package turns a Flutter icon into a picture, and on a phone that came out
+/// several times too big, so every tab icon needs an entry here (the Material
+/// icon is the fallback, wrong size or not).
+nlg.NativeLiquidGlassIcon _nativeIcon(IconData icon, {required bool selected}) {
+  final name = switch (icon) {
+    Icons.space_dashboard_outlined => 'square.grid.2x2',
+    Icons.space_dashboard_rounded => 'square.grid.2x2.fill',
+    Icons.storage_outlined => 'externaldrive',
+    Icons.storage_rounded => 'externaldrive.fill',
+    Icons.folder_shared_outlined => 'folder.badge.person.crop',
+    Icons.folder_shared_rounded => 'folder.fill.badge.person.crop',
+    Icons.widgets_outlined => 'square.stack.3d.up',
+    Icons.widgets_rounded => 'square.stack.3d.up.fill',
+    Icons.more_horiz_rounded => 'ellipsis',
+    _ => null,
+  };
+  return name == null
+      ? nlg.NativeLiquidGlassIcon.iconData(icon)
+      : nlg.NativeLiquidGlassIcon.sfSymbol(name);
 }
 
 Widget _badged(Widget icon, int count) =>

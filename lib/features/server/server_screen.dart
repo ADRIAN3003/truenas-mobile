@@ -34,9 +34,17 @@ const railBreakpoint = 600.0;
 
 /// Connects to one saved server and shows its overview.
 class ServerScreen extends ConsumerStatefulWidget {
-  const ServerScreen(this.instanceId, {super.key});
+  const ServerScreen(
+    this.instanceId, {
+    super.key,
+    this.openAlertsOnStart = false,
+  });
 
   final String instanceId;
+
+  /// Opens the alerts list as soon as the server is connected (the user
+  /// tapped an alert notification).
+  final bool openAlertsOnStart;
 
   @override
   ConsumerState<ServerScreen> createState() => _ServerScreenState();
@@ -50,6 +58,7 @@ class _ServerScreenState extends ConsumerState<ServerScreen>
   Map<String, dynamic>? _info;
   Object? _error;
   var _tab = 0;
+  var _openedAlerts = false;
 
   /// Apps with an update, shown as a badge on the Apps tab. The tab reports it
   /// when it loads; this keeps it current while that tab is not open.
@@ -180,7 +189,14 @@ class _ServerScreenState extends ConsumerState<ServerScreen>
             .catchError((_) {});
       }
       final info = await session.systemInfo();
-      if (mounted) setState(() => _info = info);
+      if (!mounted) return;
+      setState(() => _info = info);
+      if (widget.openAlertsOnStart && !_openedAlerts) {
+        _openedAlerts = true;
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) openAlerts(context, session);
+        });
+      }
     } catch (error) {
       if (mounted) setState(() => _error = error);
     }

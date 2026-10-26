@@ -100,6 +100,18 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Run now'), findsNothing);
     await tester.tap(find.text('Stop'));
+    await tester.pumpAndSettle();
+    // Stopping asks first; cancelling leaves the task running.
+    expect(find.text('Stop Photos to B2?'), findsOneWidget);
+    await tester.tap(find.text('Cancel'));
+    await tester.pumpAndSettle();
+    expect(server.calls.map((c) => c.$1), isNot(contains('cloudsync.abort')));
+
+    await tester.tap(menuOf('Photos to B2'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Stop'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Stop').last);
     await tester.pump(const Duration(milliseconds: 500));
     await settle(tester);
     expect(server.calls.map((c) => c.$1), contains('cloudsync.abort'));

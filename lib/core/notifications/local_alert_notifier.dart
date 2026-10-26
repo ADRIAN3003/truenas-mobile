@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:flutter/foundation.dart' show ValueChanged;
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 import '../../l10n/generated/app_localizations.dart';
@@ -20,12 +21,22 @@ class LocalAlertNotifier implements AlertNotifier {
   LocalAlertNotifier({
     FlutterLocalNotificationsPlugin? plugin,
     Locale Function()? locale,
+    this.onTap,
   }) : _plugin = plugin ?? FlutterLocalNotificationsPlugin(),
        _locale = locale ?? (() => PlatformDispatcher.instance.locale);
+
+  /// Called with the server id when the user taps one of the notifications
+  /// while the app is running. The background check has no use for it.
+  final ValueChanged<String>? onTap;
 
   final FlutterLocalNotificationsPlugin _plugin;
   final Locale Function() _locale;
   bool _ready = false;
+
+  /// The payload of the notification that started the app, and when it was
+  /// read. iOS may also report that same tap through [onTap] just after.
+  String? _launchPayload;
+  DateTime? _launchRead;
 
   Future<void> _ensureReady() async {
     if (_ready) return;
@@ -40,8 +51,40 @@ class LocalAlertNotifier implements AlertNotifier {
           requestSoundPermission: false,
         ),
       ),
+      onDidReceiveNotificationResponse: _tapped,
     );
     _ready = true;
+  }
+
+  void _tapped(NotificationResponse response) {
+    final server = response.payload;
+    if (server == null || server.isEmpty) return;
+    final read = _launchRead;
+    if (server == _launchPayload &&
+        read != null &&
+        DateTime.now().difference(read) < const Duration(seconds: 3)) {
+      return;
+    }
+    onTap?.call(server);
+  }
+
+  /// Starts listening for taps and returns the server of the notification
+  /// that started the app, if the app was started by one.
+  /// Never throws: without it the app only loses the shortcut.
+  Future<String?> listenForTaps() async {
+    try {
+      await _ensureReady();
+      final launch = await _plugin.getNotificationAppLaunchDetails();
+      final payload = launch?.didNotificationLaunchApp == true
+          ? launch?.notificationResponse?.payload
+          : null;
+      if (payload == null || payload.isEmpty) return null;
+      _launchPayload = payload;
+      _launchRead = DateTime.now();
+      return payload;
+    } catch (_) {
+      return null;
+    }
   }
 
   AppLocalizations get _l10n {

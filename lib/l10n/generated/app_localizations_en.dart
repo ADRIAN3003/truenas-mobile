@@ -1638,6 +1638,9 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get taskStopBody => 'It stops now and can be run again later.';
+
+  @override
   String taskStopped(String name) {
     return 'Stopped $name';
   }

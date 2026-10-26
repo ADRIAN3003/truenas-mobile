@@ -2834,6 +2834,12 @@ abstract class AppLocalizations {
   /// **'Started {name}'**
   String taskStarted(String name);
 
+  /// Confirmation body for stopping a running replication, sync or other data protection task.
+  ///
+  /// In en, this message translates to:
+  /// **'It stops now and can be run again later.'**
+  String get taskStopBody;
+
   /// Snackbar.
   ///
   /// In en, this message translates to:

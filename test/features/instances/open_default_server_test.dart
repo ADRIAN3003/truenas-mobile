@@ -5,6 +5,7 @@ import 'package:truenas_mobile/app.dart';
 import 'package:truenas_mobile/core/instances/instance_repository.dart';
 import 'package:truenas_mobile/core/instances/instances_provider.dart';
 import 'package:truenas_mobile/core/instances/server_instance.dart';
+import 'package:truenas_mobile/core/notifications/alert_taps.dart';
 import 'package:truenas_mobile/core/settings/app_settings.dart';
 import 'package:truenas_mobile/core/settings/settings_provider.dart';
 import 'package:truenas_mobile/features/instances/open_default_server.dart';
@@ -23,11 +24,14 @@ ServerInstance _server(String id, String name) => ServerInstance(
 );
 
 void main() {
+  late ProviderContainer appContainer;
+
   Future<void> start(
     WidgetTester tester,
     List<ServerInstance> servers, {
     AppSettings settings = const AppSettings(),
     bool autoOpen = true,
+    String? launchAlertServer,
   }) async {
     final store = MemoryStore();
     await InstanceRepository(store).save(servers);
@@ -36,9 +40,11 @@ void main() {
         instanceRepositoryProvider.overrideWithValue(InstanceRepository(store)),
         initialSettingsProvider.overrideWithValue(settings),
         openDefaultServerProvider.overrideWithValue(autoOpen),
+        launchAlertServerProvider.overrideWithValue(launchAlertServer),
       ],
     );
     addTearDown(container.dispose);
+    appContainer = container;
     await tester.pumpWidget(
       UncontrolledProviderScope(
         container: container,
@@ -102,5 +108,44 @@ void main() {
       autoOpen: false,
     );
     expect(find.text('Default'), findsOneWidget);
+  });
+
+  testWidgets('a tapped alert notification opens its server, not the default', (
+    tester,
+  ) async {
+    await start(
+      tester,
+      [_server('a', 'Home'), _server('b', 'Office')],
+      settings: const AppSettings(defaultServerId: 'a'),
+      launchAlertServer: 'b',
+    );
+    final screen = tester.widget<ServerScreen>(find.byType(ServerScreen));
+    expect(screen.instanceId, 'b');
+    expect(screen.openAlertsOnStart, isTrue);
+    expect(find.byType(ServerScreen), findsOneWidget);
+    expect(appContainer.read(pendingAlertServerProvider), isNull);
+  });
+
+  testWidgets('a notification tapped while the app runs opens its server', (
+    tester,
+  ) async {
+    await start(tester, [_server('a', 'Home'), _server('b', 'Office')]);
+    expect(find.byType(ServerScreen), findsNothing);
+    appContainer.read(pendingAlertServerProvider.notifier).open('b');
+    await tester.pumpAndSettle();
+    final screen = tester.widget<ServerScreen>(find.byType(ServerScreen));
+    expect(screen.instanceId, 'b');
+    expect(screen.openAlertsOnStart, isTrue);
+  });
+
+  testWidgets('a tapped notification of a removed server does nothing', (
+    tester,
+  ) async {
+    await start(tester, [
+      _server('a', 'Home'),
+      _server('b', 'Office'),
+    ], launchAlertServer: 'gone');
+    expect(find.byType(ServerScreen), findsNothing);
+    expect(find.text('Home'), findsOneWidget);
   });
 }

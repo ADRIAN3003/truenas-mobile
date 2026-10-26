@@ -610,6 +610,9 @@ class FakeTrueNasServer {
         }),
       );
       socket.listen((raw) {
+        // A message that was already on its way when the connection was
+        // dropped (dropConnections) gets no answer.
+        if (socket.readyState != WebSocket.open) return;
         final message = jsonDecode(raw as String) as Map<String, dynamic>;
         final params = message['params'] as List<dynamic>;
         Object? result;

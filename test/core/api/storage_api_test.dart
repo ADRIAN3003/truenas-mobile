@@ -176,6 +176,94 @@ void main() {
     ]);
   });
 
+  test('smart attributes give hours and sector counts', () async {
+    await connect();
+    final disk = (await session.storage.disks()).first;
+    expect(await session.storage.canReadSmartAttributes(), isTrue);
+    final attributes = await session.storage.smartAttributes(disk);
+    expect(attributes.powerOnHours, 12345);
+    expect(attributes.reallocatedSectors, 0);
+    expect(attributes.pendingSectors, 0);
+    expect(attributes.sectorsBad, isFalse);
+    expect(server.calls.last.$1, 'disk.smart_attributes');
+    expect(server.calls.last.$2, ['sda']);
+  });
+
+  test('attribute raw values with extra text keep the leading number', () {
+    final attributes = SmartAttributes.fromJson([
+      {
+        'id': 9,
+        'name': 'Power_On_Hours',
+        'raw': {'value': 4294967296, 'string': '12345h+12m+3.000s'},
+      },
+      {'id': 5, 'raw': 7},
+      {'id': 197, 'raw': '3 (0 0 0)'},
+    ]);
+    expect(attributes.powerOnHours, 12345);
+    expect(attributes.reallocatedSectors, 7);
+    expect(attributes.pendingSectors, 3);
+    expect(attributes.sectorsBad, isTrue);
+  });
+
+  test(
+    'a disk without attributes, or a server without them, gives none',
+    () async {
+      await connect();
+      final disk = (await session.storage.disks()).last;
+      expect((await session.storage.smartAttributes(disk)).isEmpty, isTrue);
+      expect(SmartAttributes.fromJson('nonsense').isEmpty, isTrue);
+    },
+  );
+
+  test('attribute support follows the method catalog', () async {
+    await connect();
+    server.smartAttributes = false;
+    expect(await session.storage.canReadSmartAttributes(), isFalse);
+  });
+
+  test('health is critical when the newest finished test failed', () {
+    final results = SmartResults.fromJson({
+      'tests': [
+        {'num': 1, 'status': 'FAILED'},
+        {'num': 2, 'status': 'SUCCESS'},
+      ],
+    });
+    expect(smartHealth(results, null), SmartHealth.critical);
+  });
+
+  test('health is a warning for an older failure or bad sectors', () {
+    final older = SmartResults.fromJson({
+      'tests': [
+        {'num': 1, 'status': 'SUCCESS'},
+        {'num': 2, 'status': 'FAILED'},
+      ],
+    });
+    expect(smartHealth(older, null), SmartHealth.warning);
+    final passed = SmartResults.fromJson({
+      'tests': [
+        {'num': 1, 'status': 'SUCCESS'},
+      ],
+    });
+    expect(smartHealth(passed, null), SmartHealth.good);
+    final bad = SmartAttributes.fromJson([
+      {'id': 5, 'raw': 12},
+    ]);
+    expect(smartHealth(passed, bad), SmartHealth.warning);
+    final failing = SmartAttributes.fromJson([
+      {'id': 1, 'when_failed': 'FAILING_NOW', 'raw': 0},
+    ]);
+    expect(smartHealth(passed, failing), SmartHealth.critical);
+    final past = SmartAttributes.fromJson([
+      {'id': 1, 'when_failed': 'In_the_past', 'raw': 0},
+    ]);
+    expect(smartHealth(null, past), SmartHealth.warning);
+  });
+
+  test('health is unknown with no tests and no attributes', () {
+    expect(smartHealth(SmartResults.none, SmartAttributes.none), isNull);
+    expect(smartHealth(null, null), isNull);
+  });
+
   test('a disk without a log has no results', () async {
     await connect();
     final disk = (await session.storage.disks()).last;

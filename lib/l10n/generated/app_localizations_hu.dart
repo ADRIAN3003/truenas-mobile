@@ -2214,6 +2214,45 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String get settingsJobNotifications => 'Befejezett feladatok';
+
+  @override
+  String get settingsJobNotificationsHint =>
+      'Értesítést kérek, ha egy scrub, replikáció vagy felhőszinkron befejeződik vagy hibával leáll';
+
+  @override
+  String get jobNotificationChannel => 'Befejezett feladatok';
+
+  @override
+  String get jobNotificationChannelDescription =>
+      'Befejezett vagy hibával leállt scrubok, replikációk és felhőszinkronok';
+
+  @override
+  String jobNotificationDone(String what) {
+    return '$what befejeződött';
+  }
+
+  @override
+  String jobNotificationFailed(String what) {
+    return '$what hibával leállt';
+  }
+
+  @override
+  String jobNotificationFailedWithError(String what, String error) {
+    return '$what hibával leállt: $error';
+  }
+
+  @override
+  String jobNotificationMany(int count) {
+    return '$count feladat befejeződött';
+  }
+
+  @override
+  String jobNotificationManyFailed(int count, int failed) {
+    return '$count feladat befejeződött, ebből $failed hibával';
+  }
+
+  @override
   String get settingsSecurity => 'Biztonság';
 
   @override
@@ -2963,6 +3002,45 @@ class AppLocalizationsHu extends AppLocalizations {
   @override
   String appLogsLastLines(int count) {
     return 'Utolsó $count sor';
+  }
+
+  @override
+  String get diskSmartHealthy => 'Egészséges';
+
+  @override
+  String get diskSmartAttention => 'Figyelmet igényel';
+
+  @override
+  String get diskSmartFailing => 'Meghibásodik';
+
+  @override
+  String get diskSmartPowerOn => 'Üzemidő';
+
+  @override
+  String get diskSmartPowerOnAtTest => 'Üzemidő az utolsó teszten';
+
+  @override
+  String diskSmartHours(int hours) {
+    return '$hours óra';
+  }
+
+  @override
+  String get diskSmartReallocated => 'Átcsoportosított szektorok';
+
+  @override
+  String get diskSmartPending => 'Függőben lévő szektorok';
+
+  @override
+  String get diskSmartUncorrectable => 'Javíthatatlan szektorok';
+
+  @override
+  String diskSmartFailedWarning(String test) {
+    return 'Az utolsó önteszt hibát talált: $test';
+  }
+
+  @override
+  String diskSmartEarlierFailedWarning(String test) {
+    return 'Egy korábbi önteszt hibát talált: $test';
   }
 
   @override

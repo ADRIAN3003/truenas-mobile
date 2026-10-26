@@ -5,7 +5,8 @@ import '../../core/instances/instances_provider.dart';
 import '../../core/notifications/alert_taps.dart';
 import '../server/server_screen.dart';
 
-/// Opens a server's alerts when the user taps one of its alert notifications,
+/// Opens a server's alerts when the user taps one of its alert notifications
+/// (or the server itself for a finished-job one, see [jobPayloadPrefix]),
 /// whether the app was closed, in the background or open. Wraps the first
 /// screen, inside [OpenDefaultServer] so that one steps aside for the tap.
 class OpenAlertFromNotification extends ConsumerStatefulWidget {
@@ -29,8 +30,12 @@ class _OpenAlertFromNotificationState
     );
   }
 
-  Future<void> _open(String? serverId) async {
-    if (serverId == null) return;
+  Future<void> _open(String? payload) async {
+    if (payload == null) return;
+    final forJob = payload.startsWith(jobPayloadPrefix);
+    final serverId = forJob
+        ? payload.substring(jobPayloadPrefix.length)
+        : payload;
     ref.read(pendingAlertServerProvider.notifier).clear();
     final servers = await ref.read(instancesProvider.future);
     // The server may have been removed since the notification was shown.
@@ -38,7 +43,7 @@ class _OpenAlertFromNotificationState
     await Navigator.push(
       context,
       MaterialPageRoute<void>(
-        builder: (_) => ServerScreen(serverId, openAlertsOnStart: true),
+        builder: (_) => ServerScreen(serverId, openAlertsOnStart: !forJob),
       ),
     );
   }

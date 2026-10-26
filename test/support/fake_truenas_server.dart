@@ -120,6 +120,35 @@ class FakeTrueNasServer {
     },
   ];
 
+  /// Whether the server has `disk.smart_attributes`.
+  bool smartAttributes = true;
+
+  /// The attribute table of `sda`, as smartctl prints it.
+  List<Map<String, dynamic>> smartAttributeRows = [
+    _attribute(5, 'Reallocated_Sector_Ct', 100, 36, 0),
+    _attribute(9, 'Power_On_Hours', 90, 0, 12345, string: '12345'),
+    _attribute(197, 'Current_Pending_Sector', 100, 0, 0),
+    _attribute(198, 'Offline_Uncorrectable', 100, 0, 0),
+  ];
+
+  static Map<String, dynamic> _attribute(
+    int id,
+    String name,
+    int value,
+    int thresh,
+    int raw, {
+    String? string,
+    String whenFailed = '',
+  }) => {
+    'id': id,
+    'name': name,
+    'value': value,
+    'worst': value,
+    'thresh': thresh,
+    'when_failed': whenFailed,
+    'raw': {'value': raw, 'string': string ?? '$raw'},
+  };
+
   /// Percent done of the self-test running on `sda`, null when none runs.
   double? smartProgress;
 
@@ -517,6 +546,10 @@ class FakeTrueNasServer {
   };
   var _nextJobId = 100;
 
+  /// More jobs for `core.get_jobs` (oldest first, ids above [runningScrub]'s):
+  /// tests add and change these to start and finish jobs.
+  final jobs = <Map<String, dynamic>>[];
+
   /// Events passed to `core.subscribe`.
   final subscriptions = <String>[];
 
@@ -725,6 +758,8 @@ class FakeTrueNasServer {
               if (service == 'smart.test' && smart)
                 for (final m in ['results', 'manual_test'])
                   'smart.test.$m': <String, dynamic>{},
+              if (service == 'disk' && smartAttributes)
+                'disk.smart_attributes': <String, dynamic>{},
               if (service == 'service' && !legacy)
                 'service.control': <String, dynamic>{},
               if (service == 'nvmet.subsys' && !legacy)
@@ -1210,6 +1245,8 @@ class FakeTrueNasServer {
                 'job': null,
               },
             ];
+          case 'disk.smart_attributes':
+            result = params.first == 'sda' ? smartAttributeRows : [];
           case 'disk.temperatures':
             result = {'sda': 34, 'nvme0n1': null};
           case 'alert.list':
@@ -1222,9 +1259,27 @@ class FakeTrueNasServer {
           case 'core.get_jobs'
               when params.isNotEmpty &&
                   (params.first as List).isNotEmpty &&
+                  ((params.first as List).first as List)[0] == 'id' &&
+                  (((params.first as List).first as List)[1] == '>' ||
+                      ((params.first as List).first as List)[1] == 'in'):
+            final filter = (params.first as List).first as List;
+            result = [
+              for (final job in jobs)
+                if (filter[1] == '>'
+                    ? (job['id'] as int) > (filter[2] as int)
+                    : (filter[2] as List).contains(job['id']))
+                  job,
+            ];
+          case 'core.get_jobs'
+              when params.isNotEmpty &&
+                  (params.first as List).isNotEmpty &&
                   ((params.first as List).first as List)[0] == 'state':
             // The jobs that are waiting or running.
-            result = [runningScrub];
+            result = [
+              runningScrub,
+              for (final job in jobs)
+                if (job['state'] == 'WAITING' || job['state'] == 'RUNNING') job,
+            ];
           case 'core.get_jobs'
               when params.isNotEmpty && (params.first as List).isNotEmpty:
             final filters = params.first as List;
@@ -1233,7 +1288,14 @@ class FakeTrueNasServer {
                 if (filters.every((f) => job[(f as List)[0]] == f[2])) job,
             ];
           case 'core.get_jobs':
-            result = [runningScrub];
+            // Newest first, as `order_by: ['-id']` says.
+            final limit = params.length > 1
+                ? (params[1] as Map)['limit'] as int?
+                : null;
+            result = [
+              ...jobs.reversed,
+              runningScrub,
+            ].take(limit ?? 1000).toList();
         }
         socket.add(
           jsonEncode({'jsonrpc': '2.0', 'id': message['id'], 'result': result}),

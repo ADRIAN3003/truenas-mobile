@@ -2216,6 +2216,45 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get settingsJobNotifications => 'Finished jobs';
+
+  @override
+  String get settingsJobNotificationsHint =>
+      'Tell me when a scrub, replication or cloud sync finishes or fails';
+
+  @override
+  String get jobNotificationChannel => 'Finished jobs';
+
+  @override
+  String get jobNotificationChannelDescription =>
+      'Scrubs, replications and cloud syncs that finished or failed';
+
+  @override
+  String jobNotificationDone(String what) {
+    return '$what finished';
+  }
+
+  @override
+  String jobNotificationFailed(String what) {
+    return '$what failed';
+  }
+
+  @override
+  String jobNotificationFailedWithError(String what, String error) {
+    return '$what failed: $error';
+  }
+
+  @override
+  String jobNotificationMany(int count) {
+    return '$count jobs finished';
+  }
+
+  @override
+  String jobNotificationManyFailed(int count, int failed) {
+    return '$count jobs finished, $failed failed';
+  }
+
+  @override
   String get settingsSecurity => 'Security';
 
   @override
@@ -2991,6 +3030,45 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String appLogsLastLines(int count) {
     return 'Last $count lines';
+  }
+
+  @override
+  String get diskSmartHealthy => 'Healthy';
+
+  @override
+  String get diskSmartAttention => 'Needs attention';
+
+  @override
+  String get diskSmartFailing => 'Failing';
+
+  @override
+  String get diskSmartPowerOn => 'Power-on time';
+
+  @override
+  String get diskSmartPowerOnAtTest => 'Power-on time at last test';
+
+  @override
+  String diskSmartHours(int hours) {
+    return '$hours h';
+  }
+
+  @override
+  String get diskSmartReallocated => 'Reallocated sectors';
+
+  @override
+  String get diskSmartPending => 'Pending sectors';
+
+  @override
+  String get diskSmartUncorrectable => 'Uncorrectable sectors';
+
+  @override
+  String diskSmartFailedWarning(String test) {
+    return 'The last self-test failed: $test';
+  }
+
+  @override
+  String diskSmartEarlierFailedWarning(String test) {
+    return 'An earlier self-test failed: $test';
   }
 
   @override

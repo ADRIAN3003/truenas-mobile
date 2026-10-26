@@ -3782,6 +3782,60 @@ abstract class AppLocalizations {
   /// **'{count} new alerts'**
   String alertNotificationMany(int count);
 
+  /// Setting: notify when a scrub, replication or cloud sync finishes or fails.
+  ///
+  /// In en, this message translates to:
+  /// **'Finished jobs'**
+  String get settingsJobNotifications;
+
+  /// Explains the finished jobs notification setting.
+  ///
+  /// In en, this message translates to:
+  /// **'Tell me when a scrub, replication or cloud sync finishes or fails'**
+  String get settingsJobNotificationsHint;
+
+  /// Name of the Android notification channel for jobs that finished.
+  ///
+  /// In en, this message translates to:
+  /// **'Finished jobs'**
+  String get jobNotificationChannel;
+
+  /// Description of the Android notification channel for finished jobs.
+  ///
+  /// In en, this message translates to:
+  /// **'Scrubs, replications and cloud syncs that finished or failed'**
+  String get jobNotificationChannelDescription;
+
+  /// Notification text when a job finished. what is e.g. 'Scrub · tank' or 'Cloud sync'.
+  ///
+  /// In en, this message translates to:
+  /// **'{what} finished'**
+  String jobNotificationDone(String what);
+
+  /// Notification text when a job failed. what is e.g. 'Scrub · tank' or 'Cloud sync'.
+  ///
+  /// In en, this message translates to:
+  /// **'{what} failed'**
+  String jobNotificationFailed(String what);
+
+  /// Notification text when a job failed, with the first line of the server's error.
+  ///
+  /// In en, this message translates to:
+  /// **'{what} failed: {error}'**
+  String jobNotificationFailedWithError(String what, String error);
+
+  /// Notification text when several jobs finished at once.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} jobs finished'**
+  String jobNotificationMany(int count);
+
+  /// Notification text when several jobs finished at once and some failed.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} jobs finished, {failed} failed'**
+  String jobNotificationManyFailed(int count, int failed);
+
   /// Settings section.
   ///
   /// In en, this message translates to:
@@ -4921,6 +4975,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Last {count} lines'**
   String appLogsLastLines(int count);
+
+  /// Overall S.M.A.R.T. verdict: nothing wrong found.
+  ///
+  /// In en, this message translates to:
+  /// **'Healthy'**
+  String get diskSmartHealthy;
+
+  /// Overall S.M.A.R.T. verdict: signs of wear or an old failure.
+  ///
+  /// In en, this message translates to:
+  /// **'Needs attention'**
+  String get diskSmartAttention;
+
+  /// Overall S.M.A.R.T. verdict: the disk reports a failure now.
+  ///
+  /// In en, this message translates to:
+  /// **'Failing'**
+  String get diskSmartFailing;
+
+  /// Label for how long the disk has been running.
+  ///
+  /// In en, this message translates to:
+  /// **'Power-on time'**
+  String get diskSmartPowerOn;
+
+  /// Label for the disk age read from the self-test log, shown when the attribute table is missing.
+  ///
+  /// In en, this message translates to:
+  /// **'Power-on time at last test'**
+  String get diskSmartPowerOnAtTest;
+
+  /// Number of power-on hours.
+  ///
+  /// In en, this message translates to:
+  /// **'{hours} h'**
+  String diskSmartHours(int hours);
+
+  /// S.M.A.R.T. attribute: sectors moved to spare area.
+  ///
+  /// In en, this message translates to:
+  /// **'Reallocated sectors'**
+  String get diskSmartReallocated;
+
+  /// S.M.A.R.T. attribute: sectors waiting to be moved.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending sectors'**
+  String get diskSmartPending;
+
+  /// S.M.A.R.T. attribute: sectors that could not be read.
+  ///
+  /// In en, this message translates to:
+  /// **'Uncorrectable sectors'**
+  String get diskSmartUncorrectable;
+
+  /// Warning when the newest finished self-test failed.
+  ///
+  /// In en, this message translates to:
+  /// **'The last self-test failed: {test}'**
+  String diskSmartFailedWarning(String test);
+
+  /// Warning when an older self-test failed but a later one passed.
+  ///
+  /// In en, this message translates to:
+  /// **'An earlier self-test failed: {test}'**
+  String diskSmartEarlierFailedWarning(String test);
 
   /// Button or menu entry that puts a shortcut on the Android home screen.
   ///

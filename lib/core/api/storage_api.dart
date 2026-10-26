@@ -169,6 +169,24 @@ class StorageApi {
         : SmartResults.fromJson(asMap(result.first));
   }
 
+  /// Whether the server can read the attribute table
+  /// (`disk.smart_attributes`). Written from the middleware source and
+  /// unconfirmed on a real NAS, hence optional everywhere.
+  Future<bool> canReadSmartAttributes() async =>
+      _catalog.has('disk.smart_attributes');
+
+  /// The attribute table of [disk]: power-on hours, sector counts and so on.
+  /// Empty for disks that have none (NVMe) or when the server refuses.
+  Future<SmartAttributes> smartAttributes(Disk disk) async {
+    try {
+      return SmartAttributes.fromJson(
+        await _client.call('disk.smart_attributes', [disk.name]),
+      );
+    } catch (_) {
+      return SmartAttributes.none;
+    }
+  }
+
   /// Starts a self-test of [type] on [disk]. The test runs on the disk, not
   /// as a job, so progress is read back with [smartResults].
   Future<void> runSmartTest(Disk disk, SmartTestType type) async {

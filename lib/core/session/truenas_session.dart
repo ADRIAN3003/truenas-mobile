@@ -155,6 +155,11 @@ class TrueNasSession {
     ['id', 'in', ids.toList()],
   ]);
 
+  /// Jobs newer than [id], finished or not.
+  Future<List<TrueNasJob>> jobsAfter(int id) => _jobsWhere([
+    ['id', '>', id],
+  ]);
+
   Future<List<TrueNasJob>> _jobsWhere(List<Object?> filters) async {
     final result = await client.call('core.get_jobs', [filters]) as List;
     return result

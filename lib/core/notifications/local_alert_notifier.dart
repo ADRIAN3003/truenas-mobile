@@ -5,7 +5,10 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 import '../../l10n/generated/app_localizations.dart';
 import '../instances/server_instance.dart';
+import '../jobs/tracked_job.dart';
 import '../models/alert.dart';
+import '../models/job.dart';
+import 'alert_taps.dart';
 import 'alert_watcher.dart';
 
 /// Android's small status bar icon: a white warning triangle in
@@ -14,6 +17,10 @@ const _androidIcon = 'ic_stat_alert';
 
 /// The channel the alerts are posted in (Android lets the user tune it).
 const _channelId = 'alerts';
+
+/// The channel for jobs that finished, apart from the alerts so that each can
+/// be silenced on its own (and at a lower importance: it is good news too).
+const _jobsChannelId = 'finished_jobs';
 
 /// Shows alerts as phone notifications, in the phone's language or the one
 /// chosen in the app. Works in the background too: it needs no screen.
@@ -141,6 +148,50 @@ class LocalAlertNotifier implements AlertNotifier {
       payload: server.id,
     );
   }
+
+  @override
+  Future<void> showJobs(ServerInstance server, List<TrackedJob> jobs) async {
+    if (jobs.isEmpty) return;
+    await _ensureReady();
+    final l10n = _l10n;
+    final single = jobs.length == 1;
+    final failed = jobs.where((j) => j.job.state == JobState.failed).length;
+    final String body;
+    if (single) {
+      final job = jobs.first;
+      final what = _jobName(l10n, job);
+      body = job.job.state == JobState.failed
+          ? _failedBody(l10n, what, job.job.error)
+          : l10n.jobNotificationDone(what);
+    } else {
+      body = failed == 0
+          ? l10n.jobNotificationMany(jobs.length)
+          : l10n.jobNotificationManyFailed(jobs.length, failed);
+    }
+    await _plugin.show(
+      id: _stableId(
+        single ? 'job:${server.id}:${jobs.first.id}' : 'jobs:${server.id}',
+      ),
+      title: server.name,
+      body: body,
+      notificationDetails: NotificationDetails(
+        android: AndroidNotificationDetails(
+          _jobsChannelId,
+          l10n.jobNotificationChannel,
+          channelDescription: l10n.jobNotificationChannelDescription,
+          importance: failed > 0
+              ? Importance.high
+              : Importance.defaultImportance,
+          priority: failed > 0 ? Priority.high : Priority.defaultPriority,
+          icon: _androidIcon,
+          groupKey: server.id,
+          styleInformation: BigTextStyleInformation(body),
+        ),
+        iOS: DarwinNotificationDetails(threadIdentifier: server.id),
+      ),
+      payload: '$jobPayloadPrefix${server.id}',
+    );
+  }
 }
 
 /// A notification id from [text] that is the same in every run (unlike
@@ -151,4 +202,28 @@ int _stableId(String text) {
     hash = ((hash ^ unit) * 0x01000193) & 0x7fffffff;
   }
   return hash;
+}
+
+/// "Scrub · tank" for a scrub of pool tank, "Cloud sync" when the job does not
+/// say what it works on.
+String _jobName(AppLocalizations l10n, TrackedJob job) {
+  final kind = switch (job.kind) {
+    JobKind.scrub => l10n.jobKindScrub,
+    JobKind.replication => l10n.jobKindReplication,
+    JobKind.appUpdate => l10n.jobKindAppUpdate,
+    JobKind.cloudSync => l10n.jobKindCloudSync,
+    JobKind.cloudBackup => l10n.jobKindCloudBackup,
+    JobKind.rsync => l10n.jobKindRsync,
+    JobKind.systemUpdate => l10n.jobKindSystemUpdate,
+  };
+  return job.target == null ? kind : '$kind · ${job.target}';
+}
+
+/// The server's error text is long and technical: its first line, cut short.
+String _failedBody(AppLocalizations l10n, String what, String? error) {
+  var line = (error ?? '').trim().split('\n').first.trim();
+  if (line.length > 160) line = '${line.substring(0, 159)}…';
+  return line.isEmpty
+      ? l10n.jobNotificationFailed(what)
+      : l10n.jobNotificationFailedWithError(what, line);
 }

@@ -200,6 +200,22 @@ README covers what the app does; this file covers how to work on it.
   fake the phone with `FakeAlertNotifier`/`FakeBackgroundScheduler`
   (`test/support/alert_fakes.dart`) and the service provider is off unless
   `main` overrides it.
+- Finished-job notifications (`lib/core/notifications/job_watch.dart`, setting
+  `jobNotifications`, on by default, shown under Settings > Notifications once
+  alert notifications are on): the same background check also tells when a
+  scrub, replication, cloud sync, cloud backup or rsync task ended (done or
+  failed; aborted ones and anything that ended over 24 h ago are skipped).
+  `watchJobs` keeps `jobwatch.v1` per server: the highest job id seen and the
+  watched jobs that were still running. Next time it asks `core.get_jobs` for
+  ids above that (jobs that started and ended in between) and for the
+  remembered ones by id. A first look, and the moment the feature is turned
+  on, only record. With the setting off it still records, so switching it on
+  does not replay old jobs. A job that ended while the app was open is
+  reported too if the check runs later (the app does not mark it as seen).
+  Own channel (`finished_jobs`); the payload is `job:<server id>`
+  (`jobPayloadPrefix`), so a tap opens the server, not its alerts. A failure
+  here never holds up the alerts of the same visit. Fake server:
+  `FakeTrueNasServer.jobs`, `FakeAlertNotifier.shownJobs`.
 - Alert types can be muted (`mutedAlertKinds`, the alert's `klass`, global not
   per server). `AlertWatcher` still records muted alerts as seen, so
   unmuting never replays old ones. The list for Settings > Notifications >

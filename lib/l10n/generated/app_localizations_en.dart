@@ -2216,6 +2216,45 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get settingsJobNotifications => 'Finished jobs';
+
+  @override
+  String get settingsJobNotificationsHint =>
+      'Tell me when a scrub, replication or cloud sync finishes or fails';
+
+  @override
+  String get jobNotificationChannel => 'Finished jobs';
+
+  @override
+  String get jobNotificationChannelDescription =>
+      'Scrubs, replications and cloud syncs that finished or failed';
+
+  @override
+  String jobNotificationDone(String what) {
+    return '$what finished';
+  }
+
+  @override
+  String jobNotificationFailed(String what) {
+    return '$what failed';
+  }
+
+  @override
+  String jobNotificationFailedWithError(String what, String error) {
+    return '$what failed: $error';
+  }
+
+  @override
+  String jobNotificationMany(int count) {
+    return '$count jobs finished';
+  }
+
+  @override
+  String jobNotificationManyFailed(int count, int failed) {
+    return '$count jobs finished, $failed failed';
+  }
+
+  @override
   String get settingsSecurity => 'Security';
 
   @override

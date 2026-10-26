@@ -546,6 +546,10 @@ class FakeTrueNasServer {
   };
   var _nextJobId = 100;
 
+  /// More jobs for `core.get_jobs` (oldest first, ids above [runningScrub]'s):
+  /// tests add and change these to start and finish jobs.
+  final jobs = <Map<String, dynamic>>[];
+
   /// Events passed to `core.subscribe`.
   final subscriptions = <String>[];
 
@@ -1255,9 +1259,27 @@ class FakeTrueNasServer {
           case 'core.get_jobs'
               when params.isNotEmpty &&
                   (params.first as List).isNotEmpty &&
+                  ((params.first as List).first as List)[0] == 'id' &&
+                  (((params.first as List).first as List)[1] == '>' ||
+                      ((params.first as List).first as List)[1] == 'in'):
+            final filter = (params.first as List).first as List;
+            result = [
+              for (final job in jobs)
+                if (filter[1] == '>'
+                    ? (job['id'] as int) > (filter[2] as int)
+                    : (filter[2] as List).contains(job['id']))
+                  job,
+            ];
+          case 'core.get_jobs'
+              when params.isNotEmpty &&
+                  (params.first as List).isNotEmpty &&
                   ((params.first as List).first as List)[0] == 'state':
             // The jobs that are waiting or running.
-            result = [runningScrub];
+            result = [
+              runningScrub,
+              for (final job in jobs)
+                if (job['state'] == 'WAITING' || job['state'] == 'RUNNING') job,
+            ];
           case 'core.get_jobs'
               when params.isNotEmpty && (params.first as List).isNotEmpty:
             final filters = params.first as List;
@@ -1266,7 +1288,14 @@ class FakeTrueNasServer {
                 if (filters.every((f) => job[(f as List)[0]] == f[2])) job,
             ];
           case 'core.get_jobs':
-            result = [runningScrub];
+            // Newest first, as `order_by: ['-id']` says.
+            final limit = params.length > 1
+                ? (params[1] as Map)['limit'] as int?
+                : null;
+            result = [
+              ...jobs.reversed,
+              runningScrub,
+            ].take(limit ?? 1000).toList();
         }
         socket.add(
           jsonEncode({'jsonrpc': '2.0', 'id': message['id'], 'result': result}),

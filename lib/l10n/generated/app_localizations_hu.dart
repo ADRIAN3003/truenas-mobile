@@ -2214,6 +2214,45 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String get settingsJobNotifications => 'Befejezett feladatok';
+
+  @override
+  String get settingsJobNotificationsHint =>
+      'Értesítést kérek, ha egy scrub, replikáció vagy felhőszinkron befejeződik vagy hibával leáll';
+
+  @override
+  String get jobNotificationChannel => 'Befejezett feladatok';
+
+  @override
+  String get jobNotificationChannelDescription =>
+      'Befejezett vagy hibával leállt scrubok, replikációk és felhőszinkronok';
+
+  @override
+  String jobNotificationDone(String what) {
+    return '$what befejeződött';
+  }
+
+  @override
+  String jobNotificationFailed(String what) {
+    return '$what hibával leállt';
+  }
+
+  @override
+  String jobNotificationFailedWithError(String what, String error) {
+    return '$what hibával leállt: $error';
+  }
+
+  @override
+  String jobNotificationMany(int count) {
+    return '$count feladat befejeződött';
+  }
+
+  @override
+  String jobNotificationManyFailed(int count, int failed) {
+    return '$count feladat befejeződött, ebből $failed hibával';
+  }
+
+  @override
   String get settingsSecurity => 'Biztonság';
 
   @override

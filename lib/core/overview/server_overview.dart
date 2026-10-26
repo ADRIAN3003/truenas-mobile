@@ -93,6 +93,7 @@ class ServerOverviewLoader {
   final Duration timeout;
 
   final _sessions = <String, TrueNasSession>{};
+  var _closed = false;
 
   /// Looks at every server in [servers] and calls [onEntry] as each answers.
   /// Sessions of servers no longer in the list are closed.
@@ -111,8 +112,7 @@ class ServerOverviewLoader {
 
   Future<OverviewEntry> _look(ServerInstance server) async {
     try {
-      final session = _sessions[server.id] ??= await _connect(server)
-          .timeout(timeout);
+      final session = _sessions[server.id] ??= await _open(server);
       final (pools, alerts, jobs) = await (
         session.pools(),
         session.alerts(),
@@ -147,6 +147,17 @@ class ServerOverviewLoader {
     }
   }
 
+  /// Signs in to [server]. A sign-in that ends after [close] is closed at
+  /// once, so leaving the overview mid-look leaves no session behind.
+  Future<TrueNasSession> _open(ServerInstance server) async {
+    final session = await _connect(server).timeout(timeout);
+    if (_closed) {
+      unawaited(session.close().catchError((_) {}));
+      throw const ConnectCancelled();
+    }
+    return session;
+  }
+
   Future<void> _drop(String id) async {
     final session = _sessions.remove(id);
     try {
@@ -155,6 +166,7 @@ class ServerOverviewLoader {
   }
 
   Future<void> close() async {
+    _closed = true;
     for (final id in _sessions.keys.toList()) {
       await _drop(id);
     }

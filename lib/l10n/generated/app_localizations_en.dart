@@ -2992,4 +2992,43 @@ class AppLocalizationsEn extends AppLocalizations {
   String appLogsLastLines(int count) {
     return 'Last $count lines';
   }
+
+  @override
+  String get diskSmartHealthy => 'Healthy';
+
+  @override
+  String get diskSmartAttention => 'Needs attention';
+
+  @override
+  String get diskSmartFailing => 'Failing';
+
+  @override
+  String get diskSmartPowerOn => 'Power-on time';
+
+  @override
+  String get diskSmartPowerOnAtTest => 'Power-on time at last test';
+
+  @override
+  String diskSmartHours(int hours) {
+    return '$hours h';
+  }
+
+  @override
+  String get diskSmartReallocated => 'Reallocated sectors';
+
+  @override
+  String get diskSmartPending => 'Pending sectors';
+
+  @override
+  String get diskSmartUncorrectable => 'Uncorrectable sectors';
+
+  @override
+  String diskSmartFailedWarning(String test) {
+    return 'The last self-test failed: $test';
+  }
+
+  @override
+  String diskSmartEarlierFailedWarning(String test) {
+    return 'An earlier self-test failed: $test';
+  }
 }

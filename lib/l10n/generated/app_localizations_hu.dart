@@ -2964,4 +2964,43 @@ class AppLocalizationsHu extends AppLocalizations {
   String appLogsLastLines(int count) {
     return 'Utolsó $count sor';
   }
+
+  @override
+  String get diskSmartHealthy => 'Egészséges';
+
+  @override
+  String get diskSmartAttention => 'Figyelmet igényel';
+
+  @override
+  String get diskSmartFailing => 'Meghibásodik';
+
+  @override
+  String get diskSmartPowerOn => 'Üzemidő';
+
+  @override
+  String get diskSmartPowerOnAtTest => 'Üzemidő az utolsó teszten';
+
+  @override
+  String diskSmartHours(int hours) {
+    return '$hours óra';
+  }
+
+  @override
+  String get diskSmartReallocated => 'Átcsoportosított szektorok';
+
+  @override
+  String get diskSmartPending => 'Függőben lévő szektorok';
+
+  @override
+  String get diskSmartUncorrectable => 'Javíthatatlan szektorok';
+
+  @override
+  String diskSmartFailedWarning(String test) {
+    return 'Az utolsó önteszt hibát talált: $test';
+  }
+
+  @override
+  String diskSmartEarlierFailedWarning(String test) {
+    return 'Egy korábbi önteszt hibát talált: $test';
+  }
 }

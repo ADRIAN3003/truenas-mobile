@@ -803,5 +803,16 @@
   "appLogsFilter": "Sorok szűrése",
   "appLogsFollow": "Ugrás a legutolsó sorra",
   "appLogsClear": "Törlés",
-  "appLogsLastLines": "Utolsó {count} sor"
+  "appLogsLastLines": "Utolsó {count} sor",
+  "diskSmartHealthy": "Egészséges",
+  "diskSmartAttention": "Figyelmet igényel",
+  "diskSmartFailing": "Meghibásodik",
+  "diskSmartPowerOn": "Üzemidő",
+  "diskSmartPowerOnAtTest": "Üzemidő az utolsó teszten",
+  "diskSmartHours": "{hours} óra",
+  "diskSmartReallocated": "Átcsoportosított szektorok",
+  "diskSmartPending": "Függőben lévő szektorok",
+  "diskSmartUncorrectable": "Javíthatatlan szektorok",
+  "diskSmartFailedWarning": "Az utolsó önteszt hibát talált: {test}",
+  "diskSmartEarlierFailedWarning": "Egy korábbi önteszt hibát talált: {test}"
 }

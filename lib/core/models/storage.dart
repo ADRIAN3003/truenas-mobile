@@ -383,6 +383,14 @@ class SmartResults {
 
   bool get running => progress != null || tests.any((t) => t.running);
 
+  /// The newest test that found a problem, whether or not later ones passed.
+  SmartTest? get lastFailed {
+    for (final test in tests) {
+      if (test.failed) return test;
+    }
+    return null;
+  }
+
   /// The newest test that has finished, running ones skipped.
   SmartTest? get lastFinished {
     for (final test in tests) {
@@ -390,4 +398,141 @@ class SmartResults {
     }
     return null;
   }
+}
+
+/// One row of a disk's S.M.A.R.T. attribute table (`disk.smart_attributes`).
+class SmartAttribute {
+  const SmartAttribute({
+    required this.id,
+    required this.name,
+    this.value,
+    this.worst,
+    this.threshold,
+    this.whenFailed = '',
+    this.raw = 0,
+  });
+
+  /// Reads one attribute the way smartctl prints it: `raw` is either
+  /// `{value, string}` or a bare number or string.
+  factory SmartAttribute.fromJson(Map<String, dynamic> json) {
+    final raw = json['raw'] ?? json['raw_value'];
+    final text = raw is Map ? raw['string'] : raw;
+    final number = raw is Map ? raw['value'] : raw;
+    return SmartAttribute(
+      id: asInt(json['id']),
+      name: (json['name'] ?? '').toString(),
+      value: json['value'] is num ? (json['value'] as num).toInt() : null,
+      worst: json['worst'] is num ? (json['worst'] as num).toInt() : null,
+      threshold: (json['thresh'] ?? json['threshold']) is num
+          ? ((json['thresh'] ?? json['threshold']) as num).toInt()
+          : null,
+      whenFailed: (json['when_failed'] ?? '').toString(),
+      raw: _leadingInt(text) ?? (number is num ? number.toInt() : 0),
+    );
+  }
+
+  /// First whole number in [text]: drives write raw values like
+  /// `12345h+12m+3.000s` or `0 (0 0 0)`, and the number alone is what counts.
+  static int? _leadingInt(Object? text) {
+    if (text is num) return text.toInt();
+    if (text is! String) return null;
+    final match = RegExp(r'\d+').firstMatch(text);
+    return match == null ? null : int.tryParse(match.group(0)!);
+  }
+
+  final int id;
+  final String name;
+
+  /// Normalised value, 100 or 253 when new, falling towards [threshold].
+  final int? value;
+  final int? worst;
+  final int? threshold;
+
+  /// Empty, `-`, `In_the_past` or `FAILING_NOW`.
+  final String whenFailed;
+
+  /// The raw count: sectors, hours, ...
+  final int raw;
+
+  bool get failingNow => whenFailed.toUpperCase().contains('NOW');
+  bool get failedBefore =>
+      !failingNow &&
+      whenFailed.isNotEmpty &&
+      whenFailed != '-' &&
+      whenFailed.toUpperCase().contains('PAST');
+}
+
+/// How a disk looks overall.
+enum SmartHealth { good, warning, critical }
+
+/// The attribute table of a disk, with the few values that say how it is.
+class SmartAttributes {
+  const SmartAttributes(this.attributes);
+
+  /// Accepts the bare list, or a map holding it under `attributes`/`table`.
+  factory SmartAttributes.fromJson(Object? json) {
+    final rows = json is Map ? (json['attributes'] ?? json['table']) : json;
+    return SmartAttributes([
+      if (rows is List)
+        for (final row in rows)
+          if (row is Map) SmartAttribute.fromJson(asMap(row)),
+    ]);
+  }
+
+  static const none = SmartAttributes([]);
+
+  final List<SmartAttribute> attributes;
+
+  bool get isEmpty => attributes.isEmpty;
+
+  SmartAttribute? _byId(int id) {
+    for (final attribute in attributes) {
+      if (attribute.id == id) return attribute;
+    }
+    return null;
+  }
+
+  /// Hours the disk has run (attribute 9), when it says.
+  int? get powerOnHours => _byId(9)?.raw;
+
+  /// Sectors the disk has moved to spares (attribute 5).
+  int? get reallocatedSectors => _byId(5)?.raw;
+
+  /// Sectors waiting to be moved (attribute 197).
+  int? get pendingSectors => _byId(197)?.raw;
+
+  /// Sectors that could not be read or moved (attribute 198).
+  int? get uncorrectableSectors => _byId(198)?.raw;
+
+  /// Attributes the disk itself says are past their limit.
+  bool get anyFailingNow => attributes.any((a) => a.failingNow);
+  bool get anyFailedBefore => attributes.any((a) => a.failedBefore);
+
+  /// Whether sectors are going bad: any of the three sector counters is up.
+  bool get sectorsBad =>
+      (reallocatedSectors ?? 0) > 0 ||
+      (pendingSectors ?? 0) > 0 ||
+      (uncorrectableSectors ?? 0) > 0;
+}
+
+/// Overall health from the self-test log and the attribute table, either of
+/// which may be missing. Null when neither says anything.
+///
+/// Critical: an attribute is failing now, or the newest finished self-test
+/// failed. Warning: sectors are going bad, an attribute failed in the past, or
+/// an older self-test failed.
+SmartHealth? smartHealth(SmartResults? results, SmartAttributes? attributes) {
+  final hasTests = results != null && results.tests.isNotEmpty;
+  final hasAttributes = attributes != null && !attributes.isEmpty;
+  if (!hasTests && !hasAttributes) return null;
+  if ((hasAttributes && attributes.anyFailingNow) ||
+      (hasTests && results.lastFinished?.failed == true)) {
+    return SmartHealth.critical;
+  }
+  if ((hasAttributes &&
+          (attributes.sectorsBad || attributes.anyFailedBefore)) ||
+      (hasTests && results.lastFailed != null)) {
+    return SmartHealth.warning;
+  }
+  return SmartHealth.good;
 }

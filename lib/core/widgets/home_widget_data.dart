@@ -161,13 +161,10 @@ List<Map<String, dynamic>> _jobItems(
 /// when ZFS says it is down or faulted.
 Map<String, dynamic> _pool(PoolSummary pool) {
   final status = pool.status.toUpperCase();
-  final level = switch (status) {
-    'ONLINE' =>
-      !pool.healthy || pool.usedFraction >= 0.9
-          ? WidgetLevel.warn
-          : WidgetLevel.ok,
-    'DEGRADED' => WidgetLevel.warn,
-    _ => WidgetLevel.bad,
+  final level = switch (pool.condition) {
+    PoolCondition.ok => WidgetLevel.ok,
+    PoolCondition.attention => WidgetLevel.warn,
+    PoolCondition.down => WidgetLevel.bad,
   };
   return {
     'name': pool.name,

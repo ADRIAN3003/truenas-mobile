@@ -3063,4 +3063,87 @@ class AppLocalizationsHu extends AppLocalizations {
   String diskSmartEarlierFailedWarning(String test) {
     return 'Egy korábbi önteszt hibát talált: $test';
   }
+
+  @override
+  String get overviewTitle => 'Áttekintés';
+
+  @override
+  String get overviewAllFine => 'Minden rendben';
+
+  @override
+  String overviewNeedAttention(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count szerver figyelmet igényel',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get overviewLevelOk => 'Rendben';
+
+  @override
+  String get overviewLevelAttention => 'Figyelem';
+
+  @override
+  String get overviewLevelProblem => 'Hiba';
+
+  @override
+  String get overviewLevelOffline => 'Nem elérhető';
+
+  @override
+  String overviewPoolsHealthy(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count tároló rendben',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String overviewPoolsAttention(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count tároló figyelmet igényel',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get overviewNoPools => 'Nincs tároló';
+
+  @override
+  String overviewAlerts(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count aktív riasztás',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String overviewAlertsCritical(int count) {
+    return '$count kritikus';
+  }
+
+  @override
+  String get overviewNoAlerts => 'Nincs aktív riasztás';
+
+  @override
+  String get overviewNoJobs => 'Nem fut semmi';
+
+  @override
+  String get overviewNeedsYou =>
+      'Nyisd meg egyszer ezt a szervert, hogy elfogadd a tanúsítványát vagy megadd a 2FA-kódot.';
+
+  @override
+  String get overviewLoginRejected =>
+      'A szerver elutasította a mentett bejelentkezést.';
+
+  @override
+  String get overviewUnreachable => 'A szerver nem érhető el.';
 }

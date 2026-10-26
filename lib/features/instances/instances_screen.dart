@@ -16,6 +16,7 @@ import '../../shared/widgets.dart';
 import '../server/server_screen.dart';
 import '../settings/settings_screen.dart';
 import 'server_form_screen.dart';
+import 'servers_overview_screen.dart';
 import 'wake_server.dart';
 
 /// Widest the list grows on tablets, so cards stay readable.
@@ -45,6 +46,17 @@ class InstancesScreen extends ConsumerWidget {
             ),
             icon: const Icon(Icons.settings_outlined),
           ),
+          if ((instances.value?.length ?? 0) > 1)
+            IconButton(
+              tooltip: l10n.overviewTitle,
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute<void>(
+                  builder: (_) => const ServersOverviewScreen(),
+                ),
+              ),
+              icon: const Icon(Icons.dashboard_outlined),
+            ),
           if (instances.value?.isNotEmpty ?? false)
             IconButton(
               tooltip: l10n.addServer,

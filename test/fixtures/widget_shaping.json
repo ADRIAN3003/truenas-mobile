@@ -1,0 +1,586 @@
+{
+ "comment": "Raw answers of a TrueNAS server and the widget JSON both the Dart (serverWidgetData) and the Swift (WidgetShape) sides must make of them. Regenerate with UPDATE_WIDGET_FIXTURE=1 flutter test test/core/widgets/widget_shaping_test.dart",
+ "labels": {
+  "pools": "Pools",
+  "system": "System",
+  "alerts": "Alerts",
+  "cpu": "CPU",
+  "memory": "RAM",
+  "updated": "Updated",
+  "unreachable": "Can't reach the server",
+  "setup": "Open TrueNAS Mobile to set up",
+  "noData": "No data yet. Open the app.",
+  "noPools": "No pools",
+  "poolsOk": "All pools healthy",
+  "poolsAttentionOne": "1 pool needs attention",
+  "poolsAttentionMany": "{count} pools need attention",
+  "alertsNone": "No active alerts",
+  "alertsCountOne": "1 active alert",
+  "alertsCountMany": "{count} active alerts",
+  "memoryText": "{used} of {total}",
+  "appsNone": "All apps are up to date",
+  "appsUpdatesOne": "1 app has an update",
+  "appsUpdatesMany": "{count} apps have updates",
+  "idle": "No scrub or cloud sync running",
+  "jobScrub": "Scrub",
+  "jobCloudSync": "Cloud sync",
+  "jobCloudBackup": "Cloud backup",
+  "jobWaiting": "Waiting"
+ },
+ "cases": [
+  {
+   "name": "healthy server",
+   "raw": {
+    "pools": [
+     {
+      "name": "tank",
+      "status": "ONLINE",
+      "healthy": true,
+      "size": 10737418240,
+      "allocated": 4294967296
+     },
+     {
+      "name": "backup",
+      "status": "ONLINE",
+      "healthy": true,
+      "size": 8589934592,
+      "allocated": 5726623061
+     }
+    ],
+    "alerts": [],
+    "jobs": [],
+    "apps": [
+     {
+      "name": "plex",
+      "state": "RUNNING",
+      "upgrade_available": false
+     },
+     {
+      "name": "nextcloud",
+      "state": "RUNNING",
+      "upgrade_available": false
+     }
+    ],
+    "realtime": {
+     "cpu": {
+      "cpu": {
+       "usage": 18.46,
+       "temp": 48.4
+      }
+     },
+     "memory": {
+      "physical_memory_total": 34359738368,
+      "physical_memory_available": 18253611008,
+      "arc_size": 1073741824
+     },
+     "interfaces": {}
+    }
+   },
+   "expected": {
+    "pools": {
+     "level": "ok",
+     "summary": "All pools healthy",
+     "items": [
+      {
+       "name": "tank",
+       "status": "ONLINE",
+       "used": 40.0,
+       "level": "ok"
+      },
+      {
+       "name": "backup",
+       "status": "ONLINE",
+       "used": 66.7,
+       "level": "ok"
+      }
+     ]
+    },
+    "alerts": {
+     "level": "ok",
+     "count": 0,
+     "summary": "No active alerts",
+     "items": []
+    },
+    "jobs": {
+     "items": []
+    },
+    "apps": {
+     "updates": 0,
+     "summary": "All apps are up to date"
+    },
+    "system": {
+     "cpu": 18.5,
+     "memory": 46.9,
+     "memoryText": "15.0 GiB of 32.0 GiB",
+     "temperature": "48 °C"
+    }
+   }
+  },
+  {
+   "name": "things need attention",
+   "raw": {
+    "pools": [
+     {
+      "name": "tank",
+      "status": "DEGRADED",
+      "healthy": false,
+      "size": 10737418240,
+      "allocated": 3221225472
+     },
+     {
+      "name": "fast",
+      "status": "ONLINE",
+      "healthy": true,
+      "size": 10737418240,
+      "allocated": 10200547328
+     },
+     {
+      "name": "old",
+      "status": "FAULTED",
+      "healthy": false,
+      "size": 0,
+      "allocated": 0
+     },
+     {
+      "name": "odd",
+      "status": "ONLINE",
+      "healthy": false,
+      "size": 4294967296,
+      "allocated": 1073741824
+     }
+    ],
+    "alerts": [
+     {
+      "uuid": "1",
+      "level": "INFO",
+      "formatted": "An update is available",
+      "klass": "K",
+      "dismissed": false
+     },
+     {
+      "uuid": "2",
+      "level": "CRITICAL",
+      "formatted": "Pool <b>tank</b> is <i>DEGRADED</i><br/>Replace a disk &amp; resilver",
+      "klass": "K",
+      "dismissed": false
+     },
+     {
+      "uuid": "3",
+      "level": "WARNING",
+      "formatted": "  Scrub of pool tank is overdue  ",
+      "klass": "K",
+      "dismissed": false
+     },
+     {
+      "uuid": "4",
+      "level": "ERROR",
+      "formatted": "Disk&nbsp;sda has failed SMART",
+      "klass": "K",
+      "dismissed": false
+     },
+     {
+      "uuid": "5",
+      "level": "NOTICE",
+      "formatted": "Looks fine",
+      "klass": "K",
+      "dismissed": false
+     },
+     {
+      "uuid": "6",
+      "level": "CRITICAL",
+      "formatted": "Already dismissed",
+      "klass": "K",
+      "dismissed": true
+     },
+     {
+      "uuid": "7",
+      "level": "EMERGENCY",
+      "formatted": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+      "klass": "K",
+      "dismissed": false
+     },
+     {
+      "uuid": "8",
+      "level": "MYSTERY",
+      "formatted": "Unknown levels count as info",
+      "klass": "K",
+      "dismissed": false
+     }
+    ],
+    "jobs": [
+     {
+      "id": 1,
+      "method": "pool.scrub.scrub",
+      "state": "RUNNING",
+      "progress": {
+       "percent": 42.55,
+       "description": "Scrubbing tank"
+      },
+      "arguments": [
+       "tank"
+      ]
+     },
+     {
+      "id": 5,
+      "method": "cloud_backup.sync",
+      "state": "RUNNING",
+      "progress": {
+       "percent": 150,
+       "description": "yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy"
+      },
+      "arguments": [
+       3
+      ]
+     },
+     {
+      "id": 4,
+      "method": "core.bulk",
+      "state": "RUNNING",
+      "progress": {
+       "percent": 12.3,
+       "description": "Bulk"
+      },
+      "arguments": [
+       "cloudsync.sync",
+       [
+        [
+         1
+        ]
+       ]
+      ]
+     },
+     {
+      "id": 3,
+      "method": "pool.scrub.scrub",
+      "state": "SUCCESS",
+      "progress": {
+       "percent": 100,
+       "description": "Done"
+      },
+      "arguments": [
+       "old"
+      ]
+     },
+     {
+      "id": 6,
+      "method": "app.upgrade",
+      "state": "RUNNING",
+      "progress": {
+       "percent": 5,
+       "description": "Upgrading"
+      },
+      "arguments": [
+       "plex"
+      ]
+     },
+     {
+      "id": 2,
+      "method": "cloudsync.sync",
+      "state": "WAITING",
+      "progress": {
+       "percent": null,
+       "description": ""
+      },
+      "arguments": [
+       7
+      ]
+     },
+     {
+      "id": 7,
+      "method": "pool.scrub.scrub",
+      "state": "RUNNING",
+      "progress": {
+       "percent": 1,
+       "description": "A fourth one that does not fit"
+      },
+      "arguments": [
+       "fast"
+      ]
+     }
+    ],
+    "apps": [
+     {
+      "name": "a",
+      "state": "RUNNING",
+      "upgrade_available": true
+     },
+     {
+      "name": "b",
+      "state": "RUNNING",
+      "upgrade_available": true
+     },
+     {
+      "name": "c",
+      "state": "RUNNING",
+      "upgrade_available": false
+     },
+     {
+      "name": "d",
+      "state": "RUNNING",
+      "upgrade_available": true
+     }
+    ],
+    "realtime": {
+     "cpu": {
+      "cpu": {
+       "usage": 99.94,
+       "temp": null
+      }
+     },
+     "memory": {
+      "physical_memory_total": 17179869184,
+      "physical_memory_available": 536870912,
+      "arc_size": 1073741824
+     },
+     "interfaces": {}
+    }
+   },
+   "expected": {
+    "pools": {
+     "level": "bad",
+     "summary": "4 pools need attention",
+     "items": [
+      {
+       "name": "tank",
+       "status": "DEGRADED",
+       "used": 30.0,
+       "level": "warn"
+      },
+      {
+       "name": "fast",
+       "status": "ONLINE",
+       "used": 95.0,
+       "level": "warn"
+      },
+      {
+       "name": "old",
+       "status": "FAULTED",
+       "used": 0.0,
+       "level": "bad"
+      },
+      {
+       "name": "odd",
+       "status": "ONLINE",
+       "used": 25.0,
+       "level": "warn"
+      }
+     ]
+    },
+    "alerts": {
+     "level": "bad",
+     "count": 7,
+     "summary": "7 active alerts",
+     "items": [
+      {
+       "level": "bad",
+       "text": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx…"
+      },
+      {
+       "level": "bad",
+       "text": "Pool tank is DEGRADED"
+      },
+      {
+       "level": "bad",
+       "text": "Disk sda has failed SMART"
+      },
+      {
+       "level": "warn",
+       "text": "Scrub of pool tank is overdue"
+      }
+     ]
+    },
+    "jobs": {
+     "items": [
+      {
+       "kind": "scrub",
+       "title": "Scrub · tank",
+       "percent": 42.6,
+       "detail": "Scrubbing tank"
+      },
+      {
+       "kind": "cloudBackup",
+       "title": "Cloud backup",
+       "percent": 100.0,
+       "detail": "yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy…"
+      },
+      {
+       "kind": "cloudSync",
+       "title": "Cloud sync",
+       "percent": 12.3,
+       "detail": "Bulk"
+      }
+     ]
+    },
+    "apps": {
+     "updates": 3,
+     "summary": "3 apps have updates"
+    },
+    "system": {
+     "cpu": 99.9,
+     "memory": 96.9,
+     "memoryText": "15.5 GiB of 16.0 GiB"
+    }
+   }
+  },
+  {
+   "name": "one of each",
+   "raw": {
+    "pools": [
+     {
+      "name": "tank",
+      "status": "ONLINE",
+      "healthy": false,
+      "size": 10737418240,
+      "allocated": 1073741824
+     }
+    ],
+    "alerts": [
+     {
+      "uuid": "1",
+      "level": "WARNING",
+      "formatted": "Just one",
+      "klass": "K",
+      "dismissed": false
+     }
+    ],
+    "jobs": [
+     {
+      "id": 1,
+      "method": "rsynctask.run",
+      "state": "RUNNING",
+      "progress": {
+       "percent": 50,
+       "description": "not a widget job"
+      },
+      "arguments": [
+       1
+      ]
+     },
+     {
+      "id": 2,
+      "method": "pool.scrub.scrub",
+      "state": "RUNNING",
+      "progress": {
+       "percent": null,
+       "description": ""
+      },
+      "arguments": [
+       "tank"
+      ]
+     },
+     {
+      "id": 3,
+      "method": "cloudsync.sync",
+      "state": "WAITING",
+      "progress": {
+       "percent": null,
+       "description": ""
+      },
+      "arguments": [
+       9
+      ]
+     }
+    ],
+    "apps": [
+     {
+      "name": "only",
+      "state": "RUNNING",
+      "upgrade_available": true
+     }
+    ],
+    "realtime": {
+     "cpu": {
+      "cpu": {
+       "usage": 0,
+       "temp": 35.5
+      }
+     },
+     "memory": {
+      "physical_memory_total": 0,
+      "physical_memory_available": 0,
+      "arc_size": 1073741824
+     },
+     "interfaces": {}
+    }
+   },
+   "expected": {
+    "pools": {
+     "level": "warn",
+     "summary": "1 pool needs attention",
+     "items": [
+      {
+       "name": "tank",
+       "status": "ONLINE",
+       "used": 10.0,
+       "level": "warn"
+      }
+     ]
+    },
+    "alerts": {
+     "level": "warn",
+     "count": 1,
+     "summary": "1 active alert",
+     "items": [
+      {
+       "level": "warn",
+       "text": "Just one"
+      }
+     ]
+    },
+    "jobs": {
+     "items": [
+      {
+       "kind": "scrub",
+       "title": "Scrub · tank",
+       "detail": ""
+      },
+      {
+       "kind": "cloudSync",
+       "title": "Cloud sync",
+       "detail": "Waiting"
+      }
+     ]
+    },
+    "apps": {
+     "updates": 1,
+     "summary": "1 app has an update"
+    },
+    "system": {
+     "cpu": 0.0,
+     "memoryText": "0 B of 0 B",
+     "temperature": "36 °C"
+    }
+   }
+  },
+  {
+   "name": "nothing there",
+   "raw": {
+    "pools": [],
+    "alerts": [],
+    "jobs": [],
+    "apps": [],
+    "realtime": null
+   },
+   "expected": {
+    "pools": {
+     "level": "ok",
+     "summary": "No pools",
+     "items": []
+    },
+    "alerts": {
+     "level": "ok",
+     "count": 0,
+     "summary": "No active alerts",
+     "items": []
+    },
+    "jobs": {
+     "items": []
+    },
+    "apps": {
+     "updates": 0,
+     "summary": "All apps are up to date"
+    }
+   }
+  }
+ ]
+}

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/instances/server_instance.dart';
+import '../../core/logging/app_log.dart';
 import '../../core/wol/wake_on_lan.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../shared/haptics.dart';
@@ -25,6 +26,7 @@ Future<void> wakeServer(
     );
   } catch (error) {
     Haptics.warning();
+    AppLog.instance.warning('wake-on-lan', '${instance.name}: $error');
     messenger.showSnackBar(SnackBar(content: Text(l10n.wolFailed('$error'))));
   }
 }

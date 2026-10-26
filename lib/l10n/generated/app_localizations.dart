@@ -746,6 +746,12 @@ abstract class AppLocalizations {
   /// **'Close'**
   String get close;
 
+  /// Shown in the dashboard's CPU card when the server refused the live statistics.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t get live data: {reason}. Pull down to try again.'**
+  String liveFailed(String reason);
+
   /// Shown until the first live statistics sample arrives.
   ///
   /// In en, this message translates to:

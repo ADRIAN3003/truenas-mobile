@@ -388,6 +388,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get close => 'Close';
 
   @override
+  String liveFailed(String reason) {
+    return 'Couldn\'t get live data: $reason. Pull down to try again.';
+  }
+
+  @override
   String get liveWaiting => 'Waiting for live data…';
 
   @override

@@ -133,6 +133,40 @@ void main() {
     await disconnect(tester);
   });
 
+  testWidgets('refused live statistics are explained, not waited for', (
+    tester,
+  ) async {
+    await connect(tester);
+    server.failingRealtime = true;
+    await tester.pumpWidget(
+      wrap(
+        DashboardTab(
+          session: session,
+          info: const {'hostname': 'nas', 'version': '25.10.7'},
+          onOpenAlerts: () {},
+        ),
+      ),
+    );
+    await settle(tester);
+
+    expect(find.text('Waiting for live data…'), findsNothing);
+    expect(find.textContaining("Couldn't get live data"), findsOneWidget);
+    expect(find.textContaining('[EACCES] Not allowed'), findsOneWidget);
+
+    // Pulling down asks again once the server allows it.
+    server.failingRealtime = false;
+    await tester.drag(find.byType(ListView).first, const Offset(0, 300));
+    // The indicator needs a few frames before it starts the refresh.
+    for (var i = 0; i < 3; i++) {
+      await tester.pump(const Duration(milliseconds: 500));
+    }
+    await settle(tester);
+    await tester.pump(gaugeDuration);
+    expect(find.textContaining("Couldn't get live data"), findsNothing);
+    expect(find.text('24%'), findsOneWidget);
+    await disconnect(tester);
+  });
+
   testWidgets('alerts can be dismissed and restored', (tester) async {
     await connect(tester);
     await tester.pumpWidget(wrap(AlertsTab(session: session)));

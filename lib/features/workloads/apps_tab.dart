@@ -16,6 +16,7 @@ import '../../shared/viz_colors.dart';
 import '../../shared/widgets.dart';
 import '../sharing/sharing_widgets.dart';
 import '../storage/storage_helpers.dart';
+import 'app_catalog_screen.dart';
 import 'app_icon.dart';
 import 'app_screen.dart';
 import 'update_all_apps.dart';
@@ -28,6 +29,7 @@ class _Workloads {
     required this.containers,
     required this.containerActions,
     required this.canBulk,
+    required this.canInstall,
   });
 
   final List<TrueNasApp> apps;
@@ -41,6 +43,9 @@ class _Workloads {
 
   /// Whether the server can update all apps in one job.
   final bool canBulk;
+
+  /// Whether apps can be installed from the catalog.
+  final bool canInstall;
 }
 
 const _appActions = [
@@ -80,6 +85,10 @@ class _AppsTabState extends State<AppsTab> with LoadState<AppsTab, _Workloads> {
   Timer? _poller;
   var _polling = false;
 
+  /// Looks at the list again a few seconds after an app was seen deploying
+  /// or stopping (an install, a configuration change), until it settles.
+  Timer? _settling;
+
   /// Apps ticked while choosing which to act on, or null when not choosing.
   Set<String>? _selected;
 
@@ -96,7 +105,14 @@ class _AppsTabState extends State<AppsTab> with LoadState<AppsTab, _Workloads> {
     }
 
     final backend = await _api.containerBackend();
-    final (apps, vms, containers, containerActions, canBulk) = await (
+    final (
+      apps,
+      vms,
+      containers,
+      containerActions,
+      canBulk,
+      canInstall,
+    ) = await (
       _api.apps(),
       optional(_api.vms),
       backend == ContainerBackend.none
@@ -104,14 +120,26 @@ class _AppsTabState extends State<AppsTab> with LoadState<AppsTab, _Workloads> {
           : optional(_api.containers),
       _api.containerActions(),
       _api.canBulk(),
+      _api.canInstall(),
     ).wait;
     widget.onUpdateCount?.call(apps.where((a) => a.upgradeAvailable).length);
+    _settling?.cancel();
+    if (apps.any(
+      (a) =>
+          a.state == WorkloadState.deploying ||
+          a.state == WorkloadState.stopping,
+    )) {
+      _settling = Timer(const Duration(seconds: 5), () {
+        if (mounted) load();
+      });
+    }
     return _Workloads(
       apps: apps,
       vms: vms,
       containers: containers,
       containerActions: containerActions,
       canBulk: canBulk,
+      canInstall: canInstall,
     );
   }
 
@@ -124,6 +152,7 @@ class _AppsTabState extends State<AppsTab> with LoadState<AppsTab, _Workloads> {
   @override
   void dispose() {
     _poller?.cancel();
+    _settling?.cancel();
     super.dispose();
   }
 
@@ -308,6 +337,16 @@ class _AppsTabState extends State<AppsTab> with LoadState<AppsTab, _Workloads> {
     if (!selected.remove(name)) selected.add(name);
   });
 
+  Future<void> _openCatalog() async {
+    final installed = await Navigator.push<bool>(
+      context,
+      MaterialPageRoute<bool>(
+        builder: (_) => AppCatalogScreen(session: widget.session),
+      ),
+    );
+    if (installed == true) await load();
+  }
+
   Future<void> _openApp(TrueNasApp app) async {
     await Navigator.push(
       context,
@@ -358,6 +397,45 @@ class _AppsTabState extends State<AppsTab> with LoadState<AppsTab, _Workloads> {
     );
   }
 
+  /// The buttons beside the "Apps" heading: install, and picking apps.
+  Widget? _trailing(_Workloads w, Set<String>? selected) {
+    final l10n = AppLocalizations.of(context);
+    final canSelect = w.canBulk && w.apps.isNotEmpty && _bulkRun == null;
+    if (selected != null) {
+      return Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          TextButton(
+            onPressed: () =>
+                setState(() => _selected = {for (final a in w.apps) a.name}),
+            child: Text(l10n.appsSelectAll),
+          ),
+          TextButton(
+            onPressed: () => setState(() => _selected = null),
+            child: Text(l10n.done),
+          ),
+        ],
+      );
+    }
+    if (!canSelect && !w.canInstall) return null;
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (canSelect)
+          TextButton(
+            onPressed: () => setState(() => _selected = {}),
+            child: Text(l10n.appsSelect),
+          ),
+        if (w.canInstall)
+          IconButton(
+            tooltip: l10n.appInstallTitle,
+            icon: const Icon(Icons.add_circle_outline),
+            onPressed: _openCatalog,
+          ),
+      ],
+    );
+  }
+
   Widget _list(BuildContext context, _Workloads w) {
     final l10n = AppLocalizations.of(context);
     final selected = _selected;
@@ -381,28 +459,7 @@ class _AppsTabState extends State<AppsTab> with LoadState<AppsTab, _Workloads> {
               ? l10n.appsTitle
               : l10n.appsSelectedCount(selected.length),
           empty: l10n.appsEmpty,
-          trailing: !w.canBulk || w.apps.isEmpty || _bulkRun != null
-              ? null
-              : selected == null
-              ? TextButton(
-                  onPressed: () => setState(() => _selected = {}),
-                  child: Text(l10n.appsSelect),
-                )
-              : Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    TextButton(
-                      onPressed: () => setState(
-                        () => _selected = {for (final a in w.apps) a.name},
-                      ),
-                      child: Text(l10n.appsSelectAll),
-                    ),
-                    TextButton(
-                      onPressed: () => setState(() => _selected = null),
-                      child: Text(l10n.done),
-                    ),
-                  ],
-                ),
+          trailing: _trailing(w, selected),
           [
             for (final app in w.apps)
               ListTile(

@@ -4921,6 +4921,288 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Last {count} lines'**
   String appLogsLastLines(int count);
+
+  /// Problem with an app setting that must be a number.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a number'**
+  String get appFormNotNumber;
+
+  /// Problem with an app setting: number below the minimum.
+  ///
+  /// In en, this message translates to:
+  /// **'Too small'**
+  String get appFormTooSmall;
+
+  /// Problem with an app setting: number above the maximum.
+  ///
+  /// In en, this message translates to:
+  /// **'Too large'**
+  String get appFormTooLarge;
+
+  /// Problem with an app setting: text shorter than allowed.
+  ///
+  /// In en, this message translates to:
+  /// **'Too short'**
+  String get appFormTooShort;
+
+  /// Problem with an app setting: text longer than allowed.
+  ///
+  /// In en, this message translates to:
+  /// **'Too long'**
+  String get appFormTooLong;
+
+  /// Problem with an app setting: text has characters the app does not accept.
+  ///
+  /// In en, this message translates to:
+  /// **'Contains characters that are not allowed'**
+  String get appFormInvalidChars;
+
+  /// Shown instead of the form when an app has nothing to configure.
+  ///
+  /// In en, this message translates to:
+  /// **'This app has no settings.'**
+  String get appFormNoSettings;
+
+  /// Tooltip of the button that adds an entry to a list setting.
+  ///
+  /// In en, this message translates to:
+  /// **'Add entry'**
+  String get appFormAdd;
+
+  /// Hint under an app setting that is locked once the app is installed.
+  ///
+  /// In en, this message translates to:
+  /// **'Can\'t be changed after install'**
+  String get appFormLocked;
+
+  /// Tooltip of the button that shows an app configuration as raw JSON.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit as JSON'**
+  String get appFormJson;
+
+  /// Tooltip of the button that goes from raw JSON back to the form.
+  ///
+  /// In en, this message translates to:
+  /// **'Back to the form'**
+  String get appFormFields;
+
+  /// Label of the raw JSON box for an app configuration.
+  ///
+  /// In en, this message translates to:
+  /// **'Configuration (JSON)'**
+  String get appFormJsonLabel;
+
+  /// Snackbar when the JSON typed for an app configuration cannot be read.
+  ///
+  /// In en, this message translates to:
+  /// **'That is not valid JSON.'**
+  String get appFormJsonInvalid;
+
+  /// Snackbar when the JSON typed for an app configuration is not an object.
+  ///
+  /// In en, this message translates to:
+  /// **'The configuration must be a JSON object (curly braces around the settings).'**
+  String get appFormJsonObject;
+
+  /// Tooltip of the button in the Apps tab that opens the catalog.
+  ///
+  /// In en, this message translates to:
+  /// **'Install app'**
+  String get appInstallTitle;
+
+  /// Button that installs an app.
+  ///
+  /// In en, this message translates to:
+  /// **'Install'**
+  String get appInstallButton;
+
+  /// Field for the name an app is installed under.
+  ///
+  /// In en, this message translates to:
+  /// **'Application name'**
+  String get appInstallName;
+
+  /// Help text under the app name field.
+  ///
+  /// In en, this message translates to:
+  /// **'Lowercase letters, digits and hyphens, starting with a letter'**
+  String get appInstallNameHelp;
+
+  /// Error under the app name field.
+  ///
+  /// In en, this message translates to:
+  /// **'Use lowercase letters, digits and hyphens (up to 40), starting with a letter'**
+  String get appInstallNameInvalid;
+
+  /// Field that picks which catalog version of an app to install.
+  ///
+  /// In en, this message translates to:
+  /// **'Version to install'**
+  String get appInstallVersion;
+
+  /// Label for the catalog train (stable, community, ...) an app comes from.
+  ///
+  /// In en, this message translates to:
+  /// **'Train'**
+  String get appInstallTrain;
+
+  /// Snackbar when an app install finished quickly.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} installed'**
+  String appInstalled(String name);
+
+  /// Snackbar when an app install was accepted and is still running on the server.
+  ///
+  /// In en, this message translates to:
+  /// **'Installing {name}. It shows in the list while the server sets it up.'**
+  String appInstalling(String name);
+
+  /// Title of the screen that lists installable apps.
+  ///
+  /// In en, this message translates to:
+  /// **'App catalog'**
+  String get catalogTitle;
+
+  /// Tooltip of the button that re-reads the app catalog from its source.
+  ///
+  /// In en, this message translates to:
+  /// **'Refresh catalog'**
+  String get catalogRefresh;
+
+  /// Snackbar after the app catalog was refreshed.
+  ///
+  /// In en, this message translates to:
+  /// **'Catalog refreshed'**
+  String get catalogRefreshed;
+
+  /// Hint of the catalog search box.
+  ///
+  /// In en, this message translates to:
+  /// **'Search apps'**
+  String get catalogSearch;
+
+  /// Catalog filter chip that shows every category.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get catalogAll;
+
+  /// Heading above the entry that installs a custom app.
+  ///
+  /// In en, this message translates to:
+  /// **'Your own'**
+  String get catalogCustomAppSection;
+
+  /// Catalog entry and screen title for installing from a Docker Compose file.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom app'**
+  String get catalogCustomApp;
+
+  /// Subtitle of the custom app entry.
+  ///
+  /// In en, this message translates to:
+  /// **'Install any container from a Docker Compose file'**
+  String get catalogCustomAppHint;
+
+  /// Heading above the catalog list with the number of apps shown.
+  ///
+  /// In en, this message translates to:
+  /// **'Apps ({count})'**
+  String catalogAppsSection(int count);
+
+  /// Shown when the catalog search finds nothing.
+  ///
+  /// In en, this message translates to:
+  /// **'No apps match.'**
+  String get catalogEmpty;
+
+  /// Tooltip of the check mark on a catalog app that is already installed.
+  ///
+  /// In en, this message translates to:
+  /// **'Installed'**
+  String get catalogInstalled;
+
+  /// Note on the install screen of an app that is already installed.
+  ///
+  /// In en, this message translates to:
+  /// **'An app made from this is already installed. Give the new one a different name.'**
+  String get catalogInstalledNote;
+
+  /// Shown in the catalog when apps have no pool yet.
+  ///
+  /// In en, this message translates to:
+  /// **'Apps need a pool first. Choose one in the TrueNAS web interface under Apps > Configuration > Choose Pool, then come back.'**
+  String get dockerUnconfigured;
+
+  /// Shown in the catalog when the apps service is not running.
+  ///
+  /// In en, this message translates to:
+  /// **'Apps are not running on the server right now, so nothing can be installed.'**
+  String get dockerNotRunning;
+
+  /// Label of the box for a custom app's Compose file.
+  ///
+  /// In en, this message translates to:
+  /// **'Docker Compose file'**
+  String get appCustomCompose;
+
+  /// Help text under the Compose file box.
+  ///
+  /// In en, this message translates to:
+  /// **'Paste the contents of a compose.yaml'**
+  String get appCustomComposeHelp;
+
+  /// Label of the JSON box when editing a custom app.
+  ///
+  /// In en, this message translates to:
+  /// **'Docker Compose config (JSON)'**
+  String get appCustomComposeJson;
+
+  /// Button on an app's screen that edits its configuration.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit configuration'**
+  String get appEditConfig;
+
+  /// Title of the screen that edits an app's configuration.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit {name}'**
+  String appEditTitle(String name);
+
+  /// Note above an app configuration form.
+  ///
+  /// In en, this message translates to:
+  /// **'Saving applies the changes and redeploys the app.'**
+  String get appEditRestartNote;
+
+  /// Note above the JSON editor when the catalog form is missing.
+  ///
+  /// In en, this message translates to:
+  /// **'The catalog\'s form for this version isn\'t available, so the configuration is shown as JSON. Saving redeploys the app.'**
+  String get appEditNoFormNote;
+
+  /// Note above the JSON editor of a custom app.
+  ///
+  /// In en, this message translates to:
+  /// **'A custom app is configured with its Docker Compose config. Saving redeploys the app.'**
+  String get appEditCustomNote;
+
+  /// Snackbar when an app configuration change finished quickly.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} updated'**
+  String appConfigSaved(String name);
+
+  /// Snackbar when an app configuration change was accepted and still runs.
+  ///
+  /// In en, this message translates to:
+  /// **'Applying the changes to {name}. It redeploys on the server.'**
+  String appConfigApplying(String name);
 }
 
 class _AppLocalizationsDelegate

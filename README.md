@@ -73,7 +73,8 @@ for Android and iOS that talks to the official TrueNAS middleware API
   disable any of them, and add, edit or delete every kind.
 - **Shares:** SMB and NFS shares (create, edit, delete), services (start,
   stop, start on boot), and read-only views of iSCSI and NVMe-oF.
-- **Apps and VMs:** Docker apps (start, stop, redeploy, upgrade, delete, or
+- **Apps and VMs:** Docker apps (install from the catalog or a Docker Compose
+  file, edit their configuration, start, stop, redeploy, upgrade, delete, or
   update all that have a newer version, after listing them), virtual machines
   and containers (start, stop, restart), each with a shell.
 - **System:** users and groups, API keys, network and certificates

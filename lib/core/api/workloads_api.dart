@@ -1,8 +1,11 @@
 import 'dart:async';
 import 'dart:convert';
 
+import '../models/app_catalog.dart';
+import '../models/job.dart';
 import '../models/json.dart';
 import '../models/workloads.dart';
+import 'api_exception.dart';
 import 'events.dart';
 import 'job_wait.dart';
 import 'json_rpc_client.dart';
@@ -106,6 +109,139 @@ class WorkloadsApi {
       if (run != null && run.isActive) return run;
     }
     return null;
+  }
+
+  /// Whether apps can be installed from the catalog from here.
+  Future<bool> canInstall() async =>
+      await _catalog.has('app.create') &&
+      await _catalog.has('app.available') &&
+      await _catalog.has('catalog.get_app_details');
+
+  /// Whether an installed app's configuration can be changed from here.
+  Future<bool> canEdit() async =>
+      await _catalog.has('app.update') && await _catalog.has('app.config');
+
+  /// Whether the catalog can be refreshed from its source.
+  Future<bool> canSyncCatalog() => _catalog.has('catalog.sync');
+
+  /// Where Docker stands. Installing needs it running, and it only runs once
+  /// a pool is chosen for apps. [DockerState.unknown] when the server doesn't
+  /// say.
+  Future<DockerState> dockerState() async {
+    if (!await _catalog.has('docker.status')) return DockerState.unknown;
+    try {
+      return DockerState.parse(
+        asMap(await _client.call('docker.status'))['status'],
+      );
+    } catch (_) {
+      return DockerState.unknown;
+    }
+  }
+
+  /// Every app the catalog offers, by title.
+  Future<List<CatalogApp>> catalogApps() async =>
+      (await _query('app.available')).map(CatalogApp.fromJson).toList()..sort(
+        (a, b) => a.title.toLowerCase().compareTo(b.title.toLowerCase()),
+      );
+
+  /// An app with the form of each of its versions.
+  Future<CatalogAppDetails> catalogDetails(String name, String train) async =>
+      CatalogAppDetails.fromJson(
+        asMap(
+          await _client.call('catalog.get_app_details', [
+            name,
+            {'train': train},
+          ]),
+        ),
+      );
+
+  /// Pulls the catalog's newest content from its source.
+  Future<void> syncCatalog() => _job('catalog.sync', const []);
+
+  /// The values an installed app runs with.
+  Future<Map<String, dynamic>> appConfig(String name) async =>
+      asMap(await _client.call('app.config', [name]));
+
+  /// Starts installing [catalogApp] as an app called [name] and returns the
+  /// job. Pulling images takes a while; see [settleJob].
+  Future<int> installApp({
+    required String name,
+    required String catalogApp,
+    required String train,
+    required String version,
+    required Map<String, dynamic> values,
+  }) async => asInt(
+    await _client.call('app.create', [
+      {
+        'app_name': name,
+        'train': train,
+        'catalog_app': catalogApp,
+        'version': version,
+        'values': values,
+      },
+    ]),
+  );
+
+  /// Starts installing a custom app from a Docker Compose file.
+  Future<int> installCustomApp({
+    required String name,
+    required String compose,
+  }) async => asInt(
+    await _client.call('app.create', [
+      {
+        'app_name': name,
+        'custom_app': true,
+        'custom_compose_config_string': compose,
+      },
+    ]),
+  );
+
+  /// Starts applying new [values] to an installed app (or a new Compose
+  /// config, for a custom one) and returns the job.
+  Future<int> updateApp(
+    String name, {
+    Map<String, dynamic>? values,
+    Map<String, dynamic>? compose,
+  }) async => asInt(
+    await _client.call('app.update', [
+      name,
+      {'values': ?values, 'custom_compose_config': ?compose},
+    ]),
+  );
+
+  /// How long [settleJob] waits by default. Tests shorten it.
+  static Duration settleWindow = const Duration(seconds: 10);
+
+  /// Waits up to [within] for job [id]: true once it succeeded, false when it
+  /// still runs (installing and redeploying can take minutes). Throws an
+  /// [ApiException] with the job's error when it failed, which is how a
+  /// refused configuration shows, usually within a second.
+  Future<bool> settleJob(
+    int id, {
+    Duration? within,
+    Duration poll = const Duration(milliseconds: 500),
+  }) async {
+    final deadline = DateTime.now().add(within ?? settleWindow);
+    while (true) {
+      final jobs = await _client.call('core.get_jobs', [
+        [
+          ['id', '=', id],
+        ],
+      ]) as List<dynamic>;
+      if (jobs.isNotEmpty) {
+        final job = TrueNasJob.fromJson(asMap(jobs.first));
+        switch (job.state) {
+          case JobState.success:
+            return true;
+          case JobState.failed || JobState.aborted:
+            throw ApiException(job.error ?? job.state.name);
+          case JobState.waiting || JobState.running:
+            break;
+        }
+      }
+      if (DateTime.now().isAfter(deadline)) return false;
+      await Future<void>.delayed(poll);
+    }
   }
 
   Future<List<VirtualMachine>> vms() async =>

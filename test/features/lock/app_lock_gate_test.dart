@@ -16,7 +16,10 @@ import '../../support/memory_store.dart';
 void main() {
   late FakeBiometricAuth auth;
 
-  setUp(() => auth = FakeBiometricAuth());
+  setUp(() {
+    auth = FakeBiometricAuth();
+    resetNativeGlassPauses();
+  });
 
   Future<void> open(
     WidgetTester tester, {

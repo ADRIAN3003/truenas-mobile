@@ -120,13 +120,16 @@ README covers what the app does; this file covers how to work on it.
   (`onChangeEnd` is not called); the switch, slider and segments follow the
   device's light or dark appearance, only the tab bar follows the app's theme;
   tests cannot run them (no iOS), so check them on a phone. A native view also
-  ignores a page being dragged and shows through Flutter's own cover, so
-  `pauseNativeGlass()` (glass.dart; calls stack) swaps the tab bar, switch,
-  slider and segments for the Flutter look-alikes while the user drags a page
-  back (the observer's `didStartUserGesture` to `didStopUserGesture`) and while
-  the app lock cover is up (`AppLockGate`); the switch, slider and segments
-  also use the look-alikes while the keyboard is up (read from the platform
-  views, since a `Scaffold` zeroes its body's `viewInsets`). New native glass
+  ignores a page that is moving and shows through Flutter's own cover, so
+  `pauseNativeGlass()` (glass.dart; calls stack) swaps the switch, slider and
+  segments for the Flutter look-alikes, and hides the tab bar (its look-alike
+  would flip to the native bar afterwards), for the whole of every page
+  transition (the observer holds it until the route's animation ends, ignoring
+  the offstage first frame that reports completed; a back drag holds it from
+  `didStartUserGesture` to `didStopUserGesture`) and while the app lock cover is
+  up (`AppLockGate`); the switch, slider and segments also use the look-alikes
+  while the keyboard is up (read from the platform views, since a `Scaffold`
+  zeroes its body's `viewInsets`). New native glass
   goes through `_nativeOrFallback`. Not yet seen on a phone. Dialogs, sheets,
   menus and glass panels stay on `liquid_glass_widgets`.
 - Haptics go through `lib/shared/haptics.dart` (switched off by

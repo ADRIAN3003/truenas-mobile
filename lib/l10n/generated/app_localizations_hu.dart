@@ -3310,4 +3310,40 @@ class AppLocalizationsHu extends AppLocalizations {
   String appConfigApplying(String name) {
     return 'A módosítások alkalmazása a(z) $name alkalmazáson. A szerver újratelepíti.';
   }
+
+  @override
+  String get shortcutAdd => 'Hozzáadás a kezdőképernyőhöz';
+
+  @override
+  String shortcutPickTitle(String name) {
+    return '$name parancsikon';
+  }
+
+  @override
+  String shortcutLabelStart(String name) {
+    return '$name indítása';
+  }
+
+  @override
+  String shortcutLabelStop(String name) {
+    return '$name leállítása';
+  }
+
+  @override
+  String shortcutLabelRestart(String name) {
+    return '$name újraindítása';
+  }
+
+  @override
+  String shortcutLabelSync(String name) {
+    return '$name szinkronizálása';
+  }
+
+  @override
+  String get shortcutUnsupported =>
+      'Ez az indítóképernyő nem tud parancsikonokat hozzáadni.';
+
+  @override
+  String get shortcutTaskMissing =>
+      'Ez a szinkronizálási feladat már nem létezik.';
 }

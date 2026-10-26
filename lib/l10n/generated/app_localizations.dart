@@ -5455,6 +5455,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Applying the changes to {name}. It redeploys on the server.'**
   String appConfigApplying(String name);
+
+  /// Button or menu entry that puts a shortcut on the Android home screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Add to home screen'**
+  String get shortcutAdd;
+
+  /// Title of the choice of what the shortcut does, for an app.
+  ///
+  /// In en, this message translates to:
+  /// **'Shortcut for {name}'**
+  String shortcutPickTitle(String name);
+
+  /// Label of a home screen shortcut that starts an app.
+  ///
+  /// In en, this message translates to:
+  /// **'Start {name}'**
+  String shortcutLabelStart(String name);
+
+  /// Label of a home screen shortcut that stops an app.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop {name}'**
+  String shortcutLabelStop(String name);
+
+  /// Label of a home screen shortcut that restarts an app.
+  ///
+  /// In en, this message translates to:
+  /// **'Restart {name}'**
+  String shortcutLabelRestart(String name);
+
+  /// Label of a home screen shortcut that runs a cloud sync task.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync {name}'**
+  String shortcutLabelSync(String name);
+
+  /// Snackbar when the Android launcher cannot pin shortcuts.
+  ///
+  /// In en, this message translates to:
+  /// **'This launcher can\'t add shortcuts.'**
+  String get shortcutUnsupported;
+
+  /// Snackbar when a shortcut's cloud sync task was deleted.
+  ///
+  /// In en, this message translates to:
+  /// **'That sync task no longer exists.'**
+  String get shortcutTaskMissing;
 }
 
 class _AppLocalizationsDelegate

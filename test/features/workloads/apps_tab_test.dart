@@ -2,23 +2,31 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/misc.dart' show Override;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:truenas_mobile/core/instances/server_instance.dart';
+import 'package:truenas_mobile/core/quick_actions/quick_actions.dart';
 import 'package:truenas_mobile/core/session/truenas_session.dart';
 import 'package:truenas_mobile/features/workloads/apps_tab.dart';
 import 'package:truenas_mobile/l10n/generated/app_localizations.dart';
 
 import '../../support/fake_truenas_server.dart';
+import '../../support/quick_action_fakes.dart';
 
 void main() {
   late FakeTrueNasServer server;
   late TrueNasSession session;
 
-  Widget wrap(Widget child) => MaterialApp(
-    localizationsDelegates: AppLocalizations.localizationsDelegates,
-    supportedLocales: AppLocalizations.supportedLocales,
-    home: Scaffold(body: child),
-  );
+  Widget wrap(Widget child, {List<Override> overrides = const []}) =>
+      ProviderScope(
+        overrides: overrides,
+        child: MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: Scaffold(body: child),
+        ),
+      );
 
   Future<void> settle(WidgetTester tester) async {
     for (var i = 0; i < 10; i++) {
@@ -428,5 +436,49 @@ void main() {
     await disconnect(tester);
     // Let the icon download's idle HTTP connection time out.
     await tester.pump(const Duration(seconds: 16));
+  });
+  testWidgets('an app can be pinned to the home screen as a shortcut', (
+    tester,
+  ) async {
+    final quickActions = FakeQuickActions();
+    await connect(tester);
+    await tester.pumpWidget(
+      wrap(
+        AppsTab(session: session),
+        overrides: [quickActionsProvider.overrideWithValue(quickActions)],
+      ),
+    );
+    await settle(tester);
+    await tester.tap(find.text('jellyfin'));
+    await settle(tester);
+
+    await tester.tap(find.text('Add to home screen'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Restart jellyfin'));
+    await tester.pumpAndSettle();
+
+    expect(quickActions.pinned, [
+      (
+        const QuickAction(
+          serverId: '1',
+          kind: QuickActionKind.appRestart,
+          target: 'jellyfin',
+        ),
+        'Restart jellyfin',
+      ),
+    ]);
+    await disconnect(tester);
+  });
+
+  testWidgets('a launcher that cannot pin gets no shortcut button', (
+    tester,
+  ) async {
+    await connect(tester);
+    await tester.pumpWidget(wrap(AppsTab(session: session)));
+    await settle(tester);
+    await tester.tap(find.text('jellyfin'));
+    await settle(tester);
+    expect(find.text('Add to home screen'), findsNothing);
+    await disconnect(tester);
   });
 }

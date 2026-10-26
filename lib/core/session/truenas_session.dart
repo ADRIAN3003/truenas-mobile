@@ -30,6 +30,7 @@ class TrueNasSession {
   TrueNasSession(
     TrueNasConnection connection,
     this.userInfo, {
+    this.instanceId,
     Future<TrueNasConnection> Function()? reconnect,
   }) : _connection = connection {
     client = reconnect == null
@@ -43,6 +44,10 @@ class TrueNasSession {
 
   TrueNasConnection _connection;
   final Map<String, dynamic>? userInfo;
+
+  /// The saved server this is a session of, for things that name it later
+  /// (a home screen shortcut).
+  final String? instanceId;
 
   /// The connection in use right now; it changes after a reconnect.
   TrueNasConnection get connection => _connection;
@@ -241,6 +246,7 @@ Future<(TrueNasSession, ServerInstance)> connectToInstance(
           TrueNasSession(
             connection,
             userInfo,
+            instanceId: current.id,
             reconnect: () => _reconnect(saved, askOtp),
           ),
           current,

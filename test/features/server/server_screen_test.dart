@@ -8,6 +8,7 @@ import 'package:liquid_glass_widgets/liquid_glass_widgets.dart' as lg;
 import 'package:truenas_mobile/core/instances/instance_repository.dart';
 import 'package:truenas_mobile/core/instances/instances_provider.dart';
 import 'package:truenas_mobile/core/instances/server_instance.dart';
+import 'package:truenas_mobile/core/quick_actions/quick_actions.dart';
 import 'package:truenas_mobile/core/settings/app_settings.dart';
 import 'package:truenas_mobile/core/settings/settings_provider.dart';
 import 'package:truenas_mobile/core/widgets/home_widgets.dart';
@@ -45,6 +46,7 @@ void main() {
     List<Override> overrides = const [],
     void Function(FakeTrueNasServer server)? before,
     bool openAlertsOnStart = false,
+    QuickAction? quickAction,
   }) async {
     tester.view.physicalSize = size;
     tester.view.devicePixelRatio = 1;
@@ -100,7 +102,11 @@ void main() {
                       ),
                     ),
                   )
-                : ServerScreen('1', openAlertsOnStart: openAlertsOnStart),
+                : ServerScreen(
+                    '1',
+                    openAlertsOnStart: openAlertsOnStart,
+                    quickAction: quickAction,
+                  ),
           ),
         ),
       ),
@@ -134,6 +140,78 @@ void main() {
     expect(find.text('Alerts'), findsWidgets);
     expect(find.text('Pool tank state is DEGRADED'), findsOneWidget);
     await close(tester);
+  });
+
+  group('a home screen shortcut', () {
+    QuickAction shortcut(QuickActionKind kind, String target) =>
+        QuickAction(serverId: '1', kind: kind, target: target);
+
+    Iterable<String> calledMethods() => server.calls.map((c) => c.$1);
+
+    testWidgets('starts an app without asking', (tester) async {
+      await open(
+        tester,
+        const Size(400, 800),
+        quickAction: shortcut(QuickActionKind.appStart, 'jellyfin'),
+      );
+      await tester.pumpAndSettle();
+      expect(calledMethods(), contains('app.start'));
+      expect(find.text('jellyfin started'), findsOneWidget);
+      await close(tester);
+    });
+
+    testWidgets('asks before it restarts an app', (tester) async {
+      await open(
+        tester,
+        const Size(400, 800),
+        quickAction: shortcut(QuickActionKind.appRestart, 'jellyfin'),
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('Restart jellyfin?'), findsOneWidget);
+      expect(calledMethods(), isNot(contains('app.redeploy')));
+      await tester.tap(find.widgetWithText(FilledButton, 'Restart'));
+      await settle(tester);
+      expect(calledMethods(), contains('app.redeploy'));
+      await close(tester);
+    });
+
+    testWidgets('does nothing when the question is declined', (tester) async {
+      await open(
+        tester,
+        const Size(400, 800),
+        quickAction: shortcut(QuickActionKind.appStop, 'jellyfin'),
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('Stop jellyfin?'), findsOneWidget);
+      await tester.tap(find.text('Cancel'));
+      await settle(tester);
+      expect(calledMethods(), isNot(contains('app.stop')));
+      await close(tester);
+    });
+
+    testWidgets('runs a cloud sync', (tester) async {
+      await open(
+        tester,
+        const Size(400, 800),
+        quickAction: shortcut(QuickActionKind.cloudSyncRun, '1'),
+      );
+      await tester.pumpAndSettle();
+      expect(calledMethods(), contains('cloudsync.sync'));
+      expect(find.text('Started Photos to B2'), findsOneWidget);
+      await close(tester);
+    });
+
+    testWidgets('says so when its cloud sync task is gone', (tester) async {
+      await open(
+        tester,
+        const Size(400, 800),
+        quickAction: shortcut(QuickActionKind.cloudSyncRun, '99'),
+      );
+      await tester.pumpAndSettle();
+      expect(calledMethods(), isNot(contains('cloudsync.sync')));
+      expect(find.text('That sync task no longer exists.'), findsOneWidget);
+      await close(tester);
+    });
   });
 
   testWidgets('the app settings are one tap away inside a server', (

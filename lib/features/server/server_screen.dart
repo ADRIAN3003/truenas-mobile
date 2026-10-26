@@ -8,6 +8,7 @@ import '../../core/instances/server_instance.dart';
 import '../../core/jobs/job_monitor.dart';
 import '../../core/jobs/job_tracker.dart';
 import '../../core/jobs/live_progress.dart';
+import '../../core/quick_actions/quick_actions.dart';
 import '../../core/settings/settings_provider.dart';
 import '../../core/session/truenas_session.dart';
 import '../../core/session/wait_for_server.dart';
@@ -30,6 +31,7 @@ import '../workloads/apps_tab.dart';
 import '../settings/settings_screen.dart';
 import 'dashboard_tab.dart';
 import 'more_tab.dart';
+import 'run_quick_action.dart';
 
 /// Window width from which the server screen uses a navigation rail.
 const railBreakpoint = 600.0;
@@ -40,6 +42,7 @@ class ServerScreen extends ConsumerStatefulWidget {
     this.instanceId, {
     super.key,
     this.openAlertsOnStart = false,
+    this.quickAction,
     this.wait = ServerWait.none,
   });
 
@@ -52,6 +55,10 @@ class ServerScreen extends ConsumerStatefulWidget {
   /// Opens the alerts list as soon as the server is connected (the user
   /// tapped an alert notification).
   final bool openAlertsOnStart;
+
+  /// What a home screen shortcut asked for, run as soon as the server is
+  /// connected.
+  final QuickAction? quickAction;
 
   @override
   ConsumerState<ServerScreen> createState() => _ServerScreenState();
@@ -66,6 +73,7 @@ class _ServerScreenState extends ConsumerState<ServerScreen>
   Object? _error;
   var _tab = 0;
   var _openedAlerts = false;
+  var _ranQuickAction = false;
 
   /// Ends the wait for the server of the connection attempt in progress.
   WaitToken? _token;
@@ -259,6 +267,12 @@ class _ServerScreenState extends ConsumerState<ServerScreen>
         _openedAlerts = true;
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (mounted) openAlerts(context, session);
+        });
+      }
+      if (widget.quickAction case final action? when !_ranQuickAction) {
+        _ranQuickAction = true;
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) runQuickAction(context, session, action);
         });
       }
     } catch (error) {

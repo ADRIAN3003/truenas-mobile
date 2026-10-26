@@ -892,5 +892,13 @@
   "appEditNoFormNote": "A katalógus nem adja meg ennek a verziónak az űrlapját, ezért a beállítások JSON-ként látszanak. A mentés újratelepíti az alkalmazást.",
   "appEditCustomNote": "Az egyéni alkalmazás a Docker Compose beállításaival adható meg. A mentés újratelepíti az alkalmazást.",
   "appConfigSaved": "A(z) {name} frissítve",
-  "appConfigApplying": "A módosítások alkalmazása a(z) {name} alkalmazáson. A szerver újratelepíti."
+  "appConfigApplying": "A módosítások alkalmazása a(z) {name} alkalmazáson. A szerver újratelepíti.",
+  "shortcutAdd": "Hozzáadás a kezdőképernyőhöz",
+  "shortcutPickTitle": "{name} parancsikon",
+  "shortcutLabelStart": "{name} indítása",
+  "shortcutLabelStop": "{name} leállítása",
+  "shortcutLabelRestart": "{name} újraindítása",
+  "shortcutLabelSync": "{name} szinkronizálása",
+  "shortcutUnsupported": "Ez az indítóképernyő nem tud parancsikonokat hozzáadni.",
+  "shortcutTaskMissing": "Ez a szinkronizálási feladat már nem létezik."
 }

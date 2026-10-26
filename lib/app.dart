@@ -7,6 +7,7 @@ import 'core/settings/system_language.dart';
 import 'features/instances/instances_screen.dart';
 import 'features/instances/open_alert_from_notification.dart';
 import 'features/instances/open_default_server.dart';
+import 'features/instances/open_quick_action.dart';
 import 'features/lock/app_lock_gate.dart';
 import 'features/updates/update_prompt.dart';
 import 'features/widgets/home_widget_list_sync.dart';
@@ -43,7 +44,9 @@ class TrueNasMobileApp extends ConsumerWidget {
       home: const UpdateAutoCheck(
         child: HomeWidgetListSync(
           child: OpenDefaultServer(
-            child: OpenAlertFromNotification(child: InstancesScreen()),
+            child: OpenQuickAction(
+              child: OpenAlertFromNotification(child: InstancesScreen()),
+            ),
           ),
         ),
       ),

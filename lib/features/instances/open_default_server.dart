@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/instances/default_server.dart';
 import '../../core/instances/instances_provider.dart';
 import '../../core/notifications/alert_taps.dart';
+import '../../core/quick_actions/quick_actions.dart';
 import '../../core/settings/settings_provider.dart';
 import '../server/server_screen.dart';
 
@@ -33,6 +34,8 @@ class _OpenDefaultServerState extends ConsumerState<OpenDefaultServer> {
     if (!ref.read(openDefaultServerProvider)) return;
     // A tapped alert notification opens its own server instead.
     if (ref.read(pendingAlertServerProvider) != null) return;
+    // So does a tapped shortcut.
+    if (ref.read(pendingQuickActionProvider) != null) return;
     final servers = await ref.read(instancesProvider.future);
     if (!mounted) return;
     final server = defaultServer(

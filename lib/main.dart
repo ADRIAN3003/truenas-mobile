@@ -12,6 +12,7 @@ import 'core/logging/file_log_store.dart';
 import 'core/notifications/alert_taps.dart';
 import 'core/notifications/background_alerts.dart';
 import 'core/notifications/local_alert_notifier.dart';
+import 'core/quick_actions/quick_actions.dart';
 import 'core/security/biometric_auth.dart';
 import 'core/settings/app_settings.dart';
 import 'core/settings/settings_provider.dart';
@@ -47,6 +48,9 @@ Future<void> main() async {
         )
       : null;
   final launchServer = await notifier?.listenForTaps();
+  // Android home screen shortcuts; iOS has Siri and Shortcuts instead.
+  final quickActions = Platform.isAndroid ? PlatformQuickActions() : null;
+  final launchQuickAction = await quickActions?.launchAction();
   final alerts = notifier == null
       ? null
       : AlertNotificationService(
@@ -59,6 +63,10 @@ Future<void> main() async {
   container = ProviderContainer(
     overrides: [
       launchAlertServerProvider.overrideWithValue(launchServer),
+      if (quickActions != null) ...[
+        quickActionsProvider.overrideWithValue(quickActions),
+        launchQuickActionProvider.overrideWithValue(launchQuickAction),
+      ],
       if (alerts != null)
         alertNotificationServiceProvider.overrideWithValue(alerts),
       initialSettingsProvider.overrideWithValue(settings),

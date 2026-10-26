@@ -377,6 +377,15 @@
   "@poolsTitle": {
     "description": "Title of the storage pools card."
   },
+  "poolsLoadFailed": "Couldn't load the pools: {reason}",
+  "@poolsLoadFailed": {
+    "description": "Shown in the pools card when the server did not answer the pool query.",
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
   "poolsEmpty": "No pools",
   "@poolsEmpty": {
     "description": "Shown when the server has no storage pools."

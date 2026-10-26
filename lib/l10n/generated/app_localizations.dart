@@ -602,6 +602,12 @@ abstract class AppLocalizations {
   /// **'Pools'**
   String get poolsTitle;
 
+  /// Shown in the pools card when the server did not answer the pool query.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t load the pools: {reason}'**
+  String poolsLoadFailed(String reason);
+
   /// Shown when the server has no storage pools.
   ///
   /// In en, this message translates to:

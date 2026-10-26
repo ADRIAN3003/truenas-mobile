@@ -288,6 +288,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get poolsTitle => 'Pools';
 
   @override
+  String poolsLoadFailed(String reason) {
+    return 'Couldn\'t load the pools: $reason';
+  }
+
+  @override
   String get poolsEmpty => 'No pools';
 
   @override

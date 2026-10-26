@@ -289,6 +289,11 @@ class AppLocalizationsHu extends AppLocalizations {
   String get poolsTitle => 'Poolok';
 
   @override
+  String poolsLoadFailed(String reason) {
+    return 'Nem sikerült betölteni a poolokat: $reason';
+  }
+
+  @override
   String get poolsEmpty => 'Nincs pool';
 
   @override

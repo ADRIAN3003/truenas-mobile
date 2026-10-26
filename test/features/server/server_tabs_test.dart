@@ -105,6 +105,34 @@ void main() {
     await disconnect(tester);
   });
 
+  testWidgets('a failed pool query is not shown as "No pools"', (tester) async {
+    await connect(tester);
+    server.failingPools = true;
+    await tester.pumpWidget(
+      wrap(
+        DashboardTab(
+          session: session,
+          info: const {'hostname': 'nas', 'version': '25.10.7'},
+          onOpenAlerts: () {},
+        ),
+      ),
+    );
+    await settle(tester);
+    await tester.scrollUntilVisible(find.text('Try again'), 200);
+
+    expect(find.text('No pools'), findsNothing);
+    expect(find.textContaining("Couldn't load the pools"), findsOneWidget);
+
+    // Retrying once the server answers again shows the pools.
+    server.failingPools = false;
+    await tester.tap(find.text('Try again'));
+    await settle(tester);
+    await tester.scrollUntilVisible(find.text('tank'), 200);
+    expect(find.text('tank'), findsOneWidget);
+    expect(find.text('Try again'), findsNothing);
+    await disconnect(tester);
+  });
+
   testWidgets('alerts can be dismissed and restored', (tester) async {
     await connect(tester);
     await tester.pumpWidget(wrap(AlertsTab(session: session)));

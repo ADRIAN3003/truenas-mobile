@@ -84,6 +84,7 @@
   "networkIn": "Be",
   "networkOut": "Ki",
   "poolsTitle": "Poolok",
+  "poolsLoadFailed": "Nem sikerült betölteni a poolokat: {reason}",
   "poolsEmpty": "Nincs pool",
   "poolUsage": "{used} / {total}",
   "alertsTitle": "Riasztások",

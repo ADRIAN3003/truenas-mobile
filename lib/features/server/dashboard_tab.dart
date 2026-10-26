@@ -9,6 +9,7 @@ import '../../core/models/pool_summary.dart';
 import '../../core/models/realtime_stats.dart';
 import '../../core/session/truenas_session.dart';
 import '../../l10n/generated/app_localizations.dart';
+import '../../shared/connect_dialogs.dart';
 import '../../shared/glass.dart';
 import '../../shared/formatting.dart';
 import '../../shared/theme.dart';
@@ -43,6 +44,7 @@ class _DashboardTabState extends State<DashboardTab> {
   StreamSubscription<Object?>? _alertChanges;
   StreamSubscription<void>? _reconnects;
   List<PoolSummary>? _pools;
+  Object? _poolsError;
   List<TrueNasAlert>? _alerts;
   bool _hasHistory = false;
 
@@ -86,9 +88,15 @@ class _DashboardTabState extends State<DashboardTab> {
   Future<void> _loadPools() async {
     try {
       final pools = await widget.session.pools();
-      if (mounted) setState(() => _pools = pools);
-    } catch (_) {
-      if (mounted) setState(() => _pools = const []);
+      if (mounted) {
+        setState(() {
+          _pools = pools;
+          _poolsError = null;
+        });
+      }
+    } catch (error) {
+      // Keep the last list: a failed refresh is not "no pools".
+      if (mounted) setState(() => _poolsError = error);
     }
   }
 
@@ -123,7 +131,10 @@ class _DashboardTabState extends State<DashboardTab> {
             ),
             _NetworkCard(history: _history),
           ];
-    final pools = [if (_pools != null) _PoolsCard(pools: _pools!)];
+    final pools = [
+      if (_pools != null || _poolsError != null)
+        _PoolsCard(pools: _pools, error: _poolsError, onRetry: _loadPools),
+    ];
     return AppRefreshIndicator(
       edgeOffset: ChromeInsets.of(context).top,
       onRefresh: _refresh,
@@ -613,9 +624,14 @@ class _NetworkCard extends StatelessWidget {
 }
 
 class _PoolsCard extends StatelessWidget {
-  const _PoolsCard({required this.pools});
+  const _PoolsCard({required this.pools, this.error, this.onRetry});
 
-  final List<PoolSummary> pools;
+  /// Null while no list was ever loaded.
+  final List<PoolSummary>? pools;
+
+  /// Why the last load failed, shown instead of the list when there is none.
+  final Object? error;
+  final VoidCallback? onRetry;
 
   @override
   Widget build(BuildContext context) {
@@ -625,11 +641,20 @@ class _PoolsCard extends StatelessWidget {
     return _DashCard(
       icon: Icons.storage_rounded,
       title: l10n.poolsTitle,
-      child: pools.isEmpty
+      child: pools == null
+          ? Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(l10n.poolsLoadFailed(describeConnectError(l10n, error!))),
+                const SizedBox(height: 8),
+                TextButton(onPressed: onRetry, child: Text(l10n.retry)),
+              ],
+            )
+          : pools!.isEmpty
           ? Text(l10n.poolsEmpty)
           : Column(
               children: [
-                for (final (i, pool) in pools.indexed)
+                for (final (i, pool) in pools!.indexed)
                   Padding(
                     padding: EdgeInsets.only(top: i == 0 ? 0 : 16),
                     child: Column(

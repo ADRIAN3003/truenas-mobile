@@ -132,6 +132,9 @@ class FakeTrueNasServer {
   /// Graphs the server does not list, e.g. `cputemp` on a VM.
   final hiddenGraphs = <String>{};
 
+  /// `pool.query` answers with an error instead of the pools.
+  bool failingPools = false;
+
   /// Services served by `service.query`; control calls change their state.
   final services = <Map<String, dynamic>>[
     {
@@ -1106,6 +1109,19 @@ class FakeTrueNasServer {
             return;
           case 'test.job':
             result = _job();
+          case 'pool.query' when failingPools:
+            socket.add(
+              jsonEncode({
+                'jsonrpc': '2.0',
+                'id': message['id'],
+                'error': {
+                  'code': -32001,
+                  'message': 'Method call error',
+                  'data': {'reason': '[EFAULT] Pool query failed'},
+                },
+              }),
+            );
+            return;
           case 'pool.query':
             result = pools;
           case 'pool.scrub.scrub':

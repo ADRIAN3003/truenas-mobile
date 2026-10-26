@@ -448,7 +448,9 @@ class _ServerScreenState extends ConsumerState<ServerScreen>
               Positioned(
                 left: 12,
                 right: 12,
-                bottom: insets.bottom - 4,
+                // The native tab bar stands a little higher than the shader
+                // one, so the job card sits higher with it.
+                bottom: insets.bottom + (useNativeGlass(context) ? 4 : -4),
                 child: _jobs == null
                     ? const SizedBox.shrink()
                     : JobProgressBanner(

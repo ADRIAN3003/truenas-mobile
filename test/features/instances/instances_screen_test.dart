@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:truenas_mobile/core/instances/instance_repository.dart';
+import 'package:truenas_mobile/core/logging/app_log.dart';
 import 'package:truenas_mobile/core/instances/instances_provider.dart';
 import 'package:truenas_mobile/core/instances/server_instance.dart';
 import 'package:truenas_mobile/core/wol/wake_on_lan.dart';
@@ -121,12 +122,18 @@ void main() {
     });
 
     testWidgets('a packet that could not be sent is reported', (tester) async {
+      AppLog.instance = AppLog();
       final sender = await openWith(tester, waking);
       sender.failWith = const SocketException('Network is unreachable');
       await tester.tap(find.byTooltip('Wake up'));
       await tester.pumpAndSettle();
       expect(find.textContaining('Could not send the wake-up'), findsOneWidget);
       expect(find.textContaining('Network is unreachable'), findsOneWidget);
+      // The failure is in the error log too, for a bug report.
+      final logged = AppLog.instance.entries.single;
+      expect(logged.source, 'wake-on-lan');
+      expect(logged.message, contains('Home NAS'));
+      expect(logged.message, contains('Network is unreachable'));
     });
   });
 }

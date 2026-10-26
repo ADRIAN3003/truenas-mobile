@@ -135,6 +135,9 @@ class FakeTrueNasServer {
   /// `pool.query` answers with an error instead of the pools.
   bool failingPools = false;
 
+  /// `core.subscribe` refuses `reporting.realtime`.
+  bool failingRealtime = false;
+
   /// Services served by `service.query`; control calls change their state.
   final services = <Map<String, dynamic>>[
     {
@@ -685,6 +688,20 @@ class FakeTrueNasServer {
             result = {'pw_name': username};
           case 'system.info':
             result = {'hostname': 'nas', 'version': '25.10.7'};
+          case 'core.subscribe'
+              when failingRealtime && params.first == 'reporting.realtime':
+            socket.add(
+              jsonEncode({
+                'jsonrpc': '2.0',
+                'id': message['id'],
+                'error': {
+                  'code': -32001,
+                  'message': 'Method call error',
+                  'data': {'reason': '[EACCES] Not allowed'},
+                },
+              }),
+            );
+            return;
           case 'core.subscribe':
             subscriptions.add(params.first as String);
             result = 'sub-${subscriptions.length}';

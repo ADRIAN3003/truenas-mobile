@@ -108,6 +108,7 @@
   "jobStateFailed": "Sikertelen",
   "jobStateAborted": "Megszakítva",
   "close": "Bezárás",
+  "liveFailed": "Nem sikerült élő adatot kérni: {reason}. Húzd le a frissítéshez.",
   "liveWaiting": "Várakozás az élő adatokra…",
   "systemTitle": "Rendszer",
   "tabStorage": "Tárhely",

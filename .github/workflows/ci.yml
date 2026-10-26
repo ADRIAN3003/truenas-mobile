@@ -30,6 +30,15 @@ jobs:
       - run: flutter analyze
       - run: flutter test
 
+  # The iOS widgets shape the server's answers in Swift, as the app does in
+  # Dart; both are held to test/fixtures/widget_shaping.json.
+  swift-widget-shaping:
+    name: Check Swift widget shaping
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v7
+      - run: tools/check-widget-shaping.sh
+
   build-android:
     name: Build Android (debug)
     needs: analyze-test

@@ -4,12 +4,12 @@ import 'dart:math' as math;
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
+import '../../core/api/api_exception.dart';
 import '../../core/models/alert.dart';
 import '../../core/models/pool_summary.dart';
 import '../../core/models/realtime_stats.dart';
 import '../../core/session/truenas_session.dart';
 import '../../l10n/generated/app_localizations.dart';
-import '../../shared/connect_dialogs.dart';
 import '../../shared/glass.dart';
 import '../../shared/formatting.dart';
 import '../../shared/theme.dart';
@@ -17,6 +17,11 @@ import '../../shared/ui.dart';
 import '../../shared/viz_colors.dart';
 import '../../shared/widgets.dart';
 import '../reporting/history_screen.dart';
+
+/// Why a call failed, as the server said it; a connection problem is worded
+/// as such.
+String _reason(Object error) =>
+    error is ApiException ? error.message : error.toString();
 
 /// Number of live samples kept for the charts (2 minutes at 2 s each).
 const _historyLength = 60;
@@ -48,16 +53,14 @@ class _DashboardTabState extends State<DashboardTab> {
   List<TrueNasAlert>? _alerts;
   bool _hasHistory = false;
 
+  /// Why the live statistics could not be subscribed to; cleared by the next
+  /// sample.
+  Object? _liveError;
+
   @override
   void initState() {
     super.initState();
-    _realtime = widget.session.realtimeStats().listen(
-      (stats) => setState(() {
-        _history.add(stats);
-        if (_history.length > _historyLength) _history.removeAt(0);
-      }),
-      onError: (_) {},
-    );
+    _listenLive();
     _alertChanges = widget.session.alertChanges().listen(
       (_) => _loadAlerts(),
       onError: (_) {},
@@ -75,8 +78,27 @@ class _DashboardTabState extends State<DashboardTab> {
     super.dispose();
   }
 
-  Future<void> _refresh() =>
-      Future.wait([_loadPools(), _loadAlerts(), _checkHistory()]);
+  void _listenLive() {
+    _realtime?.cancel();
+    _realtime = widget.session.realtimeStats().listen(
+      (stats) => setState(() {
+        _liveError = null;
+        _history.add(stats);
+        if (_history.length > _historyLength) _history.removeAt(0);
+      }),
+      // The subscription renews itself when the connection comes back; until
+      // then say why nothing moves instead of waiting forever.
+      onError: (Object error) {
+        if (mounted) setState(() => _liveError = error);
+      },
+    );
+  }
+
+  Future<void> _refresh() {
+    // Pulling down also asks for the live statistics again after a refusal.
+    if (_liveError != null) _listenLive();
+    return Future.wait([_loadPools(), _loadAlerts(), _checkHistory()]);
+  }
 
   Future<void> _checkHistory() async {
     try {
@@ -116,7 +138,7 @@ class _DashboardTabState extends State<DashboardTab> {
         _AlertsBanner(alerts: _alerts!, onTap: widget.onOpenAlerts),
     ];
     final live = latest == null
-        ? [const _WaitingCard()]
+        ? [_WaitingCard(error: _liveError)]
         : [
             _GaugesCard(
               history: _history,
@@ -360,23 +382,31 @@ class _ServerHeader extends StatelessWidget {
 }
 
 class _WaitingCard extends StatelessWidget {
-  const _WaitingCard();
+  const _WaitingCard({this.error});
+
+  /// Why no sample has arrived, when the server refused the subscription.
+  final Object? error;
 
   @override
-  Widget build(BuildContext context) => _DashCard(
-    icon: Icons.speed_rounded,
-    title: AppLocalizations.of(context).cpuTitle,
-    child: Row(
-      children: [
-        const SizedBox.square(
-          dimension: 16,
-          child: CircularProgressIndicator.adaptive(strokeWidth: 2),
-        ),
-        const SizedBox(width: 12),
-        Expanded(child: Text(AppLocalizations.of(context).liveWaiting)),
-      ],
-    ),
-  );
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return _DashCard(
+      icon: Icons.speed_rounded,
+      title: l10n.cpuTitle,
+      child: error != null
+          ? Text(l10n.liveFailed(_reason(error!)))
+          : Row(
+              children: [
+                const SizedBox.square(
+                  dimension: 16,
+                  child: CircularProgressIndicator.adaptive(strokeWidth: 2),
+                ),
+                const SizedBox(width: 12),
+                Expanded(child: Text(l10n.liveWaiting)),
+              ],
+            ),
+    );
+  }
 }
 
 /// CPU and memory rings, with the CPU history underneath.
@@ -645,7 +675,7 @@ class _PoolsCard extends StatelessWidget {
           ? Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(l10n.poolsLoadFailed(describeConnectError(l10n, error!))),
+                Text(l10n.poolsLoadFailed(_reason(error!))),
                 const SizedBox(height: 8),
                 TextButton(onPressed: onRetry, child: Text(l10n.retry)),
               ],

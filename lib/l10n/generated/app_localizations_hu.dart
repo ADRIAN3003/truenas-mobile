@@ -386,6 +386,11 @@ class AppLocalizationsHu extends AppLocalizations {
   String get close => 'Bezárás';
 
   @override
+  String liveFailed(String reason) {
+    return 'Nem sikerült élő adatot kérni: $reason. Húzd le a frissítéshez.';
+  }
+
+  @override
   String get liveWaiting => 'Várakozás az élő adatokra…';
 
   @override

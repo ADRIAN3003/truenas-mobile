@@ -42,9 +42,17 @@ Future<void> openJobs(BuildContext context, TrueNasSession session) =>
 
 /// Everything that doesn't need a tab of its own.
 class MoreTab extends StatelessWidget {
-  const MoreTab({super.key, required this.session, required this.serverName});
+  const MoreTab({
+    super.key,
+    required this.session,
+    required this.instanceId,
+    required this.serverName,
+  });
 
   final TrueNasSession session;
+
+  /// The saved server this is, to reopen it after a restart.
+  final String instanceId;
 
   /// The name the user gave this server, for power confirmations.
   final String serverName;
@@ -111,7 +119,11 @@ class MoreTab extends StatelessWidget {
               Icons.system_update_rounded,
               AppPalette.tilePurple,
               l10n.updatesTitle,
-              () => UpdatesScreen(session: session, serverName: serverName),
+              () => UpdatesScreen(
+                session: session,
+                instanceId: instanceId,
+                serverName: serverName,
+              ),
             ),
           ],
         ),
@@ -169,6 +181,7 @@ class MoreTab extends StatelessWidget {
               onTap: () => confirmPower(
                 context,
                 session,
+                instanceId: instanceId,
                 serverName: serverName,
                 reboot: true,
               ),
@@ -185,6 +198,7 @@ class MoreTab extends StatelessWidget {
               onTap: () => confirmPower(
                 context,
                 session,
+                instanceId: instanceId,
                 serverName: serverName,
                 reboot: false,
               ),

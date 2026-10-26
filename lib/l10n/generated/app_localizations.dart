@@ -518,6 +518,36 @@ abstract class AppLocalizations {
   /// **'Connection cancelled.'**
   String get errorCancelled;
 
+  /// Shown when the app waited several minutes for a server that was woken up or restarted and it never answered.
+  ///
+  /// In en, this message translates to:
+  /// **'The server did not come online in time. Check that it is powered on and on the network, then try again.'**
+  String get errorWaitTimeout;
+
+  /// Shown after a restart command while the server is still going down.
+  ///
+  /// In en, this message translates to:
+  /// **'Waiting for {name} to shut down…'**
+  String waitShuttingDown(String name);
+
+  /// Shown while the app polls a server that is starting after a wake-up or a restart; it opens by itself when the server answers.
+  ///
+  /// In en, this message translates to:
+  /// **'Waiting for {name} to start…'**
+  String waitStarting(String name);
+
+  /// Under the waiting text while a server starts.
+  ///
+  /// In en, this message translates to:
+  /// **'This can take a few minutes. The server opens by itself once it answers.'**
+  String get waitHint;
+
+  /// Button that gives up waiting for a server to start.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop waiting'**
+  String get waitStop;
+
   /// Bottom navigation tab for the dashboard.
   ///
   /// In en, this message translates to:

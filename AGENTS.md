@@ -373,6 +373,18 @@ README covers what the app does; this file covers how to work on it.
   can read the MAC from `interface.query` (`state.hardware_link_address`).
   iOS needs the local network permission (`NSLocalNetworkUsageDescription`,
   already set); never promise delivery, a sleeping NAS may ignore it.
+  After the packet goes out (server card, or the error screen's Wake up) the
+  app opens `ServerScreen(wait: ServerWait.wake)`; a restart from the Updates
+  screen or More tab does the same with `ServerWait.restart`
+  (`confirmPower` needs the `instanceId`). The screen polls instead of failing
+  (`lib/core/session/wait_for_server.dart`): `retryUntilOnline` runs the normal
+  `connectToInstance` every 5 s for up to 10 min (`ServerWaitTiming`, which
+  tests shorten through `serverWaitTimingProvider`); anything but a refused
+  login, a declined prompt or an unsupported version counts as "still
+  starting". A restart first waits (up to 90 s, `serverAnswers` probes the
+  version endpoint) until the NAS stops answering, so the dying server is not
+  taken for the new one. "Stop waiting" and leaving the screen cancel through a
+  `WaitToken`, which also cancels the sleeping timer.
 - Disk health (`lib/features/storage/disk_screen.dart`, `StorageApi.smartResults`
   and `runSmartTest`): `smart.test.results` filtered on `["disk","=",name]`
   gives `tests` (newest first, `num` 1 is the newest; `status` SUCCESS, RUNNING,

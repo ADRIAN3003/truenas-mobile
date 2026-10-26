@@ -3179,6 +3179,169 @@ class AppLocalizationsEn extends AppLocalizations {
   String get overviewUnreachable => 'Can\'t reach the server.';
 
   @override
+  String get appFormNotNumber => 'Enter a number';
+
+  @override
+  String get appFormTooSmall => 'Too small';
+
+  @override
+  String get appFormTooLarge => 'Too large';
+
+  @override
+  String get appFormTooShort => 'Too short';
+
+  @override
+  String get appFormTooLong => 'Too long';
+
+  @override
+  String get appFormInvalidChars => 'Contains characters that are not allowed';
+
+  @override
+  String get appFormNoSettings => 'This app has no settings.';
+
+  @override
+  String get appFormAdd => 'Add entry';
+
+  @override
+  String get appFormLocked => 'Can\'t be changed after install';
+
+  @override
+  String get appFormJson => 'Edit as JSON';
+
+  @override
+  String get appFormFields => 'Back to the form';
+
+  @override
+  String get appFormJsonLabel => 'Configuration (JSON)';
+
+  @override
+  String get appFormJsonInvalid => 'That is not valid JSON.';
+
+  @override
+  String get appFormJsonObject =>
+      'The configuration must be a JSON object (curly braces around the settings).';
+
+  @override
+  String get appInstallTitle => 'Install app';
+
+  @override
+  String get appInstallButton => 'Install';
+
+  @override
+  String get appInstallName => 'Application name';
+
+  @override
+  String get appInstallNameHelp =>
+      'Lowercase letters, digits and hyphens, starting with a letter';
+
+  @override
+  String get appInstallNameInvalid =>
+      'Use lowercase letters, digits and hyphens (up to 40), starting with a letter';
+
+  @override
+  String get appInstallVersion => 'Version to install';
+
+  @override
+  String get appInstallTrain => 'Train';
+
+  @override
+  String appInstalled(String name) {
+    return '$name installed';
+  }
+
+  @override
+  String appInstalling(String name) {
+    return 'Installing $name. It shows in the list while the server sets it up.';
+  }
+
+  @override
+  String get catalogTitle => 'App catalog';
+
+  @override
+  String get catalogRefresh => 'Refresh catalog';
+
+  @override
+  String get catalogRefreshed => 'Catalog refreshed';
+
+  @override
+  String get catalogSearch => 'Search apps';
+
+  @override
+  String get catalogAll => 'All';
+
+  @override
+  String get catalogCustomAppSection => 'Your own';
+
+  @override
+  String get catalogCustomApp => 'Custom app';
+
+  @override
+  String get catalogCustomAppHint =>
+      'Install any container from a Docker Compose file';
+
+  @override
+  String catalogAppsSection(int count) {
+    return 'Apps ($count)';
+  }
+
+  @override
+  String get catalogEmpty => 'No apps match.';
+
+  @override
+  String get catalogInstalled => 'Installed';
+
+  @override
+  String get catalogInstalledNote =>
+      'An app made from this is already installed. Give the new one a different name.';
+
+  @override
+  String get dockerUnconfigured =>
+      'Apps need a pool first. Choose one in the TrueNAS web interface under Apps > Configuration > Choose Pool, then come back.';
+
+  @override
+  String get dockerNotRunning =>
+      'Apps are not running on the server right now, so nothing can be installed.';
+
+  @override
+  String get appCustomCompose => 'Docker Compose file';
+
+  @override
+  String get appCustomComposeHelp => 'Paste the contents of a compose.yaml';
+
+  @override
+  String get appCustomComposeJson => 'Docker Compose config (JSON)';
+
+  @override
+  String get appEditConfig => 'Edit configuration';
+
+  @override
+  String appEditTitle(String name) {
+    return 'Edit $name';
+  }
+
+  @override
+  String get appEditRestartNote =>
+      'Saving applies the changes and redeploys the app.';
+
+  @override
+  String get appEditNoFormNote =>
+      'The catalog\'s form for this version isn\'t available, so the configuration is shown as JSON. Saving redeploys the app.';
+
+  @override
+  String get appEditCustomNote =>
+      'A custom app is configured with its Docker Compose config. Saving redeploys the app.';
+
+  @override
+  String appConfigSaved(String name) {
+    return '$name updated';
+  }
+
+  @override
+  String appConfigApplying(String name) {
+    return 'Applying the changes to $name. It redeploys on the server.';
+  }
+
+  @override
   String get shortcutAdd => 'Add to home screen';
 
   @override

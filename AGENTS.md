@@ -238,6 +238,37 @@ README covers what the app does; this file covers how to work on it.
   and from the alerts seen; muting also works from the menu on an alert in the
   Alerts tab. The live job progress switch (`liveJobs`) sits in the same
   Notifications section.
+- App install and configuration (`lib/features/workloads/app_catalog_screen.dart`,
+  `app_install_screen.dart`, `app_edit_screen.dart`, `app_form.dart`,
+  `app_config_state.dart`; `lib/core/models/app_catalog.dart`, `app_values.dart`;
+  `WorkloadsApi.catalogApps/catalogDetails/installApp/updateApp/settleJob`). The
+  "+" beside "Apps" opens the catalog (`app.available`: `name`, `train`, `title`,
+  `categories`, `latest_version`, `installed`, `icon_url`); gated on `app.create`,
+  `app.available` and `catalog.get_app_details` (`canInstall`), editing on
+  `app.update` and `app.config` (`canEdit`), refresh on `catalog.sync`, and
+  `docker.status` (UNCONFIGURED means no pool for apps yet) only explains why
+  install is off. The form is drawn from `catalog.get_app_details(name, {train})`:
+  `versions[v].schema` has `groups` and `questions` (`variable`, `label`, `group`,
+  `schema` with `type`, `default`, `required`, `null`, `enum`, `min`/`max`,
+  `private`, `show_if` over sibling variables, `show_subquestions_if` +
+  `subquestions` whose values live at the same level as the parent, `attrs` for a
+  dict, `items` for a list). `AppValues` builds defaults, hides settings by
+  `show_if`, prunes what does not apply before sending (as the web UI does), and
+  validates; keys the schema does not know (`ix_volumes`) are kept. Anything the
+  form cannot draw falls back to a text field by type, and "Edit as JSON" covers
+  the rest (also the only editor for custom apps, whose `app.config` is the
+  Compose dict, sent back as `custom_compose_config`). `app.create` takes
+  `{app_name, train, catalog_app, version, values}` (custom:
+  `{app_name, custom_app: true, custom_compose_config_string}`), `app.update`
+  takes `[name, {values}]`; both are jobs. `submitAppJob` waits
+  `WorkloadsApi.settleWindow` (10 s; tests shorten it) so a refusal shows on the
+  form, then leaves the work to the server (the app shows as deploying in the
+  list). The payloads are written from the middleware source and unconfirmed on
+  a real NAS: check `app.available` / `catalog.get_app_details` shapes (25.04 may
+  nest them differently), `$ref` choices (certificates, interfaces, GPUs) and
+  `ix_volume` storage on one. Fake server: `catalog`, `dockerStatus`,
+  `catalogApps`, `catalogDetails`, `appConfigs`, `appCreates`, `appUpdates`,
+  `appJobState`.
 - Apps tab bulk actions hand the work to the server as one `core.bulk` job
   (what the web UI's "Update All" does), so it carries on when the app is
   closed: "Update all", or Select, tick apps, then Update, Start, Stop or

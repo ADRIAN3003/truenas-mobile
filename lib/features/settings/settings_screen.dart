@@ -339,6 +339,14 @@ class _NotificationsCard extends ConsumerWidget {
                 notifier.update((s) => s.copyWith(alertLevel: level)),
           ),
         if (alertsSupported && settings.alertNotifications)
+          AppSwitchTile(
+            title: Text(l10n.settingsJobNotifications),
+            subtitle: Text(l10n.settingsJobNotificationsHint),
+            value: settings.jobNotifications,
+            onChanged: (on) =>
+                notifier.update((s) => s.copyWith(jobNotifications: on)),
+          ),
+        if (alertsSupported && settings.alertNotifications)
           NavRow(
             icon: Icons.tune_rounded,
             color: AppPalette.tileSlate,

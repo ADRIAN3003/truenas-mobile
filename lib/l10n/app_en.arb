@@ -3047,6 +3047,73 @@
       }
     }
   },
+  "settingsJobNotifications": "Finished jobs",
+  "@settingsJobNotifications": {
+    "description": "Setting: notify when a scrub, replication or cloud sync finishes or fails."
+  },
+  "settingsJobNotificationsHint": "Tell me when a scrub, replication or cloud sync finishes or fails",
+  "@settingsJobNotificationsHint": {
+    "description": "Explains the finished jobs notification setting."
+  },
+  "jobNotificationChannel": "Finished jobs",
+  "@jobNotificationChannel": {
+    "description": "Name of the Android notification channel for jobs that finished."
+  },
+  "jobNotificationChannelDescription": "Scrubs, replications and cloud syncs that finished or failed",
+  "@jobNotificationChannelDescription": {
+    "description": "Description of the Android notification channel for finished jobs."
+  },
+  "jobNotificationDone": "{what} finished",
+  "@jobNotificationDone": {
+    "description": "Notification text when a job finished. what is e.g. 'Scrub · tank' or 'Cloud sync'.",
+    "placeholders": {
+      "what": {
+        "type": "String"
+      }
+    }
+  },
+  "jobNotificationFailed": "{what} failed",
+  "@jobNotificationFailed": {
+    "description": "Notification text when a job failed. what is e.g. 'Scrub · tank' or 'Cloud sync'.",
+    "placeholders": {
+      "what": {
+        "type": "String"
+      }
+    }
+  },
+  "jobNotificationFailedWithError": "{what} failed: {error}",
+  "@jobNotificationFailedWithError": {
+    "description": "Notification text when a job failed, with the first line of the server's error.",
+    "placeholders": {
+      "what": {
+        "type": "String"
+      },
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "jobNotificationMany": "{count} jobs finished",
+  "@jobNotificationMany": {
+    "description": "Notification text when several jobs finished at once.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "jobNotificationManyFailed": "{count} jobs finished, {failed} failed",
+  "@jobNotificationManyFailed": {
+    "description": "Notification text when several jobs finished at once and some failed.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "failed": {
+        "type": "int"
+      }
+    }
+  },
   "settingsSecurity": "Security",
   "@settingsSecurity": {
     "description": "Settings section."

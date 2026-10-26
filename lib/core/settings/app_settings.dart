@@ -21,6 +21,7 @@ class AppSettings {
     this.appLock = false,
     this.liveJobs = true,
     this.alertNotifications = false,
+    this.jobNotifications = true,
     this.alertLevel = AlertSeverity.critical,
     this.mutedAlertKinds = const {},
     this.homeWidgets = true,
@@ -44,6 +45,7 @@ class AppSettings {
     appLock: json['appLock'] as bool? ?? false,
     liveJobs: json['liveJobs'] as bool? ?? true,
     alertNotifications: json['alertNotifications'] as bool? ?? false,
+    jobNotifications: json['jobNotifications'] as bool? ?? true,
     alertLevel:
         AlertSeverity.values.asNameMap()[json['alertLevel']] ??
         AlertSeverity.critical,
@@ -103,6 +105,10 @@ class AppSettings {
   /// each new alert at or above [alertLevel].
   final bool alertNotifications;
 
+  /// With [alertNotifications] on, the same background check also tells when a
+  /// scrub, replication or cloud sync finished or failed.
+  final bool jobNotifications;
+
   /// The lowest [AlertSeverity] that is worth a notification. `info` is not
   /// offered: it would only ever be noise.
   final AlertSeverity alertLevel;
@@ -134,6 +140,7 @@ class AppSettings {
     bool? appLock,
     bool? liveJobs,
     bool? alertNotifications,
+    bool? jobNotifications,
     AlertSeverity? alertLevel,
     Set<String>? mutedAlertKinds,
     bool? homeWidgets,
@@ -155,6 +162,7 @@ class AppSettings {
     appLock: appLock ?? this.appLock,
     liveJobs: liveJobs ?? this.liveJobs,
     alertNotifications: alertNotifications ?? this.alertNotifications,
+    jobNotifications: jobNotifications ?? this.jobNotifications,
     alertLevel: alertLevel ?? this.alertLevel,
     mutedAlertKinds: mutedAlertKinds ?? this.mutedAlertKinds,
     homeWidgets: homeWidgets ?? this.homeWidgets,
@@ -174,6 +182,7 @@ class AppSettings {
     'appLock': appLock,
     'liveJobs': liveJobs,
     'alertNotifications': alertNotifications,
+    'jobNotifications': jobNotifications,
     'alertLevel': alertLevel.name,
     'mutedAlertKinds': mutedAlertKinds.toList()..sort(),
     'homeWidgets': homeWidgets,

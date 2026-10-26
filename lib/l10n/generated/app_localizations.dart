@@ -3782,6 +3782,60 @@ abstract class AppLocalizations {
   /// **'{count} new alerts'**
   String alertNotificationMany(int count);
 
+  /// Setting: notify when a scrub, replication or cloud sync finishes or fails.
+  ///
+  /// In en, this message translates to:
+  /// **'Finished jobs'**
+  String get settingsJobNotifications;
+
+  /// Explains the finished jobs notification setting.
+  ///
+  /// In en, this message translates to:
+  /// **'Tell me when a scrub, replication or cloud sync finishes or fails'**
+  String get settingsJobNotificationsHint;
+
+  /// Name of the Android notification channel for jobs that finished.
+  ///
+  /// In en, this message translates to:
+  /// **'Finished jobs'**
+  String get jobNotificationChannel;
+
+  /// Description of the Android notification channel for finished jobs.
+  ///
+  /// In en, this message translates to:
+  /// **'Scrubs, replications and cloud syncs that finished or failed'**
+  String get jobNotificationChannelDescription;
+
+  /// Notification text when a job finished. what is e.g. 'Scrub · tank' or 'Cloud sync'.
+  ///
+  /// In en, this message translates to:
+  /// **'{what} finished'**
+  String jobNotificationDone(String what);
+
+  /// Notification text when a job failed. what is e.g. 'Scrub · tank' or 'Cloud sync'.
+  ///
+  /// In en, this message translates to:
+  /// **'{what} failed'**
+  String jobNotificationFailed(String what);
+
+  /// Notification text when a job failed, with the first line of the server's error.
+  ///
+  /// In en, this message translates to:
+  /// **'{what} failed: {error}'**
+  String jobNotificationFailedWithError(String what, String error);
+
+  /// Notification text when several jobs finished at once.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} jobs finished'**
+  String jobNotificationMany(int count);
+
+  /// Notification text when several jobs finished at once and some failed.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} jobs finished, {failed} failed'**
+  String jobNotificationManyFailed(int count, int failed);
+
   /// Settings section.
   ///
   /// In en, this message translates to:

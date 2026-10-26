@@ -121,6 +121,7 @@ Future<void> runBackgroundAlertCheck({
     minimum: settings.alertLevel,
     // Without the notifications on, alerts are only recorded as seen.
     notify: settings.alertNotifications,
+    notifyJobs: settings.jobNotifications,
     muted: settings.mutedAlertKinds,
     widgets: forWidgets
         ? HomeWidgetCollector(

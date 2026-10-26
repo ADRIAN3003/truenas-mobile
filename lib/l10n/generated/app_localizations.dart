@@ -518,6 +518,36 @@ abstract class AppLocalizations {
   /// **'Connection cancelled.'**
   String get errorCancelled;
 
+  /// Shown when the app waited several minutes for a server that was woken up or restarted and it never answered.
+  ///
+  /// In en, this message translates to:
+  /// **'The server did not come online in time. Check that it is powered on and on the network, then try again.'**
+  String get errorWaitTimeout;
+
+  /// Shown after a restart command while the server is still going down.
+  ///
+  /// In en, this message translates to:
+  /// **'Waiting for {name} to shut down…'**
+  String waitShuttingDown(String name);
+
+  /// Shown while the app polls a server that is starting after a wake-up or a restart; it opens by itself when the server answers.
+  ///
+  /// In en, this message translates to:
+  /// **'Waiting for {name} to start…'**
+  String waitStarting(String name);
+
+  /// Under the waiting text while a server starts.
+  ///
+  /// In en, this message translates to:
+  /// **'This can take a few minutes. The server opens by itself once it answers.'**
+  String get waitHint;
+
+  /// Button that gives up waiting for a server to start.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop waiting'**
+  String get waitStop;
+
   /// Bottom navigation tab for the dashboard.
   ///
   /// In en, this message translates to:
@@ -5041,6 +5071,108 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'An earlier self-test failed: {test}'**
   String diskSmartEarlierFailedWarning(String test);
+
+  /// Title of the screen that shows every saved server at once, and the tooltip of the button that opens it.
+  ///
+  /// In en, this message translates to:
+  /// **'Overview'**
+  String get overviewTitle;
+
+  /// Top of the overview when no server needs attention.
+  ///
+  /// In en, this message translates to:
+  /// **'Everything looks fine'**
+  String get overviewAllFine;
+
+  /// Top of the overview: how many servers have a problem or cannot be reached.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{1 server needs attention} other{{count} servers need attention}}'**
+  String overviewNeedAttention(int count);
+
+  /// Status label on a server in the overview.
+  ///
+  /// In en, this message translates to:
+  /// **'Healthy'**
+  String get overviewLevelOk;
+
+  /// Status label on a server in the overview: something is not quite right.
+  ///
+  /// In en, this message translates to:
+  /// **'Attention'**
+  String get overviewLevelAttention;
+
+  /// Status label on a server in the overview: a pool is down or an alert is critical.
+  ///
+  /// In en, this message translates to:
+  /// **'Problem'**
+  String get overviewLevelProblem;
+
+  /// Status label on a server in the overview that could not be reached.
+  ///
+  /// In en, this message translates to:
+  /// **'Offline'**
+  String get overviewLevelOffline;
+
+  /// Overview row: all pools of a server are fine.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{1 pool healthy} other{{count} pools healthy}}'**
+  String overviewPoolsHealthy(int count);
+
+  /// Overview row: some pools are degraded, nearly full or down.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{1 pool needs attention} other{{count} pools need attention}}'**
+  String overviewPoolsAttention(int count);
+
+  /// Overview row: the server has no storage pool.
+  ///
+  /// In en, this message translates to:
+  /// **'No pools'**
+  String get overviewNoPools;
+
+  /// Overview row: how many alerts are active on a server.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{1 active alert} other{{count} active alerts}}'**
+  String overviewAlerts(int count);
+
+  /// Overview row: how many of the active alerts are critical.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} critical'**
+  String overviewAlertsCritical(int count);
+
+  /// Overview row: the server has no active alert.
+  ///
+  /// In en, this message translates to:
+  /// **'No active alerts'**
+  String get overviewNoAlerts;
+
+  /// Overview row: no scrub, sync or other job is running on the server.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing running'**
+  String get overviewNoJobs;
+
+  /// Overview: a server that cannot be looked at without asking the user something.
+  ///
+  /// In en, this message translates to:
+  /// **'Open this server once to trust its certificate or enter the 2FA code.'**
+  String get overviewNeedsYou;
+
+  /// Overview: the saved credentials were rejected.
+  ///
+  /// In en, this message translates to:
+  /// **'The server refused the saved sign-in.'**
+  String get overviewLoginRejected;
+
+  /// Overview: the server did not answer.
+  ///
+  /// In en, this message translates to:
+  /// **'Can\'t reach the server.'**
+  String get overviewUnreachable;
 
   /// Button or menu entry that puts a shortcut on the Android home screen.
   ///

@@ -4,11 +4,12 @@ import 'package:flutter/cupertino.dart'
     show showCupertinoDialog, showCupertinoModalPopup;
 import 'package:flutter/material.dart';
 import 'package:liquid_glass_widgets/liquid_glass_widgets.dart' as lg;
+import 'package:native_liquid_glass/native_liquid_glass.dart' as nlg;
 
 import 'theme.dart';
 
-// The one place that knows about liquid_glass_widgets, so swapping it out (or
-// for Apple's own material later) touches this file only.
+// The one place that knows about liquid_glass_widgets and native_liquid_glass,
+// so swapping them out touches this file only.
 
 /// Height of the floating glass tab bar.
 const _barHeight = 64.0;
@@ -19,6 +20,20 @@ const _barGap = 12.0;
 /// Whether the screen gets iOS 26 style glass chrome: a floating glass tab
 /// bar and content scrolling under a blurred top edge.
 bool useGlassChrome(BuildContext context) => isCupertino(context);
+
+/// Whether the tab bar, switch, slider and segmented control are Apple's own
+/// UIKit views (iOS 26 and later, hosted as platform views) rather than the
+/// package's shader look-alikes. Only the system material follows what the
+/// user chose in Settings (Reduce Transparency, and the iOS 27 glass look).
+/// Never true in tests, which do not run on an iPhone.
+bool useNativeGlass(BuildContext context) =>
+    useGlassChrome(context) && nlg.NativeLiquidGlassUtils.supportsLiquidGlass;
+
+/// Fades native glass out under dialogs, sheets and other pop-up routes, which
+/// it would otherwise bleed through (a native view sits above Flutter's
+/// surface). Add it to the app's `navigatorObservers`.
+NavigatorObserver glassNavigatorObserver() =>
+    nlg.LiquidGlassNavigatorObserver();
 
 /// Space that floating chrome covers at the top and bottom of a tab, so its
 /// list can start below the top bar and scroll clear of the tab bar.
@@ -74,6 +89,38 @@ class GlassTabBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final width = math.min(MediaQuery.sizeOf(context).width - 24, 440.0);
     final accent = Theme.of(context).colorScheme.primary;
+    if (useNativeGlass(context)) {
+      // A real UITabBar: iOS draws the glass, so it follows the system
+      // settings. Only the selected tab takes the accent colour.
+      return Align(
+        alignment: Alignment.bottomCenter,
+        child: SafeArea(
+          top: false,
+          // The native view reserves 20 points of overflow for its glow and
+          // sits that much higher than the shader bar, so it takes no gap of
+          // its own: it then rests about where the shader bar did.
+          child: Padding(
+            padding: EdgeInsets.zero,
+            child: nlg.LiquidGlassTabBar(
+              width: width,
+              height: _barHeight,
+              selectedItemColor: accent,
+              currentIndex: selectedIndex,
+              onTabSelected: onSelected,
+              items: [
+                for (final (i, (icon, selected, label)) in destinations.indexed)
+                  nlg.LiquidGlassTabItem(
+                    label: label,
+                    icon: _nativeIcon(icon, selected: false),
+                    selectedIcon: _nativeIcon(selected, selected: true),
+                    iosBadgeValue: (badges[i] ?? 0) > 0 ? '${badges[i]}' : null,
+                  ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
     // The glass itself stays plain; only the selected tab's icon and label
     // take the accent colour. A selected tab is drawn a second time on top of
     // the bar, 15% larger and heavier by default, and where that copy was
@@ -135,6 +182,28 @@ class GlassTabBar extends StatelessWidget {
       ),
     );
   }
+}
+
+/// The tab's icon as an SF Symbol, which UIKit draws at the right size. The
+/// package turns a Flutter icon into a picture, and on a phone that came out
+/// several times too big, so every tab icon needs an entry here (the Material
+/// icon is the fallback, wrong size or not).
+nlg.NativeLiquidGlassIcon _nativeIcon(IconData icon, {required bool selected}) {
+  final name = switch (icon) {
+    Icons.space_dashboard_outlined => 'square.grid.2x2',
+    Icons.space_dashboard_rounded => 'square.grid.2x2.fill',
+    Icons.storage_outlined => 'externaldrive',
+    Icons.storage_rounded => 'externaldrive.fill',
+    Icons.folder_shared_outlined => 'folder.badge.person.crop',
+    Icons.folder_shared_rounded => 'folder.fill.badge.person.crop',
+    Icons.widgets_outlined => 'square.stack.3d.up',
+    Icons.widgets_rounded => 'square.stack.3d.up.fill',
+    Icons.more_horiz_rounded => 'ellipsis',
+    _ => null,
+  };
+  return name == null
+      ? nlg.NativeLiquidGlassIcon.iconData(icon)
+      : nlg.NativeLiquidGlassIcon.sfSymbol(name);
 }
 
 Widget _badged(Widget icon, int count) =>
@@ -616,19 +685,26 @@ class GlassSwitchControl extends StatelessWidget {
   final ValueChanged<bool>? onChanged;
 
   @override
-  Widget build(BuildContext context) => Opacity(
-    opacity: onChanged == null ? 0.4 : 1,
-    child: IgnorePointer(
-      ignoring: onChanged == null,
-      child: lg.GlassSwitch(
-        value: value,
-        useOwnLayer: true,
-        // Haptics follow the app's own setting (see Haptics).
-        enableHaptics: false,
-        onChanged: onChanged ?? (_) {},
-      ),
-    ),
-  );
+  Widget build(BuildContext context) => useNativeGlass(context)
+      ? nlg.LiquidGlassToggle(
+          value: value,
+          enabled: onChanged != null,
+          height: 31,
+          onChanged: onChanged ?? (_) {},
+        )
+      : Opacity(
+          opacity: onChanged == null ? 0.4 : 1,
+          child: IgnorePointer(
+            ignoring: onChanged == null,
+            child: lg.GlassSwitch(
+              value: value,
+              useOwnLayer: true,
+              // Haptics follow the app's own setting (see Haptics).
+              enableHaptics: false,
+              onChanged: onChanged ?? (_) {},
+            ),
+          ),
+        );
 }
 
 /// An iOS 26 slider: the package's [lg.GlassSlider] on its own glass layer.
@@ -651,15 +727,25 @@ class GlassSliderControl extends StatelessWidget {
   final int? divisions;
 
   @override
-  Widget build(BuildContext context) => lg.GlassSlider(
-    value: value,
-    min: min,
-    max: max,
-    divisions: divisions,
-    useOwnLayer: true,
-    onChanged: onChanged,
-    onChangeEnd: onChangeEnd,
-  );
+  Widget build(BuildContext context) => useNativeGlass(context)
+      ? nlg.LiquidGlassSlider(
+          value: value.clamp(min, max),
+          min: min,
+          max: max,
+          step: divisions == null ? null : (max - min) / divisions!,
+          // The UISlider reports no end of drag, so [onChangeEnd] is not
+          // called here.
+          onChanged: onChanged,
+        )
+      : lg.GlassSlider(
+          value: value,
+          min: min,
+          max: max,
+          divisions: divisions,
+          useOwnLayer: true,
+          onChanged: onChanged,
+          onChangeEnd: onChangeEnd,
+        );
 }
 
 /// An iOS 26 segmented control: the package's [lg.GlassSegmentedControl].
@@ -679,22 +765,31 @@ class GlassSegments extends StatelessWidget {
   final ValueChanged<int> onSelected;
 
   @override
-  Widget build(BuildContext context) => lg.GlassSegmentedControl(
-    useOwnLayer: true,
-    // Tall enough for an icon above its label, and a capsule like the
-    // system's.
-    height: 58,
-    borderRadius: 29,
-    selectedIndex: selectedIndex,
-    onSegmentSelected: onSelected,
-    segments: [
-      for (final (i, label) in labels.indexed)
-        lg.GlassSegment(
-          label: label,
-          icon: icons == null ? null : Icon(icons![i], size: 18),
-        ),
-    ],
-  );
+  Widget build(BuildContext context) =>
+      // The UISegmentedControl has no icons, so those keep the package's.
+      useNativeGlass(context) && icons == null
+      ? nlg.LiquidGlassSegmentedControl(
+          labels: labels,
+          selectedIndex: selectedIndex,
+          height: 36,
+          onValueChanged: onSelected,
+        )
+      : lg.GlassSegmentedControl(
+          useOwnLayer: true,
+          // Tall enough for an icon above its label, and a capsule like the
+          // system's.
+          height: 58,
+          borderRadius: 29,
+          selectedIndex: selectedIndex,
+          onSegmentSelected: onSelected,
+          segments: [
+            for (final (i, label) in labels.indexed)
+              lg.GlassSegment(
+                label: label,
+                icon: icons == null ? null : Icon(icons![i], size: 18),
+              ),
+          ],
+        );
 }
 
 /// One entry of a [GlassPopupMenu].

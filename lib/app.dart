@@ -12,6 +12,7 @@ import 'features/lock/app_lock_gate.dart';
 import 'features/updates/update_prompt.dart';
 import 'features/widgets/home_widget_list_sync.dart';
 import 'l10n/generated/app_localizations.dart';
+import 'shared/glass.dart';
 import 'shared/theme.dart';
 
 class TrueNasMobileApp extends ConsumerWidget {
@@ -38,6 +39,7 @@ class TrueNasMobileApp extends ConsumerWidget {
         ThemeChoice.light => ThemeMode.light,
         ThemeChoice.dark => ThemeMode.dark,
       },
+      navigatorObservers: [glassNavigatorObserver()],
       builder: (context, child) => AppLockGate(child: child!),
       home: const UpdateAutoCheck(
         child: HomeWidgetListSync(

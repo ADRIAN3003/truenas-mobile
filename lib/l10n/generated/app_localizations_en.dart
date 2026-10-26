@@ -242,6 +242,27 @@ class AppLocalizationsEn extends AppLocalizations {
   String get errorCancelled => 'Connection cancelled.';
 
   @override
+  String get errorWaitTimeout =>
+      'The server did not come online in time. Check that it is powered on and on the network, then try again.';
+
+  @override
+  String waitShuttingDown(String name) {
+    return 'Waiting for $name to shut down…';
+  }
+
+  @override
+  String waitStarting(String name) {
+    return 'Waiting for $name to start…';
+  }
+
+  @override
+  String get waitHint =>
+      'This can take a few minutes. The server opens by itself once it answers.';
+
+  @override
+  String get waitStop => 'Stop waiting';
+
+  @override
   String get tabDashboard => 'Home';
 
   @override
@@ -3070,6 +3091,92 @@ class AppLocalizationsEn extends AppLocalizations {
   String diskSmartEarlierFailedWarning(String test) {
     return 'An earlier self-test failed: $test';
   }
+
+  @override
+  String get overviewTitle => 'Overview';
+
+  @override
+  String get overviewAllFine => 'Everything looks fine';
+
+  @override
+  String overviewNeedAttention(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count servers need attention',
+      one: '1 server needs attention',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get overviewLevelOk => 'Healthy';
+
+  @override
+  String get overviewLevelAttention => 'Attention';
+
+  @override
+  String get overviewLevelProblem => 'Problem';
+
+  @override
+  String get overviewLevelOffline => 'Offline';
+
+  @override
+  String overviewPoolsHealthy(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count pools healthy',
+      one: '1 pool healthy',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String overviewPoolsAttention(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count pools need attention',
+      one: '1 pool needs attention',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get overviewNoPools => 'No pools';
+
+  @override
+  String overviewAlerts(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count active alerts',
+      one: '1 active alert',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String overviewAlertsCritical(int count) {
+    return '$count critical';
+  }
+
+  @override
+  String get overviewNoAlerts => 'No active alerts';
+
+  @override
+  String get overviewNoJobs => 'Nothing running';
+
+  @override
+  String get overviewNeedsYou =>
+      'Open this server once to trust its certificate or enter the 2FA code.';
+
+  @override
+  String get overviewLoginRejected => 'The server refused the saved sign-in.';
+
+  @override
+  String get overviewUnreachable => 'Can\'t reach the server.';
 
   @override
   String get shortcutAdd => 'Add to home screen';

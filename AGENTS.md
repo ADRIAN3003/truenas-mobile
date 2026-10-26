@@ -107,6 +107,20 @@ README covers what the app does; this file covers how to work on it.
   `Scaffold`/`AppBar` with our own `GlassTopEdge` and `ChromeInsets`, instead
   of `GlassScaffold`/`GlassAppBar`), buttons, text fields and snackbars (a
   `GlassToast` needs a live context and would sit over the tab bar).
+- Native glass (`useNativeGlass` in `glass.dart`, package `native_liquid_glass`):
+  on iOS 26 and later the tab bar, `AppSwitch`, `AppSlider` and `AppSegments`
+  (without icons) are Apple's own UIKit views (`UITabBar`, `UISwitch`,
+  `UISlider`, `UISegmentedControl`) hosted as platform views, so the system
+  draws the glass and it follows what the user set in Settings (Reduce
+  Transparency, the iOS 27 glass look), which the shader look-alikes cannot
+  read. Older iOS, Android and tests keep the `liquid_glass_widgets` / Material
+  versions. Costs: a native view sits above Flutter's surface, so
+  `glassNavigatorObserver()` (in `MaterialApp.navigatorObservers`) hides it
+  under pushed routes and dialogs; the UISlider reports no end of drag
+  (`onChangeEnd` is not called); the switch, slider and segments follow the
+  device's light or dark appearance, only the tab bar follows the app's theme;
+  tests cannot run them (no iOS), so check them on a phone. Dialogs, sheets,
+  menus and glass panels stay on `liquid_glass_widgets`.
 - Haptics go through `lib/shared/haptics.dart` (switched off by
   `Haptics.enabled`, which the settings notifier keeps in step). Use
   `AppRefreshIndicator`, `AppSwitch` and `AppSwitchTile` (in `ui.dart`)
@@ -393,6 +407,18 @@ README covers what the app does; this file covers how to work on it.
   can read the MAC from `interface.query` (`state.hardware_link_address`).
   iOS needs the local network permission (`NSLocalNetworkUsageDescription`,
   already set); never promise delivery, a sleeping NAS may ignore it.
+  After the packet goes out (server card, or the error screen's Wake up) the
+  app opens `ServerScreen(wait: ServerWait.wake)`; a restart from the Updates
+  screen or More tab does the same with `ServerWait.restart`
+  (`confirmPower` needs the `instanceId`). The screen polls instead of failing
+  (`lib/core/session/wait_for_server.dart`): `retryUntilOnline` runs the normal
+  `connectToInstance` every 5 s for up to 10 min (`ServerWaitTiming`, which
+  tests shorten through `serverWaitTimingProvider`); anything but a refused
+  login, a declined prompt or an unsupported version counts as "still
+  starting". A restart first waits (up to 90 s, `serverAnswers` probes the
+  version endpoint) until the NAS stops answering, so the dying server is not
+  taken for the new one. "Stop waiting" and leaving the screen cancel through a
+  `WaitToken`, which also cancels the sleeping timer.
 - Disk health (`lib/features/storage/disk_screen.dart`, `StorageApi.smartResults`
   and `runSmartTest`): `smart.test.results` filtered on `["disk","=",name]`
   gives `tests` (newest first, `num` 1 is the newest; `status` SUCCESS, RUNNING,
@@ -423,6 +449,16 @@ README covers what the app does; this file covers how to work on it.
   now" once an update waits for a restart. Reboot and shutdown both go through
   `confirmPower` (More tab and Updates screen). The job's live progress is the
   existing `JobKind.systemUpdate`.
+- All-servers overview (`lib/core/overview/server_overview.dart`,
+  `lib/features/instances/servers_overview_screen.dart`): the grid button in the
+  server list's app bar (shown with two or more servers) opens one card per
+  saved server with its pools, active alerts and waiting/running jobs.
+  `ServerOverviewLoader` signs in with `connectQuietly` (no prompts: a server
+  that needs a certificate trust or a 2FA code is shown as "open it once", a
+  refused sign-in and an unreachable server have their own text), keeps one
+  session per server while the screen is open, and looks again every 30 s, on
+  resume and on pull to refresh. Pool health comes from `PoolSummary.condition`,
+  shared with the home screen widgets.
 - Saved servers live in secure storage (`SecureKeyValueStore`). Its Android
   default `resetOnError: true` erases everything when one read fails, so it is
   off; a failed read is retried, then shown as an error with Try again and

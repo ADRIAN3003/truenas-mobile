@@ -19,9 +19,17 @@ typedef _UpdatesData = (String?, UpdateInfo, List<BootEnvironment>);
 
 /// Update status, installing updates, and boot environments.
 class UpdatesScreen extends StatefulWidget {
-  const UpdatesScreen({super.key, required this.session, this.serverName = ''});
+  const UpdatesScreen({
+    super.key,
+    required this.session,
+    required this.instanceId,
+    this.serverName = '',
+  });
 
   final TrueNasSession session;
+
+  /// The saved server this is, to reopen it after a restart.
+  final String instanceId;
 
   /// The name the user gave this server, for the restart confirmation.
   final String serverName;
@@ -82,6 +90,7 @@ class _UpdatesScreenState extends State<UpdatesScreen>
   Future<void> _restart() => confirmPower(
     context,
     _session,
+    instanceId: widget.instanceId,
     serverName: widget.serverName,
     reboot: true,
   );

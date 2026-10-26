@@ -5,6 +5,7 @@ import '../../core/api/server_address.dart';
 import '../../core/instances/default_server.dart';
 import '../../core/instances/instances_provider.dart';
 import '../../core/instances/server_instance.dart';
+import '../../core/session/wait_for_server.dart';
 import '../../core/settings/settings_provider.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../shared/dialogs.dart';
@@ -15,6 +16,7 @@ import '../../shared/widgets.dart';
 import '../server/server_screen.dart';
 import '../settings/settings_screen.dart';
 import 'server_form_screen.dart';
+import 'servers_overview_screen.dart';
 import 'wake_server.dart';
 
 /// Widest the list grows on tablets, so cards stay readable.
@@ -44,6 +46,17 @@ class InstancesScreen extends ConsumerWidget {
             ),
             icon: const Icon(Icons.settings_outlined),
           ),
+          if ((instances.value?.length ?? 0) > 1)
+            IconButton(
+              tooltip: l10n.overviewTitle,
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute<void>(
+                  builder: (_) => const ServersOverviewScreen(),
+                ),
+              ),
+              icon: const Icon(Icons.dashboard_outlined),
+            ),
           if (instances.value?.isNotEmpty ?? false)
             IconButton(
               tooltip: l10n.addServer,
@@ -116,6 +129,22 @@ String _hostLabel(String url) {
   final uri = ServerAddress.tryParse(url)?.uri;
   if (uri == null) return url;
   return uri.hasPort ? '${uri.host}:${uri.port}' : uri.host;
+}
+
+/// Wakes [instance], then opens it: the screen waits until the server
+/// answers instead of failing while it starts.
+Future<void> _wakeAndOpen(
+  BuildContext context,
+  WidgetRef ref,
+  ServerInstance instance,
+) async {
+  final navigator = Navigator.of(context);
+  if (!await wakeServer(context, ref, instance)) return;
+  await navigator.push(
+    MaterialPageRoute<void>(
+      builder: (_) => ServerScreen(instance.id, wait: ServerWait.wake),
+    ),
+  );
 }
 
 class _ServerCard extends ConsumerWidget {
@@ -191,7 +220,7 @@ class _ServerCard extends ConsumerWidget {
                     if (instance.wol != null)
                       IconButton(
                         tooltip: l10n.wolWake,
-                        onPressed: () => wakeServer(context, ref, instance),
+                        onPressed: () => _wakeAndOpen(context, ref, instance),
                         icon: const Icon(Icons.power_settings_new_rounded),
                       ),
                     _Menu(instance),

@@ -10,6 +10,7 @@ import '../../core/jobs/job_tracker.dart';
 import '../../core/jobs/live_progress.dart';
 import '../../core/settings/settings_provider.dart';
 import '../../core/session/truenas_session.dart';
+import '../../core/session/wait_for_server.dart';
 import '../../core/widgets/home_widget_sync.dart';
 import '../../core/widgets/home_widgets.dart';
 import '../../core/notifications/background_alerts.dart';
@@ -17,6 +18,7 @@ import '../../l10n/generated/app_localizations.dart';
 import '../../shared/connect_dialogs.dart';
 import '../../shared/glass.dart';
 import '../../shared/haptics.dart';
+import '../../shared/theme.dart';
 import '../../shared/widgets.dart';
 import '../instances/wake_server.dart';
 import '../jobs/job_gauge_button.dart';
@@ -38,9 +40,14 @@ class ServerScreen extends ConsumerStatefulWidget {
     this.instanceId, {
     super.key,
     this.openAlertsOnStart = false,
+    this.wait = ServerWait.none,
   });
 
   final String instanceId;
+
+  /// Waits for the server to answer before connecting, instead of failing
+  /// while it starts: it was just woken up or told to restart.
+  final ServerWait wait;
 
   /// Opens the alerts list as soon as the server is connected (the user
   /// tapped an alert notification).
@@ -60,6 +67,12 @@ class _ServerScreenState extends ConsumerState<ServerScreen>
   var _tab = 0;
   var _openedAlerts = false;
 
+  /// Ends the wait for the server of the connection attempt in progress.
+  WaitToken? _token;
+
+  /// What the wait is on right now; null when it is not waiting.
+  _WaitPhase? _phase;
+
   /// Apps with an update, shown as a badge on the Apps tab. The tab reports it
   /// when it loads; this keeps it current while that tab is not open.
   var _appUpdates = 0;
@@ -75,7 +88,9 @@ class _ServerScreenState extends ConsumerState<ServerScreen>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    WidgetsBinding.instance.addPostFrameCallback((_) => _connect());
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) => _connect(wait: widget.wait),
+    );
   }
 
   @override
@@ -99,6 +114,7 @@ class _ServerScreenState extends ConsumerState<ServerScreen>
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     _appUpdateTimer?.cancel();
+    _token?.cancel();
     _jobs?.dispose();
     _widgets?.dispose();
     _session?.close();
@@ -122,9 +138,58 @@ class _ServerScreenState extends ConsumerState<ServerScreen>
     } catch (_) {}
   }
 
-  Future<void> _connect() async {
+  /// Stops waiting for the server and shows the way to try again.
+  void _stopWaiting() {
+    _token?.cancel();
+    setState(() {
+      _phase = null;
+      _error = const ConnectCancelled();
+    });
+  }
+
+  /// Connects to [instance]. With [wait] it first waits for the server to
+  /// start answering, which can take minutes after a wake-up or a restart.
+  Future<(TrueNasSession, ServerInstance)> _open(
+    ServerInstance instance,
+    ServerWait wait,
+    WaitToken token,
+  ) {
+    Future<(TrueNasSession, ServerInstance)> attempt() => connectToInstance(
+      instance,
+      confirmCertificate: (cert) => confirmCertificateDialog(context, cert),
+      askOtp: () => askOtpDialog(context),
+    );
+    if (wait == ServerWait.none) return attempt();
+    final timing = ref.read(serverWaitTimingProvider);
+    return () async {
+      if (wait == ServerWait.restart) {
+        // It answers for a moment after the command; that is not it coming
+        // back.
+        setState(() => _phase = _WaitPhase.shuttingDown);
+        await waitUntilDown(
+          () => serverAnswers(instance),
+          token: token,
+          interval: timing.downInterval,
+          limit: timing.downLimit,
+        );
+      }
+      if (mounted && !token.cancelled) {
+        setState(() => _phase = _WaitPhase.starting);
+      }
+      return retryUntilOnline(
+        attempt,
+        token: token,
+        interval: timing.interval,
+        timeout: timing.timeout,
+      );
+    }();
+  }
+
+  Future<void> _connect({ServerWait wait = ServerWait.none}) async {
     final instance = _instance;
     if (instance == null) return;
+    _token?.cancel();
+    final token = _token = WaitToken();
     final previous = _session;
     _session = null;
     _appUpdateTimer?.cancel();
@@ -135,20 +200,19 @@ class _ServerScreenState extends ConsumerState<ServerScreen>
     _widgets = null;
     await previousJobs?.dispose();
     await previous?.close();
+    if (!mounted || token.cancelled) return;
     setState(() {
       _error = null;
       _info = null;
+      _phase = null;
     });
     try {
-      final (session, updated) = await connectToInstance(
-        instance,
-        confirmCertificate: (cert) => confirmCertificateDialog(context, cert),
-        askOtp: () => askOtpDialog(context),
-      );
-      if (!mounted) {
+      final (session, updated) = await _open(instance, wait, token);
+      if (!mounted || token.cancelled) {
         await session.close();
         return;
       }
+      _phase = null;
       _session = session;
       _appUpdateTimer = Timer.periodic(
         const Duration(minutes: 5),
@@ -198,7 +262,12 @@ class _ServerScreenState extends ConsumerState<ServerScreen>
         });
       }
     } catch (error) {
-      if (mounted) setState(() => _error = error);
+      if (mounted && !token.cancelled) {
+        setState(() {
+          _phase = null;
+          _error = error;
+        });
+      }
     }
   }
 
@@ -302,7 +371,11 @@ class _ServerScreenState extends ConsumerState<ServerScreen>
           StorageTab(session: session),
           SharesTab(session: session),
           AppsTab(session: session, onUpdateCount: _setAppUpdates),
-          MoreTab(session: session, serverName: instance?.name ?? ''),
+          MoreTab(
+            session: session,
+            instanceId: widget.instanceId,
+            serverName: instance?.name ?? '',
+          ),
         ],
       );
       const appsTab = 3;
@@ -375,7 +448,9 @@ class _ServerScreenState extends ConsumerState<ServerScreen>
               Positioned(
                 left: 12,
                 right: 12,
-                bottom: insets.bottom - 4,
+                // The native tab bar stands a little higher than the shader
+                // one, so the job card sits higher with it.
+                bottom: insets.bottom + (useNativeGlass(context) ? 4 : -4),
                 child: _jobs == null
                     ? const SizedBox.shrink()
                     : JobProgressBanner(
@@ -428,7 +503,17 @@ class _ServerScreenState extends ConsumerState<ServerScreen>
               onRetry: _connect,
               onWake: instance?.wol == null
                   ? null
-                  : () => wakeServer(context, ref, instance!),
+                  : () async {
+                      if (await wakeServer(context, ref, instance!)) {
+                        _connect(wait: ServerWait.wake);
+                      }
+                    },
+            )
+          : _phase != null
+          ? _WaitingState(
+              phase: _phase!,
+              serverName: instance?.name ?? '',
+              onStop: _stopWaiting,
             )
           : Center(
               child: Column(
@@ -440,6 +525,56 @@ class _ServerScreenState extends ConsumerState<ServerScreen>
                 ],
               ),
             ),
+    );
+  }
+}
+
+enum _WaitPhase { shuttingDown, starting }
+
+/// Shown while the app waits for a server that is starting or restarting.
+class _WaitingState extends StatelessWidget {
+  const _WaitingState({
+    required this.phase,
+    required this.serverName,
+    required this.onStop,
+  });
+
+  final _WaitPhase phase;
+  final String serverName;
+  final VoidCallback onStop;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const CircularProgressIndicator.adaptive(),
+            const SizedBox(height: 16),
+            Text(
+              phase == _WaitPhase.shuttingDown
+                  ? l10n.waitShuttingDown(serverName)
+                  : l10n.waitStarting(serverName),
+              textAlign: TextAlign.center,
+              style: theme.textTheme.titleMedium,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              l10n.waitHint,
+              textAlign: TextAlign.center,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: AppPalette.of(context).muted,
+              ),
+            ),
+            const SizedBox(height: 16),
+            TextButton(onPressed: onStop, child: Text(l10n.waitStop)),
+          ],
+        ),
+      ),
     );
   }
 }

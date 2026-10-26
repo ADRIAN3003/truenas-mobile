@@ -1,4 +1,6 @@
 import 'package:truenas_mobile/core/instances/server_instance.dart';
+import 'package:truenas_mobile/core/jobs/tracked_job.dart';
+import 'package:truenas_mobile/core/models/job.dart';
 import 'package:truenas_mobile/core/models/alert.dart';
 import 'package:truenas_mobile/core/notifications/alert_watcher.dart';
 import 'package:truenas_mobile/core/notifications/background_alerts.dart';
@@ -28,6 +30,17 @@ class FakeAlertNotifier implements AlertNotifier {
   @override
   Future<void> show(ServerInstance server, List<TrueNasAlert> alerts) async {
     shown.add('${server.name}: ${alerts.map((a) => a.id).join(',')}');
+  }
+
+  /// Every job notification shown, as `server: job 12 failed` (one job) or
+  /// `server: job 12 failed, job 13 done` (several in one notification).
+  final shownJobs = <String>[];
+
+  @override
+  Future<void> showJobs(ServerInstance server, List<TrackedJob> jobs) async {
+    shownJobs.add(
+      '${server.name}: ${jobs.map((j) => 'job ${j.id} ${j.job.state == JobState.failed ? 'failed' : 'done'}').join(', ')}',
+    );
   }
 }
 

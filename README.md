@@ -19,7 +19,9 @@ for Android and iOS that talks to the official TrueNAS middleware API
   can read from the running server): a power button on its card, and on the
   "can't connect" screen, wakes it with a magic packet. Wake-on-LAN has to be
   switched on in the NAS's BIOS or UEFI, and the phone must be on the same
-  network (or reach a broadcast address that is forwarded).
+  network (or reach a broadcast address that is forwarded). After a wake-up,
+  and after restarting the NAS from the app, the server opens by itself as soon
+  as it answers (it waits up to ten minutes; "Stop waiting" ends it).
 - **Dashboard:** live CPU, memory (with ARC), network and pool health, plus
   system info and an alert summary. Alerts can be dismissed and restored, and new ones can be sent to the
   phone as notifications (checked in the background, off by default).

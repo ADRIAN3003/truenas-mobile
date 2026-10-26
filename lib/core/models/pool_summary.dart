@@ -27,4 +27,17 @@ class PoolSummary {
   final int allocated;
 
   double get usedFraction => size == 0 ? 0 : allocated / size;
+
+  /// Needs attention when it is nearly full or not entirely healthy, and is
+  /// down when ZFS says it is faulted or offline.
+  PoolCondition get condition => switch (status.toUpperCase()) {
+    'ONLINE' =>
+      !healthy || usedFraction >= 0.9
+          ? PoolCondition.attention
+          : PoolCondition.ok,
+    'DEGRADED' => PoolCondition.attention,
+    _ => PoolCondition.down,
+  };
 }
+
+enum PoolCondition { ok, attention, down }

@@ -501,6 +501,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.0"
+  native_liquid_glass:
+    dependency: "direct main"
+    description:
+      name: native_liquid_glass
+      sha256: "1df94e5998f7eb5fe57a8fff5228f9c9b1650f26aa6d6799b2c78dcc73f5261a"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.3.1"
   objective_c:
     dependency: transitive
     description:

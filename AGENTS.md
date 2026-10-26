@@ -107,6 +107,20 @@ README covers what the app does; this file covers how to work on it.
   `Scaffold`/`AppBar` with our own `GlassTopEdge` and `ChromeInsets`, instead
   of `GlassScaffold`/`GlassAppBar`), buttons, text fields and snackbars (a
   `GlassToast` needs a live context and would sit over the tab bar).
+- Native glass (`useNativeGlass` in `glass.dart`, package `native_liquid_glass`):
+  on iOS 26 and later the tab bar, `AppSwitch`, `AppSlider` and `AppSegments`
+  (without icons) are Apple's own UIKit views (`UITabBar`, `UISwitch`,
+  `UISlider`, `UISegmentedControl`) hosted as platform views, so the system
+  draws the glass and it follows what the user set in Settings (Reduce
+  Transparency, the iOS 27 glass look), which the shader look-alikes cannot
+  read. Older iOS, Android and tests keep the `liquid_glass_widgets` / Material
+  versions. Costs: a native view sits above Flutter's surface, so
+  `glassNavigatorObserver()` (in `MaterialApp.navigatorObservers`) hides it
+  under pushed routes and dialogs; the UISlider reports no end of drag
+  (`onChangeEnd` is not called); the switch, slider and segments follow the
+  device's light or dark appearance, only the tab bar follows the app's theme;
+  tests cannot run them (no iOS), so check them on a phone. Dialogs, sheets,
+  menus and glass panels stay on `liquid_glass_widgets`.
 - Haptics go through `lib/shared/haptics.dart` (switched off by
   `Haptics.enabled`, which the settings notifier keeps in step). Use
   `AppRefreshIndicator`, `AppSwitch` and `AppSwitchTile` (in `ui.dart`)
@@ -200,6 +214,22 @@ README covers what the app does; this file covers how to work on it.
   fake the phone with `FakeAlertNotifier`/`FakeBackgroundScheduler`
   (`test/support/alert_fakes.dart`) and the service provider is off unless
   `main` overrides it.
+- Finished-job notifications (`lib/core/notifications/job_watch.dart`, setting
+  `jobNotifications`, on by default, shown under Settings > Notifications once
+  alert notifications are on): the same background check also tells when a
+  scrub, replication, cloud sync, cloud backup or rsync task ended (done or
+  failed; aborted ones and anything that ended over 24 h ago are skipped).
+  `watchJobs` keeps `jobwatch.v1` per server: the highest job id seen and the
+  watched jobs that were still running. Next time it asks `core.get_jobs` for
+  ids above that (jobs that started and ended in between) and for the
+  remembered ones by id. A first look, and the moment the feature is turned
+  on, only record. With the setting off it still records, so switching it on
+  does not replay old jobs. A job that ended while the app was open is
+  reported too if the check runs later (the app does not mark it as seen).
+  Own channel (`finished_jobs`); the payload is `job:<server id>`
+  (`jobPayloadPrefix`), so a tap opens the server, not its alerts. A failure
+  here never holds up the alerts of the same visit. Fake server:
+  `FakeTrueNasServer.jobs`, `FakeAlertNotifier.shownJobs`.
 - Alert types can be muted (`mutedAlertKinds`, the alert's `klass`, global not
   per server). `AlertWatcher` still records muted alerts as seen, so
   unmuting never replays old ones. The list for Settings > Notifications >
@@ -388,6 +418,18 @@ README covers what the app does; this file covers how to work on it.
   can read the MAC from `interface.query` (`state.hardware_link_address`).
   iOS needs the local network permission (`NSLocalNetworkUsageDescription`,
   already set); never promise delivery, a sleeping NAS may ignore it.
+  After the packet goes out (server card, or the error screen's Wake up) the
+  app opens `ServerScreen(wait: ServerWait.wake)`; a restart from the Updates
+  screen or More tab does the same with `ServerWait.restart`
+  (`confirmPower` needs the `instanceId`). The screen polls instead of failing
+  (`lib/core/session/wait_for_server.dart`): `retryUntilOnline` runs the normal
+  `connectToInstance` every 5 s for up to 10 min (`ServerWaitTiming`, which
+  tests shorten through `serverWaitTimingProvider`); anything but a refused
+  login, a declined prompt or an unsupported version counts as "still
+  starting". A restart first waits (up to 90 s, `serverAnswers` probes the
+  version endpoint) until the NAS stops answering, so the dying server is not
+  taken for the new one. "Stop waiting" and leaving the screen cancel through a
+  `WaitToken`, which also cancels the sleeping timer.
 - Disk health (`lib/features/storage/disk_screen.dart`, `StorageApi.smartResults`
   and `runSmartTest`): `smart.test.results` filtered on `["disk","=",name]`
   gives `tests` (newest first, `num` 1 is the newest; `status` SUCCESS, RUNNING,
@@ -397,7 +439,19 @@ README covers what the app does; this file covers how to work on it.
   Both are gated on `core.get_methods`; the screen polls every 10 s while a test
   runs. The exact payloads are written from the middleware source and unconfirmed
   on a real NAS: check them on one. Fake server: `smart`, `smartTests`,
-  `smartProgress`, `smartRejection`.
+  `smartProgress`, `smartRejection`. **SMART detail** (same screen): `disk.smart_attributes(name)`, gated on
+  `core.get_methods` and optional (it may be a private method on some releases,
+  and NVMe disks have no ATA table), returns smartctl's table, each row
+  `{id, name, value, worst, thresh, when_failed, raw: {value, string}}`; the
+  raw count is the first number in `raw.string` (drives pack hours and minutes
+  into `raw.value`). `SmartAttributes` reads power-on hours (9), reallocated
+  (5), pending (197) and uncorrectable (198) sectors. `smartHealth` gives the
+  overall verdict: critical when an attribute is failing now or the newest
+  finished self-test failed, warning for bad sectors, a past attribute failure
+  or an older failed test. Without the attribute call the card still shows the
+  verdict from the log and the power-on hours of the newest test. Shape
+  unconfirmed on a real NAS. Fake server: `smartAttributes`,
+  `smartAttributeRows`.
 - System updates and power (`SystemApi`, `lib/features/system/updates_screen.dart`,
   `power_actions.dart`): `UpdateInfo` is normalised across `update.status`
   (code `REBOOT_REQUIRED`, `new_version.filesize/changelog`, both optional) and
@@ -406,6 +460,16 @@ README covers what the app does; this file covers how to work on it.
   now" once an update waits for a restart. Reboot and shutdown both go through
   `confirmPower` (More tab and Updates screen). The job's live progress is the
   existing `JobKind.systemUpdate`.
+- All-servers overview (`lib/core/overview/server_overview.dart`,
+  `lib/features/instances/servers_overview_screen.dart`): the grid button in the
+  server list's app bar (shown with two or more servers) opens one card per
+  saved server with its pools, active alerts and waiting/running jobs.
+  `ServerOverviewLoader` signs in with `connectQuietly` (no prompts: a server
+  that needs a certificate trust or a 2FA code is shown as "open it once", a
+  refused sign-in and an unreachable server have their own text), keeps one
+  session per server while the screen is open, and looks again every 30 s, on
+  resume and on pull to refresh. Pool health comes from `PoolSummary.condition`,
+  shared with the home screen widgets.
 - Saved servers live in secure storage (`SecureKeyValueStore`). Its Android
   default `resetOnError: true` erases everything when one read fails, so it is
   off; a failed read is retried, then shown as an error with Try again and

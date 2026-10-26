@@ -518,6 +518,36 @@ abstract class AppLocalizations {
   /// **'Connection cancelled.'**
   String get errorCancelled;
 
+  /// Shown when the app waited several minutes for a server that was woken up or restarted and it never answered.
+  ///
+  /// In en, this message translates to:
+  /// **'The server did not come online in time. Check that it is powered on and on the network, then try again.'**
+  String get errorWaitTimeout;
+
+  /// Shown after a restart command while the server is still going down.
+  ///
+  /// In en, this message translates to:
+  /// **'Waiting for {name} to shut down…'**
+  String waitShuttingDown(String name);
+
+  /// Shown while the app polls a server that is starting after a wake-up or a restart; it opens by itself when the server answers.
+  ///
+  /// In en, this message translates to:
+  /// **'Waiting for {name} to start…'**
+  String waitStarting(String name);
+
+  /// Under the waiting text while a server starts.
+  ///
+  /// In en, this message translates to:
+  /// **'This can take a few minutes. The server opens by itself once it answers.'**
+  String get waitHint;
+
+  /// Button that gives up waiting for a server to start.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop waiting'**
+  String get waitStop;
+
   /// Bottom navigation tab for the dashboard.
   ///
   /// In en, this message translates to:
@@ -3782,6 +3812,60 @@ abstract class AppLocalizations {
   /// **'{count} new alerts'**
   String alertNotificationMany(int count);
 
+  /// Setting: notify when a scrub, replication or cloud sync finishes or fails.
+  ///
+  /// In en, this message translates to:
+  /// **'Finished jobs'**
+  String get settingsJobNotifications;
+
+  /// Explains the finished jobs notification setting.
+  ///
+  /// In en, this message translates to:
+  /// **'Tell me when a scrub, replication or cloud sync finishes or fails'**
+  String get settingsJobNotificationsHint;
+
+  /// Name of the Android notification channel for jobs that finished.
+  ///
+  /// In en, this message translates to:
+  /// **'Finished jobs'**
+  String get jobNotificationChannel;
+
+  /// Description of the Android notification channel for finished jobs.
+  ///
+  /// In en, this message translates to:
+  /// **'Scrubs, replications and cloud syncs that finished or failed'**
+  String get jobNotificationChannelDescription;
+
+  /// Notification text when a job finished. what is e.g. 'Scrub · tank' or 'Cloud sync'.
+  ///
+  /// In en, this message translates to:
+  /// **'{what} finished'**
+  String jobNotificationDone(String what);
+
+  /// Notification text when a job failed. what is e.g. 'Scrub · tank' or 'Cloud sync'.
+  ///
+  /// In en, this message translates to:
+  /// **'{what} failed'**
+  String jobNotificationFailed(String what);
+
+  /// Notification text when a job failed, with the first line of the server's error.
+  ///
+  /// In en, this message translates to:
+  /// **'{what} failed: {error}'**
+  String jobNotificationFailedWithError(String what, String error);
+
+  /// Notification text when several jobs finished at once.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} jobs finished'**
+  String jobNotificationMany(int count);
+
+  /// Notification text when several jobs finished at once and some failed.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} jobs finished, {failed} failed'**
+  String jobNotificationManyFailed(int count, int failed);
+
   /// Settings section.
   ///
   /// In en, this message translates to:
@@ -4921,6 +5005,174 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Last {count} lines'**
   String appLogsLastLines(int count);
+
+  /// Overall S.M.A.R.T. verdict: nothing wrong found.
+  ///
+  /// In en, this message translates to:
+  /// **'Healthy'**
+  String get diskSmartHealthy;
+
+  /// Overall S.M.A.R.T. verdict: signs of wear or an old failure.
+  ///
+  /// In en, this message translates to:
+  /// **'Needs attention'**
+  String get diskSmartAttention;
+
+  /// Overall S.M.A.R.T. verdict: the disk reports a failure now.
+  ///
+  /// In en, this message translates to:
+  /// **'Failing'**
+  String get diskSmartFailing;
+
+  /// Label for how long the disk has been running.
+  ///
+  /// In en, this message translates to:
+  /// **'Power-on time'**
+  String get diskSmartPowerOn;
+
+  /// Label for the disk age read from the self-test log, shown when the attribute table is missing.
+  ///
+  /// In en, this message translates to:
+  /// **'Power-on time at last test'**
+  String get diskSmartPowerOnAtTest;
+
+  /// Number of power-on hours.
+  ///
+  /// In en, this message translates to:
+  /// **'{hours} h'**
+  String diskSmartHours(int hours);
+
+  /// S.M.A.R.T. attribute: sectors moved to spare area.
+  ///
+  /// In en, this message translates to:
+  /// **'Reallocated sectors'**
+  String get diskSmartReallocated;
+
+  /// S.M.A.R.T. attribute: sectors waiting to be moved.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending sectors'**
+  String get diskSmartPending;
+
+  /// S.M.A.R.T. attribute: sectors that could not be read.
+  ///
+  /// In en, this message translates to:
+  /// **'Uncorrectable sectors'**
+  String get diskSmartUncorrectable;
+
+  /// Warning when the newest finished self-test failed.
+  ///
+  /// In en, this message translates to:
+  /// **'The last self-test failed: {test}'**
+  String diskSmartFailedWarning(String test);
+
+  /// Warning when an older self-test failed but a later one passed.
+  ///
+  /// In en, this message translates to:
+  /// **'An earlier self-test failed: {test}'**
+  String diskSmartEarlierFailedWarning(String test);
+
+  /// Title of the screen that shows every saved server at once, and the tooltip of the button that opens it.
+  ///
+  /// In en, this message translates to:
+  /// **'Overview'**
+  String get overviewTitle;
+
+  /// Top of the overview when no server needs attention.
+  ///
+  /// In en, this message translates to:
+  /// **'Everything looks fine'**
+  String get overviewAllFine;
+
+  /// Top of the overview: how many servers have a problem or cannot be reached.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{1 server needs attention} other{{count} servers need attention}}'**
+  String overviewNeedAttention(int count);
+
+  /// Status label on a server in the overview.
+  ///
+  /// In en, this message translates to:
+  /// **'Healthy'**
+  String get overviewLevelOk;
+
+  /// Status label on a server in the overview: something is not quite right.
+  ///
+  /// In en, this message translates to:
+  /// **'Attention'**
+  String get overviewLevelAttention;
+
+  /// Status label on a server in the overview: a pool is down or an alert is critical.
+  ///
+  /// In en, this message translates to:
+  /// **'Problem'**
+  String get overviewLevelProblem;
+
+  /// Status label on a server in the overview that could not be reached.
+  ///
+  /// In en, this message translates to:
+  /// **'Offline'**
+  String get overviewLevelOffline;
+
+  /// Overview row: all pools of a server are fine.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{1 pool healthy} other{{count} pools healthy}}'**
+  String overviewPoolsHealthy(int count);
+
+  /// Overview row: some pools are degraded, nearly full or down.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{1 pool needs attention} other{{count} pools need attention}}'**
+  String overviewPoolsAttention(int count);
+
+  /// Overview row: the server has no storage pool.
+  ///
+  /// In en, this message translates to:
+  /// **'No pools'**
+  String get overviewNoPools;
+
+  /// Overview row: how many alerts are active on a server.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{1 active alert} other{{count} active alerts}}'**
+  String overviewAlerts(int count);
+
+  /// Overview row: how many of the active alerts are critical.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} critical'**
+  String overviewAlertsCritical(int count);
+
+  /// Overview row: the server has no active alert.
+  ///
+  /// In en, this message translates to:
+  /// **'No active alerts'**
+  String get overviewNoAlerts;
+
+  /// Overview row: no scrub, sync or other job is running on the server.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing running'**
+  String get overviewNoJobs;
+
+  /// Overview: a server that cannot be looked at without asking the user something.
+  ///
+  /// In en, this message translates to:
+  /// **'Open this server once to trust its certificate or enter the 2FA code.'**
+  String get overviewNeedsYou;
+
+  /// Overview: the saved credentials were rejected.
+  ///
+  /// In en, this message translates to:
+  /// **'The server refused the saved sign-in.'**
+  String get overviewLoginRejected;
+
+  /// Overview: the server did not answer.
+  ///
+  /// In en, this message translates to:
+  /// **'Can\'t reach the server.'**
+  String get overviewUnreachable;
 
   /// Problem with an app setting that must be a number.
   ///

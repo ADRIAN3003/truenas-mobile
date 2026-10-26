@@ -243,6 +243,27 @@ class AppLocalizationsHu extends AppLocalizations {
   String get errorCancelled => 'A kapcsolódás megszakítva.';
 
   @override
+  String get errorWaitTimeout =>
+      'A szerver nem indult el időben. Ellenőrizd, hogy be van-e kapcsolva és elérhető-e a hálózaton, aztán próbáld újra.';
+
+  @override
+  String waitShuttingDown(String name) {
+    return 'Várakozás: $name leáll…';
+  }
+
+  @override
+  String waitStarting(String name) {
+    return 'Várakozás: $name elindulására…';
+  }
+
+  @override
+  String get waitHint =>
+      'Ez eltarthat pár percig. A szerver magától megnyílik, amint válaszol.';
+
+  @override
+  String get waitStop => 'Várakozás leállítása';
+
+  @override
   String get tabDashboard => 'Főoldal';
 
   @override
@@ -2214,6 +2235,45 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String get settingsJobNotifications => 'Befejezett feladatok';
+
+  @override
+  String get settingsJobNotificationsHint =>
+      'Értesítést kérek, ha egy scrub, replikáció vagy felhőszinkron befejeződik vagy hibával leáll';
+
+  @override
+  String get jobNotificationChannel => 'Befejezett feladatok';
+
+  @override
+  String get jobNotificationChannelDescription =>
+      'Befejezett vagy hibával leállt scrubok, replikációk és felhőszinkronok';
+
+  @override
+  String jobNotificationDone(String what) {
+    return '$what befejeződött';
+  }
+
+  @override
+  String jobNotificationFailed(String what) {
+    return '$what hibával leállt';
+  }
+
+  @override
+  String jobNotificationFailedWithError(String what, String error) {
+    return '$what hibával leállt: $error';
+  }
+
+  @override
+  String jobNotificationMany(int count) {
+    return '$count feladat befejeződött';
+  }
+
+  @override
+  String jobNotificationManyFailed(int count, int failed) {
+    return '$count feladat befejeződött, ebből $failed hibával';
+  }
+
+  @override
   String get settingsSecurity => 'Biztonság';
 
   @override
@@ -2964,6 +3024,128 @@ class AppLocalizationsHu extends AppLocalizations {
   String appLogsLastLines(int count) {
     return 'Utolsó $count sor';
   }
+
+  @override
+  String get diskSmartHealthy => 'Egészséges';
+
+  @override
+  String get diskSmartAttention => 'Figyelmet igényel';
+
+  @override
+  String get diskSmartFailing => 'Meghibásodik';
+
+  @override
+  String get diskSmartPowerOn => 'Üzemidő';
+
+  @override
+  String get diskSmartPowerOnAtTest => 'Üzemidő az utolsó teszten';
+
+  @override
+  String diskSmartHours(int hours) {
+    return '$hours óra';
+  }
+
+  @override
+  String get diskSmartReallocated => 'Átcsoportosított szektorok';
+
+  @override
+  String get diskSmartPending => 'Függőben lévő szektorok';
+
+  @override
+  String get diskSmartUncorrectable => 'Javíthatatlan szektorok';
+
+  @override
+  String diskSmartFailedWarning(String test) {
+    return 'Az utolsó önteszt hibát talált: $test';
+  }
+
+  @override
+  String diskSmartEarlierFailedWarning(String test) {
+    return 'Egy korábbi önteszt hibát talált: $test';
+  }
+
+  @override
+  String get overviewTitle => 'Áttekintés';
+
+  @override
+  String get overviewAllFine => 'Minden rendben';
+
+  @override
+  String overviewNeedAttention(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count szerver figyelmet igényel',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get overviewLevelOk => 'Rendben';
+
+  @override
+  String get overviewLevelAttention => 'Figyelem';
+
+  @override
+  String get overviewLevelProblem => 'Hiba';
+
+  @override
+  String get overviewLevelOffline => 'Nem elérhető';
+
+  @override
+  String overviewPoolsHealthy(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count tároló rendben',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String overviewPoolsAttention(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count tároló figyelmet igényel',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get overviewNoPools => 'Nincs tároló';
+
+  @override
+  String overviewAlerts(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count aktív riasztás',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String overviewAlertsCritical(int count) {
+    return '$count kritikus';
+  }
+
+  @override
+  String get overviewNoAlerts => 'Nincs aktív riasztás';
+
+  @override
+  String get overviewNoJobs => 'Nem fut semmi';
+
+  @override
+  String get overviewNeedsYou =>
+      'Nyisd meg egyszer ezt a szervert, hogy elfogadd a tanúsítványát vagy megadd a 2FA-kódot.';
+
+  @override
+  String get overviewLoginRejected =>
+      'A szerver elutasította a mentett bejelentkezést.';
+
+  @override
+  String get overviewUnreachable => 'A szerver nem érhető el.';
 
   @override
   String get appFormNotNumber => 'Adj meg egy számot';

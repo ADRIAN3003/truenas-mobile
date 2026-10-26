@@ -242,6 +242,27 @@ class AppLocalizationsEn extends AppLocalizations {
   String get errorCancelled => 'Connection cancelled.';
 
   @override
+  String get errorWaitTimeout =>
+      'The server did not come online in time. Check that it is powered on and on the network, then try again.';
+
+  @override
+  String waitShuttingDown(String name) {
+    return 'Waiting for $name to shut down…';
+  }
+
+  @override
+  String waitStarting(String name) {
+    return 'Waiting for $name to start…';
+  }
+
+  @override
+  String get waitHint =>
+      'This can take a few minutes. The server opens by itself once it answers.';
+
+  @override
+  String get waitStop => 'Stop waiting';
+
+  @override
   String get tabDashboard => 'Home';
 
   @override
@@ -2216,6 +2237,45 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get settingsJobNotifications => 'Finished jobs';
+
+  @override
+  String get settingsJobNotificationsHint =>
+      'Tell me when a scrub, replication or cloud sync finishes or fails';
+
+  @override
+  String get jobNotificationChannel => 'Finished jobs';
+
+  @override
+  String get jobNotificationChannelDescription =>
+      'Scrubs, replications and cloud syncs that finished or failed';
+
+  @override
+  String jobNotificationDone(String what) {
+    return '$what finished';
+  }
+
+  @override
+  String jobNotificationFailed(String what) {
+    return '$what failed';
+  }
+
+  @override
+  String jobNotificationFailedWithError(String what, String error) {
+    return '$what failed: $error';
+  }
+
+  @override
+  String jobNotificationMany(int count) {
+    return '$count jobs finished';
+  }
+
+  @override
+  String jobNotificationManyFailed(int count, int failed) {
+    return '$count jobs finished, $failed failed';
+  }
+
+  @override
   String get settingsSecurity => 'Security';
 
   @override
@@ -2992,6 +3052,131 @@ class AppLocalizationsEn extends AppLocalizations {
   String appLogsLastLines(int count) {
     return 'Last $count lines';
   }
+
+  @override
+  String get diskSmartHealthy => 'Healthy';
+
+  @override
+  String get diskSmartAttention => 'Needs attention';
+
+  @override
+  String get diskSmartFailing => 'Failing';
+
+  @override
+  String get diskSmartPowerOn => 'Power-on time';
+
+  @override
+  String get diskSmartPowerOnAtTest => 'Power-on time at last test';
+
+  @override
+  String diskSmartHours(int hours) {
+    return '$hours h';
+  }
+
+  @override
+  String get diskSmartReallocated => 'Reallocated sectors';
+
+  @override
+  String get diskSmartPending => 'Pending sectors';
+
+  @override
+  String get diskSmartUncorrectable => 'Uncorrectable sectors';
+
+  @override
+  String diskSmartFailedWarning(String test) {
+    return 'The last self-test failed: $test';
+  }
+
+  @override
+  String diskSmartEarlierFailedWarning(String test) {
+    return 'An earlier self-test failed: $test';
+  }
+
+  @override
+  String get overviewTitle => 'Overview';
+
+  @override
+  String get overviewAllFine => 'Everything looks fine';
+
+  @override
+  String overviewNeedAttention(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count servers need attention',
+      one: '1 server needs attention',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get overviewLevelOk => 'Healthy';
+
+  @override
+  String get overviewLevelAttention => 'Attention';
+
+  @override
+  String get overviewLevelProblem => 'Problem';
+
+  @override
+  String get overviewLevelOffline => 'Offline';
+
+  @override
+  String overviewPoolsHealthy(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count pools healthy',
+      one: '1 pool healthy',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String overviewPoolsAttention(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count pools need attention',
+      one: '1 pool needs attention',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get overviewNoPools => 'No pools';
+
+  @override
+  String overviewAlerts(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count active alerts',
+      one: '1 active alert',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String overviewAlertsCritical(int count) {
+    return '$count critical';
+  }
+
+  @override
+  String get overviewNoAlerts => 'No active alerts';
+
+  @override
+  String get overviewNoJobs => 'Nothing running';
+
+  @override
+  String get overviewNeedsYou =>
+      'Open this server once to trust its certificate or enter the 2FA code.';
+
+  @override
+  String get overviewLoginRejected => 'The server refused the saved sign-in.';
+
+  @override
+  String get overviewUnreachable => 'Can\'t reach the server.';
 
   @override
   String get appFormNotNumber => 'Enter a number';

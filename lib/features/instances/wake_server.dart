@@ -8,14 +8,15 @@ import '../../l10n/generated/app_localizations.dart';
 import '../../shared/haptics.dart';
 
 /// Sends the magic packet of [instance] and says in a snackbar how it went.
-/// Does nothing for a server without Wake-on-LAN settings.
-Future<void> wakeServer(
+/// Returns whether it was sent; false too for a server without Wake-on-LAN
+/// settings, which it does nothing for.
+Future<bool> wakeServer(
   BuildContext context,
   WidgetRef ref,
   ServerInstance instance,
 ) async {
   final settings = instance.wol;
-  if (settings == null) return;
+  if (settings == null) return false;
   final l10n = AppLocalizations.of(context);
   final messenger = ScaffoldMessenger.of(context);
   Haptics.confirm();
@@ -24,9 +25,11 @@ Future<void> wakeServer(
     messenger.showSnackBar(
       SnackBar(content: Text(l10n.wolSent(instance.name))),
     );
+    return true;
   } catch (error) {
     Haptics.warning();
     AppLog.instance.warning('wake-on-lan', '${instance.name}: $error');
     messenger.showSnackBar(SnackBar(content: Text(l10n.wolFailed('$error'))));
+    return false;
   }
 }

@@ -1,7 +1,10 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:truenas_mobile/core/instances/instance_repository.dart';
+import 'package:truenas_mobile/core/instances/instances_provider.dart';
 import 'package:truenas_mobile/core/instances/server_instance.dart';
 import 'package:truenas_mobile/core/session/truenas_session.dart';
 import 'package:truenas_mobile/features/server/more_tab.dart';
@@ -12,6 +15,7 @@ import 'package:truenas_mobile/features/system/users_screen.dart';
 import 'package:truenas_mobile/l10n/generated/app_localizations.dart';
 
 import '../../support/fake_truenas_server.dart';
+import '../../support/memory_store.dart';
 
 void main() {
   late FakeTrueNasServer server;
@@ -67,7 +71,7 @@ void main() {
     await tester.pumpWidget(
       wrap(
         Scaffold(
-          body: MoreTab(session: session, serverName: 'Home'),
+          body: MoreTab(session: session, instanceId: '1', serverName: 'Home'),
         ),
       ),
     );
@@ -169,7 +173,9 @@ void main() {
 
   testWidgets('installs an update after confirming', (tester) async {
     await connect(tester);
-    await tester.pumpWidget(wrap(UpdatesScreen(session: session)));
+    await tester.pumpWidget(
+      wrap(UpdatesScreen(session: session, instanceId: '1')),
+    );
     await settle(tester);
     expect(find.text('Running 25.10.7'), findsOneWidget);
     expect(find.text('25.10.8 is available'), findsOneWidget);
@@ -186,7 +192,9 @@ void main() {
 
   testWidgets('installs an update without restarting', (tester) async {
     await connect(tester);
-    await tester.pumpWidget(wrap(UpdatesScreen(session: session)));
+    await tester.pumpWidget(
+      wrap(UpdatesScreen(session: session, instanceId: '1')),
+    );
     await settle(tester);
     expect(find.text('Download size: 1.0 GiB'), findsOneWidget);
 
@@ -202,8 +210,31 @@ void main() {
   testWidgets('offers a restart once an update is installed', (tester) async {
     await connect(tester);
     server.rebootRequired = true;
+    final store = MemoryStore();
+    await InstanceRepository(store).save([
+      ServerInstance(
+        id: '1',
+        name: 'Home',
+        url: 'http://127.0.0.1:${server.port}',
+        authMethod: AuthMethod.password,
+        username: 'truenas_admin',
+        secret: 'secret',
+      ),
+    ]);
+    final container = ProviderContainer(
+      overrides: [
+        instanceRepositoryProvider.overrideWithValue(InstanceRepository(store)),
+      ],
+    );
+    addTearDown(container.dispose);
+    await tester.runAsync(() => container.read(instancesProvider.future));
     await tester.pumpWidget(
-      wrap(UpdatesScreen(session: session, serverName: 'Home')),
+      UncontrolledProviderScope(
+        container: container,
+        child: wrap(
+          UpdatesScreen(session: session, instanceId: '1', serverName: 'Home'),
+        ),
+      ),
     );
     await settle(tester);
     expect(find.text('An update is installed. Restart to finish.'), findsOne);
@@ -213,14 +244,26 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Restart Home?'), findsOneWidget);
     await tester.tap(find.text('Restart').last);
-    await settle(tester);
+    // No settling: the screen that opens waits with a spinner.
+    for (var i = 0; i < 10; i++) {
+      await tester.runAsync(
+        () => Future<void>.delayed(const Duration(milliseconds: 50)),
+      );
+      await tester.pump(const Duration(milliseconds: 100));
+    }
     expect(server.calls.map((c) => c.$1), contains('system.reboot'));
+    // The server reopens and waits for the restart instead of dropping the
+    // user on the server list.
+    expect(find.text('Waiting for Home to shut down…'), findsOneWidget);
+    expect(find.byType(UpdatesScreen), findsNothing);
     await disconnect(tester);
   });
 
   testWidgets('activates an older boot environment', (tester) async {
     await connect(tester);
-    await tester.pumpWidget(wrap(UpdatesScreen(session: session)));
+    await tester.pumpWidget(
+      wrap(UpdatesScreen(session: session, instanceId: '1')),
+    );
     await settle(tester);
 
     await tester.tap(

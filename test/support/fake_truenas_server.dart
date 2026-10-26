@@ -10,10 +10,13 @@ class FakeTrueNasServer {
   static Future<FakeTrueNasServer> start({
     List<String>? versions = const ['v24.10', 'v25.04.2', 'v25.10.5'],
     SecurityContext? tls,
+
+    /// A fixed port, to come up where a stopped server was.
+    int port = 0,
   }) async {
     final server = tls == null
-        ? await HttpServer.bind(InternetAddress.loopbackIPv4, 0)
-        : await HttpServer.bindSecure(InternetAddress.loopbackIPv4, 0, tls);
+        ? await HttpServer.bind(InternetAddress.loopbackIPv4, port)
+        : await HttpServer.bindSecure(InternetAddress.loopbackIPv4, port, tls);
     final fake = FakeTrueNasServer._(server, versions);
     server.listen(fake._handle);
     return fake;

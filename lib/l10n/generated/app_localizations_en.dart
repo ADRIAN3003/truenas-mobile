@@ -242,6 +242,27 @@ class AppLocalizationsEn extends AppLocalizations {
   String get errorCancelled => 'Connection cancelled.';
 
   @override
+  String get errorWaitTimeout =>
+      'The server did not come online in time. Check that it is powered on and on the network, then try again.';
+
+  @override
+  String waitShuttingDown(String name) {
+    return 'Waiting for $name to shut down…';
+  }
+
+  @override
+  String waitStarting(String name) {
+    return 'Waiting for $name to start…';
+  }
+
+  @override
+  String get waitHint =>
+      'This can take a few minutes. The server opens by itself once it answers.';
+
+  @override
+  String get waitStop => 'Stop waiting';
+
+  @override
   String get tabDashboard => 'Home';
 
   @override

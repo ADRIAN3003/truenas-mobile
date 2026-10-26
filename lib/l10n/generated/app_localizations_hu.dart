@@ -243,6 +243,27 @@ class AppLocalizationsHu extends AppLocalizations {
   String get errorCancelled => 'A kapcsolódás megszakítva.';
 
   @override
+  String get errorWaitTimeout =>
+      'A szerver nem indult el időben. Ellenőrizd, hogy be van-e kapcsolva és elérhető-e a hálózaton, aztán próbáld újra.';
+
+  @override
+  String waitShuttingDown(String name) {
+    return 'Várakozás: $name leáll…';
+  }
+
+  @override
+  String waitStarting(String name) {
+    return 'Várakozás: $name elindulására…';
+  }
+
+  @override
+  String get waitHint =>
+      'Ez eltarthat pár percig. A szerver magától megnyílik, amint válaszol.';
+
+  @override
+  String get waitStop => 'Várakozás leállítása';
+
+  @override
   String get tabDashboard => 'Főoldal';
 
   @override

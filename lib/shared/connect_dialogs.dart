@@ -5,6 +5,7 @@ import '../core/api/api_exception.dart';
 import '../core/api/certificate_trust.dart';
 import '../core/api/truenas_connection.dart';
 import '../core/session/truenas_session.dart';
+import '../core/session/wait_for_server.dart';
 import '../l10n/generated/app_localizations.dart';
 import 'dialogs.dart';
 
@@ -135,6 +136,7 @@ String describeConnectError(AppLocalizations l10n, Object error) =>
       LoginRejected() => l10n.errorLoginRejected,
       UnsupportedServerException() => l10n.errorUnsupported,
       ConnectCancelled() => l10n.errorCancelled,
+      ServerWaitTimeout() => l10n.errorWaitTimeout,
       UntrustedCertificateException() => l10n.errorCertificate,
       ApiException(:final message) => l10n.errorGeneric(message),
       _ => l10n.errorGeneric(error.toString()),

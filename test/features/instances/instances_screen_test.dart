@@ -116,9 +116,12 @@ void main() {
     testWidgets('the wake button sends the packet and says so', (tester) async {
       final sender = await openWith(tester, waking);
       await tester.tap(find.byTooltip('Wake up'));
-      await tester.pumpAndSettle();
+      // The server opens, waiting for it to answer (no settling: it spins).
+      await tester.pump();
+      await tester.pump(const Duration(seconds: 1));
       expect(sender.sent.single.mac, 'AA:BB:CC:DD:EE:FF');
       expect(find.textContaining('Wake-up sent to Home NAS'), findsOneWidget);
+      expect(find.text('Waiting for Home NAS to start…'), findsOneWidget);
     });
 
     testWidgets('a packet that could not be sent is reported', (tester) async {
@@ -128,6 +131,8 @@ void main() {
       await tester.tap(find.byTooltip('Wake up'));
       await tester.pumpAndSettle();
       expect(find.textContaining('Could not send the wake-up'), findsOneWidget);
+      // Nothing was sent, so there is nothing to wait for.
+      expect(find.textContaining('Waiting for'), findsNothing);
       expect(find.textContaining('Network is unreachable'), findsOneWidget);
       // The failure is in the error log too, for a bug report.
       final logged = AppLog.instance.entries.single;

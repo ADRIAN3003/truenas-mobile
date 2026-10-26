@@ -10,6 +10,7 @@ import '../../l10n/generated/app_localizations.dart';
 import '../../shared/theme.dart';
 import '../../shared/ui.dart';
 import '../storage/storage_helpers.dart';
+import 'app_edit_screen.dart';
 import 'app_icon.dart';
 import 'workload_widgets.dart';
 
@@ -27,6 +28,25 @@ class AppScreen extends StatefulWidget {
 class _AppScreenState extends State<AppScreen> {
   late TrueNasApp _app = widget.app;
   bool _busy = false;
+  bool _canEdit = false;
+
+  @override
+  void initState() {
+    super.initState();
+    widget.session.workloads.canEdit().then((can) {
+      if (mounted) setState(() => _canEdit = can);
+    });
+  }
+
+  Future<void> _edit() async {
+    final saved = await Navigator.push<bool>(
+      context,
+      MaterialPageRoute<bool>(
+        builder: (_) => AppEditScreen(session: widget.session, app: _app),
+      ),
+    );
+    if (saved == true && mounted) await _reload();
+  }
 
   Future<void> _reload() async {
     final apps = await widget.session.workloads.apps();
@@ -140,6 +160,12 @@ class _AppScreenState extends State<AppScreen> {
                                     onPressed: () => _run(action),
                                     child: Text(actionLabel(l10n, action)),
                                   ),
+                          if (_canEdit)
+                            OutlinedButton.icon(
+                              onPressed: _edit,
+                              icon: const Icon(Icons.tune_rounded),
+                              label: Text(l10n.appEditConfig),
+                            ),
                           if (app.state.isUp ||
                               app.state == WorkloadState.crashed)
                             OutlinedButton.icon(

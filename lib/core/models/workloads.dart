@@ -39,6 +39,8 @@ class TrueNasApp {
     required this.images,
     this.chartVersion,
     this.latestVersion,
+    this.catalogName,
+    this.train,
     this.title,
     this.iconUrl,
     this.notes,
@@ -65,6 +67,8 @@ class TrueNasApp {
         for (final MapEntry(:key, :value) in asMap(json['portals']).entries)
           key: value.toString(),
       },
+      catalogName: metadata['name'] as String?,
+      train: json['train'] as String? ?? metadata['train'] as String?,
       title: metadata['title'] as String?,
       iconUrl: metadata['icon'] as String?,
       notes: json['notes'] as String?,
@@ -90,6 +94,11 @@ class TrueNasApp {
 
   /// Web interfaces by label, e.g. `{"Web UI": "http://nas:30000/"}`.
   final Map<String, String> portals;
+
+  /// The catalog app it was made from (`jellyfin`) and its train; the
+  /// instance [name] may be different. Null for custom apps.
+  final String? catalogName;
+  final String? train;
 
   /// Catalog title, e.g. "Jellyfin".
   final String? title;

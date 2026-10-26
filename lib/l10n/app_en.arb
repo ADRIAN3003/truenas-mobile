@@ -4249,5 +4249,223 @@
   "overviewUnreachable": "Can't reach the server.",
   "@overviewUnreachable": {
     "description": "Overview: the server did not answer."
+  },
+  "appFormNotNumber": "Enter a number",
+  "@appFormNotNumber": {
+    "description": "Problem with an app setting that must be a number."
+  },
+  "appFormTooSmall": "Too small",
+  "@appFormTooSmall": {
+    "description": "Problem with an app setting: number below the minimum."
+  },
+  "appFormTooLarge": "Too large",
+  "@appFormTooLarge": {
+    "description": "Problem with an app setting: number above the maximum."
+  },
+  "appFormTooShort": "Too short",
+  "@appFormTooShort": {
+    "description": "Problem with an app setting: text shorter than allowed."
+  },
+  "appFormTooLong": "Too long",
+  "@appFormTooLong": {
+    "description": "Problem with an app setting: text longer than allowed."
+  },
+  "appFormInvalidChars": "Contains characters that are not allowed",
+  "@appFormInvalidChars": {
+    "description": "Problem with an app setting: text has characters the app does not accept."
+  },
+  "appFormNoSettings": "This app has no settings.",
+  "@appFormNoSettings": {
+    "description": "Shown instead of the form when an app has nothing to configure."
+  },
+  "appFormAdd": "Add entry",
+  "@appFormAdd": {
+    "description": "Tooltip of the button that adds an entry to a list setting."
+  },
+  "appFormLocked": "Can't be changed after install",
+  "@appFormLocked": {
+    "description": "Hint under an app setting that is locked once the app is installed."
+  },
+  "appFormJson": "Edit as JSON",
+  "@appFormJson": {
+    "description": "Tooltip of the button that shows an app configuration as raw JSON."
+  },
+  "appFormFields": "Back to the form",
+  "@appFormFields": {
+    "description": "Tooltip of the button that goes from raw JSON back to the form."
+  },
+  "appFormJsonLabel": "Configuration (JSON)",
+  "@appFormJsonLabel": {
+    "description": "Label of the raw JSON box for an app configuration."
+  },
+  "appFormJsonInvalid": "That is not valid JSON.",
+  "@appFormJsonInvalid": {
+    "description": "Snackbar when the JSON typed for an app configuration cannot be read."
+  },
+  "appFormJsonObject": "The configuration must be a JSON object (curly braces around the settings).",
+  "@appFormJsonObject": {
+    "description": "Snackbar when the JSON typed for an app configuration is not an object."
+  },
+  "appInstallTitle": "Install app",
+  "@appInstallTitle": {
+    "description": "Tooltip of the button in the Apps tab that opens the catalog."
+  },
+  "appInstallButton": "Install",
+  "@appInstallButton": {
+    "description": "Button that installs an app."
+  },
+  "appInstallName": "Application name",
+  "@appInstallName": {
+    "description": "Field for the name an app is installed under."
+  },
+  "appInstallNameHelp": "Lowercase letters, digits and hyphens, starting with a letter",
+  "@appInstallNameHelp": {
+    "description": "Help text under the app name field."
+  },
+  "appInstallNameInvalid": "Use lowercase letters, digits and hyphens (up to 40), starting with a letter",
+  "@appInstallNameInvalid": {
+    "description": "Error under the app name field."
+  },
+  "appInstallVersion": "Version to install",
+  "@appInstallVersion": {
+    "description": "Field that picks which catalog version of an app to install."
+  },
+  "appInstallTrain": "Train",
+  "@appInstallTrain": {
+    "description": "Label for the catalog train (stable, community, ...) an app comes from."
+  },
+  "appInstalled": "{name} installed",
+  "@appInstalled": {
+    "description": "Snackbar when an app install finished quickly.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "appInstalling": "Installing {name}. It shows in the list while the server sets it up.",
+  "@appInstalling": {
+    "description": "Snackbar when an app install was accepted and is still running on the server.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "catalogTitle": "App catalog",
+  "@catalogTitle": {
+    "description": "Title of the screen that lists installable apps."
+  },
+  "catalogRefresh": "Refresh catalog",
+  "@catalogRefresh": {
+    "description": "Tooltip of the button that re-reads the app catalog from its source."
+  },
+  "catalogRefreshed": "Catalog refreshed",
+  "@catalogRefreshed": {
+    "description": "Snackbar after the app catalog was refreshed."
+  },
+  "catalogSearch": "Search apps",
+  "@catalogSearch": {
+    "description": "Hint of the catalog search box."
+  },
+  "catalogAll": "All",
+  "@catalogAll": {
+    "description": "Catalog filter chip that shows every category."
+  },
+  "catalogCustomAppSection": "Your own",
+  "@catalogCustomAppSection": {
+    "description": "Heading above the entry that installs a custom app."
+  },
+  "catalogCustomApp": "Custom app",
+  "@catalogCustomApp": {
+    "description": "Catalog entry and screen title for installing from a Docker Compose file."
+  },
+  "catalogCustomAppHint": "Install any container from a Docker Compose file",
+  "@catalogCustomAppHint": {
+    "description": "Subtitle of the custom app entry."
+  },
+  "catalogAppsSection": "Apps ({count})",
+  "@catalogAppsSection": {
+    "description": "Heading above the catalog list with the number of apps shown.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "catalogEmpty": "No apps match.",
+  "@catalogEmpty": {
+    "description": "Shown when the catalog search finds nothing."
+  },
+  "catalogInstalled": "Installed",
+  "@catalogInstalled": {
+    "description": "Tooltip of the check mark on a catalog app that is already installed."
+  },
+  "catalogInstalledNote": "An app made from this is already installed. Give the new one a different name.",
+  "@catalogInstalledNote": {
+    "description": "Note on the install screen of an app that is already installed."
+  },
+  "dockerUnconfigured": "Apps need a pool first. Choose one in the TrueNAS web interface under Apps > Configuration > Choose Pool, then come back.",
+  "@dockerUnconfigured": {
+    "description": "Shown in the catalog when apps have no pool yet."
+  },
+  "dockerNotRunning": "Apps are not running on the server right now, so nothing can be installed.",
+  "@dockerNotRunning": {
+    "description": "Shown in the catalog when the apps service is not running."
+  },
+  "appCustomCompose": "Docker Compose file",
+  "@appCustomCompose": {
+    "description": "Label of the box for a custom app's Compose file."
+  },
+  "appCustomComposeHelp": "Paste the contents of a compose.yaml",
+  "@appCustomComposeHelp": {
+    "description": "Help text under the Compose file box."
+  },
+  "appCustomComposeJson": "Docker Compose config (JSON)",
+  "@appCustomComposeJson": {
+    "description": "Label of the JSON box when editing a custom app."
+  },
+  "appEditConfig": "Edit configuration",
+  "@appEditConfig": {
+    "description": "Button on an app's screen that edits its configuration."
+  },
+  "appEditTitle": "Edit {name}",
+  "@appEditTitle": {
+    "description": "Title of the screen that edits an app's configuration.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "appEditRestartNote": "Saving applies the changes and redeploys the app.",
+  "@appEditRestartNote": {
+    "description": "Note above an app configuration form."
+  },
+  "appEditNoFormNote": "The catalog's form for this version isn't available, so the configuration is shown as JSON. Saving redeploys the app.",
+  "@appEditNoFormNote": {
+    "description": "Note above the JSON editor when the catalog form is missing."
+  },
+  "appEditCustomNote": "A custom app is configured with its Docker Compose config. Saving redeploys the app.",
+  "@appEditCustomNote": {
+    "description": "Note above the JSON editor of a custom app."
+  },
+  "appConfigSaved": "{name} updated",
+  "@appConfigSaved": {
+    "description": "Snackbar when an app configuration change finished quickly.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "appConfigApplying": "Applying the changes to {name}. It redeploys on the server.",
+  "@appConfigApplying": {
+    "description": "Snackbar when an app configuration change was accepted and still runs.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   }
 }

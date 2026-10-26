@@ -3146,4 +3146,168 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get overviewUnreachable => 'A szerver nem érhető el.';
+
+  @override
+  String get appFormNotNumber => 'Adj meg egy számot';
+
+  @override
+  String get appFormTooSmall => 'Túl kicsi';
+
+  @override
+  String get appFormTooLarge => 'Túl nagy';
+
+  @override
+  String get appFormTooShort => 'Túl rövid';
+
+  @override
+  String get appFormTooLong => 'Túl hosszú';
+
+  @override
+  String get appFormInvalidChars => 'Meg nem engedett karaktereket tartalmaz';
+
+  @override
+  String get appFormNoSettings =>
+      'Ennek az alkalmazásnak nincsenek beállításai.';
+
+  @override
+  String get appFormAdd => 'Elem hozzáadása';
+
+  @override
+  String get appFormLocked => 'Telepítés után nem módosítható';
+
+  @override
+  String get appFormJson => 'Szerkesztés JSON-ként';
+
+  @override
+  String get appFormFields => 'Vissza az űrlaphoz';
+
+  @override
+  String get appFormJsonLabel => 'Beállítások (JSON)';
+
+  @override
+  String get appFormJsonInvalid => 'Ez nem érvényes JSON.';
+
+  @override
+  String get appFormJsonObject =>
+      'A beállításoknak JSON-objektumnak kell lenniük (kapcsos zárójelben a beállítások).';
+
+  @override
+  String get appInstallTitle => 'Alkalmazás telepítése';
+
+  @override
+  String get appInstallButton => 'Telepítés';
+
+  @override
+  String get appInstallName => 'Alkalmazás neve';
+
+  @override
+  String get appInstallNameHelp =>
+      'Kisbetűk, számjegyek és kötőjelek, betűvel kezdődően';
+
+  @override
+  String get appInstallNameInvalid =>
+      'Kisbetűket, számjegyeket és kötőjeleket használj (legfeljebb 40), betűvel kezdve';
+
+  @override
+  String get appInstallVersion => 'Telepítendő verzió';
+
+  @override
+  String get appInstallTrain => 'Csatorna';
+
+  @override
+  String appInstalled(String name) {
+    return 'A(z) $name telepítve';
+  }
+
+  @override
+  String appInstalling(String name) {
+    return 'A(z) $name telepítése folyamatban. A szerver beállítása közben megjelenik a listában.';
+  }
+
+  @override
+  String get catalogTitle => 'Alkalmazáskatalógus';
+
+  @override
+  String get catalogRefresh => 'Katalógus frissítése';
+
+  @override
+  String get catalogRefreshed => 'Katalógus frissítve';
+
+  @override
+  String get catalogSearch => 'Alkalmazások keresése';
+
+  @override
+  String get catalogAll => 'Mind';
+
+  @override
+  String get catalogCustomAppSection => 'Saját';
+
+  @override
+  String get catalogCustomApp => 'Egyéni alkalmazás';
+
+  @override
+  String get catalogCustomAppHint =>
+      'Bármilyen konténer telepítése Docker Compose fájlból';
+
+  @override
+  String catalogAppsSection(int count) {
+    return 'Alkalmazások ($count)';
+  }
+
+  @override
+  String get catalogEmpty => 'Nincs találat.';
+
+  @override
+  String get catalogInstalled => 'Telepítve';
+
+  @override
+  String get catalogInstalledNote =>
+      'Ebből már van telepített alkalmazás. Adj az újnak másik nevet.';
+
+  @override
+  String get dockerUnconfigured =>
+      'Az alkalmazásokhoz előbb egy tároló (pool) kell. Válassz egyet a TrueNAS webes felületén az Alkalmazások > Beállítások > Pool kiválasztása alatt, aztán gyere vissza.';
+
+  @override
+  String get dockerNotRunning =>
+      'Az alkalmazások most nem futnak a szerveren, ezért nem telepíthető semmi.';
+
+  @override
+  String get appCustomCompose => 'Docker Compose fájl';
+
+  @override
+  String get appCustomComposeHelp => 'Illeszd be egy compose.yaml tartalmát';
+
+  @override
+  String get appCustomComposeJson => 'Docker Compose beállítás (JSON)';
+
+  @override
+  String get appEditConfig => 'Beállítások szerkesztése';
+
+  @override
+  String appEditTitle(String name) {
+    return '$name szerkesztése';
+  }
+
+  @override
+  String get appEditRestartNote =>
+      'A mentés alkalmazza a módosításokat, és újratelepíti az alkalmazást.';
+
+  @override
+  String get appEditNoFormNote =>
+      'A katalógus nem adja meg ennek a verziónak az űrlapját, ezért a beállítások JSON-ként látszanak. A mentés újratelepíti az alkalmazást.';
+
+  @override
+  String get appEditCustomNote =>
+      'Az egyéni alkalmazás a Docker Compose beállításaival adható meg. A mentés újratelepíti az alkalmazást.';
+
+  @override
+  String appConfigSaved(String name) {
+    return 'A(z) $name frissítve';
+  }
+
+  @override
+  String appConfigApplying(String name) {
+    return 'A módosítások alkalmazása a(z) $name alkalmazáson. A szerver újratelepíti.';
+  }
 }

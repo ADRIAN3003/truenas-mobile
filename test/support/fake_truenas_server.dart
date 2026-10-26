@@ -230,7 +230,7 @@ class FakeTrueNasServer {
       'upgrade_available': true,
       'image_updates_available': false,
       'custom_app': false,
-      'metadata': {'title': 'Jellyfin'},
+      'metadata': {'title': 'Jellyfin', 'name': 'jellyfin', 'train': 'stable'},
       'active_workloads': {
         'containers': 1,
         'images': ['jellyfin/jellyfin:10.10.7'],
@@ -242,6 +242,244 @@ class FakeTrueNasServer {
 
   /// Apps whose `app.upgrade` fails.
   final failingUpgrades = <String>{};
+
+  /// Whether the server has the app catalog (`app.available`, `app.create`,
+  /// `app.update`, `app.config`, `catalog.*`, `docker.status`).
+  bool catalog = true;
+
+  /// What `docker.status` reports.
+  String dockerStatus = 'RUNNING';
+
+  /// Served by `app.available`.
+  final catalogApps = <Map<String, dynamic>>[
+    {
+      'name': 'jellyfin',
+      'title': 'Jellyfin',
+      'train': 'stable',
+      'description': 'A free media server.',
+      'categories': ['media'],
+      'latest_version': '1.2.4',
+      'latest_human_version': '10.10.7_1.2.4',
+      'installed': true,
+      'healthy': true,
+    },
+    {
+      'name': 'plex',
+      'title': 'Plex',
+      'train': 'stable',
+      'description': 'Stream your media anywhere.',
+      'categories': ['media', 'streaming'],
+      'latest_version': '2.0.1',
+      'latest_human_version': '1.41.0_2.0.1',
+      'installed': false,
+      'healthy': true,
+    },
+    {
+      'name': 'nextcloud',
+      'title': 'Nextcloud',
+      'train': 'community',
+      'description': 'Files, calendar and contacts.',
+      'categories': ['productivity'],
+      'latest_version': '3.1.0',
+      'installed': false,
+      'healthy': true,
+    },
+  ];
+
+  /// `catalog.get_app_details` answers by app name.
+  late final catalogDetails = <String, Map<String, dynamic>>{
+    'plex': {
+      ...catalogApps[1],
+      'versions': {
+        '2.0.1': {
+          'version': '2.0.1',
+          'human_version': '1.41.0_2.0.1',
+          'schema': plexSchema(),
+        },
+        '1.9.0': {
+          'version': '1.9.0',
+          'human_version': '1.40.0_1.9.0',
+          'schema': plexSchema(),
+        },
+      },
+    },
+    'jellyfin': {
+      ...catalogApps[0],
+      'versions': {
+        '1.2.3': {
+          'version': '1.2.3',
+          'human_version': '10.10.7_1.2.3',
+          'schema': plexSchema(),
+        },
+      },
+    },
+  };
+
+  /// The install form of the sample Plex app.
+  static Map<String, dynamic> plexSchema() => {
+    'groups': [
+      {'name': 'Application Configuration', 'description': 'Configure Plex'},
+      {'name': 'Storage Configuration', 'description': ''},
+    ],
+    'questions': [
+      {
+        'variable': 'claim_token',
+        'label': 'Claim token',
+        'group': 'Application Configuration',
+        'schema': {'type': 'string', 'default': '', 'private': true},
+      },
+      {
+        'variable': 'timezone',
+        'label': 'Timezone',
+        'group': 'Application Configuration',
+        'schema': {
+          'type': 'string',
+          'default': 'UTC',
+          'enum': [
+            {'value': 'UTC', 'description': 'UTC'},
+            {'value': 'Europe/Budapest', 'description': 'Europe/Budapest'},
+          ],
+        },
+      },
+      {
+        'variable': 'enable_logs',
+        'label': 'Verbose logs',
+        'group': 'Application Configuration',
+        'schema': {
+          'type': 'boolean',
+          'default': false,
+          'show_subquestions_if': true,
+          'subquestions': [
+            {
+              'variable': 'log_level',
+              'label': 'Log level',
+              'group': 'Application Configuration',
+              'schema': {
+                'type': 'string',
+                'default': 'info',
+                'enum': [
+                  {'value': 'info', 'description': 'Info'},
+                  {'value': 'debug', 'description': 'Debug'},
+                ],
+              },
+            },
+          ],
+        },
+      },
+      {
+        'variable': 'network',
+        'label': 'Networking',
+        'group': 'Application Configuration',
+        'schema': {
+          'type': 'dict',
+          'attrs': [
+            {
+              'variable': 'web_port',
+              'label': 'Web port',
+              'schema': {
+                'type': 'int',
+                'default': 32400,
+                'required': true,
+                'min': 9000,
+                'max': 65535,
+              },
+            },
+          ],
+        },
+      },
+      {
+        'variable': 'extra_env',
+        'label': 'Environment variables',
+        'group': 'Application Configuration',
+        'schema': {
+          'type': 'list',
+          'default': [],
+          'items': [
+            {
+              'variable': 'env',
+              'label': 'Variable',
+              'schema': {
+                'type': 'dict',
+                'attrs': [
+                  {
+                    'variable': 'name',
+                    'label': 'Name',
+                    'schema': {'type': 'string', 'required': true},
+                  },
+                  {
+                    'variable': 'value',
+                    'label': 'Value',
+                    'schema': {'type': 'string', 'default': ''},
+                  },
+                ],
+              },
+            },
+          ],
+        },
+      },
+      {
+        'variable': 'storage',
+        'label': 'Data storage',
+        'group': 'Storage Configuration',
+        'schema': {
+          'type': 'dict',
+          'attrs': [
+            {
+              'variable': 'type',
+              'label': 'Type',
+              'schema': {
+                'type': 'string',
+                'default': 'ix_volume',
+                'enum': [
+                  {'value': 'ix_volume', 'description': 'ixVolume'},
+                  {'value': 'host_path', 'description': 'Host path'},
+                ],
+              },
+            },
+            {
+              'variable': 'host_path',
+              'label': 'Host path',
+              'schema': {
+                'type': 'path',
+                'required': true,
+                'show_if': [
+                  ['type', '=', 'host_path'],
+                ],
+              },
+            },
+          ],
+        },
+      },
+    ],
+  };
+
+  /// `app.config` by instance name.
+  final appConfigs = <String, Map<String, dynamic>>{
+    'jellyfin': {
+      'claim_token': '',
+      'timezone': 'UTC',
+      'enable_logs': false,
+      'log_level': 'info',
+      'network': {'web_port': 30013},
+      'extra_env': [
+        {'name': 'LANG', 'value': 'C'},
+      ],
+      'storage': {'type': 'ix_volume'},
+    },
+  };
+
+  /// The `app.create` requests received.
+  final appCreates = <Map<String, dynamic>>[];
+
+  /// The `app.update` requests received: the app and what was sent.
+  final appUpdates = <(String, Map<String, dynamic>)>[];
+
+  /// How the job of `app.create` and `app.update` stands: SUCCESS, RUNNING
+  /// (still pulling images) or FAILED (the server refused the values).
+  String appJobState = 'SUCCESS';
+
+  /// Times `catalog.sync` ran.
+  int catalogSyncs = 0;
 
   /// When true a `core.bulk` job over apps stays RUNNING, changing nothing,
   /// until [finishBulk] runs it.
@@ -758,6 +996,14 @@ class FakeTrueNasServer {
                 ])
                   '$service.$m': <String, dynamic>{},
               if (service == 'core') 'core.bulk': <String, dynamic>{},
+              if (service == 'app' && catalog)
+                for (final m in ['available', 'create', 'update', 'config'])
+                  'app.$m': <String, dynamic>{},
+              if (service == 'catalog' && catalog)
+                for (final m in ['get_app_details', 'sync'])
+                  'catalog.$m': <String, dynamic>{},
+              if (service == 'docker' && catalog)
+                'docker.status': <String, dynamic>{},
               if (service == 'smart.test' && smart)
                 for (final m in ['results', 'manual_test'])
                   'smart.test.$m': <String, dynamic>{},
@@ -919,6 +1165,51 @@ class FakeTrueNasServer {
           case 'app.delete':
             apps.removeWhere((a) => a['name'] == params[0]);
             result = _job();
+          case 'app.available':
+            result = catalogApps;
+          case 'catalog.get_app_details':
+            result = catalogDetails[params[0]] ?? {};
+          case 'catalog.sync':
+            catalogSyncs++;
+            result = _job();
+          case 'docker.status':
+            result = {'status': dockerStatus, 'description': dockerStatus};
+          case 'app.config':
+            result = appConfigs[params[0]] ?? {};
+          case 'app.create':
+            final data = params.first as Map<String, dynamic>;
+            appCreates.add(data);
+            if (appJobState != 'FAILED') {
+              final name = data['app_name'] as String;
+              apps.add({
+                'name': name,
+                'id': name,
+                'state': 'DEPLOYING',
+                'human_version': data['version'] ?? '',
+                'version': data['version'] ?? '',
+                'upgrade_available': false,
+                'image_updates_available': false,
+                'custom_app': data['custom_app'] == true,
+                'metadata': {
+                  'title': name,
+                  'name': data['catalog_app'],
+                  'train': data['train'],
+                },
+                'active_workloads': {'containers': 0, 'images': []},
+                'portals': {},
+              });
+              appConfigs[name] = data['values'] as Map<String, dynamic>? ?? {};
+            }
+            result = _appJob();
+          case 'app.update':
+            final data = params[1] as Map<String, dynamic>;
+            appUpdates.add((params[0] as String, data));
+            if (appJobState != 'FAILED') {
+              appConfigs[params[0] as String] =
+                  (data['values'] ?? data['custom_compose_config'])
+                      as Map<String, dynamic>;
+            }
+            result = _appJob();
           case 'vm.query':
             result = vms;
           case 'vm.start' || 'vm.poweroff':
@@ -1447,6 +1738,18 @@ class FakeTrueNasServer {
       _runBulk(_finishedJobs[id]!);
     }
     _heldBulk.clear();
+  }
+
+  /// The job of `app.create` and `app.update`, as [appJobState] says.
+  int _appJob() {
+    final id = _nextJobId++;
+    _finishedJobs[id] = {
+      'id': id,
+      'state': appJobState,
+      'result': null,
+      if (appJobState == 'FAILED') 'error': '[EINVAL] values.network: Invalid',
+    };
+    return id;
   }
 
   /// Records a finished job and returns its id.

@@ -2,6 +2,8 @@ import 'dart:math' as math;
 
 import 'package:flutter/cupertino.dart'
     show showCupertinoDialog, showCupertinoModalPopup;
+import 'package:flutter/foundation.dart'
+    show ValueListenable, visibleForTesting;
 import 'package:flutter/material.dart';
 import 'package:liquid_glass_widgets/liquid_glass_widgets.dart' as lg;
 import 'package:native_liquid_glass/native_liquid_glass.dart' as nlg;
@@ -31,9 +33,90 @@ bool useNativeGlass(BuildContext context) =>
 
 /// Fades native glass out under dialogs, sheets and other pop-up routes, which
 /// it would otherwise bleed through (a native view sits above Flutter's
-/// surface). Add it to the app's `navigatorObservers`.
-NavigatorObserver glassNavigatorObserver() =>
-    nlg.LiquidGlassNavigatorObserver();
+/// surface), and swaps it for the Flutter look-alikes while the user drags a
+/// page back (the native views do not follow the page being dragged). Add it
+/// to the app's `navigatorObservers`.
+NavigatorObserver glassNavigatorObserver() => _GlassObserver();
+
+class _GlassObserver extends nlg.LiquidGlassNavigatorObserver {
+  VoidCallback? _release;
+
+  @override
+  void didStartUserGesture(
+    Route<dynamic> route,
+    Route<dynamic>? previousRoute,
+  ) {
+    _release ??= pauseNativeGlass();
+  }
+
+  @override
+  void didStopUserGesture() {
+    _release?.call();
+    _release = null;
+  }
+}
+
+// How many reasons there are to draw the Flutter look-alikes instead of the
+// native views right now (see [pauseNativeGlass]).
+final _pauses = ValueNotifier<int>(0);
+
+/// How many [pauseNativeGlass] calls are in force.
+@visibleForTesting
+int get nativeGlassPauses => _pauses.value;
+
+/// Draws the Flutter look-alikes of the tab bar, switch, slider and segments in
+/// place of the native views until the returned callback is called. A native
+/// view is a real UIView above Flutter's surface: it does not follow a page
+/// that is being dragged and it shows through anything Flutter paints over it
+/// (the app lock cover). Calls stack; the callback may be called more than
+/// once.
+VoidCallback pauseNativeGlass() {
+  _pauses.value++;
+  var released = false;
+  return () {
+    if (released) return;
+    released = true;
+    _pauses.value--;
+  };
+}
+
+/// Whether the soft keyboard is up. A native switch, slider or segmented control
+/// trails the page while the keyboard moves it (and while the list scrolls
+/// under it), so these use the Flutter look-alikes then. Not read from a
+/// [MediaQuery]: a [Scaffold] removes the keyboard's insets from its body.
+final _keyboardUp = _KeyboardWatcher();
+
+class _KeyboardWatcher extends ValueNotifier<bool> with WidgetsBindingObserver {
+  _KeyboardWatcher() : super(false) {
+    WidgetsBinding.instance.addObserver(this);
+    _update();
+  }
+
+  @override
+  void didChangeMetrics() => _update();
+
+  void _update() => value = WidgetsBinding.instance.platformDispatcher.views
+      .any((view) => view.viewInsets.bottom > 0);
+}
+
+/// [native] on an iPhone with native glass, unless it is paused (and, with
+/// [keyboardSensitive], while the keyboard is up); [fallback] otherwise.
+Widget _nativeOrFallback(
+  BuildContext context, {
+  required Widget Function() native,
+  required Widget Function() fallback,
+  bool keyboardSensitive = true,
+}) {
+  if (!useNativeGlass(context)) return fallback();
+  final ValueListenable<bool> keyboard = _keyboardUp;
+  return ListenableBuilder(
+    listenable: Listenable.merge([_pauses, if (keyboardSensitive) keyboard]),
+    builder: (context, _) =>
+        _pauses.value > 0 || (keyboardSensitive && keyboard.value)
+        ? fallback()
+        : native(),
+  );
+}
 
 /// Space that floating chrome covers at the top and bottom of a tab, so its
 /// list can start below the top bar and scroll clear of the tab bar.
@@ -86,41 +169,54 @@ class GlassTabBar extends StatelessWidget {
   final ValueChanged<int> onSelected;
 
   @override
-  Widget build(BuildContext context) {
-    final width = math.min(MediaQuery.sizeOf(context).width - 24, 440.0);
+  Widget build(BuildContext context) => _nativeOrFallback(
+    context,
+    // The bar is not moved by the keyboard, only by pauses.
+    keyboardSensitive: false,
+    native: () => _buildNative(context),
+    fallback: () => _buildShader(context),
+  );
+
+  double _width(BuildContext context) =>
+      math.min(MediaQuery.sizeOf(context).width - 24, 440.0);
+
+  Widget _buildNative(BuildContext context) {
     final accent = Theme.of(context).colorScheme.primary;
-    if (useNativeGlass(context)) {
-      // A real UITabBar: iOS draws the glass, so it follows the system
-      // settings. Only the selected tab takes the accent colour.
-      return Align(
-        alignment: Alignment.bottomCenter,
-        child: SafeArea(
-          top: false,
-          // The native view reserves 20 points of overflow for its glow and
-          // sits that much higher than the shader bar, so it takes no gap of
-          // its own: it then rests about where the shader bar did.
-          child: Padding(
-            padding: EdgeInsets.zero,
-            child: nlg.LiquidGlassTabBar(
-              width: width,
-              height: _barHeight,
-              selectedItemColor: accent,
-              currentIndex: selectedIndex,
-              onTabSelected: onSelected,
-              items: [
-                for (final (i, (icon, selected, label)) in destinations.indexed)
-                  nlg.LiquidGlassTabItem(
-                    label: label,
-                    icon: _nativeIcon(icon, selected: false),
-                    selectedIcon: _nativeIcon(selected, selected: true),
-                    iosBadgeValue: (badges[i] ?? 0) > 0 ? '${badges[i]}' : null,
-                  ),
-              ],
-            ),
+    // A real UITabBar: iOS draws the glass, so it follows the system
+    // settings. Only the selected tab takes the accent colour.
+    return Align(
+      alignment: Alignment.bottomCenter,
+      child: SafeArea(
+        top: false,
+        // The native view reserves 20 points of overflow for its glow and
+        // sits that much higher than the shader bar, so it takes no gap of
+        // its own: it then rests about where the shader bar did.
+        child: Padding(
+          padding: EdgeInsets.zero,
+          child: nlg.LiquidGlassTabBar(
+            width: _width(context),
+            height: _barHeight,
+            selectedItemColor: accent,
+            currentIndex: selectedIndex,
+            onTabSelected: onSelected,
+            items: [
+              for (final (i, (icon, selected, label)) in destinations.indexed)
+                nlg.LiquidGlassTabItem(
+                  label: label,
+                  icon: _nativeIcon(icon, selected: false),
+                  selectedIcon: _nativeIcon(selected, selected: true),
+                  iosBadgeValue: (badges[i] ?? 0) > 0 ? '${badges[i]}' : null,
+                ),
+            ],
           ),
         ),
-      );
-    }
+      ),
+    );
+  }
+
+  Widget _buildShader(BuildContext context) {
+    final width = _width(context);
+    final accent = Theme.of(context).colorScheme.primary;
     // The glass itself stays plain; only the selected tab's icon and label
     // take the accent colour. A selected tab is drawn a second time on top of
     // the bar, 15% larger and heavier by default, and where that copy was
@@ -685,26 +781,28 @@ class GlassSwitchControl extends StatelessWidget {
   final ValueChanged<bool>? onChanged;
 
   @override
-  Widget build(BuildContext context) => useNativeGlass(context)
-      ? nlg.LiquidGlassToggle(
+  Widget build(BuildContext context) => _nativeOrFallback(
+    context,
+    native: () => nlg.LiquidGlassToggle(
+      value: value,
+      enabled: onChanged != null,
+      height: 31,
+      onChanged: onChanged ?? (_) {},
+    ),
+    fallback: () => Opacity(
+      opacity: onChanged == null ? 0.4 : 1,
+      child: IgnorePointer(
+        ignoring: onChanged == null,
+        child: lg.GlassSwitch(
           value: value,
-          enabled: onChanged != null,
-          height: 31,
+          useOwnLayer: true,
+          // Haptics follow the app's own setting (see Haptics).
+          enableHaptics: false,
           onChanged: onChanged ?? (_) {},
-        )
-      : Opacity(
-          opacity: onChanged == null ? 0.4 : 1,
-          child: IgnorePointer(
-            ignoring: onChanged == null,
-            child: lg.GlassSwitch(
-              value: value,
-              useOwnLayer: true,
-              // Haptics follow the app's own setting (see Haptics).
-              enableHaptics: false,
-              onChanged: onChanged ?? (_) {},
-            ),
-          ),
-        );
+        ),
+      ),
+    ),
+  );
 }
 
 /// An iOS 26 slider: the package's [lg.GlassSlider] on its own glass layer.
@@ -727,25 +825,27 @@ class GlassSliderControl extends StatelessWidget {
   final int? divisions;
 
   @override
-  Widget build(BuildContext context) => useNativeGlass(context)
-      ? nlg.LiquidGlassSlider(
-          value: value.clamp(min, max),
-          min: min,
-          max: max,
-          step: divisions == null ? null : (max - min) / divisions!,
-          // The UISlider reports no end of drag, so [onChangeEnd] is not
-          // called here.
-          onChanged: onChanged,
-        )
-      : lg.GlassSlider(
-          value: value,
-          min: min,
-          max: max,
-          divisions: divisions,
-          useOwnLayer: true,
-          onChanged: onChanged,
-          onChangeEnd: onChangeEnd,
-        );
+  Widget build(BuildContext context) => _nativeOrFallback(
+    context,
+    native: () => nlg.LiquidGlassSlider(
+      value: value.clamp(min, max),
+      min: min,
+      max: max,
+      step: divisions == null ? null : (max - min) / divisions!,
+      // The UISlider reports no end of drag, so [onChangeEnd] is not
+      // called here.
+      onChanged: onChanged,
+    ),
+    fallback: () => lg.GlassSlider(
+      value: value,
+      min: min,
+      max: max,
+      divisions: divisions,
+      useOwnLayer: true,
+      onChanged: onChanged,
+      onChangeEnd: onChangeEnd,
+    ),
+  );
 }
 
 /// An iOS 26 segmented control: the package's [lg.GlassSegmentedControl].
@@ -765,31 +865,38 @@ class GlassSegments extends StatelessWidget {
   final ValueChanged<int> onSelected;
 
   @override
-  Widget build(BuildContext context) =>
+  Widget build(BuildContext context) => icons == null
       // The UISegmentedControl has no icons, so those keep the package's.
-      useNativeGlass(context) && icons == null
-      ? nlg.LiquidGlassSegmentedControl(
-          labels: labels,
-          selectedIndex: selectedIndex,
-          height: 36,
-          onValueChanged: onSelected,
+      ? _nativeOrFallback(
+          context,
+          native: () => nlg.LiquidGlassSegmentedControl(
+            labels: labels,
+            selectedIndex: selectedIndex,
+            height: 36,
+            onValueChanged: onSelected,
+          ),
+          // Same size as the native control, so swapping does not move
+          // anything.
+          fallback: () => _shaderSegments(36),
         )
-      : lg.GlassSegmentedControl(
-          useOwnLayer: true,
-          // Tall enough for an icon above its label, and a capsule like the
-          // system's.
-          height: 58,
-          borderRadius: 29,
-          selectedIndex: selectedIndex,
-          onSegmentSelected: onSelected,
-          segments: [
-            for (final (i, label) in labels.indexed)
-              lg.GlassSegment(
-                label: label,
-                icon: icons == null ? null : Icon(icons![i], size: 18),
-              ),
-          ],
-        );
+      : _shaderSegments(58);
+
+  Widget _shaderSegments(double height) => lg.GlassSegmentedControl(
+    useOwnLayer: true,
+    // Tall enough for an icon above its label (when there is one), and a
+    // capsule like the system's.
+    height: height,
+    borderRadius: height / 2,
+    selectedIndex: selectedIndex,
+    onSegmentSelected: onSelected,
+    segments: [
+      for (final (i, label) in labels.indexed)
+        lg.GlassSegment(
+          label: label,
+          icon: icons == null ? null : Icon(icons![i], size: 18),
+        ),
+    ],
+  );
 }
 
 /// One entry of a [GlassPopupMenu].

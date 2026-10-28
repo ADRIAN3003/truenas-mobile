@@ -150,6 +150,46 @@ void main() {
       expect(container.read(instancesProvider).value, isEmpty);
     });
 
+    test('clear resets the storage when even writing to it fails', () async {
+      final store = FlakyStore();
+      await InstanceRepository(store).save([_home]);
+      store.failReads = 99;
+      store.failWrites = 1;
+      final container = open(store);
+      await expectLater(
+        container.read(instancesProvider.future),
+        throwsStateError,
+      );
+
+      await container.read(instancesProvider.notifier).clear();
+      expect(store.resets, 1);
+      expect(container.read(instancesProvider).value, isEmpty);
+    });
+
+    test('clear does not reset the storage when a write works', () async {
+      final store = FlakyStore();
+      await InstanceRepository(store).save([_home]);
+      final container = open(store);
+      await container.read(instancesProvider.future);
+
+      await container.read(instancesProvider.notifier).clear();
+      expect(store.resets, 0);
+    });
+
+    test('a storage error is summed up in one line', () {
+      expect(
+        storageErrorSummary(
+          PlatformException(
+            code: 'Exception encountered',
+            message: 'Migration failed after algorithm change\nmore',
+            details: 'java.lang.Exception: ...',
+          ),
+        ),
+        'Migration failed after algorithm change',
+      );
+      expect(storageErrorSummary(StateError('x' * 400)).length, 243);
+    });
+
     test('a failed write leaves the list as it was', () async {
       final store = FlakyStore();
       final container = open(store);

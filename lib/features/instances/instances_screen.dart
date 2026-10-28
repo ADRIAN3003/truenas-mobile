@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/api/server_address.dart';
 import '../../core/instances/default_server.dart';
+import '../../core/instances/instance_repository.dart';
 import '../../core/instances/instances_provider.dart';
 import '../../core/instances/server_instance.dart';
 import '../../core/session/wait_for_server.dart';
@@ -82,7 +83,7 @@ class InstancesScreen extends ConsumerWidget {
             ),
           ),
         ),
-        AsyncError() => const _LoadError(),
+        AsyncError(:final error) => _LoadError(error),
         _ => const Center(child: CircularProgressIndicator.adaptive()),
       },
     );
@@ -386,14 +387,16 @@ class _AddCard extends StatelessWidget {
 /// The saved servers could not be read. Nothing is deleted by that, so it
 /// offers another try before it offers to start over.
 class _LoadError extends ConsumerWidget {
-  const _LoadError();
+  const _LoadError(this.error);
+
+  final Object error;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context);
     return Center(
-      child: Padding(
+      child: SingleChildScrollView(
         padding: const EdgeInsets.all(32),
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 360),
@@ -419,6 +422,17 @@ class _LoadError extends ConsumerWidget {
                 textAlign: TextAlign.center,
                 style: theme.textTheme.bodyMedium?.copyWith(
                   color: AppPalette.of(context).muted,
+                ),
+              ),
+              const SizedBox(height: 12),
+              // The reason the phone gave, so a report says more than "failed".
+              SelectableText(
+                storageErrorSummary(error),
+                maxLines: 4,
+                textAlign: TextAlign.center,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: AppPalette.of(context).muted,
+                  fontFamily: 'monospace',
                 ),
               ),
               const SizedBox(height: 24),

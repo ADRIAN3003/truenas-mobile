@@ -77,6 +77,66 @@ void main() {
     expect(seen.headers['User-Agent'], isNotEmpty);
   });
 
+  group('latest', () {
+    test('asks for the release GitHub marks as latest', () async {
+      late http.Request seen;
+      final latest = await checker((request) async {
+        seen = request;
+        return json(release('v0.1.3', body: ' Notes '));
+      }).latest();
+      expect(seen.url.path, '/repos/ADRIAN3003/truenas-mobile/releases/latest');
+      expect(seen.headers['Accept'], 'application/vnd.github+json');
+      expect(latest?.version.toString(), '0.1.3');
+      expect(latest?.notes, 'Notes');
+    });
+
+    test('no release yet, or a tag that is not a version, is null', () async {
+      expect(await checker((_) async => json({}, 404)).latest(), isNull);
+      expect(
+        await checker((_) async => json(release('nightly'))).latest(),
+        isNull,
+      );
+      expect(
+        await checker((_) async => json(release('v1.0.0', draft: true)))
+            .latest(),
+        isNull,
+      );
+    });
+
+    test('failures are told apart like the list', () async {
+      await expectLater(
+        checker((_) async => json({}, 403)).latest(),
+        throwsA(
+          isA<UpdateCheckException>().having(
+            (e) => e.failure,
+            'failure',
+            UpdateCheckFailure.rateLimited,
+          ),
+        ),
+      );
+      await expectLater(
+        checker((_) async => json({}, 500)).latest(),
+        throwsA(
+          isA<UpdateCheckException>().having(
+            (e) => e.failure,
+            'failure',
+            UpdateCheckFailure.server,
+          ),
+        ),
+      );
+      await expectLater(
+        checker((_) async => json([1])).latest(),
+        throwsA(
+          isA<UpdateCheckException>().having(
+            (e) => e.failure,
+            'failure',
+            UpdateCheckFailure.network,
+          ),
+        ),
+      );
+    });
+  });
+
   test('no releases is an empty list', () async {
     expect(await checker((_) async => json([])).releases(), isEmpty);
   });

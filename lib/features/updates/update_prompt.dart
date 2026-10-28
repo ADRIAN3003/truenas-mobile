@@ -8,7 +8,7 @@ import '../../shared/dialogs.dart';
 import 'update_screen.dart';
 import 'updates_provider.dart';
 
-/// Looks for a newer release once, when the app opens, and offers it in a
+/// Looks at the latest release once, when the app opens, and offers it in a
 /// dialog: view it, skip that version, or decide later. Wraps the first
 /// screen, so a dialog has a navigator to open on.
 class UpdateAutoCheck extends ConsumerStatefulWidget {
@@ -32,9 +32,10 @@ class _UpdateAutoCheckState extends ConsumerState<UpdateAutoCheck> {
   Future<void> _run() async {
     if (!ref.read(updateAutoCheckProvider)) return;
     if (!ref.read(settingsProvider).checkForUpdates) return;
-    // A failed check is not worth bothering anyone about; the update screen
-    // shows failures when the user asks.
-    await ref.read(updateStatusProvider.notifier).check();
+    // Only the release GitHub marks as the latest counts. A failed check is
+    // not worth bothering anyone about; the update screen shows failures when
+    // the user asks.
+    await ref.read(updateStatusProvider.notifier).checkLatest();
     if (!mounted) return;
     final status = ref.read(updateStatusProvider).value;
     final latest = status?.latest;

@@ -523,7 +523,9 @@ README covers what the app does; this file covers how to work on it.
   Installing goes through `MainActivity` (a method channel, a FileProvider on
   the `updates/` cache folder and the `REQUEST_INSTALL_PACKAGES`
   permission); Android's installer verifies the signature, so the fixed
-  signing key above is what makes in-app updates possible. Tests fake GitHub
+  signing key above is what makes in-app updates possible. The prompt when the app opens
+  asks only `releases/latest` (`UpdateChecker.latest`, `UpdateStatusNotifier.checkLatest`);
+  the update screen loads the whole list (`releases`) for the notes. Tests fake GitHub
   with `FakeGitHub` and the installer and downloader in
   `test/support/update_fakes.dart`; `updateAutoCheckProvider` is off unless
   `main` turns it on, so widget tests never look for updates by themselves.

@@ -34,9 +34,9 @@ void main() {
         .where((f) => f.uri.pathSegments.last.startsWith('widget_'));
     expect(layouts, isNotEmpty);
     for (final file in layouts) {
-      final tags = RegExp(
-        r'<([A-Za-z][\w.]*)',
-      ).allMatches(file.readAsStringSync()).map((m) => m.group(1)!);
+      final tagPattern = RegExp(r'<([A-Za-z][\w.]*)');
+      final text = file.readAsStringSync();
+      final tags = tagPattern.allMatches(text).map((m) => m.group(1)!);
       for (final tag in tags) {
         expect(allowed, contains(tag), reason: '$tag in ${file.path}');
       }

@@ -492,7 +492,16 @@ README covers what the app does; this file covers how to work on it.
   Clear (`InstancesNotifier`), and a list that could not be read is never saved
   over. Changes to the list run through one queue. The encrypted prefs are
   excluded from Android backups (`backup_rules.xml`, `data_extraction_rules.xml`)
-  since the Keystore key does not travel.
+  since the Keystore key does not travel (the plugin keeps the wrapped AES key
+  in `FlutterSecureKeyStorage.xml` and its markers in
+  `FlutterSecureStorageConfiguration:FlutterSecureStorage.xml`; list all of its
+  files there, a key file restored without its Keystore key breaks the store for
+  good). If the key no longer matches the data (seen after an in-app update on
+  Android 16: `Migration failed after algorithm change`, `OAEP_DECODING_ERROR`),
+  every read and write fails and nothing can be recovered; "Clear" then falls
+  back to `KeyValueStore.reset()` (`resetOnError: true`, which also drops
+  settings). Reads are tried 5 times with a growing pause, each failure goes to
+  the error log, and the error screen shows the first line of the reason.
 - Android release APKs must be signed with a fixed key, or Android refuses
   to install one over another ("app not updated"). `release.yml` signs with
   the four `ANDROID_*` secrets; `tools/make-android-keystore.sh` makes them.

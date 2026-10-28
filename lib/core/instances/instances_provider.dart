@@ -42,9 +42,19 @@ class InstancesNotifier extends AsyncNotifier<List<ServerInstance>> {
   /// Reads the saved servers again after a failed read.
   void retry() => ref.invalidateSelf();
 
-  /// Forgets every saved server, for when they cannot be read at all.
+  /// Forgets every saved server, for when they cannot be read at all. If
+  /// even writing the empty list fails (the key behind the secure storage is
+  /// gone or unusable), the storage is reset, which also drops the other
+  /// things kept in it, and the list is written again.
   Future<void> clear() async {
-    final result = _queue.then((_) => _persist(const []));
+    final result = _queue.then((_) async {
+      try {
+        await _persist(const []);
+      } catch (_) {
+        await ref.read(instanceRepositoryProvider).reset();
+        await _persist(const []);
+      }
+    });
     _queue = result.catchError((_) {});
     await result;
   }

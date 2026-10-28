@@ -8,6 +8,14 @@ class MemoryStore implements KeyValueStore {
 
   @override
   Future<void> write(String key, String value) async => values[key] = value;
+
+  int resets = 0;
+
+  @override
+  Future<void> reset() async {
+    resets++;
+    values.clear();
+  }
 }
 
 /// A store whose reads and writes fail while [failReads] / [failWrites] count

@@ -486,22 +486,29 @@ README covers what the app does; this file covers how to work on it.
   session per server while the screen is open, and looks again every 30 s, on
   resume and on pull to refresh. Pool health comes from `PoolSummary.condition`,
   shared with the home screen widgets.
-- Saved servers live in secure storage (`SecureKeyValueStore`). Its Android
-  default `resetOnError: true` erases everything when one read fails, so it is
-  off; a failed read is retried, then shown as an error with Try again and
-  Clear (`InstancesNotifier`), and a list that could not be read is never saved
-  over. Changes to the list run through one queue. The encrypted prefs are
-  excluded from Android backups (`backup_rules.xml`, `data_extraction_rules.xml`)
-  since the Keystore key does not travel (the plugin keeps the wrapped AES key
-  in `FlutterSecureKeyStorage.xml` and its markers in
-  `FlutterSecureStorageConfiguration:FlutterSecureStorage.xml`; list all of its
-  files there, a key file restored without its Keystore key breaks the store for
-  good). If the key no longer matches the data (seen after an in-app update on
-  Android 16: `Migration failed after algorithm change`, `OAEP_DECODING_ERROR`),
-  every read and write fails and nothing can be recovered; "Clear" then falls
-  back to `KeyValueStore.reset()` (`resetOnError: true`, which also drops
-  settings). Reads are tried 5 times with a growing pause, each failure goes to
-  the error log, and the error screen shows the first line of the reason.
+- Saved servers, settings and the background check's bookkeeping live in
+  `SecureKeyValueStore`: the Keychain on iOS, and on Android a private file of
+  the app (`PrivateFileStore`, `files/private_store/`, one file per key so the
+  app and the background isolate never overwrite each other, written through a
+  temp file and a rename). Android left `flutter_secure_storage` because on a
+  rooted LineageOS phone its Keystore key was gone after a restart
+  (`Migration failed after algorithm change`, `OAEP_DECODING_ERROR`), which
+  took every saved server with it. The trade-off: only Android's app sandbox
+  protects the file, not a key, so anyone with root can read the passwords.
+  The old storage is read once per key and moved over (`<key>.moved` marks it
+  done, the old copy is deleted); if it cannot be read that is an error, not
+  "nothing saved", so a transient Keystore failure loses nothing. Writes go to
+  the file whatever state the old storage is in, so "Clear" in the servers
+  list always works. `resetOnError` stays off on the old storage. A failed
+  read is retried 5 times with a growing pause, shown as an error with Try
+  again and Clear (`InstancesNotifier`), logged, and a list that could not be
+  read is never saved over. Changes to the list run through one queue. The
+  file folder and the old plugin files are excluded from Android backups
+  (`backup_rules.xml`, `data_extraction_rules.xml`; the plugin keeps its
+  wrapped AES key in `FlutterSecureKeyStorage.xml` and its markers in
+  `FlutterSecureStorageConfiguration:FlutterSecureStorage.xml`, list all of
+  them there). `KeyValueStore.reset()` (`resetOnError: true`, also empties the
+  folder) is the last resort when even the file cannot be written.
 - Android release APKs must be signed with a fixed key, or Android refuses
   to install one over another ("app not updated"). `release.yml` signs with
   the four `ANDROID_*` secrets; `tools/make-android-keystore.sh` makes them.

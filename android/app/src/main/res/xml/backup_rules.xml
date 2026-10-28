@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Android 11 and older. The saved servers are encrypted with a key in the
-     phone's Keystore, which is not backed up. Restored onto a new phone (or
-     after a reinstall) the data could not be decrypted, so it stays out of
-     the backup and the servers are simply added again. -->
+<!-- Android 11 and older. The saved servers (with their passwords) are kept
+     in private_store/ and, from older versions, encrypted with a key in the
+     phone's Keystore, which is not backed up. Neither goes into a backup, so
+     a restored phone never gets data it cannot read or a password in the
+     cloud, and the servers are simply added again. -->
 <full-backup-content>
     <exclude domain="sharedpref" path="FlutterSecureStorage.xml" />
     <exclude domain="sharedpref" path="FlutterSecureStorageConfiguration.xml" />
     <exclude domain="sharedpref" path="FlutterSecureStorageConfiguration:FlutterSecureStorage.xml" />
     <exclude domain="sharedpref" path="FlutterSecureKeyStorage.xml" />
+    <exclude domain="file" path="private_store/" />
 </full-backup-content>

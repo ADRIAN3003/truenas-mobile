@@ -1,10 +1,12 @@
 import 'dart:convert';
+import 'dart:io' show Platform;
 
 import 'package:flutter/services.dart' show PlatformException;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import '../logging/app_log.dart';
 import '../logging/log_redaction.dart';
+import 'private_file_store.dart';
 import 'server_instance.dart';
 
 /// Minimal key-value storage, so tests can swap out secure storage.
@@ -17,6 +19,17 @@ abstract interface class KeyValueStore {
   Future<void> reset();
 }
 
+/// Where the app keeps what must survive a restart of the phone: the saved
+/// servers (with their passwords or API keys), settings and the background
+/// check's bookkeeping.
+///
+/// iOS keeps them in the Keychain. Android keeps them in a private file of the
+/// app ([PrivateFileStore]), because the Keystore key behind
+/// `flutter_secure_storage` is lost at a restart on some phones (a custom ROM
+/// with root, seen on LineageOS) and everything saved under it with it. A key
+/// is moved over from that storage the first time it is read; what the old
+/// storage cannot read any more is an error, never "nothing saved", so the
+/// caller does not save over it.
 class SecureKeyValueStore implements KeyValueStore {
   /// [KeychainAccessibility.first_unlock] instead of the default "unlocked",
   /// so the background alert check can read the saved servers while the phone
@@ -32,9 +45,19 @@ class SecureKeyValueStore implements KeyValueStore {
       aOptions: AndroidOptions(resetOnError: false),
       iOptions: IOSOptions(accessibility: KeychainAccessibility.first_unlock),
     ),
+    this._files,
   ]);
 
   final FlutterSecureStorage _storage;
+
+  /// The Android file store; null means the default one on Android and none
+  /// elsewhere.
+  final PrivateFileStore? _files;
+
+  static const _androidFiles = PrivateFileStore();
+
+  PrivateFileStore? get _private =>
+      _files ?? (Platform.isAndroid ? _androidFiles : null);
 
   /// Same store, but allowed to throw away what it cannot decrypt. The
   /// plugin only erases and starts again from `resetOnError`, and the normal
@@ -47,15 +70,51 @@ class SecureKeyValueStore implements KeyValueStore {
     iOptions: IOSOptions(accessibility: KeychainAccessibility.first_unlock),
   );
 
-  @override
-  Future<String?> read(String key) => _storage.read(key: key);
+  /// The marker that says the old storage has been dealt with for [key].
+  static String _movedMark(String key) => '$key.moved';
 
   @override
-  Future<void> write(String key, String value) =>
-      _storage.write(key: key, value: value);
+  Future<String?> read(String key) async {
+    final files = _private;
+    if (files == null) return _storage.read(key: key);
+    final own = await files.read(key);
+    if (own != null) return own;
+    if (await files.contains(_movedMark(key))) return null;
+
+    // First read on this phone: take over what the old storage holds. If it
+    // cannot be read this throws and nothing is marked, so a later try (or
+    // Clear) starts from the same place.
+    final old = await _storage.read(key: key);
+    if (old != null) await files.write(key, old);
+    await files.write(_movedMark(key), '');
+    if (old != null) await _forgetOld(key);
+    return old;
+  }
 
   @override
-  Future<void> reset() => _eraser.deleteAll();
+  Future<void> write(String key, String value) async {
+    final files = _private;
+    if (files == null) return _storage.write(key: key, value: value);
+    await files.write(key, value);
+    if (!await files.contains(_movedMark(key))) {
+      await files.write(_movedMark(key), '');
+      await _forgetOld(key);
+    }
+  }
+
+  /// The old copy of [key] goes, so a password is not kept in two places.
+  /// Failing to remove it changes nothing: the file is read first.
+  Future<void> _forgetOld(String key) async {
+    try {
+      await _storage.delete(key: key);
+    } catch (_) {}
+  }
+
+  @override
+  Future<void> reset() async {
+    await _private?.deleteAll();
+    await _eraser.deleteAll();
+  }
 }
 
 /// One line on why the secure storage failed: a platform error's message

@@ -69,6 +69,20 @@ void main() {
     );
   });
 
+  testWidgets('asks only for the latest release when the app opens', (
+    tester,
+  ) async {
+    final github = FakeGitHub([releaseJson('v0.1.3'), releaseJson('v0.1.4')]);
+    await launch(tester, github);
+    expect(github.paths, ['/repos/ADRIAN3003/truenas-mobile/releases/latest']);
+    expect(find.text('Update available'), findsOneWidget);
+  });
+
+  testWidgets('a repository without releases offers nothing', (tester) async {
+    await launch(tester, FakeGitHub([]));
+    expect(find.text('Update available'), findsNothing);
+  });
+
   testWidgets('"Later" leaves everything as it was', (tester) async {
     await launch(tester, newer);
     await tester.tap(find.text('Later'));

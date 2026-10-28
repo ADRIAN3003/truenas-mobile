@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 import 'package:truenas_mobile/core/updates/apk_downloader.dart';
+import 'package:truenas_mobile/core/updates/app_version.dart';
 import 'package:truenas_mobile/core/updates/release.dart';
 import 'package:truenas_mobile/core/updates/update_checker.dart';
 import 'package:truenas_mobile/features/updates/apk_installer.dart';
@@ -39,21 +40,36 @@ Map<String, dynamic> releaseJson(
 };
 
 /// An [UpdateChecker] that answers with [releases], or with [status] when it
-/// is not 200. Every request is counted in [requests].
+/// is not 200. `releases/latest` answers with the highest version, or 404 when
+/// there is none. Every request is counted in [requests], the paths asked for
+/// are kept in [paths].
 class FakeGitHub {
   FakeGitHub(this.releases, {this.status = 200});
 
   final List<Map<String, dynamic>> releases;
   final int status;
   var requests = 0;
+  final paths = <String>[];
 
   UpdateChecker get checker => UpdateChecker(
     client: MockClient((request) async {
       requests++;
-      return http.Response(
-        jsonEncode(status == 200 ? releases : {'message': 'error'}),
-        status,
-      );
+      paths.add(request.url.path);
+      if (status != 200) {
+        return http.Response(jsonEncode({'message': 'error'}), status);
+      }
+      if (request.url.path.endsWith('/releases/latest')) {
+        if (releases.isEmpty) return http.Response('{}', 404);
+        final latest = releases.reduce(
+          (a, b) =>
+              AppVersion.tryParse(a['tag_name'] as String)! >
+                  AppVersion.tryParse(b['tag_name'] as String)!
+              ? a
+              : b,
+        );
+        return http.Response(jsonEncode(latest), 200);
+      }
+      return http.Response(jsonEncode(releases), 200);
     }),
   );
 }

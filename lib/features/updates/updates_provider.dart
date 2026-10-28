@@ -72,6 +72,17 @@ class UpdateStatusNotifier extends AsyncNotifier<UpdateStatus?> {
       return UpdateStatus(installed: installed, releases: releases);
     });
   }
+
+  /// Looks at the latest release only (one small request), for the check when
+  /// the app opens. [UpdateStatus.releases] then holds just that release.
+  Future<void> checkLatest() async {
+    state = const AsyncLoading<UpdateStatus?>();
+    state = await AsyncValue.guard(() async {
+      final latest = await ref.read(updateCheckerProvider).latest();
+      final installed = await ref.read(installedVersionProvider.future);
+      return UpdateStatus(installed: installed, releases: [?latest]);
+    });
+  }
 }
 
 /// Why installing an update from inside the app did not work.

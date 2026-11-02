@@ -69,13 +69,15 @@ void main() {
 
   test('groups count their members', () async {
     await connect();
-    final group = (await session.system.groups()).single;
-    expect(group.name, 'alice');
-    expect(group.members, 1);
+    final groups = await session.system.groups();
+    expect(groups.map((g) => g.name), ['alice', 'media']);
+    expect(groups.first.members, 1);
+    expect(groups.first.memberIds, [70]);
   });
 
   test('groups load on 25.04, sorted by name', () async {
     await connect(legacy: true);
+    server.groups.removeWhere((g) => g['name'] == 'media');
     server.groups.insert(0, {
       'id': 41,
       'gid': 3001,
@@ -87,6 +89,35 @@ void main() {
     });
     final groups = await session.system.groups();
     expect(groups.map((g) => g.name), ['alice', 'Media']);
+  });
+
+  test('editing a user and a group sends only the given fields', () async {
+    await connect();
+    await session.system.updateUser(70, {'email': 'a@example.com'});
+    await session.system.updateGroup(42, members: [70]);
+    expect(server.calls.lastWhere((c) => c.$1 == 'user.update').$2, [
+      70,
+      {'email': 'a@example.com'},
+    ]);
+    expect(server.calls.lastWhere((c) => c.$1 == 'group.update').$2, [
+      42,
+      {
+        'users': [70],
+      },
+    ]);
+    final alice = (await session.system.users()).last;
+    expect(alice.primaryGroupId, 40);
+    expect(alice.shell, '/usr/bin/bash');
+    expect(await session.system.shellChoices(), {
+      '/usr/bin/bash': 'bash',
+      '/usr/bin/zsh': 'zsh',
+    });
+  });
+
+  test('shell choices are empty when the server has none', () async {
+    await connect();
+    server.shellChoices.clear();
+    expect(await session.system.shellChoices(), isEmpty);
   });
 
   test('creating an API key returns its secret once', () async {

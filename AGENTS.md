@@ -529,6 +529,19 @@ README covers what the app does; this file covers how to work on it.
   with `FakeGitHub` and the installer and downloader in
   `test/support/update_fakes.dart`; `updateAutoCheckProvider` is off unless
   `main` turns it on, so widget tests never look for updates by themselves.
+- Users and groups (`lib/features/system/users_screen.dart`, `account_editors.dart`,
+  `SystemApi.updateUser/updateGroup/shellChoices`): tapping a user or group (or
+  Edit in its menu) opens `UserEditor` / `GroupEditor`. Only changed fields are
+  sent to `user.update` (`username`, `full_name`, `email`, `password`, `smb`,
+  `locked`, `shell`, `sshpubkey`, `group`, `groups`) and `group.update`
+  (`name`, `users`, the member user ids). `user.query` gives `group` as an
+  object with `id` and `groups` as ids (`LocalUser.primaryGroupId/groupIds`);
+  `group.query` `users` are ids too. A built-in account only gets name, email,
+  password, shell and key (the middleware refuses the rest) and a built-in group
+  only its members. Group members that are system accounts stay in the set when
+  saving even though the list hides them. Shells come from the optional
+  `user.shell_choices` (gated on `core.get_methods`). Payloads are written from
+  the middleware source and unconfirmed on a real NAS. Fake server: `shellChoices`.
 - App ID `hu.adrian.truenasmobile` on both platforms. MIT licence.
 - Branch names are descriptive kebab-case, e.g. `claude/shell-reverse-proxy`.
 - PRs follow `.github/pull_request_template.md`. The owner merges as soon as

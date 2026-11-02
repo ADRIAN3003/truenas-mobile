@@ -1781,6 +1781,68 @@
       }
     }
   },
+  "userEdit": "Edit user",
+  "@userEdit": {
+    "description": "Title of the screen that edits a user."
+  },
+  "userSaved": "Saved {name}",
+  "@userSaved": {
+    "description": "Snackbar after saving a user.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "userEmail": "Email",
+  "@userEmail": {
+    "description": "Field label."
+  },
+  "userNewPassword": "New password",
+  "@userNewPassword": {
+    "description": "Field label for changing a user's password."
+  },
+  "userNewPasswordHelp": "Leave empty to keep the current password",
+  "@userNewPasswordHelp": {
+    "description": "Helper text under the new password field."
+  },
+  "userShell": "Shell",
+  "@userShell": {
+    "description": "Field label for a user's login shell."
+  },
+  "userSshKey": "SSH public key",
+  "@userSshKey": {
+    "description": "Field label."
+  },
+  "userPrimaryGroup": "Primary group",
+  "@userPrimaryGroup": {
+    "description": "Field label."
+  },
+  "userExtraGroups": "Other groups",
+  "@userExtraGroups": {
+    "description": "Row and dialog title for the extra groups of a user."
+  },
+  "userExtraGroupsNone": "None",
+  "@userExtraGroupsNone": {
+    "description": "Shown when a user is in no extra group."
+  },
+  "groupEdit": "Edit group",
+  "@groupEdit": {
+    "description": "Title of the screen that edits a group."
+  },
+  "groupSaved": "Saved {name}",
+  "@groupSaved": {
+    "description": "Snackbar after saving a group.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "groupMembersTitle": "Members",
+  "@groupMembersTitle": {
+    "description": "Heading above the users that can be ticked as members of a group."
+  },
   "apiKeysTitle": "API keys",
   "@apiKeysTitle": {
     "description": "API keys screen title."

@@ -58,6 +58,27 @@ class SystemApi {
         {'locked': locked},
       ]);
 
+  /// Changes the given fields of a user, in the middleware's names
+  /// (`full_name`, `email`, `password`, `smb`, `locked`, `group`, `groups`,
+  /// `shell`, `sshpubkey`, `username`). Only the changes are sent.
+  Future<void> updateUser(int id, Map<String, Object?> changes) =>
+      _client.call('user.update', [id, changes]);
+
+  /// Login shells by path, e.g. `/usr/bin/zsh` -> `zsh`; empty when the
+  /// server does not offer the list.
+  Future<Map<String, String>> shellChoices() async {
+    if (!await _catalog.has('user.shell_choices')) return {};
+    try {
+      final result = await _client.call('user.shell_choices', [[]]);
+      return {
+        if (result is Map)
+          for (final e in result.entries) '${e.key}': '${e.value}',
+      };
+    } catch (_) {
+      return {};
+    }
+  }
+
   /// Deletes the user and its primary group if nothing else uses it.
   Future<void> deleteUser(int id) => _client.call('user.delete', [
     id,
@@ -78,6 +99,13 @@ class SystemApi {
   Future<void> createGroup(String name) => _client.call('group.create', [
     {'name': name},
   ]);
+
+  /// Renames a group and/or sets its members (user database ids).
+  Future<void> updateGroup(int id, {String? name, List<int>? members}) =>
+      _client.call('group.update', [
+        id,
+        {'name': ?name, 'users': ?members},
+      ]);
 
   Future<void> deleteGroup(int id) => _client.call('group.delete', [
     id,

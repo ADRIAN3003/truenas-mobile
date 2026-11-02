@@ -12,6 +12,10 @@ class LocalUser {
     required this.smb,
     required this.twoFactor,
     this.email,
+    this.primaryGroupId,
+    this.groupIds = const [],
+    this.shell = '',
+    this.sshPublicKey = '',
   });
 
   factory LocalUser.fromJson(Map<String, dynamic> json) => LocalUser(
@@ -24,7 +28,24 @@ class LocalUser {
     smb: json['smb'] == true,
     twoFactor: json['twofactor_auth_configured'] == true,
     email: json['email'] as String?,
+    primaryGroupId: _groupId(json['group']),
+    groupIds: [
+      for (final g in json['groups'] as List<dynamic>? ?? const [])
+        if (_groupId(g) != null) _groupId(g)!,
+    ],
+    shell: (json['shell'] ?? '').toString(),
+    sshPublicKey: (json['sshpubkey'] ?? '').toString(),
   );
+
+  /// `group` is an object with an `id` on a user from `user.query`; the
+  /// extra groups are plain ids. Both are read.
+  static int? _groupId(Object? value) => switch (value) {
+    final int id => id,
+    final Map<dynamic, dynamic> group when group['id'] != null => asInt(
+      group['id'],
+    ),
+    _ => null,
+  };
 
   final int id;
   final int uid;
@@ -37,6 +58,14 @@ class LocalUser {
   final bool smb;
   final bool twoFactor;
   final String? email;
+
+  /// The database id of the primary group, when the server said which.
+  final int? primaryGroupId;
+
+  /// Database ids of the extra groups the user is in.
+  final List<int> groupIds;
+  final String shell;
+  final String sshPublicKey;
 }
 
 /// A local group from `group.query`.
@@ -47,6 +76,7 @@ class LocalGroup {
     required this.name,
     required this.builtin,
     required this.members,
+    this.memberIds = const [],
   });
 
   factory LocalGroup.fromJson(Map<String, dynamic> json) => LocalGroup(
@@ -55,6 +85,10 @@ class LocalGroup {
     name: (json['name'] ?? json['group'] ?? '').toString(),
     builtin: json['builtin'] == true,
     members: (json['users'] as List<dynamic>? ?? const []).length,
+    memberIds: [
+      for (final id in json['users'] as List<dynamic>? ?? const [])
+        if (id is int) id,
+    ],
   );
 
   final int id;
@@ -62,6 +96,9 @@ class LocalGroup {
   final String name;
   final bool builtin;
   final int members;
+
+  /// Database ids of the users that list this as an extra group.
+  final List<int> memberIds;
 }
 
 /// An API key from `api_key.query`. The secret itself is only returned

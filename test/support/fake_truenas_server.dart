@@ -547,8 +547,19 @@ class FakeTrueNasServer {
       'smb': true,
       'local': true,
       'twofactor_auth_configured': true,
+      'email': null,
+      'shell': '/usr/bin/bash',
+      'sshpubkey': null,
+      'group': {'id': 40, 'bsdgrp_gid': 3000, 'bsdgrp_group': 'alice'},
+      'groups': <int>[],
     },
   ];
+
+  /// Login shells offered by `user.shell_choices`; empty hides the method.
+  final shellChoices = <String, String>{
+    '/usr/bin/bash': 'bash',
+    '/usr/bin/zsh': 'zsh',
+  };
 
   /// Groups served by `group.query`.
   final groups = <Map<String, dynamic>>[
@@ -558,6 +569,14 @@ class FakeTrueNasServer {
       'name': 'alice',
       'builtin': false,
       'users': [70],
+      'local': true,
+    },
+    {
+      'id': 42,
+      'gid': 3002,
+      'name': 'media',
+      'builtin': false,
+      'users': <int>[],
       'local': true,
     },
   ];
@@ -996,6 +1015,8 @@ class FakeTrueNasServer {
                 ])
                   '$service.$m': <String, dynamic>{},
               if (service == 'core') 'core.bulk': <String, dynamic>{},
+              if (service == 'user' && shellChoices.isNotEmpty)
+                'user.shell_choices': <String, dynamic>{},
               if (service == 'app' && catalog)
                 for (final m in ['available', 'create', 'update', 'config'])
                   'app.$m': <String, dynamic>{},
@@ -1287,6 +1308,8 @@ class FakeTrueNasServer {
                 .firstWhere((u) => u['id'] == params.first)
                 .addAll(params[1] as Map<String, dynamic>);
             result = params.first;
+          case 'user.shell_choices':
+            result = shellChoices;
           case 'user.delete':
             users.removeWhere((u) => u['id'] == params.first);
             result = true;
@@ -1318,6 +1341,12 @@ class FakeTrueNasServer {
               'local': true,
             });
             result = 41;
+          case 'group.update':
+            final changes = params[1] as Map<String, dynamic>;
+            final group = groups.firstWhere((g) => g['id'] == params.first);
+            if (changes['name'] != null) group['name'] = changes['name'];
+            if (changes['users'] != null) group['users'] = changes['users'];
+            result = params.first;
           case 'group.delete':
             groups.removeWhere((g) => g['id'] == params.first);
             result = true;

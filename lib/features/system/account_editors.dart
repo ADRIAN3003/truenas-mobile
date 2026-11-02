@@ -300,10 +300,13 @@ class _GroupsDialogState extends State<_GroupsDialog> {
     final l10n = AppLocalizations.of(context);
     return AppDialog(
       title: Text(l10n.userExtraGroups),
+      // The dialog scrolls its content itself; a ListView in there would
+      // swallow the drags (and has no height to scroll in on iOS).
+      scrollable: true,
       content: SizedBox(
         width: double.maxFinite,
-        child: ListView(
-          shrinkWrap: true,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
             for (final g in widget.groups)
               CheckboxListTile(

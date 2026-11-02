@@ -13,6 +13,7 @@ import 'package:truenas_mobile/features/system/network_screen.dart';
 import 'package:truenas_mobile/features/system/updates_screen.dart';
 import 'package:truenas_mobile/features/system/users_screen.dart';
 import 'package:truenas_mobile/l10n/generated/app_localizations.dart';
+import 'package:truenas_mobile/shared/theme.dart';
 
 import '../../support/fake_truenas_server.dart';
 import '../../support/memory_store.dart';
@@ -175,6 +176,47 @@ void main() {
     expect(find.textContaining('Alice Jones'), findsOneWidget);
     await disconnect(tester);
   });
+
+  testWidgets('the other groups list scrolls in an iOS dialog', (tester) async {
+    tester.view.physicalSize = const Size(800, 1800);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    await connect(tester);
+    for (var i = 0; i < 30; i++) {
+      server.groups.add({
+        'id': 500 + i,
+        'name': 'extra$i',
+        'builtin': false,
+        'users': <int>[],
+      });
+    }
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: buildAppTheme(Brightness.light, platform: TargetPlatform.iOS),
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        home: UsersScreen(session: session),
+      ),
+    );
+    await settle(tester);
+    await tester.tap(find.text('alice'));
+    await settle(tester);
+    await tester.tap(find.text('Other groups'));
+    await tester.pumpAndSettle();
+
+    // Squeeze the window so the list is taller than the dialog.
+    tester.view.physicalSize = const Size(800, 700);
+    await tester.pumpAndSettle();
+    // Off the bottom of the window until the dialog is scrolled.
+    expect(tester.getTopLeft(find.text('extra29')).dy, greaterThan(700));
+    await tester.drag(
+      find.byType(CheckboxListTile).first,
+      const Offset(0, -2000),
+    );
+    await tester.pumpAndSettle();
+    expect(tester.getTopLeft(find.text('extra29')).dy, lessThan(700));
+    await disconnect(tester);
+  }, variant: TargetPlatformVariant.only(TargetPlatform.iOS));
 
   testWidgets('a user with no changes saves nothing', (tester) async {
     await connect(tester);

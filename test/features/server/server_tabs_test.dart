@@ -13,6 +13,7 @@ import 'package:truenas_mobile/features/server/alerts_tab.dart';
 import 'package:truenas_mobile/features/server/dashboard_tab.dart';
 import 'package:truenas_mobile/features/server/jobs_tab.dart';
 import 'package:truenas_mobile/l10n/generated/app_localizations.dart';
+import 'package:truenas_mobile/shared/theme.dart';
 import 'package:truenas_mobile/shared/ui.dart';
 
 import '../../support/alert_fakes.dart';
@@ -167,6 +168,29 @@ void main() {
     await disconnect(tester);
   });
 
+  testWidgets('a degraded pool is yellow on the dashboard', (tester) async {
+    await connect(tester);
+    server.pools = [
+      {...samplePool, 'status': 'DEGRADED', 'healthy': false},
+    ];
+    await tester.pumpWidget(
+      wrap(
+        DashboardTab(
+          session: session,
+          info: const {'hostname': 'nas', 'version': '25.10.7'},
+          onOpenAlerts: () {},
+        ),
+      ),
+    );
+    await settle(tester);
+    await tester.scrollUntilVisible(find.text('DEGRADED'), 200);
+    final pill = tester.widget<StatusPill>(
+      find.widgetWithText(StatusPill, 'DEGRADED'),
+    );
+    expect(pill.tone, StatusTone.warning);
+    await disconnect(tester);
+  });
+
   testWidgets('alerts can be dismissed and restored', (tester) async {
     await connect(tester);
     await tester.pumpWidget(wrap(AlertsTab(session: session)));
@@ -250,6 +274,26 @@ void main() {
     await disconnect(tester);
   });
 
+  testWidgets('running jobs are listed before finished ones', (tester) async {
+    await connect(tester);
+    // The server lists the newer finished job first.
+    server.jobs.add({
+      'id': 8,
+      'method': 'cronjob.run',
+      'state': 'SUCCESS',
+      'progress': {'percent': 100, 'description': ''},
+      'abortable': false,
+      'time_started': {r'$date': 1760000100000},
+    });
+    await tester.pumpWidget(wrap(JobsTab(session: session)));
+    await settle(tester);
+    expect(
+      tester.getTopLeft(find.text('pool.scrub.run')).dy,
+      lessThan(tester.getTopLeft(find.text('cronjob.run')).dy),
+    );
+    await disconnect(tester);
+  });
+
   testWidgets('a job type can be hidden from the list and shown again', (
     tester,
   ) async {
@@ -280,8 +324,8 @@ void main() {
     expect(find.text('pool.scrub.run'), findsOneWidget);
     expect(find.text('Hidden job types'), findsNothing);
 
-    // The menu on the cron job hides its type.
-    await tester.tap(find.byType(PopupMenuButton<bool>).first);
+    // The menu on the cron job (below the running scrub) hides its type.
+    await tester.tap(find.byType(PopupMenuButton<bool>).last);
     await tester.pumpAndSettle();
     await tester.tap(find.text('Hide this type of job'));
     await tester.pumpAndSettle();

@@ -1,3 +1,4 @@
+import 'cron_schedule.dart';
 import 'json.dart';
 
 /// The kinds of data protection task, with the API service behind each.
@@ -143,7 +144,8 @@ class ProtectionTask {
   final int? lifetimeValue;
   final LifetimeUnit? lifetimeUnit;
 
-  /// A preset when the cron matches one, otherwise the cron text.
+  /// A [SnapshotSchedule] when the cron matches one, otherwise a
+  /// [CronSchedule]; null when the server sent none.
   final Object? schedule;
 
   /// The task as the server sent it, for editing.
@@ -159,12 +161,15 @@ enum SnapshotSchedule {
   const SnapshotSchedule(this.cron);
 
   final Map<String, String> cron;
+
+  /// The preset as a [CronSchedule], to start editing from.
+  CronSchedule get asCron => CronSchedule.fromJson(cron);
 }
 
 /// Lifetime units accepted by `pool.snapshottask`.
 enum LifetimeUnit { hour, day, week, month, year }
 
-/// Reads a cron object as a [SnapshotSchedule] preset or cron text.
+/// Reads a cron object as a [SnapshotSchedule] preset or a [CronSchedule].
 Object? parseSchedule(Map<String, dynamic> s) => _schedule(s);
 
 Object? _schedule(Map<String, dynamic> s) {
@@ -181,8 +186,21 @@ Object? _schedule(Map<String, dynamic> s) {
     );
     if (matches) return preset;
   }
-  return cron.values.join(' ');
+  return CronSchedule.fromJson(s);
 }
+
+/// The `schedule` object to send for [schedule] (a [SnapshotSchedule] or a
+/// [CronSchedule]), or null for anything else. [window] adds the whole-day
+/// `begin` and `end` that snapshot and replication tasks carry.
+Map<String, String>? scheduleRequest(Object? schedule, {bool window = false}) =>
+    switch (schedule) {
+      final SnapshotSchedule preset => {
+        ...preset.cron,
+        if (window) ...{'begin': '00:00', 'end': '23:59'},
+      },
+      final CronSchedule cron => cron.toJson(window: window),
+      _ => null,
+    };
 
 String _first(Object? a, Object? b) {
   final text = (a ?? '').toString();

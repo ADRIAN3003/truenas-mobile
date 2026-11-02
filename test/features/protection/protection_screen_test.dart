@@ -318,6 +318,118 @@ void main() {
     await disconnect(tester);
   });
 
+  /// Opens the cloud sync editor with a B2 bucket filled in, ready to save.
+  Future<void> openCloudSyncEditor(WidgetTester tester) async {
+    await connect(tester);
+    await tester.pumpWidget(wrap(ProtectionScreen(session: session)));
+    await settle(tester);
+
+    await tester.tap(find.text('Add task'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Cloud sync').last);
+    await settle(tester);
+
+    await tester.tap(find.byType(DropdownButtonFormField<int>));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Backblaze (B2)').last);
+    await tester.pumpAndSettle();
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Bucket'),
+      'photos',
+    );
+    await tester.tap(find.byTooltip('Choose a dataset'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('tank/media').last);
+    await tester.pumpAndSettle();
+  }
+
+  Future<void> chooseCustomSchedule(WidgetTester tester) async {
+    await tapVisible(tester, find.text('Every day at midnight'));
+    await tester.tap(find.text('Custom…').last);
+    await tester.pumpAndSettle();
+    expect(find.text('Custom schedule'), findsOneWidget);
+  }
+
+  testWidgets('a cloud sync can run on chosen weekdays', (tester) async {
+    await openCloudSyncEditor(tester);
+    await chooseCustomSchedule(tester);
+
+    await tester.tap(find.text('Every day').last);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('On certain weekdays').last);
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(FilterChip, 'Fri'));
+    await tester.pumpAndSettle();
+    expect(
+      find.textContaining(RegExp(r'^Monday, Friday at 12:00\s*AM$')),
+      findsOneWidget,
+    );
+    expect(find.text('0 0 * * 1,5'), findsOneWidget);
+    await tester.tap(find.text('Done'));
+    await tester.pumpAndSettle();
+    expect(
+      find.textContaining(RegExp(r'^Monday, Friday at 12:00\s*AM$')),
+      findsOneWidget,
+    );
+
+    await tapVisible(tester, find.text('Save'));
+    await settle(tester);
+    final created = lastCall('cloudsync.create');
+    expect(created['schedule'], {
+      'minute': '0',
+      'hour': '0',
+      'dom': '*',
+      'month': '*',
+      'dow': '1,5',
+    });
+    await disconnect(tester);
+  });
+
+  testWidgets('a cloud sync can take a cron expression', (tester) async {
+    await openCloudSyncEditor(tester);
+    await chooseCustomSchedule(tester);
+
+    await tester.tap(find.text('Every day').last);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Cron expression').last);
+    await tester.pumpAndSettle();
+    await tester.enterText(find.widgetWithText(TextField, 'Minute'), '99');
+    await tester.pumpAndSettle();
+    expect(find.text('Not valid'), findsOneWidget);
+    await tester.tap(find.text('Done'));
+    await tester.pumpAndSettle();
+    expect(find.text('Custom schedule'), findsOneWidget);
+
+    await tester.enterText(find.widgetWithText(TextField, 'Minute'), '*/20');
+    await tester.enterText(find.widgetWithText(TextField, 'Hour'), '8-18');
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Done'));
+    await tester.pumpAndSettle();
+    expect(find.text('Cron: */20 8-18 * * *'), findsOneWidget);
+
+    await tapVisible(tester, find.text('Save'));
+    await settle(tester);
+    expect(
+      lastCall('cloudsync.create')['schedule'],
+      containsPair('minute', '*/20'),
+    );
+    expect(
+      lastCall('cloudsync.create')['schedule'],
+      containsPair('hour', '8-18'),
+    );
+    await disconnect(tester);
+  });
+
+  testWidgets('cancelling the editor keeps the schedule', (tester) async {
+    await openCloudSyncEditor(tester);
+    await chooseCustomSchedule(tester);
+    await tester.tap(find.text('Cancel'));
+    await tester.pumpAndSettle();
+    expect(find.text('Every day at midnight'), findsOneWidget);
+    expect(find.text('Custom…'), findsNothing);
+    await disconnect(tester);
+  });
+
   testWidgets('adds a TrueCloud backup task', (tester) async {
     await connect(tester);
     await tester.pumpWidget(wrap(ProtectionScreen(session: session)));

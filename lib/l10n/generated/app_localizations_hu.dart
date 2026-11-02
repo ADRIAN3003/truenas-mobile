@@ -1727,6 +1727,116 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String get scheduleCustomChoice => 'Egyéni…';
+
+  @override
+  String get cronEditorTitle => 'Egyéni ütemezés';
+
+  @override
+  String get cronRepeat => 'Ismétlés';
+
+  @override
+  String get cronModeMinutes => 'Néhány percenként';
+
+  @override
+  String get cronModeHourly => 'Néhány óránként';
+
+  @override
+  String get cronModeDaily => 'Minden nap';
+
+  @override
+  String get cronModeWeekly => 'Bizonyos hétköznapokon';
+
+  @override
+  String get cronModeMonthly => 'Havonta egyszer';
+
+  @override
+  String get cronModeAdvanced => 'Cron-kifejezés';
+
+  @override
+  String get cronMinutesBetween => 'Percek két futás között';
+
+  @override
+  String get cronHoursBetween => 'Órák két futás között';
+
+  @override
+  String get cronAtMinute => 'Hányadik percben';
+
+  @override
+  String get cronTimeHour => 'Óra';
+
+  @override
+  String get cronTimeMinute => 'Perc';
+
+  @override
+  String get cronDayOfMonth => 'A hónap napja';
+
+  @override
+  String get cronWeekdays => 'Ezeken a napokon';
+
+  @override
+  String get cronPickWeekday => 'Válassz legalább egy napot.';
+
+  @override
+  String get cronFieldMinute => 'Perc';
+
+  @override
+  String get cronFieldHour => 'Óra';
+
+  @override
+  String get cronFieldDom => 'Nap';
+
+  @override
+  String get cronFieldMonth => 'Hónap';
+
+  @override
+  String get cronFieldDow => 'Hétköznap';
+
+  @override
+  String get cronFieldInvalid => 'Érvénytelen';
+
+  @override
+  String get cronAdvancedHelp =>
+      'A * minden, a */5 minden 5., az 1-5 tartomány, az 1,15 lista. Hétköznapok: 0 vagy 7 a vasárnap.';
+
+  @override
+  String scheduleEveryMinutes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count percenként',
+      one: 'Minden percben',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String scheduleEveryHours(int count, int minute) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count óránként',
+      one: 'Minden órában',
+    );
+    return '$_temp0, $minute. percben';
+  }
+
+  @override
+  String scheduleDailyAt(String time) {
+    return 'Minden nap $time-kor';
+  }
+
+  @override
+  String scheduleWeeklyAt(String days, String time) {
+    return '$days, $time-kor';
+  }
+
+  @override
+  String scheduleMonthlyAt(int day, String time) {
+    return 'Minden hónap $day. napján, $time-kor';
+  }
+
+  @override
   String get snapshotTaskRecursiveLabel => 'gyermek-datasetekkel';
 
   @override

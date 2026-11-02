@@ -468,6 +468,16 @@ README covers what the app does; this file covers how to work on it.
   verdict from the log and the power-on hours of the newest test. Shape
   unconfirmed on a real NAS. Fake server: `smartAttributes`,
   `smartAttributeRows`.
+- Schedules (`lib/core/models/cron_schedule.dart`, `lib/features/protection/schedule_field.dart`):
+  data protection tasks (snapshot, replication, cloud sync, cloud backup, rsync) carry
+  `Object? schedule`: a `SnapshotSchedule` preset, a `CronSchedule` (five cron text fields plus the
+  optional `begin`/`end` window, which is carried back on save), or null (replication that follows
+  its snapshots). `scheduleRequest(schedule, window:)` makes the request object. `ScheduleField`
+  is the dropdown (presets, the task's own custom cron, "Custom...") and `showCronEditor` the
+  dialog: `CronDraft` reads a cron into the simplest of minutes / hourly / daily / weekly / monthly
+  and keeps anything else (`*/7`, ranges, month lists) in the advanced mode as typed;
+  `CronField.accepts` validates. `cronDescription` turns a cron into words. Unconfirmed on a real
+  NAS: that 25.04 takes lists and steps in every field (it is croniter underneath).
 - System updates and power (`SystemApi`, `lib/features/system/updates_screen.dart`,
   `power_actions.dart`): `UpdateInfo` is normalised across `update.status`
   (code `REBOOT_REQUIRED`, `new_version.filesize/changelog`, both optional) and

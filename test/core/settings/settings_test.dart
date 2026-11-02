@@ -34,6 +34,7 @@ void main() {
       alertNotifications: true,
       alertLevel: AlertSeverity.warning,
       mutedAlertKinds: {'PoolStatus', 'ScrubPaused'},
+      hiddenJobMethods: {'cronjob.run'},
       siriShortcuts: false,
     );
     final back = AppSettings.fromJson(settings.toJson());
@@ -52,6 +53,7 @@ void main() {
     expect(back.alertLevel, AlertSeverity.warning);
     expect(back.siriShortcuts, isFalse);
     expect(back.mutedAlertKinds, {'PoolStatus', 'ScrubPaused'});
+    expect(back.hiddenJobMethods, {'cronjob.run'});
   });
 
   test('unknown or missing values fall back to the defaults', () {
@@ -96,6 +98,17 @@ void main() {
     expect(const AppSettings().liveJobs, isTrue);
     expect(AppSettings.fromJson(const {}).liveJobs, isTrue);
     expect(const AppSettings().copyWith(liveJobs: false).liveJobs, isFalse);
+  });
+
+  test('no job type is hidden by default, and bad entries are dropped', () {
+    expect(const AppSettings().hiddenJobMethods, isEmpty);
+    expect(AppSettings.fromJson(const {}).hiddenJobMethods, isEmpty);
+    expect(
+      AppSettings.fromJson(const {
+        'hiddenJobMethods': ['cronjob.run', 3, ''],
+      }).hiddenJobMethods,
+      {'cronjob.run'},
+    );
   });
 
   test('alert notifications are off, for critical alerts, by default', () {

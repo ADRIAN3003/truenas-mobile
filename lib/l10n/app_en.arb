@@ -499,6 +499,47 @@
   "@jobsEmpty": {
     "description": "Shown when there are no jobs."
   },
+  "undo": "Undo",
+  "@undo": {
+    "description": "Snackbar action that reverses the last change."
+  },
+  "jobsAllHidden": "All recent jobs are of hidden types",
+  "@jobsAllHidden": {
+    "description": "Shown on the Jobs list when every job found is of a type the user hid."
+  },
+  "jobHideType": "Hide this type of job",
+  "@jobHideType": {
+    "description": "Job menu entry: stop listing jobs of this kind."
+  },
+  "jobTypeHidden": "Hiding \"{method}\" jobs",
+  "@jobTypeHidden": {
+    "description": "Snackbar after hiding a job type. The placeholder is the API method, e.g. cronjob.run.",
+    "placeholders": {
+      "method": {
+        "type": "String"
+      }
+    }
+  },
+  "hiddenJobsTitle": "Hidden job types",
+  "@hiddenJobsTitle": {
+    "description": "Row at the bottom of the Jobs list and title of the screen that lists the hidden job types."
+  },
+  "hiddenJobsHint": "Jobs of these types are left out of the Jobs list. Live progress and notifications are not affected.",
+  "@hiddenJobsHint": {
+    "description": "Explains the hidden job types screen."
+  },
+  "hiddenJobsEmpty": "No job types are hidden. Use the menu on a job to hide its type.",
+  "@hiddenJobsEmpty": {
+    "description": "Empty state of the hidden job types screen."
+  },
+  "hiddenJobsShow": "Show",
+  "@hiddenJobsShow": {
+    "description": "Button that lists a hidden job type again."
+  },
+  "hiddenJobsShowAll": "Show all",
+  "@hiddenJobsShowAll": {
+    "description": "Button that lists every hidden job type again."
+  },
   "jobAbort": "Abort",
   "@jobAbort": {
     "description": "Action that aborts a running job."

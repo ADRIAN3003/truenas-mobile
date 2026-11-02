@@ -249,4 +249,70 @@ void main() {
     expect(find.byTooltip('Abort'), findsOneWidget);
     await disconnect(tester);
   });
+
+  testWidgets('a job type can be hidden from the list and shown again', (
+    tester,
+  ) async {
+    await connect(tester);
+    server.jobs.add({
+      'id': 8,
+      'method': 'cronjob.run',
+      'state': 'SUCCESS',
+      'progress': {'percent': 100, 'description': ''},
+      'abortable': false,
+      'time_started': {r'$date': 1760000100000},
+    });
+    await tester.pumpWidget(
+      wrap(
+        JobsTab(session: session),
+        overrides: [
+          settingsRepositoryProvider.overrideWithValue(
+            SettingsRepository(MemoryStore()),
+          ),
+        ],
+      ),
+    );
+    await settle(tester);
+    final container = ProviderScope.containerOf(
+      tester.element(find.byType(JobsTab)),
+    );
+    expect(find.text('cronjob.run'), findsOneWidget);
+    expect(find.text('pool.scrub.run'), findsOneWidget);
+    expect(find.text('Hidden job types'), findsNothing);
+
+    // The menu on the cron job hides its type.
+    await tester.tap(find.byType(PopupMenuButton<bool>).first);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Hide this type of job'));
+    await tester.pumpAndSettle();
+    await settle(tester);
+    expect(container.read(settingsProvider).hiddenJobMethods, {'cronjob.run'});
+    expect(find.text('cronjob.run'), findsNothing);
+    expect(find.text('pool.scrub.run'), findsOneWidget);
+    expect(find.text('Hidden job types'), findsOneWidget);
+
+    // A new job of that type does not show up either.
+    server.pushEvent('core.get_jobs', 'added', {
+      'id': 9,
+      'method': 'cronjob.run',
+      'state': 'RUNNING',
+    });
+    await settle(tester);
+    expect(find.text('cronjob.run'), findsNothing);
+
+    // The list of hidden types brings it back.
+    await tester.tap(find.text('Hidden job types'));
+    await tester.pumpAndSettle();
+    expect(find.text('cronjob.run'), findsOneWidget);
+    await tester.tap(find.text('Show'));
+    await tester.pumpAndSettle();
+    expect(container.read(settingsProvider).hiddenJobMethods, isEmpty);
+    expect(find.textContaining('No job types are hidden'), findsOneWidget);
+    await tester.pageBack();
+    await tester.pumpAndSettle();
+    await settle(tester);
+    expect(find.text('cronjob.run'), findsOneWidget);
+    expect(find.text('Hidden job types'), findsNothing);
+    await disconnect(tester);
+  });
 }

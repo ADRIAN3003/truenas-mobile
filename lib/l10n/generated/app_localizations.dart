@@ -728,6 +728,60 @@ abstract class AppLocalizations {
   /// **'No recent jobs'**
   String get jobsEmpty;
 
+  /// Snackbar action that reverses the last change.
+  ///
+  /// In en, this message translates to:
+  /// **'Undo'**
+  String get undo;
+
+  /// Shown on the Jobs list when every job found is of a type the user hid.
+  ///
+  /// In en, this message translates to:
+  /// **'All recent jobs are of hidden types'**
+  String get jobsAllHidden;
+
+  /// Job menu entry: stop listing jobs of this kind.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide this type of job'**
+  String get jobHideType;
+
+  /// Snackbar after hiding a job type. The placeholder is the API method, e.g. cronjob.run.
+  ///
+  /// In en, this message translates to:
+  /// **'Hiding \"{method}\" jobs'**
+  String jobTypeHidden(String method);
+
+  /// Row at the bottom of the Jobs list and title of the screen that lists the hidden job types.
+  ///
+  /// In en, this message translates to:
+  /// **'Hidden job types'**
+  String get hiddenJobsTitle;
+
+  /// Explains the hidden job types screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Jobs of these types are left out of the Jobs list. Live progress and notifications are not affected.'**
+  String get hiddenJobsHint;
+
+  /// Empty state of the hidden job types screen.
+  ///
+  /// In en, this message translates to:
+  /// **'No job types are hidden. Use the menu on a job to hide its type.'**
+  String get hiddenJobsEmpty;
+
+  /// Button that lists a hidden job type again.
+  ///
+  /// In en, this message translates to:
+  /// **'Show'**
+  String get hiddenJobsShow;
+
+  /// Button that lists every hidden job type again.
+  ///
+  /// In en, this message translates to:
+  /// **'Show all'**
+  String get hiddenJobsShowAll;
+
   /// Action that aborts a running job.
   ///
   /// In en, this message translates to:

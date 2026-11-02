@@ -806,6 +806,24 @@ class FakeTrueNasServer {
   var logCollectionWithArgs = false;
   String? _logEvent;
 
+  /// Sends a `collection_update` to every connected API socket.
+  void pushEvent(String collection, String msg, Map<String, dynamic> fields) {
+    for (final socket in _apiSockets) {
+      socket.add(
+        jsonEncode({
+          'jsonrpc': '2.0',
+          'method': 'collection_update',
+          'params': {
+            'msg': msg,
+            'collection': collection,
+            'id': fields['id'],
+            'fields': fields,
+          },
+        }),
+      );
+    }
+  }
+
   /// Sends one more line to everyone following the log.
   void pushLogLine(String line) {
     final event = _logEvent;
@@ -1550,6 +1568,20 @@ class FakeTrueNasServer {
           case 'alert.dismiss' || 'alert.restore':
             final alert = alerts.firstWhere((a) => a['uuid'] == params.first);
             alert['dismissed'] = message['method'] == 'alert.dismiss';
+          case 'core.get_jobs'
+              when params.isNotEmpty &&
+                  (params.first as List).isNotEmpty &&
+                  ((params.first as List).first as List)[0] == 'method' &&
+                  ((params.first as List).first as List)[1] == 'nin':
+            // The history list without the hidden job types.
+            final hidden = ((params.first as List).first as List)[2] as List;
+            final limit = params.length > 1
+                ? (params[1] as Map)['limit'] as int?
+                : null;
+            result = [
+              for (final job in [...jobs.reversed, runningScrub])
+                if (!hidden.contains(job['method'])) job,
+            ].take(limit ?? 1000).toList();
           case 'core.get_jobs'
               when params.isNotEmpty &&
                   (params.first as List).isNotEmpty &&

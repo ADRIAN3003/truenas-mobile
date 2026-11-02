@@ -12,6 +12,7 @@ import '../../shared/widgets.dart';
 import '../server/add_shortcut.dart';
 import '../sharing/sharing_widgets.dart';
 import '../storage/storage_helpers.dart';
+import 'schedule_field.dart';
 import 'task_editors.dart';
 import '../../shared/dialogs.dart';
 
@@ -245,15 +246,6 @@ String keepFor(AppLocalizations l10n, int count, LifetimeUnit unit) =>
       LifetimeUnit.year => l10n.keepYears(count),
     };
 
-String scheduleLabel(AppLocalizations l10n, Object? schedule) =>
-    switch (schedule) {
-      SnapshotSchedule.hourly => l10n.scheduleHourly,
-      SnapshotSchedule.daily => l10n.scheduleDaily,
-      SnapshotSchedule.weekly => l10n.scheduleWeekly,
-      final String cron => l10n.scheduleCustom(cron),
-      _ => '',
-    };
-
 class _TaskTile extends StatelessWidget {
   const _TaskTile({
     required this.task,
@@ -388,7 +380,7 @@ class _NewSnapshotTask {
 
   final String dataset;
   final bool recursive;
-  final SnapshotSchedule schedule;
+  final Object schedule;
   final int keep;
   final LifetimeUnit unit;
 }
@@ -405,7 +397,7 @@ class _NewSnapshotTaskDialog extends StatefulWidget {
 class _NewSnapshotTaskDialogState extends State<_NewSnapshotTaskDialog> {
   late String? _dataset = widget.datasets.firstOrNull;
   bool _recursive = false;
-  SnapshotSchedule _schedule = SnapshotSchedule.daily;
+  Object _schedule = SnapshotSchedule.daily;
   final _keep = TextEditingController(text: '2');
   LifetimeUnit _unit = LifetimeUnit.week;
 
@@ -449,19 +441,8 @@ class _NewSnapshotTaskDialogState extends State<_NewSnapshotTaskDialog> {
                     value: _recursive,
                     onChanged: (v) => setState(() => _recursive = v),
                   ),
-                  DropdownButtonFormField<SnapshotSchedule>(
-                    initialValue: _schedule,
-                    isExpanded: true,
-                    decoration: InputDecoration(
-                      labelText: l10n.snapshotTaskSchedule,
-                    ),
-                    items: [
-                      for (final s in SnapshotSchedule.values)
-                        DropdownMenuItem(
-                          value: s,
-                          child: Text(scheduleLabel(l10n, s)),
-                        ),
-                    ],
+                  ScheduleField(
+                    value: _schedule,
                     onChanged: (s) => setState(() => _schedule = s!),
                   ),
                   Row(

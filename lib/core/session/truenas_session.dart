@@ -127,10 +127,17 @@ class TrueNasSession {
 
   Future<void> restoreAlert(String id) => client.call('alert.restore', [id]);
 
-  /// The most recent jobs, newest first.
-  Future<List<TrueNasJob>> jobs({int limit = 50}) async {
+  /// The most recent jobs, newest first, leaving out those started by the
+  /// API methods in [excludeMethods].
+  Future<List<TrueNasJob>> jobs({
+    int limit = 50,
+    Iterable<String> excludeMethods = const [],
+  }) async {
     final result = await client.call('core.get_jobs', [
-      [],
+      [
+        if (excludeMethods.isNotEmpty)
+          ['method', 'nin', excludeMethods.toList()],
+      ],
       {
         'order_by': ['-id'],
         'limit': limit,

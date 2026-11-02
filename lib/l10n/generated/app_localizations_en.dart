@@ -385,6 +385,37 @@ class AppLocalizationsEn extends AppLocalizations {
   String get jobsEmpty => 'No recent jobs';
 
   @override
+  String get undo => 'Undo';
+
+  @override
+  String get jobsAllHidden => 'All recent jobs are of hidden types';
+
+  @override
+  String get jobHideType => 'Hide this type of job';
+
+  @override
+  String jobTypeHidden(String method) {
+    return 'Hiding \"$method\" jobs';
+  }
+
+  @override
+  String get hiddenJobsTitle => 'Hidden job types';
+
+  @override
+  String get hiddenJobsHint =>
+      'Jobs of these types are left out of the Jobs list. Live progress and notifications are not affected.';
+
+  @override
+  String get hiddenJobsEmpty =>
+      'No job types are hidden. Use the menu on a job to hide its type.';
+
+  @override
+  String get hiddenJobsShow => 'Show';
+
+  @override
+  String get hiddenJobsShowAll => 'Show all';
+
+  @override
   String get jobAbort => 'Abort';
 
   @override
@@ -1770,6 +1801,116 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get scheduleCustomChoice => 'Custom…';
+
+  @override
+  String get cronEditorTitle => 'Custom schedule';
+
+  @override
+  String get cronRepeat => 'Repeat';
+
+  @override
+  String get cronModeMinutes => 'Every few minutes';
+
+  @override
+  String get cronModeHourly => 'Every few hours';
+
+  @override
+  String get cronModeDaily => 'Every day';
+
+  @override
+  String get cronModeWeekly => 'On certain weekdays';
+
+  @override
+  String get cronModeMonthly => 'Once a month';
+
+  @override
+  String get cronModeAdvanced => 'Cron expression';
+
+  @override
+  String get cronMinutesBetween => 'Minutes between runs';
+
+  @override
+  String get cronHoursBetween => 'Hours between runs';
+
+  @override
+  String get cronAtMinute => 'At minute';
+
+  @override
+  String get cronTimeHour => 'Hour';
+
+  @override
+  String get cronTimeMinute => 'Minute';
+
+  @override
+  String get cronDayOfMonth => 'Day of the month';
+
+  @override
+  String get cronWeekdays => 'On these days';
+
+  @override
+  String get cronPickWeekday => 'Pick at least one day.';
+
+  @override
+  String get cronFieldMinute => 'Minute';
+
+  @override
+  String get cronFieldHour => 'Hour';
+
+  @override
+  String get cronFieldDom => 'Day';
+
+  @override
+  String get cronFieldMonth => 'Month';
+
+  @override
+  String get cronFieldDow => 'Weekday';
+
+  @override
+  String get cronFieldInvalid => 'Not valid';
+
+  @override
+  String get cronAdvancedHelp =>
+      '* is every, */5 every 5th, 1-5 a range, 1,15 a list. Weekdays: 0 or 7 is Sunday.';
+
+  @override
+  String scheduleEveryMinutes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Every $count minutes',
+      one: 'Every minute',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String scheduleEveryHours(int count, int minute) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Every $count hours',
+      one: 'Every hour',
+    );
+    return '$_temp0, at minute $minute';
+  }
+
+  @override
+  String scheduleDailyAt(String time) {
+    return 'Every day at $time';
+  }
+
+  @override
+  String scheduleWeeklyAt(String days, String time) {
+    return '$days at $time';
+  }
+
+  @override
+  String scheduleMonthlyAt(int day, String time) {
+    return 'On day $day of every month at $time';
+  }
+
+  @override
   String get snapshotTaskRecursiveLabel => 'with child datasets';
 
   @override
@@ -2728,11 +2869,6 @@ class AppLocalizationsEn extends AppLocalizations {
       'Connection lost, progress may be out of date';
 
   @override
-  String jobsMoreCount(int count) {
-    return '+$count more';
-  }
-
-  @override
   String get jobsChannelName => 'Job progress';
 
   @override
@@ -3417,4 +3553,342 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get shortcutTaskMissing => 'That sync task no longer exists.';
+
+  @override
+  String get vmCreateTitle => 'New virtual machine';
+
+  @override
+  String vmEditTitle(String name) {
+    return 'Edit $name';
+  }
+
+  @override
+  String vmCreated(String name) {
+    return 'Created $name';
+  }
+
+  @override
+  String vmSaved(String name) {
+    return 'Saved $name';
+  }
+
+  @override
+  String get vmEditNote =>
+      'Changes to a running machine take effect the next time it starts.';
+
+  @override
+  String get vmSectionGeneral => 'General';
+
+  @override
+  String get vmName => 'Name';
+
+  @override
+  String get vmDescription => 'Description';
+
+  @override
+  String get vmSectionProcessor => 'Processor and memory';
+
+  @override
+  String get vmVcpusField => 'Virtual CPUs (sockets)';
+
+  @override
+  String vmVcpusMax(int count) {
+    return 'The host allows up to $count in total';
+  }
+
+  @override
+  String get vmCoresField => 'Cores per CPU';
+
+  @override
+  String get vmThreadsField => 'Threads per core';
+
+  @override
+  String get vmCpuMode => 'CPU mode';
+
+  @override
+  String get vmCpuModeCustom => 'Custom';
+
+  @override
+  String get vmCpuModeHostModel => 'Host model';
+
+  @override
+  String get vmCpuModeHostPassthrough => 'Host passthrough';
+
+  @override
+  String get vmCpuModel => 'CPU model';
+
+  @override
+  String get vmCpuModelDefault => 'Default';
+
+  @override
+  String get vmMemoryField => 'Memory (MiB)';
+
+  @override
+  String get vmMinMemoryField => 'Minimum memory (MiB)';
+
+  @override
+  String get vmMinMemoryHelp =>
+      'Leave empty to give the machine a fixed amount.';
+
+  @override
+  String get vmSectionBoot => 'Boot and clock';
+
+  @override
+  String get vmBootloader => 'Boot method';
+
+  @override
+  String get vmClock => 'Guest clock';
+
+  @override
+  String get vmClockLocal => 'Local time';
+
+  @override
+  String get vmShutdownTimeout => 'Shutdown timeout';
+
+  @override
+  String get vmShutdownTimeoutHelp =>
+      'Seconds the guest gets to shut down before it is powered off.';
+
+  @override
+  String vmSeconds(int count) {
+    return '$count s';
+  }
+
+  @override
+  String get vmAutostartField => 'Start when the server boots';
+
+  @override
+  String get vmSectionAdvanced => 'Advanced';
+
+  @override
+  String get vmEnsureDisplay => 'Add a display device';
+
+  @override
+  String get vmEnsureDisplayHelp =>
+      'Adds one if the machine has none, so you can see its screen.';
+
+  @override
+  String get vmHyperv => 'Hyper-V enlightenments';
+
+  @override
+  String get vmHypervHelp => 'Makes Windows guests faster.';
+
+  @override
+  String get vmHideFromMsr => 'Hide the hypervisor from the guest';
+
+  @override
+  String get vmHideFromMsrHelp =>
+      'Some software refuses to run in a virtual machine.';
+
+  @override
+  String get vmTpm => 'Virtual TPM';
+
+  @override
+  String get vmSectionNewDevices => 'Devices';
+
+  @override
+  String get vmNewDisk => 'Create a disk';
+
+  @override
+  String get vmNewNic => 'Add a network adapter';
+
+  @override
+  String get vmInstallImage => 'Install image (path to an ISO)';
+
+  @override
+  String get vmInstallImageHelp =>
+      'Optional. A file on the server, e.g. /mnt/tank/iso/win11.iso';
+
+  @override
+  String get vmSectionSettings => 'Settings';
+
+  @override
+  String get vmInfoCpu => 'Processor';
+
+  @override
+  String vmInfoCpuValue(int total, String layout) {
+    return '$total vCPU ($layout)';
+  }
+
+  @override
+  String get vmInfoMemory => 'Memory';
+
+  @override
+  String get vmDevices => 'Devices';
+
+  @override
+  String get vmDevicesEmpty => 'No devices';
+
+  @override
+  String get vmDeviceAdd => 'Add device';
+
+  @override
+  String vmDeviceAddTitle(String type) {
+    return 'Add $type';
+  }
+
+  @override
+  String vmDeviceEditTitle(String type) {
+    return 'Edit $type';
+  }
+
+  @override
+  String get vmDeviceSaved => 'Device saved';
+
+  @override
+  String get vmDeviceRemove => 'Remove';
+
+  @override
+  String get vmDeviceRemoved => 'Device removed';
+
+  @override
+  String vmDeviceRemoveTitle(String type) {
+    return 'Remove this $type?';
+  }
+
+  @override
+  String get vmDeviceRemoveBody =>
+      'The device is taken out of the machine. This takes effect at the next start.';
+
+  @override
+  String get vmDeviceDestroyZvol => 'Also destroy the zvol (deletes its data)';
+
+  @override
+  String get vmDeviceNote =>
+      'Changes take effect the next time the machine starts.';
+
+  @override
+  String get vmDeviceDisk => 'Disk (zvol)';
+
+  @override
+  String get vmDeviceRaw => 'Raw file';
+
+  @override
+  String get vmDeviceCdrom => 'CD-ROM (ISO)';
+
+  @override
+  String get vmDeviceNic => 'Network adapter';
+
+  @override
+  String get vmDeviceDisplay => 'Display';
+
+  @override
+  String get vmDevicePci => 'PCI device';
+
+  @override
+  String get vmDeviceUsb => 'USB device';
+
+  @override
+  String get vmDeviceBus => 'Bus';
+
+  @override
+  String get vmDeviceBusHelp =>
+      'VirtIO is faster; AHCI works with any operating system.';
+
+  @override
+  String get vmDeviceNewZvol => 'New zvol';
+
+  @override
+  String get vmDeviceExistingZvol => 'Existing zvol';
+
+  @override
+  String get vmDevicePool => 'Pool';
+
+  @override
+  String get vmDeviceZvolName => 'Zvol name';
+
+  @override
+  String get vmDeviceZvolNameHelp =>
+      'Optional. Leave empty to name it after the machine.';
+
+  @override
+  String get vmDeviceSizeGib => 'Size (GiB)';
+
+  @override
+  String get vmDeviceZvol => 'Zvol';
+
+  @override
+  String get vmDevicePath => 'Path';
+
+  @override
+  String get vmDeviceZvolPathHelp => 'e.g. /dev/zvol/tank/vm-disk';
+
+  @override
+  String get vmDeviceRawPathHelp =>
+      'A file on the server, e.g. /mnt/tank/vm/disk.img';
+
+  @override
+  String get vmDeviceCdromPathHelp =>
+      'An ISO file on the server, e.g. /mnt/tank/iso/win11.iso';
+
+  @override
+  String get vmNicType => 'Adapter type';
+
+  @override
+  String get vmNicTypeHelp =>
+      'VirtIO is faster; E1000 works without extra drivers.';
+
+  @override
+  String get vmNicAttach => 'Attach to';
+
+  @override
+  String get vmMac => 'MAC address';
+
+  @override
+  String get vmMacHelp => 'Leave empty for a random one.';
+
+  @override
+  String get vmMacRandom => 'Random address';
+
+  @override
+  String get vmTrustRx => 'Trust guest receive filters';
+
+  @override
+  String get vmTrustRxHelp =>
+      'Lets the guest change its MAC address and receive modes.';
+
+  @override
+  String get vmResolution => 'Resolution';
+
+  @override
+  String get vmBind => 'Listen on';
+
+  @override
+  String get vmDisplayPassword => 'Password';
+
+  @override
+  String get vmDisplayWeb => 'Web access';
+
+  @override
+  String get vmDisplayWebHelp => 'Lets a browser open the display.';
+
+  @override
+  String get vmPciDevice => 'PCI device';
+
+  @override
+  String get vmPciDeviceHelp => 'The device address, e.g. pci_0000_01_00_0';
+
+  @override
+  String get vmUsbController => 'USB controller';
+
+  @override
+  String get vmUsbDevice => 'USB device';
+
+  @override
+  String get vmDeviceJson => 'Attributes (JSON)';
+
+  @override
+  String get vmDeviceJsonInvalid => 'That is not valid JSON.';
+
+  @override
+  String vmDeleteTitle(String name) {
+    return 'Delete $name?';
+  }
+
+  @override
+  String get vmDeleteBody =>
+      'The machine and its device list are removed. Its disks stay unless you choose to destroy them.';
+
+  @override
+  String get vmDeleteDisks => 'Also destroy its disks (deletes their data)';
 }

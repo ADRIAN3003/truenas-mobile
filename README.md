@@ -85,7 +85,9 @@ for Android and iOS that talks to the official TrueNAS middleware API
 - **Apps and VMs:** Docker apps (install from the catalog or a Docker Compose
   file, edit their configuration, start, stop, redeploy, upgrade, delete, or
   update all that have a newer version, after listing them), virtual machines
-  and containers (start, stop, restart), each with a shell.
+  (create, edit their processor, memory and boot settings, add, change and
+  remove disks, network adapters and other devices, delete) and containers
+  (start, stop, restart), each with a shell.
 - **System:** users and groups (add, edit, lock, delete), API keys, network and certificates
   (read-only), updates and boot environments, reboot and shut down.
 - **Shell:** a terminal on the server, with Esc, Tab, Ctrl+C and arrow keys.

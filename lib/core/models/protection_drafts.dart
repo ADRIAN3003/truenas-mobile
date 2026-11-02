@@ -96,8 +96,8 @@ class ReplicationDraft {
   String? nameRegex;
   bool auto = true;
 
-  /// A [SnapshotSchedule], cron text to keep unchanged, or null to run
-  /// right after the bound snapshot task.
+  /// A [SnapshotSchedule], a [CronSchedule], or null to run right after the
+  /// bound snapshot task.
   Object? schedule = SnapshotSchedule.daily;
   RetentionPolicy retention = RetentionPolicy.source;
   int lifetimeValue = 2;
@@ -133,14 +133,7 @@ class ReplicationDraft {
           : <String>[],
     },
     'auto': auto,
-    if (schedule is! String || !auto)
-      'schedule': auto && schedule is SnapshotSchedule
-          ? {
-              ...(schedule as SnapshotSchedule).cron,
-              'begin': '00:00',
-              'end': '23:59',
-            }
-          : null,
+    'schedule': auto ? scheduleRequest(schedule, window: true) : null,
     'retention_policy': retention.value,
     'lifetime_value': retention == RetentionPolicy.custom
         ? lifetimeValue
@@ -185,7 +178,7 @@ class CloudSyncDraft {
   /// `SYNC`, `COPY` or `MOVE`.
   String transferMode = 'COPY';
 
-  /// A [SnapshotSchedule], or cron text to keep unchanged.
+  /// A [SnapshotSchedule] or a [CronSchedule].
   Object schedule = SnapshotSchedule.daily;
 
   Map<String, dynamic> toJson() => {
@@ -199,7 +192,7 @@ class CloudSyncDraft {
       if (bucket.isNotEmpty) 'bucket': bucket,
       'folder': folder,
     },
-    if (schedule case final SnapshotSchedule preset) 'schedule': preset.cron,
+    'schedule': scheduleRequest(schedule),
   };
 }
 
@@ -247,7 +240,7 @@ class RsyncDraft {
   /// Delete files on the destination that are gone from the source.
   bool delete = false;
 
-  /// A [SnapshotSchedule], or cron text to keep unchanged.
+  /// A [SnapshotSchedule] or a [CronSchedule].
   Object schedule = SnapshotSchedule.daily;
 
   Map<String, dynamic> toJson() {
@@ -264,7 +257,7 @@ class RsyncDraft {
       'remotemodule': ssh ? null : remoteModule,
       'remotepath': remotePath,
       'delete': delete,
-      if (schedule case final SnapshotSchedule preset) 'schedule': preset.cron,
+      'schedule': scheduleRequest(schedule),
     };
   }
 }
@@ -316,6 +309,6 @@ class CloudBackupDraft {
     },
     'keep_last': keepLast,
     if (password.isNotEmpty) 'password': password,
-    if (schedule case final SnapshotSchedule preset) 'schedule': preset.cron,
+    'schedule': scheduleRequest(schedule),
   };
 }

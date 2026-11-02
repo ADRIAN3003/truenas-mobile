@@ -7,12 +7,10 @@ import '../../l10n/generated/app_localizations.dart';
 import '../../shared/viz_colors.dart';
 import 'job_texts.dart';
 
-/// How many jobs the banner lists before it says "+N more".
-const bannerLimit = 3;
-
 /// A card over the bottom of the server screen with the scrubs,
-/// replications and updates that run. Gone when there are none, and hidden by
-/// its close button until another job starts.
+/// replications and updates that run, one at a time: swipe sideways for the
+/// next one. Gone when there are none, and hidden by its close button until
+/// another job starts.
 class JobProgressBanner extends StatefulWidget {
   const JobProgressBanner({
     super.key,
@@ -32,6 +30,30 @@ class JobProgressBanner extends StatefulWidget {
 class _JobProgressBannerState extends State<JobProgressBanner> {
   /// Jobs the user hid. A job that starts later is not among them.
   final _dismissed = <int>{};
+  final _controller = PageController();
+
+  /// The job the user is looking at, so a list that changes under them (a job
+  /// ends, another starts) does not move them to a different one.
+  int? _viewing;
+  int _lastIndex = 0;
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  /// Running jobs first, in start order, then the ones that just finished.
+  List<TrackedJob> _visible(JobsSnapshot data) {
+    final open = [
+      for (final job in data.jobs)
+        if (!_dismissed.contains(job.id)) job,
+    ];
+    return [
+      ...open.where((t) => t.job.state.isActive),
+      ...open.where((t) => !t.job.state.isActive),
+    ];
+  }
 
   @override
   Widget build(BuildContext context) => StreamBuilder<JobsSnapshot>(
@@ -39,15 +61,26 @@ class _JobProgressBannerState extends State<JobProgressBanner> {
     initialData: widget.tracker.snapshot,
     builder: (context, snapshot) {
       final data = snapshot.requireData;
-      final visible = [
-        for (final job in data.jobs)
-          if (!_dismissed.contains(job.id)) job,
-      ];
+      final visible = _visible(data);
       if (visible.isEmpty) return const SizedBox.shrink();
       final l10n = AppLocalizations.of(context);
       final theme = Theme.of(context);
-      final shown = visible.take(bannerLimit).toList();
-      final more = visible.length - shown.length;
+      var index = visible.indexWhere((t) => t.id == _viewing);
+      if (index < 0) index = _lastIndex.clamp(0, visible.length - 1);
+      _lastIndex = index;
+      _viewing = visible[index].id;
+      // The pages moved under the user's finger (a job ended before the one
+      // they look at): bring the view back to their job.
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted || !_controller.hasClients) return;
+        final page = _controller.page;
+        if (page != null && page == page.roundToDouble() && page != index) {
+          _controller.jumpToPage(index);
+        }
+      });
+      // A page needs a height of its own; this fits a title, a detail line
+      // and a progress bar at the user's text size.
+      final pageHeight = MediaQuery.textScalerOf(context).scale(36) + 14;
       return Semantics(
         container: true,
         child: Material(
@@ -70,16 +103,32 @@ class _JobProgressBannerState extends State<JobProgressBanner> {
                         mainAxisSize: MainAxisSize.min,
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          for (var i = 0; i < shown.length; i++) ...[
-                            if (i > 0) const SizedBox(height: 12),
-                            _BannerRow(shown[i], connected: data.connected),
-                          ],
-                          if (more > 0)
+                          SizedBox(
+                            height: pageHeight,
+                            child: PageView.builder(
+                              key: const ValueKey('job-pages'),
+                              controller: _controller,
+                              itemCount: visible.length,
+                              onPageChanged: (i) {
+                                _lastIndex = i;
+                                _viewing = visible[i].id;
+                                setState(() {});
+                              },
+                              itemBuilder: (_, i) => Align(
+                                alignment: Alignment.centerLeft,
+                                child: _BannerRow(
+                                  visible[i],
+                                  connected: data.connected,
+                                ),
+                              ),
+                            ),
+                          ),
+                          if (visible.length > 1)
                             Padding(
                               padding: const EdgeInsets.only(top: 8),
-                              child: Text(
-                                l10n.jobsMoreCount(more),
-                                style: theme.textTheme.bodySmall,
+                              child: _PageDots(
+                                count: visible.length,
+                                index: index,
                               ),
                             ),
                           if (!data.connected && data.hasActive)
@@ -112,6 +161,47 @@ class _JobProgressBannerState extends State<JobProgressBanner> {
       );
     },
   );
+}
+
+/// One dot per job, the one on show longer and in the accent colour. A long
+/// list shows a count instead of a row of dots.
+class _PageDots extends StatelessWidget {
+  const _PageDots({required this.count, required this.index});
+
+  final int count;
+  final int index;
+
+  static const _maxDots = 8;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    if (count > _maxDots) {
+      return Text(
+        '${index + 1} / $count',
+        textAlign: TextAlign.center,
+        style: theme.textTheme.bodySmall,
+      );
+    }
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        for (var i = 0; i < count; i++)
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            margin: const EdgeInsets.symmetric(horizontal: 3),
+            width: i == index ? 16 : 6,
+            height: 6,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(3),
+              color: i == index
+                  ? theme.colorScheme.primary
+                  : theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.35),
+            ),
+          ),
+      ],
+    );
+  }
 }
 
 class _BannerRow extends StatelessWidget {

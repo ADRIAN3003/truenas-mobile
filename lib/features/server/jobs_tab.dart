@@ -1,29 +1,36 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import '../../core/api/events.dart';
 import '../../core/models/job.dart';
 import '../../core/session/truenas_session.dart';
+import '../../core/settings/settings_provider.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../shared/ui.dart';
 import '../../shared/widgets.dart';
 import '../../shared/connect_dialogs.dart';
 import '../../shared/viz_colors.dart';
 import '../../shared/dialogs.dart';
+import '../../shared/theme.dart';
+import '../jobs/hidden_jobs_screen.dart';
 
 /// Recent middleware jobs with live progress.
-class JobsTab extends StatefulWidget {
+///
+/// Job types the user hid (`hiddenJobMethods`) are left out; a row at the
+/// bottom says how many and opens the list to bring them back.
+class JobsTab extends ConsumerStatefulWidget {
   const JobsTab({super.key, required this.session});
 
   final TrueNasSession session;
 
   @override
-  State<JobsTab> createState() => _JobsTabState();
+  ConsumerState<JobsTab> createState() => _JobsTabState();
 }
 
-class _JobsTabState extends State<JobsTab> {
+class _JobsTabState extends ConsumerState<JobsTab> {
   List<TrueNasJob>? _jobs;
   Object? _error;
   StreamSubscription<CollectionUpdate>? _changes;
@@ -43,7 +50,9 @@ class _JobsTabState extends State<JobsTab> {
 
   Future<void> _load() async {
     try {
-      final jobs = await widget.session.jobs();
+      final jobs = await widget.session.jobs(
+        excludeMethods: ref.read(settingsProvider).hiddenJobMethods,
+      );
       if (!mounted) return;
       setState(() {
         _jobs = jobs;
@@ -60,9 +69,11 @@ class _JobsTabState extends State<JobsTab> {
     if (jobs == null || fields == null) return;
     final id = update.id ?? fields['id'];
     final index = jobs.indexWhere((j) => j.id == id);
+    final hidden = ref.read(settingsProvider).hiddenJobMethods;
     setState(() {
       if (index == -1) {
-        jobs.insert(0, TrueNasJob.fromJson({'id': id, ...fields}));
+        final job = TrueNasJob.fromJson({'id': id, ...fields});
+        if (!hidden.contains(job.method)) jobs.insert(0, job);
       } else {
         jobs[index] = jobs[index].merge(fields);
       }
@@ -90,9 +101,46 @@ class _JobsTabState extends State<JobsTab> {
     }
   }
 
+  /// Hides (or, from the snackbar's Undo, shows again) the jobs of [method].
+  Future<void> _setHidden(String method, {required bool hidden}) => ref
+      .read(settingsProvider.notifier)
+      .update(
+        (s) => s.copyWith(
+          hiddenJobMethods: {
+            for (final m in s.hiddenJobMethods)
+              if (m != method) m,
+            if (hidden) method,
+          },
+        ),
+      );
+
+  Future<void> _hide(TrueNasJob job) async {
+    final l10n = AppLocalizations.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    await _setHidden(job.method, hidden: true);
+    messenger
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          content: Text(l10n.jobTypeHidden(job.method)),
+          action: SnackBarAction(
+            label: l10n.undo,
+            onPressed: () => _setHidden(job.method, hidden: false),
+          ),
+        ),
+      );
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final hidden = ref.watch(
+      settingsProvider.select((s) => s.hiddenJobMethods),
+    );
+    // Hiding or showing a type changes which jobs the server should list.
+    ref.listen(settingsProvider.select((s) => s.hiddenJobMethods), (_, _) {
+      _load();
+    });
     final jobs = _jobs;
     if (jobs == null) {
       return Center(
@@ -103,33 +151,64 @@ class _JobsTabState extends State<JobsTab> {
     }
     return AppRefreshIndicator(
       onRefresh: _load,
-      child: jobs.isEmpty
-          ? ListView(
+      child: ListView(
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+        children: [
+          if (jobs.isEmpty) ...[
+            const SizedBox(height: 112),
+            Center(
+              child: Text(hidden.isEmpty ? l10n.jobsEmpty : l10n.jobsAllHidden),
+            ),
+            const SizedBox(height: 24),
+          ] else
+            GroupedCard(
+              indent: 72,
               children: [
-                const SizedBox(height: 120),
-                Center(child: Text(l10n.jobsEmpty)),
+                for (final job in jobs)
+                  _JobTile(job, onAbort: _abort, onHide: _hide),
               ],
-            )
-          : ListView(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+            ),
+          if (hidden.isNotEmpty) ...[
+            const SizedBox(height: 16),
+            GroupedCard(
               children: [
-                GroupedCard(
-                  indent: 72,
-                  children: [
-                    for (final job in jobs) _JobTile(job, onAbort: _abort),
-                  ],
+                NavRow(
+                  icon: Icons.visibility_off_rounded,
+                  color: AppPalette.tileSlate,
+                  title: l10n.hiddenJobsTitle,
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        '${hidden.length}',
+                        style: TextStyle(color: AppPalette.of(context).muted),
+                      ),
+                      const SizedBox(width: 4),
+                      const Chevron(),
+                    ],
+                  ),
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute<void>(
+                      builder: (_) => const HiddenJobsScreen(),
+                    ),
+                  ),
                 ),
               ],
             ),
+          ],
+        ],
+      ),
     );
   }
 }
 
 class _JobTile extends StatelessWidget {
-  const _JobTile(this.job, {required this.onAbort});
+  const _JobTile(this.job, {required this.onAbort, required this.onHide});
 
   final TrueNasJob job;
   final ValueChanged<TrueNasJob> onAbort;
+  final ValueChanged<TrueNasJob> onHide;
 
   @override
   Widget build(BuildContext context) {
@@ -193,11 +272,22 @@ class _JobTile extends StatelessWidget {
           ],
         ],
       ),
-      trailing: job.state.isActive && job.abortable
-          ? IconButton(
-              tooltip: l10n.jobAbort,
-              icon: const Icon(Icons.stop_circle_outlined),
-              onPressed: () => onAbort(job),
+      trailing: job.state.isActive && job.abortable || job.method.isNotEmpty
+          ? Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (job.state.isActive && job.abortable)
+                  IconButton(
+                    tooltip: l10n.jobAbort,
+                    icon: const Icon(Icons.stop_circle_outlined),
+                    onPressed: () => onAbort(job),
+                  ),
+                if (job.method.isNotEmpty)
+                  AppPopupMenu<bool>(
+                    entries: [menuEntry(true, l10n.jobHideType)],
+                    onSelected: (_) => onHide(job),
+                  ),
+              ],
             )
           : null,
       onTap: job.error == null

@@ -24,6 +24,7 @@ class AppSettings {
     this.jobNotifications = true,
     this.alertLevel = AlertSeverity.critical,
     this.mutedAlertKinds = const {},
+    this.hiddenJobMethods = const {},
     this.homeWidgets = true,
     this.siriShortcuts = true,
   });
@@ -52,6 +53,10 @@ class AppSettings {
     mutedAlertKinds: {
       for (final id in (json['mutedAlertKinds'] as List?) ?? const [])
         if (id is String && id.isNotEmpty) id,
+    },
+    hiddenJobMethods: {
+      for (final method in (json['hiddenJobMethods'] as List?) ?? const [])
+        if (method is String && method.isNotEmpty) method,
     },
     homeWidgets: json['homeWidgets'] as bool? ?? true,
     siriShortcuts: json['siriShortcuts'] as bool? ?? true,
@@ -117,6 +122,11 @@ class AppSettings {
   /// notification for. They still show in the Alerts list.
   final Set<String> mutedAlertKinds;
 
+  /// The API methods (`Job.method`, e.g. `cronjob.run`) whose jobs the Jobs
+  /// list leaves out. Only the list is affected: live progress, notifications
+  /// and widgets still see these jobs. Global, not per server.
+  final Set<String> hiddenJobMethods;
+
   /// Keep the home screen widgets up to date in the background (about every
   /// 15 minutes, when the phone allows it). They also update whenever a
   /// server is open in the app. Does nothing until a widget is added.
@@ -143,6 +153,7 @@ class AppSettings {
     bool? jobNotifications,
     AlertSeverity? alertLevel,
     Set<String>? mutedAlertKinds,
+    Set<String>? hiddenJobMethods,
     bool? homeWidgets,
     bool? siriShortcuts,
   }) => AppSettings(
@@ -165,6 +176,7 @@ class AppSettings {
     jobNotifications: jobNotifications ?? this.jobNotifications,
     alertLevel: alertLevel ?? this.alertLevel,
     mutedAlertKinds: mutedAlertKinds ?? this.mutedAlertKinds,
+    hiddenJobMethods: hiddenJobMethods ?? this.hiddenJobMethods,
     homeWidgets: homeWidgets ?? this.homeWidgets,
     siriShortcuts: siriShortcuts ?? this.siriShortcuts,
   );
@@ -185,6 +197,7 @@ class AppSettings {
     'jobNotifications': jobNotifications,
     'alertLevel': alertLevel.name,
     'mutedAlertKinds': mutedAlertKinds.toList()..sort(),
+    'hiddenJobMethods': hiddenJobMethods.toList()..sort(),
     'homeWidgets': homeWidgets,
     'siriShortcuts': siriShortcuts,
   };

@@ -151,7 +151,9 @@ README covers what the app does; this file covers how to work on it.
   `ios/Shared` is compiled into both targets) and a notification on Android
   (`LiveProgressPlugin.kt`, a promoted ongoing progress notification on
   Android 16). `JobMonitor` ties them to one open server, `ServerScreen` owns
-  it. The in-app card (`JobProgressBanner`) has a close button (hides the jobs
+  it. The in-app card (`JobProgressBanner`) shows one job at a time (running
+  ones first, a `PageView` with dots; swipe for the next, and the job you look at
+  stays in view when the list changes) and has a close button (hides the jobs
   it showed, not later ones); `JobGaugeButton` is the animated ring in the
   app bar actions. `LiveProgress.support()` (`LiveSupport`) tells a missing
   `JobActivityWidget.appex` (sideloader stripped it: the Dynamic Island is
@@ -234,6 +236,14 @@ README covers what the app does; this file covers how to work on it.
   and from the alerts seen; muting also works from the menu on an alert in the
   Alerts tab. The live job progress switch (`liveJobs`) sits in the same
   Notifications section.
+- Hidden job types (`hiddenJobMethods`, global, in `AppSettings`): the menu on
+  a job in the Jobs list (`lib/features/server/jobs_tab.dart`) hides every job
+  with that `method` (e.g. `cronjob.run`); a row at the bottom opens
+  `HiddenJobsScreen` to show them again. `TrueNasSession.jobs(excludeMethods:)`
+  sends a `['method','nin',[...]]` filter so the 50 rows are not eaten by hidden
+  ones (unconfirmed on a real NAS; the events are filtered client side too).
+  Only the history list is affected: `JobTracker`, notifications and widgets
+  still see these jobs.
 - App install and configuration (`lib/features/workloads/app_catalog_screen.dart`,
   `app_install_screen.dart`, `app_edit_screen.dart`, `app_form.dart`,
   `app_config_state.dart`; `lib/core/models/app_catalog.dart`, `app_values.dart`;
@@ -265,6 +275,29 @@ README covers what the app does; this file covers how to work on it.
   `ix_volume` storage on one. Fake server: `catalog`, `dockerStatus`,
   `catalogApps`, `catalogDetails`, `appConfigs`, `appCreates`, `appUpdates`,
   `appJobState`.
+- Virtual machine editor (`lib/features/workloads/vm_screen.dart`,
+  `vm_edit_screen.dart`, `vm_device_screen.dart`, `vm_form_fields.dart`;
+  `lib/core/models/vm_config.dart`; `WorkloadsApi.vm/vmDevices/vmChoices/createVm/
+  updateVm/deleteVm/createVmDevice/updateVmDevice/deleteVmDevice`). A VM row in
+  the Apps tab opens `VmScreen` (state, actions, settings, device list); "+" beside
+  "Virtual machines" opens `VmEditScreen` (gated on `vm.create`; editing and the
+  device list on `vm.update` + `vm.device.query`, delete on `vm.delete`). `VmDraft`
+  holds the settings (`vm.query` row in, `toPayload()` out); `vm.update` gets only
+  `changesFrom(raw)`, since it merges. A new VM can carry a first disk (new
+  zvol: `create_zvol`, `zvol_name` = `pool/name`, `zvol_volsize` in bytes), an
+  ISO (`CDROM`) and a NIC in the same `vm.create` call (`devices`), so a refusal
+  leaves nothing behind. Devices (`vm.device.*`, `dtype` DISK, RAW, CDROM, NIC,
+  DISPLAY, PCI, USB): `vm.device.update` replaces the whole `attributes`, so
+  `VmDeviceScreen` starts from the stored set and only overwrites the fields it
+  shows; a `dtype` it does not know is edited as JSON. Pickers come from
+  `vm.bootloader_options`, `vm.cpu_model_choices`, `vm.device.nic_attach_choices`,
+  `vm.device.disk_choices`, `vm.resolution_choices`, `vm.device.bind_choices`,
+  `vm.maximum_supported_vcpus` and `vm.random_mac`, each optional (a failed one
+  gives an empty list and a text field). Changes to a running VM apply at its next
+  start. The payloads are written from the middleware source and unconfirmed on a
+  real NAS: check the new-zvol path, the NIC `nic_attach` choices, the display
+  attributes and `trusted_platform_module` (only sent when the row has it) on 25.04.
+  Fake server: `vmEditor`, `vms`, `vmDevices`.
 - Apps tab bulk actions hand the work to the server as one `core.bulk` job
   (what the web UI's "Update All" does), so it carries on when the app is
   closed: "Update all", or Select, tick apps, then Update, Start, Stop or
@@ -468,6 +501,16 @@ README covers what the app does; this file covers how to work on it.
   verdict from the log and the power-on hours of the newest test. Shape
   unconfirmed on a real NAS. Fake server: `smartAttributes`,
   `smartAttributeRows`.
+- Schedules (`lib/core/models/cron_schedule.dart`, `lib/features/protection/schedule_field.dart`):
+  data protection tasks (snapshot, replication, cloud sync, cloud backup, rsync) carry
+  `Object? schedule`: a `SnapshotSchedule` preset, a `CronSchedule` (five cron text fields plus the
+  optional `begin`/`end` window, which is carried back on save), or null (replication that follows
+  its snapshots). `scheduleRequest(schedule, window:)` makes the request object. `ScheduleField`
+  is the dropdown (presets, the task's own custom cron, "Custom...") and `showCronEditor` the
+  dialog: `CronDraft` reads a cron into the simplest of minutes / hourly / daily / weekly / monthly
+  and keeps anything else (`*/7`, ranges, month lists) in the advanced mode as typed;
+  `CronField.accepts` validates. `cronDescription` turns a cron into words. Unconfirmed on a real
+  NAS: that 25.04 takes lists and steps in every field (it is croniter underneath).
 - System updates and power (`SystemApi`, `lib/features/system/updates_screen.dart`,
   `power_actions.dart`): `UpdateInfo` is normalised across `update.status`
   (code `REBOOT_REQUIRED`, `new_version.filesize/changelog`, both optional) and

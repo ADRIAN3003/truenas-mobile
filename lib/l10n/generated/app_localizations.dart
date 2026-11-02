@@ -728,6 +728,60 @@ abstract class AppLocalizations {
   /// **'No recent jobs'**
   String get jobsEmpty;
 
+  /// Snackbar action that reverses the last change.
+  ///
+  /// In en, this message translates to:
+  /// **'Undo'**
+  String get undo;
+
+  /// Shown on the Jobs list when every job found is of a type the user hid.
+  ///
+  /// In en, this message translates to:
+  /// **'All recent jobs are of hidden types'**
+  String get jobsAllHidden;
+
+  /// Job menu entry: stop listing jobs of this kind.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide this type of job'**
+  String get jobHideType;
+
+  /// Snackbar after hiding a job type. The placeholder is the API method, e.g. cronjob.run.
+  ///
+  /// In en, this message translates to:
+  /// **'Hiding \"{method}\" jobs'**
+  String jobTypeHidden(String method);
+
+  /// Row at the bottom of the Jobs list and title of the screen that lists the hidden job types.
+  ///
+  /// In en, this message translates to:
+  /// **'Hidden job types'**
+  String get hiddenJobsTitle;
+
+  /// Explains the hidden job types screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Jobs of these types are left out of the Jobs list. Live progress and notifications are not affected.'**
+  String get hiddenJobsHint;
+
+  /// Empty state of the hidden job types screen.
+  ///
+  /// In en, this message translates to:
+  /// **'No job types are hidden. Use the menu on a job to hide its type.'**
+  String get hiddenJobsEmpty;
+
+  /// Button that lists a hidden job type again.
+  ///
+  /// In en, this message translates to:
+  /// **'Show'**
+  String get hiddenJobsShow;
+
+  /// Button that lists every hidden job type again.
+  ///
+  /// In en, this message translates to:
+  /// **'Show all'**
+  String get hiddenJobsShowAll;
+
   /// Action that aborts a running job.
   ///
   /// In en, this message translates to:
@@ -3050,6 +3104,180 @@ abstract class AppLocalizations {
   /// **'Cron: {cron}'**
   String scheduleCustom(String cron);
 
+  /// Schedule choice that opens the custom editor.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom…'**
+  String get scheduleCustomChoice;
+
+  /// Dialog title.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom schedule'**
+  String get cronEditorTitle;
+
+  /// Field label.
+  ///
+  /// In en, this message translates to:
+  /// **'Repeat'**
+  String get cronRepeat;
+
+  /// Schedule kind.
+  ///
+  /// In en, this message translates to:
+  /// **'Every few minutes'**
+  String get cronModeMinutes;
+
+  /// Schedule kind.
+  ///
+  /// In en, this message translates to:
+  /// **'Every few hours'**
+  String get cronModeHourly;
+
+  /// Schedule kind.
+  ///
+  /// In en, this message translates to:
+  /// **'Every day'**
+  String get cronModeDaily;
+
+  /// Schedule kind.
+  ///
+  /// In en, this message translates to:
+  /// **'On certain weekdays'**
+  String get cronModeWeekly;
+
+  /// Schedule kind.
+  ///
+  /// In en, this message translates to:
+  /// **'Once a month'**
+  String get cronModeMonthly;
+
+  /// Schedule kind.
+  ///
+  /// In en, this message translates to:
+  /// **'Cron expression'**
+  String get cronModeAdvanced;
+
+  /// Field label.
+  ///
+  /// In en, this message translates to:
+  /// **'Minutes between runs'**
+  String get cronMinutesBetween;
+
+  /// Field label.
+  ///
+  /// In en, this message translates to:
+  /// **'Hours between runs'**
+  String get cronHoursBetween;
+
+  /// Field label, the minute of the hour.
+  ///
+  /// In en, this message translates to:
+  /// **'At minute'**
+  String get cronAtMinute;
+
+  /// Field label, the hour of the day.
+  ///
+  /// In en, this message translates to:
+  /// **'Hour'**
+  String get cronTimeHour;
+
+  /// Field label, the minute of the hour.
+  ///
+  /// In en, this message translates to:
+  /// **'Minute'**
+  String get cronTimeMinute;
+
+  /// Field label.
+  ///
+  /// In en, this message translates to:
+  /// **'Day of the month'**
+  String get cronDayOfMonth;
+
+  /// Field label.
+  ///
+  /// In en, this message translates to:
+  /// **'On these days'**
+  String get cronWeekdays;
+
+  /// Hint under the weekday chips.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick at least one day.'**
+  String get cronPickWeekday;
+
+  /// Cron field label.
+  ///
+  /// In en, this message translates to:
+  /// **'Minute'**
+  String get cronFieldMinute;
+
+  /// Cron field label.
+  ///
+  /// In en, this message translates to:
+  /// **'Hour'**
+  String get cronFieldHour;
+
+  /// Cron field label, day of the month.
+  ///
+  /// In en, this message translates to:
+  /// **'Day'**
+  String get cronFieldDom;
+
+  /// Cron field label.
+  ///
+  /// In en, this message translates to:
+  /// **'Month'**
+  String get cronFieldMonth;
+
+  /// Cron field label, day of the week.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekday'**
+  String get cronFieldDow;
+
+  /// Error under a cron field.
+  ///
+  /// In en, this message translates to:
+  /// **'Not valid'**
+  String get cronFieldInvalid;
+
+  /// Help text under the cron fields.
+  ///
+  /// In en, this message translates to:
+  /// **'* is every, */5 every 5th, 1-5 a range, 1,15 a list. Weekdays: 0 or 7 is Sunday.'**
+  String get cronAdvancedHelp;
+
+  /// Schedule.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Every minute} other{Every {count} minutes}}'**
+  String scheduleEveryMinutes(int count);
+
+  /// Schedule: every few hours at a minute.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Every hour} other{Every {count} hours}}, at minute {minute}'**
+  String scheduleEveryHours(int count, int minute);
+
+  /// Schedule.
+  ///
+  /// In en, this message translates to:
+  /// **'Every day at {time}'**
+  String scheduleDailyAt(String time);
+
+  /// Schedule: weekday names, then a time.
+  ///
+  /// In en, this message translates to:
+  /// **'{days} at {time}'**
+  String scheduleWeeklyAt(String days, String time);
+
+  /// Schedule.
+  ///
+  /// In en, this message translates to:
+  /// **'On day {day} of every month at {time}'**
+  String scheduleMonthlyAt(int day, String time);
+
   /// Detail for recursive tasks.
   ///
   /// In en, this message translates to:
@@ -4508,12 +4736,6 @@ abstract class AppLocalizations {
   /// **'Connection lost, progress may be out of date'**
   String get jobsConnectionLost;
 
-  /// Under the running jobs when there are more than shown.
-  ///
-  /// In en, this message translates to:
-  /// **'+{count} more'**
-  String jobsMoreCount(int count);
-
   /// Android notification channel name for running jobs.
   ///
   /// In en, this message translates to:
@@ -5581,6 +5803,612 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'That sync task no longer exists.'**
   String get shortcutTaskMissing;
+
+  /// Virtual machine editor: New virtual machine
+  ///
+  /// In en, this message translates to:
+  /// **'New virtual machine'**
+  String get vmCreateTitle;
+
+  /// Virtual machine editor: Edit {name}
+  ///
+  /// In en, this message translates to:
+  /// **'Edit {name}'**
+  String vmEditTitle(String name);
+
+  /// Virtual machine editor: Created {name}
+  ///
+  /// In en, this message translates to:
+  /// **'Created {name}'**
+  String vmCreated(String name);
+
+  /// Virtual machine editor: Saved {name}
+  ///
+  /// In en, this message translates to:
+  /// **'Saved {name}'**
+  String vmSaved(String name);
+
+  /// Virtual machine editor: Changes to a running machine take effect the next time it starts.
+  ///
+  /// In en, this message translates to:
+  /// **'Changes to a running machine take effect the next time it starts.'**
+  String get vmEditNote;
+
+  /// Virtual machine editor: General
+  ///
+  /// In en, this message translates to:
+  /// **'General'**
+  String get vmSectionGeneral;
+
+  /// Virtual machine editor: Name
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get vmName;
+
+  /// Virtual machine editor: Description
+  ///
+  /// In en, this message translates to:
+  /// **'Description'**
+  String get vmDescription;
+
+  /// Virtual machine editor: Processor and memory
+  ///
+  /// In en, this message translates to:
+  /// **'Processor and memory'**
+  String get vmSectionProcessor;
+
+  /// Virtual machine editor: Virtual CPUs (sockets)
+  ///
+  /// In en, this message translates to:
+  /// **'Virtual CPUs (sockets)'**
+  String get vmVcpusField;
+
+  /// Virtual machine editor: The host allows up to {count} in total
+  ///
+  /// In en, this message translates to:
+  /// **'The host allows up to {count} in total'**
+  String vmVcpusMax(int count);
+
+  /// Virtual machine editor: Cores per CPU
+  ///
+  /// In en, this message translates to:
+  /// **'Cores per CPU'**
+  String get vmCoresField;
+
+  /// Virtual machine editor: Threads per core
+  ///
+  /// In en, this message translates to:
+  /// **'Threads per core'**
+  String get vmThreadsField;
+
+  /// Virtual machine editor: CPU mode
+  ///
+  /// In en, this message translates to:
+  /// **'CPU mode'**
+  String get vmCpuMode;
+
+  /// Virtual machine editor: Custom
+  ///
+  /// In en, this message translates to:
+  /// **'Custom'**
+  String get vmCpuModeCustom;
+
+  /// Virtual machine editor: Host model
+  ///
+  /// In en, this message translates to:
+  /// **'Host model'**
+  String get vmCpuModeHostModel;
+
+  /// Virtual machine editor: Host passthrough
+  ///
+  /// In en, this message translates to:
+  /// **'Host passthrough'**
+  String get vmCpuModeHostPassthrough;
+
+  /// Virtual machine editor: CPU model
+  ///
+  /// In en, this message translates to:
+  /// **'CPU model'**
+  String get vmCpuModel;
+
+  /// Virtual machine editor: Default
+  ///
+  /// In en, this message translates to:
+  /// **'Default'**
+  String get vmCpuModelDefault;
+
+  /// Virtual machine editor: Memory (MiB)
+  ///
+  /// In en, this message translates to:
+  /// **'Memory (MiB)'**
+  String get vmMemoryField;
+
+  /// Virtual machine editor: Minimum memory (MiB)
+  ///
+  /// In en, this message translates to:
+  /// **'Minimum memory (MiB)'**
+  String get vmMinMemoryField;
+
+  /// Virtual machine editor: Leave empty to give the machine a fixed amount.
+  ///
+  /// In en, this message translates to:
+  /// **'Leave empty to give the machine a fixed amount.'**
+  String get vmMinMemoryHelp;
+
+  /// Virtual machine editor: Boot and clock
+  ///
+  /// In en, this message translates to:
+  /// **'Boot and clock'**
+  String get vmSectionBoot;
+
+  /// Virtual machine editor: Boot method
+  ///
+  /// In en, this message translates to:
+  /// **'Boot method'**
+  String get vmBootloader;
+
+  /// Virtual machine editor: Guest clock
+  ///
+  /// In en, this message translates to:
+  /// **'Guest clock'**
+  String get vmClock;
+
+  /// Virtual machine editor: Local time
+  ///
+  /// In en, this message translates to:
+  /// **'Local time'**
+  String get vmClockLocal;
+
+  /// Virtual machine editor: Shutdown timeout
+  ///
+  /// In en, this message translates to:
+  /// **'Shutdown timeout'**
+  String get vmShutdownTimeout;
+
+  /// Virtual machine editor: Seconds the guest gets to shut down before it is powered off.
+  ///
+  /// In en, this message translates to:
+  /// **'Seconds the guest gets to shut down before it is powered off.'**
+  String get vmShutdownTimeoutHelp;
+
+  /// Virtual machine editor: {count} s
+  ///
+  /// In en, this message translates to:
+  /// **'{count} s'**
+  String vmSeconds(int count);
+
+  /// Virtual machine editor: Start when the server boots
+  ///
+  /// In en, this message translates to:
+  /// **'Start when the server boots'**
+  String get vmAutostartField;
+
+  /// Virtual machine editor: Advanced
+  ///
+  /// In en, this message translates to:
+  /// **'Advanced'**
+  String get vmSectionAdvanced;
+
+  /// Virtual machine editor: Add a display device
+  ///
+  /// In en, this message translates to:
+  /// **'Add a display device'**
+  String get vmEnsureDisplay;
+
+  /// Virtual machine editor: Adds one if the machine has none, so you can see its screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Adds one if the machine has none, so you can see its screen.'**
+  String get vmEnsureDisplayHelp;
+
+  /// Virtual machine editor: Hyper-V enlightenments
+  ///
+  /// In en, this message translates to:
+  /// **'Hyper-V enlightenments'**
+  String get vmHyperv;
+
+  /// Virtual machine editor: Makes Windows guests faster.
+  ///
+  /// In en, this message translates to:
+  /// **'Makes Windows guests faster.'**
+  String get vmHypervHelp;
+
+  /// Virtual machine editor: Hide the hypervisor from the guest
+  ///
+  /// In en, this message translates to:
+  /// **'Hide the hypervisor from the guest'**
+  String get vmHideFromMsr;
+
+  /// Virtual machine editor: Some software refuses to run in a virtual machine.
+  ///
+  /// In en, this message translates to:
+  /// **'Some software refuses to run in a virtual machine.'**
+  String get vmHideFromMsrHelp;
+
+  /// Virtual machine editor: Virtual TPM
+  ///
+  /// In en, this message translates to:
+  /// **'Virtual TPM'**
+  String get vmTpm;
+
+  /// Virtual machine editor: Devices
+  ///
+  /// In en, this message translates to:
+  /// **'Devices'**
+  String get vmSectionNewDevices;
+
+  /// Virtual machine editor: Create a disk
+  ///
+  /// In en, this message translates to:
+  /// **'Create a disk'**
+  String get vmNewDisk;
+
+  /// Virtual machine editor: Add a network adapter
+  ///
+  /// In en, this message translates to:
+  /// **'Add a network adapter'**
+  String get vmNewNic;
+
+  /// Virtual machine editor: Install image (path to an ISO)
+  ///
+  /// In en, this message translates to:
+  /// **'Install image (path to an ISO)'**
+  String get vmInstallImage;
+
+  /// Virtual machine editor: Optional. A file on the server, e.g. /mnt/tank/iso/win11.iso
+  ///
+  /// In en, this message translates to:
+  /// **'Optional. A file on the server, e.g. /mnt/tank/iso/win11.iso'**
+  String get vmInstallImageHelp;
+
+  /// Virtual machine editor: Settings
+  ///
+  /// In en, this message translates to:
+  /// **'Settings'**
+  String get vmSectionSettings;
+
+  /// Virtual machine editor: Processor
+  ///
+  /// In en, this message translates to:
+  /// **'Processor'**
+  String get vmInfoCpu;
+
+  /// Virtual machine editor: {total} vCPU ({layout})
+  ///
+  /// In en, this message translates to:
+  /// **'{total} vCPU ({layout})'**
+  String vmInfoCpuValue(int total, String layout);
+
+  /// Virtual machine editor: Memory
+  ///
+  /// In en, this message translates to:
+  /// **'Memory'**
+  String get vmInfoMemory;
+
+  /// Virtual machine editor: Devices
+  ///
+  /// In en, this message translates to:
+  /// **'Devices'**
+  String get vmDevices;
+
+  /// Virtual machine editor: No devices
+  ///
+  /// In en, this message translates to:
+  /// **'No devices'**
+  String get vmDevicesEmpty;
+
+  /// Virtual machine editor: Add device
+  ///
+  /// In en, this message translates to:
+  /// **'Add device'**
+  String get vmDeviceAdd;
+
+  /// Virtual machine editor: Add {type}
+  ///
+  /// In en, this message translates to:
+  /// **'Add {type}'**
+  String vmDeviceAddTitle(String type);
+
+  /// Virtual machine editor: Edit {type}
+  ///
+  /// In en, this message translates to:
+  /// **'Edit {type}'**
+  String vmDeviceEditTitle(String type);
+
+  /// Virtual machine editor: Device saved
+  ///
+  /// In en, this message translates to:
+  /// **'Device saved'**
+  String get vmDeviceSaved;
+
+  /// Virtual machine editor: Remove
+  ///
+  /// In en, this message translates to:
+  /// **'Remove'**
+  String get vmDeviceRemove;
+
+  /// Virtual machine editor: Device removed
+  ///
+  /// In en, this message translates to:
+  /// **'Device removed'**
+  String get vmDeviceRemoved;
+
+  /// Virtual machine editor: Remove this {type}?
+  ///
+  /// In en, this message translates to:
+  /// **'Remove this {type}?'**
+  String vmDeviceRemoveTitle(String type);
+
+  /// Virtual machine editor: The device is taken out of the machine. This takes effect at the next start.
+  ///
+  /// In en, this message translates to:
+  /// **'The device is taken out of the machine. This takes effect at the next start.'**
+  String get vmDeviceRemoveBody;
+
+  /// Virtual machine editor: Also destroy the zvol (deletes its data)
+  ///
+  /// In en, this message translates to:
+  /// **'Also destroy the zvol (deletes its data)'**
+  String get vmDeviceDestroyZvol;
+
+  /// Virtual machine editor: Changes take effect the next time the machine starts.
+  ///
+  /// In en, this message translates to:
+  /// **'Changes take effect the next time the machine starts.'**
+  String get vmDeviceNote;
+
+  /// Virtual machine editor: Disk (zvol)
+  ///
+  /// In en, this message translates to:
+  /// **'Disk (zvol)'**
+  String get vmDeviceDisk;
+
+  /// Virtual machine editor: Raw file
+  ///
+  /// In en, this message translates to:
+  /// **'Raw file'**
+  String get vmDeviceRaw;
+
+  /// Virtual machine editor: CD-ROM (ISO)
+  ///
+  /// In en, this message translates to:
+  /// **'CD-ROM (ISO)'**
+  String get vmDeviceCdrom;
+
+  /// Virtual machine editor: Network adapter
+  ///
+  /// In en, this message translates to:
+  /// **'Network adapter'**
+  String get vmDeviceNic;
+
+  /// Virtual machine editor: Display
+  ///
+  /// In en, this message translates to:
+  /// **'Display'**
+  String get vmDeviceDisplay;
+
+  /// Virtual machine editor: PCI device
+  ///
+  /// In en, this message translates to:
+  /// **'PCI device'**
+  String get vmDevicePci;
+
+  /// Virtual machine editor: USB device
+  ///
+  /// In en, this message translates to:
+  /// **'USB device'**
+  String get vmDeviceUsb;
+
+  /// Virtual machine editor: Bus
+  ///
+  /// In en, this message translates to:
+  /// **'Bus'**
+  String get vmDeviceBus;
+
+  /// Virtual machine editor: VirtIO is faster; AHCI works with any operating system.
+  ///
+  /// In en, this message translates to:
+  /// **'VirtIO is faster; AHCI works with any operating system.'**
+  String get vmDeviceBusHelp;
+
+  /// Virtual machine editor: New zvol
+  ///
+  /// In en, this message translates to:
+  /// **'New zvol'**
+  String get vmDeviceNewZvol;
+
+  /// Virtual machine editor: Existing zvol
+  ///
+  /// In en, this message translates to:
+  /// **'Existing zvol'**
+  String get vmDeviceExistingZvol;
+
+  /// Virtual machine editor: Pool
+  ///
+  /// In en, this message translates to:
+  /// **'Pool'**
+  String get vmDevicePool;
+
+  /// Virtual machine editor: Zvol name
+  ///
+  /// In en, this message translates to:
+  /// **'Zvol name'**
+  String get vmDeviceZvolName;
+
+  /// Virtual machine editor: Optional. Leave empty to name it after the machine.
+  ///
+  /// In en, this message translates to:
+  /// **'Optional. Leave empty to name it after the machine.'**
+  String get vmDeviceZvolNameHelp;
+
+  /// Virtual machine editor: Size (GiB)
+  ///
+  /// In en, this message translates to:
+  /// **'Size (GiB)'**
+  String get vmDeviceSizeGib;
+
+  /// Virtual machine editor: Zvol
+  ///
+  /// In en, this message translates to:
+  /// **'Zvol'**
+  String get vmDeviceZvol;
+
+  /// Virtual machine editor: Path
+  ///
+  /// In en, this message translates to:
+  /// **'Path'**
+  String get vmDevicePath;
+
+  /// Virtual machine editor: e.g. /dev/zvol/tank/vm-disk
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. /dev/zvol/tank/vm-disk'**
+  String get vmDeviceZvolPathHelp;
+
+  /// Virtual machine editor: A file on the server, e.g. /mnt/tank/vm/disk.img
+  ///
+  /// In en, this message translates to:
+  /// **'A file on the server, e.g. /mnt/tank/vm/disk.img'**
+  String get vmDeviceRawPathHelp;
+
+  /// Virtual machine editor: An ISO file on the server, e.g. /mnt/tank/iso/win11.iso
+  ///
+  /// In en, this message translates to:
+  /// **'An ISO file on the server, e.g. /mnt/tank/iso/win11.iso'**
+  String get vmDeviceCdromPathHelp;
+
+  /// Virtual machine editor: Adapter type
+  ///
+  /// In en, this message translates to:
+  /// **'Adapter type'**
+  String get vmNicType;
+
+  /// Virtual machine editor: VirtIO is faster; E1000 works without extra drivers.
+  ///
+  /// In en, this message translates to:
+  /// **'VirtIO is faster; E1000 works without extra drivers.'**
+  String get vmNicTypeHelp;
+
+  /// Virtual machine editor: Attach to
+  ///
+  /// In en, this message translates to:
+  /// **'Attach to'**
+  String get vmNicAttach;
+
+  /// Virtual machine editor: MAC address
+  ///
+  /// In en, this message translates to:
+  /// **'MAC address'**
+  String get vmMac;
+
+  /// Virtual machine editor: Leave empty for a random one.
+  ///
+  /// In en, this message translates to:
+  /// **'Leave empty for a random one.'**
+  String get vmMacHelp;
+
+  /// Virtual machine editor: Random address
+  ///
+  /// In en, this message translates to:
+  /// **'Random address'**
+  String get vmMacRandom;
+
+  /// Virtual machine editor: Trust guest receive filters
+  ///
+  /// In en, this message translates to:
+  /// **'Trust guest receive filters'**
+  String get vmTrustRx;
+
+  /// Virtual machine editor: Lets the guest change its MAC address and receive modes.
+  ///
+  /// In en, this message translates to:
+  /// **'Lets the guest change its MAC address and receive modes.'**
+  String get vmTrustRxHelp;
+
+  /// Virtual machine editor: Resolution
+  ///
+  /// In en, this message translates to:
+  /// **'Resolution'**
+  String get vmResolution;
+
+  /// Virtual machine editor: Listen on
+  ///
+  /// In en, this message translates to:
+  /// **'Listen on'**
+  String get vmBind;
+
+  /// Virtual machine editor: Password
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get vmDisplayPassword;
+
+  /// Virtual machine editor: Web access
+  ///
+  /// In en, this message translates to:
+  /// **'Web access'**
+  String get vmDisplayWeb;
+
+  /// Virtual machine editor: Lets a browser open the display.
+  ///
+  /// In en, this message translates to:
+  /// **'Lets a browser open the display.'**
+  String get vmDisplayWebHelp;
+
+  /// Virtual machine editor: PCI device
+  ///
+  /// In en, this message translates to:
+  /// **'PCI device'**
+  String get vmPciDevice;
+
+  /// Virtual machine editor: The device address, e.g. pci_0000_01_00_0
+  ///
+  /// In en, this message translates to:
+  /// **'The device address, e.g. pci_0000_01_00_0'**
+  String get vmPciDeviceHelp;
+
+  /// Virtual machine editor: USB controller
+  ///
+  /// In en, this message translates to:
+  /// **'USB controller'**
+  String get vmUsbController;
+
+  /// Virtual machine editor: USB device
+  ///
+  /// In en, this message translates to:
+  /// **'USB device'**
+  String get vmUsbDevice;
+
+  /// Virtual machine editor: Attributes (JSON)
+  ///
+  /// In en, this message translates to:
+  /// **'Attributes (JSON)'**
+  String get vmDeviceJson;
+
+  /// Virtual machine editor: That is not valid JSON.
+  ///
+  /// In en, this message translates to:
+  /// **'That is not valid JSON.'**
+  String get vmDeviceJsonInvalid;
+
+  /// Virtual machine editor: Delete {name}?
+  ///
+  /// In en, this message translates to:
+  /// **'Delete {name}?'**
+  String vmDeleteTitle(String name);
+
+  /// Virtual machine editor: The machine and its device list are removed. Its disks stay unless you choose to destroy them.
+  ///
+  /// In en, this message translates to:
+  /// **'The machine and its device list are removed. Its disks stay unless you choose to destroy them.'**
+  String get vmDeleteBody;
+
+  /// Virtual machine editor: Also destroy its disks (deletes their data)
+  ///
+  /// In en, this message translates to:
+  /// **'Also destroy its disks (deletes their data)'**
+  String get vmDeleteDisks;
 }
 
 class _AppLocalizationsDelegate

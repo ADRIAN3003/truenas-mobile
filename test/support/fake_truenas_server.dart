@@ -247,6 +247,10 @@ class FakeTrueNasServer {
   /// `app.update`, `app.config`, `catalog.*`, `docker.status`).
   bool catalog = true;
 
+  /// Whether the server lets VMs be created, changed and deleted
+  /// (`vm.create`, `vm.update`, `vm.delete`, `vm.device.*`).
+  bool vmEditor = true;
+
   /// What `docker.status` reports.
   String dockerStatus = 'RUNNING';
 
@@ -498,8 +502,39 @@ class FakeTrueNasServer {
       'cores': 4,
       'threads': 2,
       'memory': 8192,
+      'min_memory': null,
       'autostart': false,
+      'time': 'LOCAL',
+      'bootloader': 'UEFI',
+      'cpu_mode': 'CUSTOM',
+      'cpu_model': null,
+      'shutdown_timeout': 90,
+      'hide_from_msr': false,
+      'ensure_display_device': true,
+      'hyperv_enlightenments': false,
       'status': {'state': 'STOPPED', 'pid': null, 'domain_state': 'SHUTOFF'},
+    },
+  ];
+
+  /// Devices of the VMs, served by `vm.device.query`.
+  final vmDevices = <Map<String, dynamic>>[
+    {
+      'id': 10,
+      'dtype': 'DISK',
+      'vm': 1,
+      'order': 1001,
+      'attributes': {'path': '/dev/zvol/tank/win11', 'type': 'AHCI'},
+    },
+    {
+      'id': 11,
+      'dtype': 'NIC',
+      'vm': 1,
+      'order': 1002,
+      'attributes': {
+        'type': 'E1000',
+        'nic_attach': 'enp1s0',
+        'mac': '00:a0:98:11:22:33',
+      },
     },
   ];
 
@@ -825,6 +860,24 @@ class FakeTrueNasServer {
   var logCollectionWithArgs = false;
   String? _logEvent;
 
+  /// Sends a `collection_update` to every connected API socket.
+  void pushEvent(String collection, String msg, Map<String, dynamic> fields) {
+    for (final socket in _apiSockets) {
+      socket.add(
+        jsonEncode({
+          'jsonrpc': '2.0',
+          'method': 'collection_update',
+          'params': {
+            'msg': msg,
+            'collection': collection,
+            'id': fields['id'],
+            'fields': fields,
+          },
+        }),
+      );
+    }
+  }
+
   /// Sends one more line to everyone following the log.
   void pushLogLine(String line) {
     final event = _logEvent;
@@ -1017,6 +1070,30 @@ class FakeTrueNasServer {
               if (service == 'core') 'core.bulk': <String, dynamic>{},
               if (service == 'user' && shellChoices.isNotEmpty)
                 'user.shell_choices': <String, dynamic>{},
+              if (service == 'vm' && vmEditor)
+                for (final m in [
+                  'query',
+                  'create',
+                  'update',
+                  'delete',
+                  'bootloader_options',
+                  'random_mac',
+                  'resolution_choices',
+                  'maximum_supported_vcpus',
+                  'cpu_model_choices',
+                ])
+                  'vm.$m': <String, dynamic>{},
+              if (service == 'vm.device' && vmEditor)
+                for (final m in [
+                  'query',
+                  'create',
+                  'update',
+                  'delete',
+                  'nic_attach_choices',
+                  'disk_choices',
+                  'bind_choices',
+                ])
+                  'vm.device.$m': <String, dynamic>{},
               if (service == 'app' && catalog)
                 for (final m in ['available', 'create', 'update', 'config'])
                   'app.$m': <String, dynamic>{},
@@ -1232,7 +1309,83 @@ class FakeTrueNasServer {
             }
             result = _appJob();
           case 'vm.query':
-            result = vms;
+            final filter = params.isEmpty ? null : params[0] as List<dynamic>;
+            result = filter == null || filter.isEmpty
+                ? vms
+                : [
+                    for (final v in vms)
+                      if (v['id'] == (filter.first as List<dynamic>)[2]) v,
+                  ];
+          case 'vm.create':
+            final data = {...params[0] as Map<String, dynamic>};
+            final id =
+                vms.fold<int>(
+                  0,
+                  (m, v) => (v['id'] as int) > m ? v['id'] as int : m,
+                ) +
+                1;
+            final devices = data.remove('devices') as List<dynamic>? ?? [];
+            vms.add({
+              'id': id,
+              ...data,
+              'status': {'state': 'STOPPED', 'pid': null},
+            });
+            for (final d in devices) {
+              vmDevices.add({
+                'id': 100 + vmDevices.length,
+                'vm': id,
+                'order': 1000 + vmDevices.length,
+                ...(d as Map<String, dynamic>),
+              });
+            }
+            result = vms.last;
+          case 'vm.update':
+            vms
+                .firstWhere((v) => v['id'] == params[0])
+                .addAll(params[1] as Map<String, dynamic>);
+            result = vms.firstWhere((v) => v['id'] == params[0]);
+          case 'vm.delete':
+            vms.removeWhere((v) => v['id'] == params[0]);
+            vmDevices.removeWhere((d) => d['vm'] == params[0]);
+            result = true;
+          case 'vm.bootloader_options':
+            result = {'UEFI': 'UEFI', 'UEFI_CSM': 'Legacy BIOS'};
+          case 'vm.cpu_model_choices':
+            result = {'Skylake-Client': 'Skylake-Client'};
+          case 'vm.resolution_choices':
+            result = {'1024x768': '1024x768', '1920x1080': '1920x1080'};
+          case 'vm.maximum_supported_vcpus':
+            result = 16;
+          case 'vm.random_mac':
+            result = '00:a0:98:aa:bb:cc';
+          case 'vm.device.query':
+            final vmId = ((params[0] as List).first as List)[2];
+            result = [
+              for (final d in vmDevices)
+                if (d['vm'] == vmId) d,
+            ];
+          case 'vm.device.create':
+            final data = params[0] as Map<String, dynamic>;
+            vmDevices.add({
+              'id': 100 + vmDevices.length,
+              'order': 1000 + vmDevices.length,
+              ...data,
+            });
+            result = vmDevices.last;
+          case 'vm.device.update':
+            vmDevices
+                .firstWhere((d) => d['id'] == params[0])
+                .addAll(params[1] as Map<String, dynamic>);
+            result = vmDevices.firstWhere((d) => d['id'] == params[0]);
+          case 'vm.device.delete':
+            vmDevices.removeWhere((d) => d['id'] == params[0]);
+            result = true;
+          case 'vm.device.nic_attach_choices':
+            result = {'enp1s0': 'enp1s0', 'br0': 'br0'};
+          case 'vm.device.disk_choices':
+            result = {'/dev/zvol/tank/win11': 'tank/win11'};
+          case 'vm.device.bind_choices':
+            result = {'0.0.0.0': '0.0.0.0'};
           case 'vm.start' || 'vm.poweroff':
             (vms.firstWhere((v) => v['id'] == params[0])['status']
                 as Map)['state'] = method == 'vm.start'
@@ -1579,6 +1732,20 @@ class FakeTrueNasServer {
           case 'alert.dismiss' || 'alert.restore':
             final alert = alerts.firstWhere((a) => a['uuid'] == params.first);
             alert['dismissed'] = message['method'] == 'alert.dismiss';
+          case 'core.get_jobs'
+              when params.isNotEmpty &&
+                  (params.first as List).isNotEmpty &&
+                  ((params.first as List).first as List)[0] == 'method' &&
+                  ((params.first as List).first as List)[1] == 'nin':
+            // The history list without the hidden job types.
+            final hidden = ((params.first as List).first as List)[2] as List;
+            final limit = params.length > 1
+                ? (params[1] as Map)['limit'] as int?
+                : null;
+            result = [
+              for (final job in [...jobs.reversed, runningScrub])
+                if (!hidden.contains(job['method'])) job,
+            ].take(limit ?? 1000).toList();
           case 'core.get_jobs'
               when params.isNotEmpty &&
                   (params.first as List).isNotEmpty &&

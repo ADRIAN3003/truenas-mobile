@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:truenas_mobile/core/models/cron_schedule.dart';
 import 'package:truenas_mobile/core/models/protection.dart';
 import 'package:truenas_mobile/core/models/protection_drafts.dart';
 
@@ -17,7 +18,14 @@ void main() {
         'naming_schema': ['daily-%Y%m%d'],
         'also_include_naming_schema': [],
         'auto': true,
-        'schedule': {'minute': '15', 'hour': '3', 'dom': '*', 'month': '*'},
+        'schedule': {
+          'minute': '15',
+          'hour': '3',
+          'dom': '*',
+          'month': '*',
+          'begin': '01:00',
+          'end': '06:00',
+        },
         'retention_policy': 'CUSTOM',
         'lifetime_value': 6,
         'lifetime_unit': 'MONTH',
@@ -25,15 +33,31 @@ void main() {
       expect(draft.push, isFalse);
       expect(draft.sshCredentials, 3);
       expect(draft.namingSchema, 'daily-%Y%m%d');
-      expect(draft.schedule, '15 3 * * *');
+      expect(
+        draft.schedule,
+        const CronSchedule(
+          minute: '15',
+          hour: '3',
+          begin: '01:00',
+          end: '06:00',
+        ),
+      );
 
       final json = draft.toJson();
       expect(json['direction'], 'PULL');
       expect(json['naming_schema'], ['daily-%Y%m%d']);
       expect(json['also_include_naming_schema'], isEmpty);
       expect(json['periodic_snapshot_tasks'], isEmpty);
-      // An unchanged custom schedule is left alone.
-      expect(json.containsKey('schedule'), isFalse);
+      // A custom schedule is sent back as it is, time window included.
+      expect(json['schedule'], {
+        'minute': '15',
+        'hour': '3',
+        'dom': '*',
+        'month': '*',
+        'dow': '*',
+        'begin': '01:00',
+        'end': '06:00',
+      });
       expect(json['lifetime_value'], 6);
       expect(json['netcat_active_side'], isNull);
       expect(json.containsKey('compression'), isFalse);

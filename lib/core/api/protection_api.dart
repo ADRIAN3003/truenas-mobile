@@ -46,12 +46,13 @@ class ProtectionApi {
   Future<void> abort(ProtectionTask task) =>
       _client.call('${task.kind.service}.abort', [task.id]);
 
+  /// [schedule] is a [SnapshotSchedule] or a [CronSchedule].
   Future<void> createSnapshotTask({
     required String dataset,
     required bool recursive,
     required int lifetimeValue,
     required LifetimeUnit lifetimeUnit,
-    required SnapshotSchedule schedule,
+    required Object schedule,
   }) => _client.call('pool.snapshottask.create', [
     {
       'dataset': dataset,
@@ -59,7 +60,7 @@ class ProtectionApi {
       'lifetime_value': lifetimeValue,
       'lifetime_unit': lifetimeUnit.name.toUpperCase(),
       'naming_schema': 'auto-%Y-%m-%d_%H-%M',
-      'schedule': {...schedule.cron, 'begin': '00:00', 'end': '23:59'},
+      'schedule': scheduleRequest(schedule, window: true),
       'enabled': true,
     },
   ]);

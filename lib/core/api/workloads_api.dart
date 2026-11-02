@@ -4,6 +4,7 @@ import 'dart:convert';
 import '../models/app_catalog.dart';
 import '../models/job.dart';
 import '../models/json.dart';
+import '../models/vm_config.dart';
 import '../models/workloads.dart';
 import 'api_exception.dart';
 import 'events.dart';
@@ -262,6 +263,170 @@ class WorkloadsApi {
     WorkloadAction.powerOff => _client.call('vm.poweroff', [id]),
     _ => throw UnsupportedError(action.name),
   };
+
+  /// Whether virtual machines can be created from here.
+  Future<bool> canCreateVm() async =>
+      await _catalog.has('vm.create') && await _catalog.has('vm.query');
+
+  /// Whether a virtual machine's settings and devices can be changed.
+  Future<bool> canEditVm() async =>
+      await _catalog.has('vm.update') && await _catalog.has('vm.device.query');
+
+  Future<bool> canDeleteVm() => _catalog.has('vm.delete');
+
+  /// One virtual machine, or null when it is gone.
+  Future<VirtualMachine?> vm(int id) async {
+    final rows = await _client.call('vm.query', [
+      [
+        ['id', '=', id],
+      ],
+    ]) as List<dynamic>;
+    return rows.isEmpty ? null : VirtualMachine.fromJson(asMap(rows.first));
+  }
+
+  /// The devices of a virtual machine, in boot order.
+  Future<List<VmDevice>> vmDevices(int vmId) async {
+    final rows = await _client.call('vm.device.query', [
+      [
+        ['vm', '=', vmId],
+      ],
+    ]) as List<dynamic>;
+    return [for (final r in rows) VmDevice.fromJson(asMap(r))]..sort((a, b) {
+      final byOrder = (a.order ?? 1 << 30).compareTo(b.order ?? 1 << 30);
+      return byOrder != 0 ? byOrder : a.id.compareTo(b.id);
+    });
+  }
+
+  /// What the editors can pick from. Each list is read on its own and left
+  /// empty when the server can't give it, so the editor still opens.
+  Future<VmChoices> vmChoices() async {
+    Future<Map<String, String>> labels(String method) async {
+      try {
+        if (!await _catalog.has(method)) return const {};
+        final result = await _client.call(method);
+        return result is Map
+            ? {for (final e in result.entries) '${e.key}': '${e.value}'}
+            : const {};
+      } catch (_) {
+        return const {};
+      }
+    }
+
+    Future<List<String>> list(String method) async {
+      try {
+        if (!await _catalog.has(method)) return const [];
+        final result = await _client.call(method);
+        return switch (result) {
+          final Map<dynamic, dynamic> m => [for (final k in m.keys) '$k'],
+          final List<dynamic> l => [for (final e in l) '$e'],
+          _ => const [],
+        };
+      } catch (_) {
+        return const [];
+      }
+    }
+
+    Future<int?> maxVcpus() async {
+      try {
+        if (!await _catalog.has('vm.maximum_supported_vcpus')) return null;
+        final value = await _client.call('vm.maximum_supported_vcpus');
+        return value is num ? value.toInt() : null;
+      } catch (_) {
+        return null;
+      }
+    }
+
+    final (
+      bootloaders,
+      cpuModels,
+      nicAttach,
+      disks,
+      resolutions,
+      binds,
+      max,
+    ) = await (
+      labels('vm.bootloader_options'),
+      labels('vm.cpu_model_choices'),
+      labels('vm.device.nic_attach_choices'),
+      labels('vm.device.disk_choices'),
+      list('vm.resolution_choices'),
+      labels('vm.device.bind_choices'),
+      maxVcpus(),
+    ).wait;
+    return VmChoices(
+      bootloaders: bootloaders,
+      cpuModels: cpuModels,
+      nicAttach: nicAttach,
+      disks: disks,
+      resolutions: resolutions,
+      binds: binds,
+      maxVcpus: max,
+    );
+  }
+
+  /// A random MAC address for a network device, or null when the server
+  /// doesn't hand one out.
+  Future<String?> randomMac() async {
+    try {
+      if (!await _catalog.has('vm.random_mac')) return null;
+      return await _client.call('vm.random_mac') as String?;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// Creates a virtual machine with [config] and [devices] (each
+  /// `{dtype, attributes}`) in one call, so a refusal leaves nothing behind.
+  Future<VirtualMachine> createVm(
+    Map<String, dynamic> config,
+    List<Map<String, dynamic>> devices,
+  ) async => VirtualMachine.fromJson(
+    asMap(
+      await _client.call('vm.create', [
+        {...config, if (devices.isNotEmpty) 'devices': devices},
+      ]),
+    ),
+  );
+
+  /// Applies [changes] to a virtual machine. They take effect the next time
+  /// it starts.
+  Future<void> updateVm(int id, Map<String, dynamic> changes) async {
+    if (changes.isEmpty) return;
+    await _client.call('vm.update', [id, changes]);
+  }
+
+  /// Deletes a virtual machine. [removeZvols] also destroys the disks the
+  /// machine was using; [force] deletes it even if cleanup fails.
+  Future<void> deleteVm(
+    int id, {
+    bool removeZvols = false,
+    bool force = false,
+  }) => _client.call('vm.delete', [
+    id,
+    {'zvols': removeZvols, 'force': force},
+  ]);
+
+  Future<void> createVmDevice(
+    int vmId,
+    String dtype,
+    Map<String, dynamic> attributes,
+  ) => _client.call('vm.device.create', [
+    {'vm': vmId, 'dtype': dtype, 'attributes': attributes},
+  ]);
+
+  /// Replaces a device's [attributes] (the whole set, not a patch).
+  Future<void> updateVmDevice(int id, Map<String, dynamic> attributes) =>
+      _client.call('vm.device.update', [
+        id,
+        {'attributes': attributes},
+      ]);
+
+  /// Removes a device. [removeZvol] also destroys the zvol behind a disk.
+  Future<void> deleteVmDevice(int id, {bool removeZvol = false}) =>
+      _client.call('vm.device.delete', [
+        id,
+        {'zvol': removeZvol, 'raw_file': false, 'force': false},
+      ]);
 
   /// Containers of a running app that a shell can open in, as id → name.
   Future<Map<String, String>> appShellContainers(String app) async {

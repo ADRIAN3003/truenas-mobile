@@ -236,6 +236,14 @@ README covers what the app does; this file covers how to work on it.
   and from the alerts seen; muting also works from the menu on an alert in the
   Alerts tab. The live job progress switch (`liveJobs`) sits in the same
   Notifications section.
+- Hidden job types (`hiddenJobMethods`, global, in `AppSettings`): the menu on
+  a job in the Jobs list (`lib/features/server/jobs_tab.dart`) hides every job
+  with that `method` (e.g. `cronjob.run`); a row at the bottom opens
+  `HiddenJobsScreen` to show them again. `TrueNasSession.jobs(excludeMethods:)`
+  sends a `['method','nin',[...]]` filter so the 50 rows are not eaten by hidden
+  ones (unconfirmed on a real NAS; the events are filtered client side too).
+  Only the history list is affected: `JobTracker`, notifications and widgets
+  still see these jobs.
 - App install and configuration (`lib/features/workloads/app_catalog_screen.dart`,
   `app_install_screen.dart`, `app_edit_screen.dart`, `app_form.dart`,
   `app_config_state.dart`; `lib/core/models/app_catalog.dart`, `app_values.dart`;

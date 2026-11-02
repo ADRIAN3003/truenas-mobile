@@ -383,6 +383,37 @@ class AppLocalizationsHu extends AppLocalizations {
   String get jobsEmpty => 'Nincs friss feladat';
 
   @override
+  String get undo => 'Visszavonás';
+
+  @override
+  String get jobsAllHidden => 'Minden friss feladat rejtett típusú';
+
+  @override
+  String get jobHideType => 'Ilyen típusú feladatok elrejtése';
+
+  @override
+  String jobTypeHidden(String method) {
+    return '\"$method\" feladatok elrejtve';
+  }
+
+  @override
+  String get hiddenJobsTitle => 'Rejtett feladattípusok';
+
+  @override
+  String get hiddenJobsHint =>
+      'Ezek a típusok nem jelennek meg a Feladatok listában. Az élő folyamatjelzést és az értesítéseket nem érinti.';
+
+  @override
+  String get hiddenJobsEmpty =>
+      'Nincs rejtett feladattípus. Egy feladat menüjével elrejthetsz egy típust.';
+
+  @override
+  String get hiddenJobsShow => 'Megjelenítés';
+
+  @override
+  String get hiddenJobsShowAll => 'Mind megjelenítése';
+
+  @override
   String get jobAbort => 'Megszakítás';
 
   @override

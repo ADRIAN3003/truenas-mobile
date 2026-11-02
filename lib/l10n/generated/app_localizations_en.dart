@@ -385,6 +385,37 @@ class AppLocalizationsEn extends AppLocalizations {
   String get jobsEmpty => 'No recent jobs';
 
   @override
+  String get undo => 'Undo';
+
+  @override
+  String get jobsAllHidden => 'All recent jobs are of hidden types';
+
+  @override
+  String get jobHideType => 'Hide this type of job';
+
+  @override
+  String jobTypeHidden(String method) {
+    return 'Hiding \"$method\" jobs';
+  }
+
+  @override
+  String get hiddenJobsTitle => 'Hidden job types';
+
+  @override
+  String get hiddenJobsHint =>
+      'Jobs of these types are left out of the Jobs list. Live progress and notifications are not affected.';
+
+  @override
+  String get hiddenJobsEmpty =>
+      'No job types are hidden. Use the menu on a job to hide its type.';
+
+  @override
+  String get hiddenJobsShow => 'Show';
+
+  @override
+  String get hiddenJobsShowAll => 'Show all';
+
+  @override
   String get jobAbort => 'Abort';
 
   @override

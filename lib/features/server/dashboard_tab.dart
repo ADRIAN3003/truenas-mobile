@@ -16,6 +16,7 @@ import '../../shared/theme.dart';
 import '../../shared/ui.dart';
 import '../../shared/viz_colors.dart';
 import '../../shared/widgets.dart';
+import '../storage/storage_helpers.dart';
 import '../reporting/history_screen.dart';
 
 /// Why a call failed, as the server said it; a connection problem is worded
@@ -700,9 +701,13 @@ class _PoolsCard extends StatelessWidget {
                             ),
                             StatusPill(
                               label: pool.status,
-                              tone: pool.healthy
-                                  ? StatusTone.good
-                                  : StatusTone.critical,
+                              // Same colours as the Storage page: DEGRADED is
+                              // yellow, only a faulted or offline pool red.
+                              tone:
+                                  pool.status.toUpperCase() == 'ONLINE' &&
+                                      !pool.healthy
+                                  ? StatusTone.warning
+                                  : zfsStatusTone(pool.status.toUpperCase()),
                             ),
                           ],
                         ),

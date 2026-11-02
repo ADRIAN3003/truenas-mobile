@@ -343,7 +343,14 @@ class GlassAlert extends StatelessWidget {
                       Flexible(
                         child: Padding(
                           padding: const EdgeInsets.only(top: 12),
-                          child: SingleChildScrollView(child: content),
+                          // Its own Material, inside the panel's fill: list
+                          // tiles paint their ink on the nearest one.
+                          child: SingleChildScrollView(
+                            child: Material(
+                              type: MaterialType.transparency,
+                              child: content,
+                            ),
+                          ),
                         ),
                       ),
                     Padding(

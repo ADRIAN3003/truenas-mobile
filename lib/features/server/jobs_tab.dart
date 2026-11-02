@@ -141,7 +141,14 @@ class _JobsTabState extends ConsumerState<JobsTab> {
     ref.listen(settingsProvider.select((s) => s.hiddenJobMethods), (_, _) {
       _load();
     });
-    final jobs = _jobs;
+    final all = _jobs;
+    // Waiting and running jobs first, each group keeping the server's order.
+    final jobs = all == null
+        ? null
+        : [
+            ...all.where((j) => j.state.isActive),
+            ...all.where((j) => !j.state.isActive),
+          ];
     if (jobs == null) {
       return Center(
         child: _error == null

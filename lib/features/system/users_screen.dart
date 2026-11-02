@@ -10,10 +10,11 @@ import '../../shared/widgets.dart';
 import '../sharing/sharing_widgets.dart';
 import '../storage/storage_helpers.dart';
 import '../../shared/dialogs.dart';
+import 'account_editors.dart';
 
 typedef _AccountsData = (List<LocalUser>, List<LocalGroup>);
 
-/// Local users and groups: list, add, lock and delete.
+/// Local users and groups: list, add, edit, lock and delete.
 class UsersScreen extends StatefulWidget {
   const UsersScreen({super.key, required this.session});
 
@@ -71,6 +72,26 @@ class _UsersScreenState extends State<UsersScreen>
       success: l10n.groupCreated(name),
     );
     if (ok) await load();
+  }
+
+  Future<void> _editUser(LocalUser user) async {
+    final saved = await Navigator.push<bool>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => UserEditor(session: _session, user: user),
+      ),
+    );
+    if (saved == true) await load();
+  }
+
+  Future<void> _editGroup(LocalGroup group) async {
+    final saved = await Navigator.push<bool>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => GroupEditor(session: _session, group: group),
+      ),
+    );
+    if (saved == true) await load();
   }
 
   Future<void> _setLocked(LocalUser user, bool locked) async {
@@ -184,6 +205,7 @@ class _UsersScreenState extends State<UsersScreen>
                             for (final user in users)
                               _UserTile(
                                 user: user,
+                                onEdit: () => _editUser(user),
                                 onLock: (v) => _setLocked(user, v),
                                 onDelete: () => _deleteUser(user),
                               ),
@@ -213,13 +235,22 @@ class _UsersScreenState extends State<UsersScreen>
                                   'GID ${group.gid} · '
                                   '${l10n.groupMembers(group.members)}',
                                 ),
-                                trailing: group.builtin
-                                    ? Text(l10n.userBuiltin)
-                                    : IconButton(
-                                        tooltip: l10n.delete,
-                                        icon: const Icon(Icons.delete_outline),
-                                        onPressed: () => _deleteGroup(group),
+                                onTap: () => _editGroup(group),
+                                trailing: AppPopupMenu<String>(
+                                  onSelected: (value) => switch (value) {
+                                    'edit' => _editGroup(group),
+                                    _ => _deleteGroup(group),
+                                  },
+                                  entries: [
+                                    menuEntry('edit', l10n.edit),
+                                    if (!group.builtin)
+                                      menuEntry(
+                                        'delete',
+                                        l10n.delete,
+                                        destructive: true,
                                       ),
+                                  ],
+                                ),
                               ),
                           ],
                         ),
@@ -235,17 +266,18 @@ class _UsersScreenState extends State<UsersScreen>
   }
 }
 
-bool _validName(String value) =>
-    RegExp(r'^[a-z_][a-z0-9_-]{0,31}$').hasMatch(value);
+bool _validName(String value) => validAccountName(value);
 
 class _UserTile extends StatelessWidget {
   const _UserTile({
     required this.user,
+    required this.onEdit,
     required this.onLock,
     required this.onDelete,
   });
 
   final LocalUser user;
+  final VoidCallback onEdit;
   final ValueChanged<bool> onLock;
   final VoidCallback onDelete;
 
@@ -264,6 +296,7 @@ class _UserTile extends StatelessWidget {
         ),
       ),
       title: Text(user.username),
+      onTap: onEdit,
       subtitle: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -302,21 +335,20 @@ class _UserTile extends StatelessWidget {
             ),
         ],
       ),
-      trailing: user.builtin
-          ? null
-          : AppPopupMenu<String>(
-              onSelected: (value) => switch (value) {
-                'lock' => onLock(!user.locked),
-                _ => onDelete(),
-              },
-              entries: [
-                menuEntry(
-                  'lock',
-                  user.locked ? l10n.userUnlock : l10n.userLock,
-                ),
-                menuEntry('delete', l10n.delete, destructive: true),
-              ],
-            ),
+      trailing: AppPopupMenu<String>(
+        onSelected: (value) => switch (value) {
+          'edit' => onEdit(),
+          'lock' => onLock(!user.locked),
+          _ => onDelete(),
+        },
+        entries: [
+          menuEntry('edit', l10n.edit),
+          if (!user.builtin)
+            menuEntry('lock', user.locked ? l10n.userUnlock : l10n.userLock),
+          if (!user.builtin)
+            menuEntry('delete', l10n.delete, destructive: true),
+        ],
+      ),
     );
   }
 }

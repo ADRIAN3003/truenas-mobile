@@ -88,7 +88,7 @@ for Android and iOS that talks to the official TrueNAS middleware API
   (create, edit their processor, memory and boot settings, add, change and
   remove disks, network adapters and other devices, delete) and containers
   (start, stop, restart), each with a shell.
-- **System:** users and groups, API keys, network and certificates
+- **System:** users and groups (add, edit, lock, delete), API keys, network and certificates
   (read-only), updates and boot environments, reboot and shut down.
 - **Shell:** a terminal on the server, with Esc, Tab, Ctrl+C and arrow keys.
 - **API explorer:** every method the server exposes, with its documentation

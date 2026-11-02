@@ -128,6 +128,115 @@ void main() {
     await disconnect(tester);
   });
 
+  testWidgets('edits a user and sends only what changed', (tester) async {
+    // Tall enough to show the whole form without scrolling.
+    tester.view.physicalSize = const Size(800, 1800);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    await connect(tester);
+    await tester.pumpWidget(wrap(UsersScreen(session: session)));
+    await settle(tester);
+
+    await tester.tap(find.text('alice'));
+    await settle(tester);
+    expect(find.text('Edit user'), findsOneWidget);
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Full name'),
+      'Alice Jones',
+    );
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Email'),
+      'alice@example.com',
+    );
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'New password'),
+      'secret',
+    );
+    await tester.tap(find.text('Other groups'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(CheckboxListTile, 'media'));
+    await tester.pump();
+    await tester.tap(find.text('Done'));
+    await tester.pumpAndSettle();
+    expect(find.text('media'), findsOneWidget);
+    await tester.tap(find.text('Save'));
+    await settle(tester);
+
+    final update = server.calls.lastWhere((c) => c.$1 == 'user.update');
+    expect(update.$2, [
+      70,
+      {
+        'full_name': 'Alice Jones',
+        'email': 'alice@example.com',
+        'password': 'secret',
+        'groups': [42],
+      },
+    ]);
+    expect(find.textContaining('Alice Jones'), findsOneWidget);
+    await disconnect(tester);
+  });
+
+  testWidgets('a user with no changes saves nothing', (tester) async {
+    await connect(tester);
+    await tester.pumpWidget(wrap(UsersScreen(session: session)));
+    await settle(tester);
+    await tester.tap(find.text('alice'));
+    await settle(tester);
+    await tester.tap(find.text('Save'));
+    await settle(tester);
+    expect(server.calls.where((c) => c.$1 == 'user.update'), isEmpty);
+    expect(find.text('Edit user'), findsNothing);
+    await disconnect(tester);
+  });
+
+  testWidgets('a system account only offers what the server allows', (
+    tester,
+  ) async {
+    await connect(tester);
+    await tester.pumpWidget(wrap(UsersScreen(session: session)));
+    await settle(tester);
+    await tester.tap(find.text('Show system accounts'));
+    await settle(tester);
+    await tester.tap(find.text('root'));
+    await settle(tester);
+    expect(find.text('Edit user'), findsOneWidget);
+    expect(find.widgetWithText(TextFormField, 'Username'), findsNothing);
+    expect(find.text('Other groups'), findsNothing);
+    expect(find.text('Locked'), findsNothing);
+    expect(find.widgetWithText(TextFormField, 'New password'), findsOneWidget);
+    await disconnect(tester);
+  });
+
+  testWidgets('edits a group name and members', (tester) async {
+    await connect(tester);
+    await tester.pumpWidget(wrap(UsersScreen(session: session)));
+    await settle(tester);
+    await tester.tap(find.text('Groups'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('media'));
+    await settle(tester);
+    expect(find.text('Edit group'), findsOneWidget);
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Group name'),
+      'videos',
+    );
+    await tester.tap(find.widgetWithText(CheckboxListTile, 'alice'));
+    await tester.pump();
+    await tester.tap(find.text('Save'));
+    await settle(tester);
+
+    final update = server.calls.lastWhere((c) => c.$1 == 'group.update');
+    expect(update.$2, [
+      42,
+      {
+        'name': 'videos',
+        'users': [70],
+      },
+    ]);
+    expect(find.text('videos'), findsOneWidget);
+    await disconnect(tester);
+  });
+
   testWidgets('shows a new API key once with a copy button', (tester) async {
     await connect(tester);
     await tester.pumpWidget(wrap(ApiKeysScreen(session: session)));

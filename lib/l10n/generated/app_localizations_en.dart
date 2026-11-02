@@ -1288,6 +1288,49 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get userEdit => 'Edit user';
+
+  @override
+  String userSaved(String name) {
+    return 'Saved $name';
+  }
+
+  @override
+  String get userEmail => 'Email';
+
+  @override
+  String get userNewPassword => 'New password';
+
+  @override
+  String get userNewPasswordHelp => 'Leave empty to keep the current password';
+
+  @override
+  String get userShell => 'Shell';
+
+  @override
+  String get userSshKey => 'SSH public key';
+
+  @override
+  String get userPrimaryGroup => 'Primary group';
+
+  @override
+  String get userExtraGroups => 'Other groups';
+
+  @override
+  String get userExtraGroupsNone => 'None';
+
+  @override
+  String get groupEdit => 'Edit group';
+
+  @override
+  String groupSaved(String name) {
+    return 'Saved $name';
+  }
+
+  @override
+  String get groupMembersTitle => 'Members';
+
+  @override
   String get apiKeysTitle => 'API keys';
 
   @override

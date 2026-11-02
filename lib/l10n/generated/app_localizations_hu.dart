@@ -1289,6 +1289,49 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String get userEdit => 'Felhasználó szerkesztése';
+
+  @override
+  String userSaved(String name) {
+    return 'Mentve: $name';
+  }
+
+  @override
+  String get userEmail => 'E-mail';
+
+  @override
+  String get userNewPassword => 'Új jelszó';
+
+  @override
+  String get userNewPasswordHelp => 'Hagyd üresen, ha a jelszó marad';
+
+  @override
+  String get userShell => 'Parancsértelmező';
+
+  @override
+  String get userSshKey => 'Nyilvános SSH-kulcs';
+
+  @override
+  String get userPrimaryGroup => 'Elsődleges csoport';
+
+  @override
+  String get userExtraGroups => 'További csoportok';
+
+  @override
+  String get userExtraGroupsNone => 'Nincs';
+
+  @override
+  String get groupEdit => 'Csoport szerkesztése';
+
+  @override
+  String groupSaved(String name) {
+    return 'Mentve: $name';
+  }
+
+  @override
+  String get groupMembersTitle => 'Tagok';
+
+  @override
   String get apiKeysTitle => 'API-kulcsok';
 
   @override

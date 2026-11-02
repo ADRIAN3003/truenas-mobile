@@ -2252,6 +2252,84 @@ abstract class AppLocalizations {
   /// **'Deleted {name}'**
   String groupDeleted(String name);
 
+  /// Title of the screen that edits a user.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit user'**
+  String get userEdit;
+
+  /// Snackbar after saving a user.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved {name}'**
+  String userSaved(String name);
+
+  /// Field label.
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get userEmail;
+
+  /// Field label for changing a user's password.
+  ///
+  /// In en, this message translates to:
+  /// **'New password'**
+  String get userNewPassword;
+
+  /// Helper text under the new password field.
+  ///
+  /// In en, this message translates to:
+  /// **'Leave empty to keep the current password'**
+  String get userNewPasswordHelp;
+
+  /// Field label for a user's login shell.
+  ///
+  /// In en, this message translates to:
+  /// **'Shell'**
+  String get userShell;
+
+  /// Field label.
+  ///
+  /// In en, this message translates to:
+  /// **'SSH public key'**
+  String get userSshKey;
+
+  /// Field label.
+  ///
+  /// In en, this message translates to:
+  /// **'Primary group'**
+  String get userPrimaryGroup;
+
+  /// Row and dialog title for the extra groups of a user.
+  ///
+  /// In en, this message translates to:
+  /// **'Other groups'**
+  String get userExtraGroups;
+
+  /// Shown when a user is in no extra group.
+  ///
+  /// In en, this message translates to:
+  /// **'None'**
+  String get userExtraGroupsNone;
+
+  /// Title of the screen that edits a group.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit group'**
+  String get groupEdit;
+
+  /// Snackbar after saving a group.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved {name}'**
+  String groupSaved(String name);
+
+  /// Heading above the users that can be ticked as members of a group.
+  ///
+  /// In en, this message translates to:
+  /// **'Members'**
+  String get groupMembersTitle;
+
   /// API keys screen title.
   ///
   /// In en, this message translates to:

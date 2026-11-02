@@ -59,6 +59,14 @@ class WorkloadStateLabel extends StatelessWidget {
   }
 }
 
+/// What can be done to a virtual machine.
+const vmActions = [
+  WorkloadAction.start,
+  WorkloadAction.stop,
+  WorkloadAction.restart,
+  WorkloadAction.powerOff,
+];
+
 /// The actions to offer for a workload in [state].
 List<WorkloadAction> actionsFor(
   WorkloadState state, {

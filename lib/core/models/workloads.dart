@@ -198,6 +198,7 @@ class VirtualMachine {
     required this.vcpus,
     required this.memoryMib,
     required this.autostart,
+    this.raw = const {},
   });
 
   factory VirtualMachine.fromJson(Map<String, dynamic> json) {
@@ -215,6 +216,7 @@ class VirtualMachine {
           (threads == 0 ? 1 : threads),
       memoryMib: asInt(json['memory']),
       autostart: json['autostart'] == true,
+      raw: json,
     );
   }
 
@@ -222,6 +224,9 @@ class VirtualMachine {
   final String name;
   final String description;
   final WorkloadState state;
+
+  /// The whole `vm.query` row, for the editor.
+  final Map<String, dynamic> raw;
 
   /// Total virtual CPUs (sockets × cores × threads).
   final int vcpus;

@@ -4706,5 +4706,462 @@
   "shortcutTaskMissing": "That sync task no longer exists.",
   "@shortcutTaskMissing": {
     "description": "Snackbar when a shortcut's cloud sync task was deleted."
+  },
+  "vmCreateTitle": "New virtual machine",
+  "@vmCreateTitle": {
+    "description": "Virtual machine editor: New virtual machine"
+  },
+  "vmEditTitle": "Edit {name}",
+  "@vmEditTitle": {
+    "description": "Virtual machine editor: Edit {name}",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "vmCreated": "Created {name}",
+  "@vmCreated": {
+    "description": "Virtual machine editor: Created {name}",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "vmSaved": "Saved {name}",
+  "@vmSaved": {
+    "description": "Virtual machine editor: Saved {name}",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "vmEditNote": "Changes to a running machine take effect the next time it starts.",
+  "@vmEditNote": {
+    "description": "Virtual machine editor: Changes to a running machine take effect the next time it starts."
+  },
+  "vmSectionGeneral": "General",
+  "@vmSectionGeneral": {
+    "description": "Virtual machine editor: General"
+  },
+  "vmName": "Name",
+  "@vmName": {
+    "description": "Virtual machine editor: Name"
+  },
+  "vmDescription": "Description",
+  "@vmDescription": {
+    "description": "Virtual machine editor: Description"
+  },
+  "vmSectionProcessor": "Processor and memory",
+  "@vmSectionProcessor": {
+    "description": "Virtual machine editor: Processor and memory"
+  },
+  "vmVcpusField": "Virtual CPUs (sockets)",
+  "@vmVcpusField": {
+    "description": "Virtual machine editor: Virtual CPUs (sockets)"
+  },
+  "vmVcpusMax": "The host allows up to {count} in total",
+  "@vmVcpusMax": {
+    "description": "Virtual machine editor: The host allows up to {count} in total",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "vmCoresField": "Cores per CPU",
+  "@vmCoresField": {
+    "description": "Virtual machine editor: Cores per CPU"
+  },
+  "vmThreadsField": "Threads per core",
+  "@vmThreadsField": {
+    "description": "Virtual machine editor: Threads per core"
+  },
+  "vmCpuMode": "CPU mode",
+  "@vmCpuMode": {
+    "description": "Virtual machine editor: CPU mode"
+  },
+  "vmCpuModeCustom": "Custom",
+  "@vmCpuModeCustom": {
+    "description": "Virtual machine editor: Custom"
+  },
+  "vmCpuModeHostModel": "Host model",
+  "@vmCpuModeHostModel": {
+    "description": "Virtual machine editor: Host model"
+  },
+  "vmCpuModeHostPassthrough": "Host passthrough",
+  "@vmCpuModeHostPassthrough": {
+    "description": "Virtual machine editor: Host passthrough"
+  },
+  "vmCpuModel": "CPU model",
+  "@vmCpuModel": {
+    "description": "Virtual machine editor: CPU model"
+  },
+  "vmCpuModelDefault": "Default",
+  "@vmCpuModelDefault": {
+    "description": "Virtual machine editor: Default"
+  },
+  "vmMemoryField": "Memory (MiB)",
+  "@vmMemoryField": {
+    "description": "Virtual machine editor: Memory (MiB)"
+  },
+  "vmMinMemoryField": "Minimum memory (MiB)",
+  "@vmMinMemoryField": {
+    "description": "Virtual machine editor: Minimum memory (MiB)"
+  },
+  "vmMinMemoryHelp": "Leave empty to give the machine a fixed amount.",
+  "@vmMinMemoryHelp": {
+    "description": "Virtual machine editor: Leave empty to give the machine a fixed amount."
+  },
+  "vmSectionBoot": "Boot and clock",
+  "@vmSectionBoot": {
+    "description": "Virtual machine editor: Boot and clock"
+  },
+  "vmBootloader": "Boot method",
+  "@vmBootloader": {
+    "description": "Virtual machine editor: Boot method"
+  },
+  "vmClock": "Guest clock",
+  "@vmClock": {
+    "description": "Virtual machine editor: Guest clock"
+  },
+  "vmClockLocal": "Local time",
+  "@vmClockLocal": {
+    "description": "Virtual machine editor: Local time"
+  },
+  "vmShutdownTimeout": "Shutdown timeout",
+  "@vmShutdownTimeout": {
+    "description": "Virtual machine editor: Shutdown timeout"
+  },
+  "vmShutdownTimeoutHelp": "Seconds the guest gets to shut down before it is powered off.",
+  "@vmShutdownTimeoutHelp": {
+    "description": "Virtual machine editor: Seconds the guest gets to shut down before it is powered off."
+  },
+  "vmSeconds": "{count} s",
+  "@vmSeconds": {
+    "description": "Virtual machine editor: {count} s",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "vmAutostartField": "Start when the server boots",
+  "@vmAutostartField": {
+    "description": "Virtual machine editor: Start when the server boots"
+  },
+  "vmSectionAdvanced": "Advanced",
+  "@vmSectionAdvanced": {
+    "description": "Virtual machine editor: Advanced"
+  },
+  "vmEnsureDisplay": "Add a display device",
+  "@vmEnsureDisplay": {
+    "description": "Virtual machine editor: Add a display device"
+  },
+  "vmEnsureDisplayHelp": "Adds one if the machine has none, so you can see its screen.",
+  "@vmEnsureDisplayHelp": {
+    "description": "Virtual machine editor: Adds one if the machine has none, so you can see its screen."
+  },
+  "vmHyperv": "Hyper-V enlightenments",
+  "@vmHyperv": {
+    "description": "Virtual machine editor: Hyper-V enlightenments"
+  },
+  "vmHypervHelp": "Makes Windows guests faster.",
+  "@vmHypervHelp": {
+    "description": "Virtual machine editor: Makes Windows guests faster."
+  },
+  "vmHideFromMsr": "Hide the hypervisor from the guest",
+  "@vmHideFromMsr": {
+    "description": "Virtual machine editor: Hide the hypervisor from the guest"
+  },
+  "vmHideFromMsrHelp": "Some software refuses to run in a virtual machine.",
+  "@vmHideFromMsrHelp": {
+    "description": "Virtual machine editor: Some software refuses to run in a virtual machine."
+  },
+  "vmTpm": "Virtual TPM",
+  "@vmTpm": {
+    "description": "Virtual machine editor: Virtual TPM"
+  },
+  "vmSectionNewDevices": "Devices",
+  "@vmSectionNewDevices": {
+    "description": "Virtual machine editor: Devices"
+  },
+  "vmNewDisk": "Create a disk",
+  "@vmNewDisk": {
+    "description": "Virtual machine editor: Create a disk"
+  },
+  "vmNewNic": "Add a network adapter",
+  "@vmNewNic": {
+    "description": "Virtual machine editor: Add a network adapter"
+  },
+  "vmInstallImage": "Install image (path to an ISO)",
+  "@vmInstallImage": {
+    "description": "Virtual machine editor: Install image (path to an ISO)"
+  },
+  "vmInstallImageHelp": "Optional. A file on the server, e.g. /mnt/tank/iso/win11.iso",
+  "@vmInstallImageHelp": {
+    "description": "Virtual machine editor: Optional. A file on the server, e.g. /mnt/tank/iso/win11.iso"
+  },
+  "vmSectionSettings": "Settings",
+  "@vmSectionSettings": {
+    "description": "Virtual machine editor: Settings"
+  },
+  "vmInfoCpu": "Processor",
+  "@vmInfoCpu": {
+    "description": "Virtual machine editor: Processor"
+  },
+  "vmInfoCpuValue": "{total} vCPU ({layout})",
+  "@vmInfoCpuValue": {
+    "description": "Virtual machine editor: {total} vCPU ({layout})",
+    "placeholders": {
+      "total": {
+        "type": "int"
+      },
+      "layout": {
+        "type": "String"
+      }
+    }
+  },
+  "vmInfoMemory": "Memory",
+  "@vmInfoMemory": {
+    "description": "Virtual machine editor: Memory"
+  },
+  "vmDevices": "Devices",
+  "@vmDevices": {
+    "description": "Virtual machine editor: Devices"
+  },
+  "vmDevicesEmpty": "No devices",
+  "@vmDevicesEmpty": {
+    "description": "Virtual machine editor: No devices"
+  },
+  "vmDeviceAdd": "Add device",
+  "@vmDeviceAdd": {
+    "description": "Virtual machine editor: Add device"
+  },
+  "vmDeviceAddTitle": "Add {type}",
+  "@vmDeviceAddTitle": {
+    "description": "Virtual machine editor: Add {type}",
+    "placeholders": {
+      "type": {
+        "type": "String"
+      }
+    }
+  },
+  "vmDeviceEditTitle": "Edit {type}",
+  "@vmDeviceEditTitle": {
+    "description": "Virtual machine editor: Edit {type}",
+    "placeholders": {
+      "type": {
+        "type": "String"
+      }
+    }
+  },
+  "vmDeviceSaved": "Device saved",
+  "@vmDeviceSaved": {
+    "description": "Virtual machine editor: Device saved"
+  },
+  "vmDeviceRemove": "Remove",
+  "@vmDeviceRemove": {
+    "description": "Virtual machine editor: Remove"
+  },
+  "vmDeviceRemoved": "Device removed",
+  "@vmDeviceRemoved": {
+    "description": "Virtual machine editor: Device removed"
+  },
+  "vmDeviceRemoveTitle": "Remove this {type}?",
+  "@vmDeviceRemoveTitle": {
+    "description": "Virtual machine editor: Remove this {type}?",
+    "placeholders": {
+      "type": {
+        "type": "String"
+      }
+    }
+  },
+  "vmDeviceRemoveBody": "The device is taken out of the machine. This takes effect at the next start.",
+  "@vmDeviceRemoveBody": {
+    "description": "Virtual machine editor: The device is taken out of the machine. This takes effect at the next start."
+  },
+  "vmDeviceDestroyZvol": "Also destroy the zvol (deletes its data)",
+  "@vmDeviceDestroyZvol": {
+    "description": "Virtual machine editor: Also destroy the zvol (deletes its data)"
+  },
+  "vmDeviceNote": "Changes take effect the next time the machine starts.",
+  "@vmDeviceNote": {
+    "description": "Virtual machine editor: Changes take effect the next time the machine starts."
+  },
+  "vmDeviceDisk": "Disk (zvol)",
+  "@vmDeviceDisk": {
+    "description": "Virtual machine editor: Disk (zvol)"
+  },
+  "vmDeviceRaw": "Raw file",
+  "@vmDeviceRaw": {
+    "description": "Virtual machine editor: Raw file"
+  },
+  "vmDeviceCdrom": "CD-ROM (ISO)",
+  "@vmDeviceCdrom": {
+    "description": "Virtual machine editor: CD-ROM (ISO)"
+  },
+  "vmDeviceNic": "Network adapter",
+  "@vmDeviceNic": {
+    "description": "Virtual machine editor: Network adapter"
+  },
+  "vmDeviceDisplay": "Display",
+  "@vmDeviceDisplay": {
+    "description": "Virtual machine editor: Display"
+  },
+  "vmDevicePci": "PCI device",
+  "@vmDevicePci": {
+    "description": "Virtual machine editor: PCI device"
+  },
+  "vmDeviceUsb": "USB device",
+  "@vmDeviceUsb": {
+    "description": "Virtual machine editor: USB device"
+  },
+  "vmDeviceBus": "Bus",
+  "@vmDeviceBus": {
+    "description": "Virtual machine editor: Bus"
+  },
+  "vmDeviceBusHelp": "VirtIO is faster; AHCI works with any operating system.",
+  "@vmDeviceBusHelp": {
+    "description": "Virtual machine editor: VirtIO is faster; AHCI works with any operating system."
+  },
+  "vmDeviceNewZvol": "New zvol",
+  "@vmDeviceNewZvol": {
+    "description": "Virtual machine editor: New zvol"
+  },
+  "vmDeviceExistingZvol": "Existing zvol",
+  "@vmDeviceExistingZvol": {
+    "description": "Virtual machine editor: Existing zvol"
+  },
+  "vmDevicePool": "Pool",
+  "@vmDevicePool": {
+    "description": "Virtual machine editor: Pool"
+  },
+  "vmDeviceZvolName": "Zvol name",
+  "@vmDeviceZvolName": {
+    "description": "Virtual machine editor: Zvol name"
+  },
+  "vmDeviceZvolNameHelp": "Optional. Leave empty to name it after the machine.",
+  "@vmDeviceZvolNameHelp": {
+    "description": "Virtual machine editor: Optional. Leave empty to name it after the machine."
+  },
+  "vmDeviceSizeGib": "Size (GiB)",
+  "@vmDeviceSizeGib": {
+    "description": "Virtual machine editor: Size (GiB)"
+  },
+  "vmDeviceZvol": "Zvol",
+  "@vmDeviceZvol": {
+    "description": "Virtual machine editor: Zvol"
+  },
+  "vmDevicePath": "Path",
+  "@vmDevicePath": {
+    "description": "Virtual machine editor: Path"
+  },
+  "vmDeviceZvolPathHelp": "e.g. /dev/zvol/tank/vm-disk",
+  "@vmDeviceZvolPathHelp": {
+    "description": "Virtual machine editor: e.g. /dev/zvol/tank/vm-disk"
+  },
+  "vmDeviceRawPathHelp": "A file on the server, e.g. /mnt/tank/vm/disk.img",
+  "@vmDeviceRawPathHelp": {
+    "description": "Virtual machine editor: A file on the server, e.g. /mnt/tank/vm/disk.img"
+  },
+  "vmDeviceCdromPathHelp": "An ISO file on the server, e.g. /mnt/tank/iso/win11.iso",
+  "@vmDeviceCdromPathHelp": {
+    "description": "Virtual machine editor: An ISO file on the server, e.g. /mnt/tank/iso/win11.iso"
+  },
+  "vmNicType": "Adapter type",
+  "@vmNicType": {
+    "description": "Virtual machine editor: Adapter type"
+  },
+  "vmNicTypeHelp": "VirtIO is faster; E1000 works without extra drivers.",
+  "@vmNicTypeHelp": {
+    "description": "Virtual machine editor: VirtIO is faster; E1000 works without extra drivers."
+  },
+  "vmNicAttach": "Attach to",
+  "@vmNicAttach": {
+    "description": "Virtual machine editor: Attach to"
+  },
+  "vmMac": "MAC address",
+  "@vmMac": {
+    "description": "Virtual machine editor: MAC address"
+  },
+  "vmMacHelp": "Leave empty for a random one.",
+  "@vmMacHelp": {
+    "description": "Virtual machine editor: Leave empty for a random one."
+  },
+  "vmMacRandom": "Random address",
+  "@vmMacRandom": {
+    "description": "Virtual machine editor: Random address"
+  },
+  "vmTrustRx": "Trust guest receive filters",
+  "@vmTrustRx": {
+    "description": "Virtual machine editor: Trust guest receive filters"
+  },
+  "vmTrustRxHelp": "Lets the guest change its MAC address and receive modes.",
+  "@vmTrustRxHelp": {
+    "description": "Virtual machine editor: Lets the guest change its MAC address and receive modes."
+  },
+  "vmResolution": "Resolution",
+  "@vmResolution": {
+    "description": "Virtual machine editor: Resolution"
+  },
+  "vmBind": "Listen on",
+  "@vmBind": {
+    "description": "Virtual machine editor: Listen on"
+  },
+  "vmDisplayPassword": "Password",
+  "@vmDisplayPassword": {
+    "description": "Virtual machine editor: Password"
+  },
+  "vmDisplayWeb": "Web access",
+  "@vmDisplayWeb": {
+    "description": "Virtual machine editor: Web access"
+  },
+  "vmDisplayWebHelp": "Lets a browser open the display.",
+  "@vmDisplayWebHelp": {
+    "description": "Virtual machine editor: Lets a browser open the display."
+  },
+  "vmPciDevice": "PCI device",
+  "@vmPciDevice": {
+    "description": "Virtual machine editor: PCI device"
+  },
+  "vmPciDeviceHelp": "The device address, e.g. pci_0000_01_00_0",
+  "@vmPciDeviceHelp": {
+    "description": "Virtual machine editor: The device address, e.g. pci_0000_01_00_0"
+  },
+  "vmUsbController": "USB controller",
+  "@vmUsbController": {
+    "description": "Virtual machine editor: USB controller"
+  },
+  "vmUsbDevice": "USB device",
+  "@vmUsbDevice": {
+    "description": "Virtual machine editor: USB device"
+  },
+  "vmDeviceJson": "Attributes (JSON)",
+  "@vmDeviceJson": {
+    "description": "Virtual machine editor: Attributes (JSON)"
+  },
+  "vmDeviceJsonInvalid": "That is not valid JSON.",
+  "@vmDeviceJsonInvalid": {
+    "description": "Virtual machine editor: That is not valid JSON."
+  },
+  "vmDeleteTitle": "Delete {name}?",
+  "@vmDeleteTitle": {
+    "description": "Virtual machine editor: Delete {name}?",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "vmDeleteBody": "The machine and its device list are removed. Its disks stay unless you choose to destroy them.",
+  "@vmDeleteBody": {
+    "description": "Virtual machine editor: The machine and its device list are removed. Its disks stay unless you choose to destroy them."
+  },
+  "vmDeleteDisks": "Also destroy its disks (deletes their data)",
+  "@vmDeleteDisks": {
+    "description": "Virtual machine editor: Also destroy its disks (deletes their data)"
   }
 }

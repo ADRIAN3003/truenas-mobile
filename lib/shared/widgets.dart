@@ -130,13 +130,12 @@ Future<bool> confirmAction(
   String? typeToConfirmHint,
   bool destructive = false,
 }) async {
-  final controller = TextEditingController();
+  var typed = '';
   final confirmed = await showAppDialog<bool>(
     context: context,
     builder: (context) => StatefulBuilder(
       builder: (context, setState) {
-        final enabled =
-            typeToConfirm == null || controller.text.trim() == typeToConfirm;
+        final enabled = typeToConfirm == null || typed.trim() == typeToConfirm;
         return AppDialog(
           title: Text(title),
           message: body,
@@ -150,13 +149,9 @@ Future<bool> confirmAction(
                     ?details,
                     if (typeToConfirm != null) ...[
                       if (details != null) const SizedBox(height: 16),
-                      TextField(
-                        controller: controller,
-                        autocorrect: false,
-                        decoration: InputDecoration(
-                          labelText: typeToConfirmHint,
-                        ),
-                        onChanged: (_) => setState(() {}),
+                      _TypeToConfirmField(
+                        label: typeToConfirmHint,
+                        onChanged: (text) => setState(() => typed = text),
                       ),
                     ],
                   ],
@@ -179,7 +174,6 @@ Future<bool> confirmAction(
       },
     ),
   );
-  controller.dispose();
   if (confirmed == true) {
     if (destructive) {
       Haptics.warning();
@@ -188,4 +182,34 @@ Future<bool> confirmAction(
     }
   }
   return confirmed ?? false;
+}
+
+/// The field of [confirmAction] that the user types the name into. It owns
+/// its controller, so the controller outlives the dialog's closing animation.
+class _TypeToConfirmField extends StatefulWidget {
+  const _TypeToConfirmField({required this.label, required this.onChanged});
+
+  final String? label;
+  final ValueChanged<String> onChanged;
+
+  @override
+  State<_TypeToConfirmField> createState() => _TypeToConfirmFieldState();
+}
+
+class _TypeToConfirmFieldState extends State<_TypeToConfirmField> {
+  final _controller = TextEditingController();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => TextField(
+    controller: _controller,
+    autocorrect: false,
+    decoration: InputDecoration(labelText: widget.label),
+    onChanged: widget.onChanged,
+  );
 }

@@ -20,6 +20,8 @@ import 'app_catalog_screen.dart';
 import 'app_icon.dart';
 import 'app_screen.dart';
 import 'update_all_apps.dart';
+import 'vm_edit_screen.dart';
+import 'vm_screen.dart';
 import 'workload_widgets.dart';
 
 class _Workloads {
@@ -30,6 +32,7 @@ class _Workloads {
     required this.containerActions,
     required this.canBulk,
     required this.canInstall,
+    required this.canCreateVm,
   });
 
   final List<TrueNasApp> apps;
@@ -46,18 +49,15 @@ class _Workloads {
 
   /// Whether apps can be installed from the catalog.
   final bool canInstall;
+
+  /// Whether virtual machines can be created.
+  final bool canCreateVm;
 }
 
 const _appActions = [
   WorkloadAction.start,
   WorkloadAction.stop,
   WorkloadAction.restart,
-];
-const _vmActions = [
-  WorkloadAction.start,
-  WorkloadAction.stop,
-  WorkloadAction.restart,
-  WorkloadAction.powerOff,
 ];
 
 /// Docker apps, virtual machines and containers.
@@ -112,6 +112,7 @@ class _AppsTabState extends State<AppsTab> with LoadState<AppsTab, _Workloads> {
       containerActions,
       canBulk,
       canInstall,
+      canCreateVm,
     ) = await (
       _api.apps(),
       optional(_api.vms),
@@ -121,6 +122,7 @@ class _AppsTabState extends State<AppsTab> with LoadState<AppsTab, _Workloads> {
       _api.containerActions(),
       _api.canBulk(),
       _api.canInstall(),
+      _api.canCreateVm(),
     ).wait;
     widget.onUpdateCount?.call(apps.where((a) => a.upgradeAvailable).length);
     _settling?.cancel();
@@ -140,6 +142,7 @@ class _AppsTabState extends State<AppsTab> with LoadState<AppsTab, _Workloads> {
       containerActions: containerActions,
       canBulk: canBulk,
       canInstall: canInstall,
+      canCreateVm: canCreateVm,
     );
   }
 
@@ -347,6 +350,26 @@ class _AppsTabState extends State<AppsTab> with LoadState<AppsTab, _Workloads> {
     if (installed == true) await load();
   }
 
+  Future<void> _openVm(VirtualMachine vm) async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute<void>(
+        builder: (_) => VmScreen(session: widget.session, vm: vm),
+      ),
+    );
+    await load();
+  }
+
+  Future<void> _createVm() async {
+    final created = await Navigator.push<bool>(
+      context,
+      MaterialPageRoute<bool>(
+        builder: (_) => VmEditScreen(session: widget.session),
+      ),
+    );
+    if (created == true) await load();
+  }
+
   Future<void> _openApp(TrueNasApp app) async {
     await Navigator.push(
       context,
@@ -526,52 +549,64 @@ class _AppsTabState extends State<AppsTab> with LoadState<AppsTab, _Workloads> {
           ],
         ),
         if (w.vms case final vms?)
-          ...groupedSection(l10n.vmsTitle, empty: l10n.vmsEmpty, [
-            for (final vm in vms)
-              ListTile(
-                leading: const IconTile(
-                  Icons.computer_rounded,
-                  AppPalette.tilePurple,
-                  size: 40,
-                ),
-                title: Text(vm.name),
-                subtitle: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      [
-                        l10n.vmSummary(
-                          vm.vcpus,
-                          formatBytes(vm.memoryMib * 1024 * 1024),
-                        ),
-                        if (vm.description.isNotEmpty) vm.description,
-                      ].join('\n'),
+          ...groupedSection(
+            l10n.vmsTitle,
+            empty: l10n.vmsEmpty,
+            trailing: w.canCreateVm
+                ? IconButton(
+                    tooltip: l10n.vmCreateTitle,
+                    icon: const Icon(Icons.add_circle_outline),
+                    onPressed: _createVm,
+                  )
+                : null,
+            [
+              for (final vm in vms)
+                ListTile(
+                  onTap: () => _openVm(vm),
+                  leading: const IconTile(
+                    Icons.computer_rounded,
+                    AppPalette.tilePurple,
+                    size: 40,
+                  ),
+                  title: Text(vm.name),
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        [
+                          l10n.vmSummary(
+                            vm.vcpus,
+                            formatBytes(vm.memoryMib * 1024 * 1024),
+                          ),
+                          if (vm.description.isNotEmpty) vm.description,
+                        ].join('\n'),
+                      ),
+                      const SizedBox(height: 4),
+                      WorkloadStateLabel(state: vm.state),
+                    ],
+                  ),
+                  trailing: WorkloadMenu(
+                    busy: _busy.contains('vm:${vm.id}'),
+                    actions: actionsFor(vm.state, supported: vmActions),
+                    onShell: vm.state == WorkloadState.running
+                        ? () => openShell(
+                            context,
+                            widget.session,
+                            WorkloadsApi.vmShell(vm.id),
+                            vm.name,
+                          )
+                        : null,
+                    onSelected: (action) => _run(
+                      'vm:${vm.id}',
+                      vm.name,
+                      action,
+                      () => _api.vmAction(vm.id, action),
+                      isVm: true,
                     ),
-                    const SizedBox(height: 4),
-                    WorkloadStateLabel(state: vm.state),
-                  ],
-                ),
-                trailing: WorkloadMenu(
-                  busy: _busy.contains('vm:${vm.id}'),
-                  actions: actionsFor(vm.state, supported: _vmActions),
-                  onShell: vm.state == WorkloadState.running
-                      ? () => openShell(
-                          context,
-                          widget.session,
-                          WorkloadsApi.vmShell(vm.id),
-                          vm.name,
-                        )
-                      : null,
-                  onSelected: (action) => _run(
-                    'vm:${vm.id}',
-                    vm.name,
-                    action,
-                    () => _api.vmAction(vm.id, action),
-                    isVm: true,
                   ),
                 ),
-              ),
-          ]),
+            ],
+          ),
         if (w.containers case final containers?)
           ...groupedSection(l10n.containersTitle, empty: l10n.containersEmpty, [
             for (final container in containers)

@@ -3346,4 +3346,342 @@ class AppLocalizationsHu extends AppLocalizations {
   @override
   String get shortcutTaskMissing =>
       'Ez a szinkronizálási feladat már nem létezik.';
+
+  @override
+  String get vmCreateTitle => 'Új virtuális gép';
+
+  @override
+  String vmEditTitle(String name) {
+    return '$name szerkesztése';
+  }
+
+  @override
+  String vmCreated(String name) {
+    return '$name létrehozva';
+  }
+
+  @override
+  String vmSaved(String name) {
+    return '$name mentve';
+  }
+
+  @override
+  String get vmEditNote =>
+      'A futó gépen végzett módosítások a következő indításkor lépnek életbe.';
+
+  @override
+  String get vmSectionGeneral => 'Általános';
+
+  @override
+  String get vmName => 'Név';
+
+  @override
+  String get vmDescription => 'Leírás';
+
+  @override
+  String get vmSectionProcessor => 'Processzor és memória';
+
+  @override
+  String get vmVcpusField => 'Virtuális CPU-k (foglalatok)';
+
+  @override
+  String vmVcpusMax(int count) {
+    return 'A gazda legfeljebb $count szálat enged összesen';
+  }
+
+  @override
+  String get vmCoresField => 'Mag CPU-nként';
+
+  @override
+  String get vmThreadsField => 'Szál magonként';
+
+  @override
+  String get vmCpuMode => 'CPU mód';
+
+  @override
+  String get vmCpuModeCustom => 'Egyéni';
+
+  @override
+  String get vmCpuModeHostModel => 'Gazda modellje';
+
+  @override
+  String get vmCpuModeHostPassthrough => 'Gazda átengedése';
+
+  @override
+  String get vmCpuModel => 'CPU modell';
+
+  @override
+  String get vmCpuModelDefault => 'Alapértelmezett';
+
+  @override
+  String get vmMemoryField => 'Memória (MiB)';
+
+  @override
+  String get vmMinMemoryField => 'Minimális memória (MiB)';
+
+  @override
+  String get vmMinMemoryHelp =>
+      'Hagyd üresen, ha a gép fix mennyiséget kapjon.';
+
+  @override
+  String get vmSectionBoot => 'Indítás és óra';
+
+  @override
+  String get vmBootloader => 'Indítási mód';
+
+  @override
+  String get vmClock => 'Vendég órája';
+
+  @override
+  String get vmClockLocal => 'Helyi idő';
+
+  @override
+  String get vmShutdownTimeout => 'Leállítási időkorlát';
+
+  @override
+  String get vmShutdownTimeoutHelp =>
+      'Ennyi másodpercet kap a vendég a leállásra, mielőtt kikapcsolják.';
+
+  @override
+  String vmSeconds(int count) {
+    return '$count mp';
+  }
+
+  @override
+  String get vmAutostartField => 'Indítás a szerver indulásakor';
+
+  @override
+  String get vmSectionAdvanced => 'Haladó';
+
+  @override
+  String get vmEnsureDisplay => 'Kijelző eszköz hozzáadása';
+
+  @override
+  String get vmEnsureDisplayHelp =>
+      'Ha a gépnek nincs, hozzáad egyet, hogy lásd a képernyőjét.';
+
+  @override
+  String get vmHyperv => 'Hyper-V könnyítések';
+
+  @override
+  String get vmHypervHelp => 'Gyorsabbá teszi a Windows vendégeket.';
+
+  @override
+  String get vmHideFromMsr => 'Hipervizor elrejtése a vendég elől';
+
+  @override
+  String get vmHideFromMsrHelp => 'Egyes programok nem futnak virtuális gépen.';
+
+  @override
+  String get vmTpm => 'Virtuális TPM';
+
+  @override
+  String get vmSectionNewDevices => 'Eszközök';
+
+  @override
+  String get vmNewDisk => 'Lemez létrehozása';
+
+  @override
+  String get vmNewNic => 'Hálózati kártya hozzáadása';
+
+  @override
+  String get vmInstallImage => 'Telepítő lemezkép (ISO útvonala)';
+
+  @override
+  String get vmInstallImageHelp =>
+      'Elhagyható. Egy fájl a szerveren, pl. /mnt/tank/iso/win11.iso';
+
+  @override
+  String get vmSectionSettings => 'Beállítások';
+
+  @override
+  String get vmInfoCpu => 'Processzor';
+
+  @override
+  String vmInfoCpuValue(int total, String layout) {
+    return '$total vCPU ($layout)';
+  }
+
+  @override
+  String get vmInfoMemory => 'Memória';
+
+  @override
+  String get vmDevices => 'Eszközök';
+
+  @override
+  String get vmDevicesEmpty => 'Nincs eszköz';
+
+  @override
+  String get vmDeviceAdd => 'Eszköz hozzáadása';
+
+  @override
+  String vmDeviceAddTitle(String type) {
+    return '$type hozzáadása';
+  }
+
+  @override
+  String vmDeviceEditTitle(String type) {
+    return '$type szerkesztése';
+  }
+
+  @override
+  String get vmDeviceSaved => 'Eszköz mentve';
+
+  @override
+  String get vmDeviceRemove => 'Eltávolítás';
+
+  @override
+  String get vmDeviceRemoved => 'Eszköz eltávolítva';
+
+  @override
+  String vmDeviceRemoveTitle(String type) {
+    return 'Eltávolítod ezt: $type?';
+  }
+
+  @override
+  String get vmDeviceRemoveBody =>
+      'Az eszköz kikerül a gépből. A következő indításkor lép életbe.';
+
+  @override
+  String get vmDeviceDestroyZvol =>
+      'A zvol megsemmisítése is (az adatai törlődnek)';
+
+  @override
+  String get vmDeviceNote =>
+      'A módosítások a gép következő indításakor lépnek életbe.';
+
+  @override
+  String get vmDeviceDisk => 'Lemez (zvol)';
+
+  @override
+  String get vmDeviceRaw => 'Nyers fájl';
+
+  @override
+  String get vmDeviceCdrom => 'CD-ROM (ISO)';
+
+  @override
+  String get vmDeviceNic => 'Hálózati kártya';
+
+  @override
+  String get vmDeviceDisplay => 'Kijelző';
+
+  @override
+  String get vmDevicePci => 'PCI eszköz';
+
+  @override
+  String get vmDeviceUsb => 'USB eszköz';
+
+  @override
+  String get vmDeviceBus => 'Busz';
+
+  @override
+  String get vmDeviceBusHelp =>
+      'A VirtIO gyorsabb; az AHCI minden operációs rendszerrel működik.';
+
+  @override
+  String get vmDeviceNewZvol => 'Új zvol';
+
+  @override
+  String get vmDeviceExistingZvol => 'Meglévő zvol';
+
+  @override
+  String get vmDevicePool => 'Tároló';
+
+  @override
+  String get vmDeviceZvolName => 'Zvol neve';
+
+  @override
+  String get vmDeviceZvolNameHelp => 'Elhagyható. Üresen a gép nevéből képzi.';
+
+  @override
+  String get vmDeviceSizeGib => 'Méret (GiB)';
+
+  @override
+  String get vmDeviceZvol => 'Zvol';
+
+  @override
+  String get vmDevicePath => 'Útvonal';
+
+  @override
+  String get vmDeviceZvolPathHelp => 'pl. /dev/zvol/tank/vm-disk';
+
+  @override
+  String get vmDeviceRawPathHelp =>
+      'Egy fájl a szerveren, pl. /mnt/tank/vm/disk.img';
+
+  @override
+  String get vmDeviceCdromPathHelp =>
+      'Egy ISO fájl a szerveren, pl. /mnt/tank/iso/win11.iso';
+
+  @override
+  String get vmNicType => 'Kártya típusa';
+
+  @override
+  String get vmNicTypeHelp =>
+      'A VirtIO gyorsabb; az E1000 külön illesztőprogram nélkül is működik.';
+
+  @override
+  String get vmNicAttach => 'Csatlakoztatás ide';
+
+  @override
+  String get vmMac => 'MAC-cím';
+
+  @override
+  String get vmMacHelp => 'Hagyd üresen véletlen címhez.';
+
+  @override
+  String get vmMacRandom => 'Véletlen cím';
+
+  @override
+  String get vmTrustRx => 'Vendég fogadási szűrőinek elfogadása';
+
+  @override
+  String get vmTrustRxHelp =>
+      'Engedi, hogy a vendég módosítsa a MAC-címét és a fogadási módokat.';
+
+  @override
+  String get vmResolution => 'Felbontás';
+
+  @override
+  String get vmBind => 'Figyelés ezen';
+
+  @override
+  String get vmDisplayPassword => 'Jelszó';
+
+  @override
+  String get vmDisplayWeb => 'Webes elérés';
+
+  @override
+  String get vmDisplayWebHelp => 'Böngészőből is megnyitható a kijelző.';
+
+  @override
+  String get vmPciDevice => 'PCI eszköz';
+
+  @override
+  String get vmPciDeviceHelp => 'Az eszköz címe, pl. pci_0000_01_00_0';
+
+  @override
+  String get vmUsbController => 'USB vezérlő';
+
+  @override
+  String get vmUsbDevice => 'USB eszköz';
+
+  @override
+  String get vmDeviceJson => 'Tulajdonságok (JSON)';
+
+  @override
+  String get vmDeviceJsonInvalid => 'Ez nem érvényes JSON.';
+
+  @override
+  String vmDeleteTitle(String name) {
+    return 'Törlöd: $name?';
+  }
+
+  @override
+  String get vmDeleteBody =>
+      'A gép és az eszközlistája törlődik. A lemezei megmaradnak, hacsak nem kéred a megsemmisítésüket.';
+
+  @override
+  String get vmDeleteDisks =>
+      'A lemezei megsemmisítése is (az adatok törlődnek)';
 }

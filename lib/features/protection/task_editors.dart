@@ -7,7 +7,7 @@ import '../../l10n/generated/app_localizations.dart';
 import '../../shared/ui.dart';
 import '../sharing/sharing_widgets.dart';
 import '../storage/storage_helpers.dart';
-import 'protection_screen.dart';
+import 'schedule_field.dart';
 import '../../shared/dialogs.dart';
 
 /// Every dataset on the server, e.g. `tank/media`.
@@ -33,20 +33,6 @@ Future<String?> _pickDataset(
 
 String? _required(AppLocalizations l10n, String? value) =>
     (value ?? '').trim().isEmpty ? l10n.validationRequired : null;
-
-/// Schedule choices: the presets, plus [current] when it is cron text the
-/// app keeps as it is, plus [extra] (a null entry) when given.
-List<DropdownMenuItem<Object?>> _scheduleItems(
-  AppLocalizations l10n,
-  Object? current, {
-  String? extra,
-}) => [
-  if (extra != null) DropdownMenuItem(value: null, child: Text(extra)),
-  for (final s in SnapshotSchedule.values)
-    DropdownMenuItem(value: s, child: Text(scheduleLabel(l10n, s))),
-  if (current is String)
-    DropdownMenuItem(value: current, child: Text(scheduleLabel(l10n, current))),
-];
 
 /// Save button and loading state shared by both editors.
 mixin _EditorState<W extends StatefulWidget, T> on LoadState<W, T> {
@@ -359,16 +345,9 @@ class _ReplicationEditorState extends State<ReplicationEditor>
           onChanged: (v) => setState(() => d.auto = v),
         ),
         if (d.auto)
-          DropdownButtonFormField<Object?>(
-            key: ValueKey(d.bound),
-            initialValue: d.schedule,
-            isExpanded: true,
-            decoration: InputDecoration(labelText: l10n.snapshotTaskSchedule),
-            items: _scheduleItems(
-              l10n,
-              d.schedule,
-              extra: d.bound ? l10n.replicationAfterSnapshots : null,
-            ),
+          ScheduleField(
+            value: d.schedule,
+            noneLabel: d.bound ? l10n.replicationAfterSnapshots : null,
             onChanged: (v) => setState(() => d.schedule = v),
           ),
         DropdownButtonFormField<RetentionPolicy>(
@@ -606,11 +585,8 @@ class _CloudSyncEditorState extends State<CloudSyncEditor>
           ],
           onChanged: (v) => setState(() => d.transferMode = v!),
         ),
-        DropdownButtonFormField<Object?>(
-          initialValue: d.schedule,
-          isExpanded: true,
-          decoration: InputDecoration(labelText: l10n.snapshotTaskSchedule),
-          items: _scheduleItems(l10n, d.schedule),
+        ScheduleField(
+          value: d.schedule,
           onChanged: (v) => setState(() => d.schedule = v!),
         ),
       ],
@@ -785,11 +761,8 @@ class _RsyncEditorState extends State<RsyncEditor>
           value: d.delete,
           onChanged: (v) => setState(() => d.delete = v),
         ),
-        DropdownButtonFormField<Object?>(
-          initialValue: d.schedule,
-          isExpanded: true,
-          decoration: InputDecoration(labelText: l10n.snapshotTaskSchedule),
-          items: _scheduleItems(l10n, d.schedule),
+        ScheduleField(
+          value: d.schedule,
           onChanged: (v) => setState(() => d.schedule = v!),
         ),
       ],
@@ -939,11 +912,8 @@ class _CloudBackupEditorState extends State<CloudBackupEditor>
               ? l10n.explorerInvalidNumber
               : null,
         ),
-        DropdownButtonFormField<Object?>(
-          initialValue: d.schedule,
-          isExpanded: true,
-          decoration: InputDecoration(labelText: l10n.snapshotTaskSchedule),
-          items: _scheduleItems(l10n, d.schedule),
+        ScheduleField(
+          value: d.schedule,
           onChanged: (v) => setState(() => d.schedule = v!),
         ),
       ],

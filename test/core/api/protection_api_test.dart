@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:truenas_mobile/core/instances/server_instance.dart';
+import 'package:truenas_mobile/core/models/cron_schedule.dart';
 import 'package:truenas_mobile/core/models/protection.dart';
 import 'package:truenas_mobile/core/session/truenas_session.dart';
 
@@ -118,7 +119,26 @@ void main() {
     });
   });
 
-  test('unknown schedules fall back to cron text', () {
+  test('creates snapshot tasks with a custom schedule', () async {
+    await session.protection.createSnapshotTask(
+      dataset: 'tank',
+      recursive: true,
+      lifetimeValue: 1,
+      lifetimeUnit: LifetimeUnit.month,
+      schedule: const CronSchedule(minute: '30', hour: '*/6', dow: '1-5'),
+    );
+    expect(paramsOf('pool.snapshottask.create').single['schedule'], {
+      'minute': '30',
+      'hour': '*/6',
+      'dom': '*',
+      'month': '*',
+      'dow': '1-5',
+      'begin': '00:00',
+      'end': '23:59',
+    });
+  });
+
+  test('unknown schedules are read as cron schedules', () {
     final task = ProtectionTask.fromJson(ProtectionKind.snapshot, {
       'id': 1,
       'dataset': 'tank',
@@ -131,7 +151,8 @@ void main() {
       },
       'state': {'state': 'PENDING'},
     });
-    expect(task.schedule, '15 */6 * * *');
+    expect(task.schedule, const CronSchedule(minute: '15', hour: '*/6'));
+    expect((task.schedule as CronSchedule).text, '15 */6 * * *');
     expect(task.status, TaskStatus.waiting);
   });
 

@@ -1727,6 +1727,116 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get scheduleCustomChoice => 'Custom…';
+
+  @override
+  String get cronEditorTitle => 'Custom schedule';
+
+  @override
+  String get cronRepeat => 'Repeat';
+
+  @override
+  String get cronModeMinutes => 'Every few minutes';
+
+  @override
+  String get cronModeHourly => 'Every few hours';
+
+  @override
+  String get cronModeDaily => 'Every day';
+
+  @override
+  String get cronModeWeekly => 'On certain weekdays';
+
+  @override
+  String get cronModeMonthly => 'Once a month';
+
+  @override
+  String get cronModeAdvanced => 'Cron expression';
+
+  @override
+  String get cronMinutesBetween => 'Minutes between runs';
+
+  @override
+  String get cronHoursBetween => 'Hours between runs';
+
+  @override
+  String get cronAtMinute => 'At minute';
+
+  @override
+  String get cronTimeHour => 'Hour';
+
+  @override
+  String get cronTimeMinute => 'Minute';
+
+  @override
+  String get cronDayOfMonth => 'Day of the month';
+
+  @override
+  String get cronWeekdays => 'On these days';
+
+  @override
+  String get cronPickWeekday => 'Pick at least one day.';
+
+  @override
+  String get cronFieldMinute => 'Minute';
+
+  @override
+  String get cronFieldHour => 'Hour';
+
+  @override
+  String get cronFieldDom => 'Day';
+
+  @override
+  String get cronFieldMonth => 'Month';
+
+  @override
+  String get cronFieldDow => 'Weekday';
+
+  @override
+  String get cronFieldInvalid => 'Not valid';
+
+  @override
+  String get cronAdvancedHelp =>
+      '* is every, */5 every 5th, 1-5 a range, 1,15 a list. Weekdays: 0 or 7 is Sunday.';
+
+  @override
+  String scheduleEveryMinutes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Every $count minutes',
+      one: 'Every minute',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String scheduleEveryHours(int count, int minute) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Every $count hours',
+      one: 'Every hour',
+    );
+    return '$_temp0, at minute $minute';
+  }
+
+  @override
+  String scheduleDailyAt(String time) {
+    return 'Every day at $time';
+  }
+
+  @override
+  String scheduleWeeklyAt(String days, String time) {
+    return '$days at $time';
+  }
+
+  @override
+  String scheduleMonthlyAt(int day, String time) {
+    return 'On day $day of every month at $time';
+  }
+
+  @override
   String get snapshotTaskRecursiveLabel => 'with child datasets';
 
   @override

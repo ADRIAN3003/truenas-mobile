@@ -2447,6 +2447,156 @@
       }
     }
   },
+  "scheduleCustomChoice": "Custom…",
+  "@scheduleCustomChoice": {
+    "description": "Schedule choice that opens the custom editor."
+  },
+  "cronEditorTitle": "Custom schedule",
+  "@cronEditorTitle": {
+    "description": "Dialog title."
+  },
+  "cronRepeat": "Repeat",
+  "@cronRepeat": {
+    "description": "Field label."
+  },
+  "cronModeMinutes": "Every few minutes",
+  "@cronModeMinutes": {
+    "description": "Schedule kind."
+  },
+  "cronModeHourly": "Every few hours",
+  "@cronModeHourly": {
+    "description": "Schedule kind."
+  },
+  "cronModeDaily": "Every day",
+  "@cronModeDaily": {
+    "description": "Schedule kind."
+  },
+  "cronModeWeekly": "On certain weekdays",
+  "@cronModeWeekly": {
+    "description": "Schedule kind."
+  },
+  "cronModeMonthly": "Once a month",
+  "@cronModeMonthly": {
+    "description": "Schedule kind."
+  },
+  "cronModeAdvanced": "Cron expression",
+  "@cronModeAdvanced": {
+    "description": "Schedule kind."
+  },
+  "cronMinutesBetween": "Minutes between runs",
+  "@cronMinutesBetween": {
+    "description": "Field label."
+  },
+  "cronHoursBetween": "Hours between runs",
+  "@cronHoursBetween": {
+    "description": "Field label."
+  },
+  "cronAtMinute": "At minute",
+  "@cronAtMinute": {
+    "description": "Field label, the minute of the hour."
+  },
+  "cronTimeHour": "Hour",
+  "@cronTimeHour": {
+    "description": "Field label, the hour of the day."
+  },
+  "cronTimeMinute": "Minute",
+  "@cronTimeMinute": {
+    "description": "Field label, the minute of the hour."
+  },
+  "cronDayOfMonth": "Day of the month",
+  "@cronDayOfMonth": {
+    "description": "Field label."
+  },
+  "cronWeekdays": "On these days",
+  "@cronWeekdays": {
+    "description": "Field label."
+  },
+  "cronPickWeekday": "Pick at least one day.",
+  "@cronPickWeekday": {
+    "description": "Hint under the weekday chips."
+  },
+  "cronFieldMinute": "Minute",
+  "@cronFieldMinute": {
+    "description": "Cron field label."
+  },
+  "cronFieldHour": "Hour",
+  "@cronFieldHour": {
+    "description": "Cron field label."
+  },
+  "cronFieldDom": "Day",
+  "@cronFieldDom": {
+    "description": "Cron field label, day of the month."
+  },
+  "cronFieldMonth": "Month",
+  "@cronFieldMonth": {
+    "description": "Cron field label."
+  },
+  "cronFieldDow": "Weekday",
+  "@cronFieldDow": {
+    "description": "Cron field label, day of the week."
+  },
+  "cronFieldInvalid": "Not valid",
+  "@cronFieldInvalid": {
+    "description": "Error under a cron field."
+  },
+  "cronAdvancedHelp": "* is every, */5 every 5th, 1-5 a range, 1,15 a list. Weekdays: 0 or 7 is Sunday.",
+  "@cronAdvancedHelp": {
+    "description": "Help text under the cron fields."
+  },
+  "scheduleEveryMinutes": "{count, plural, =1{Every minute} other{Every {count} minutes}}",
+  "@scheduleEveryMinutes": {
+    "description": "Schedule.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "scheduleEveryHours": "{count, plural, =1{Every hour} other{Every {count} hours}}, at minute {minute}",
+  "@scheduleEveryHours": {
+    "description": "Schedule: every few hours at a minute.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "minute": {
+        "type": "int"
+      }
+    }
+  },
+  "scheduleDailyAt": "Every day at {time}",
+  "@scheduleDailyAt": {
+    "description": "Schedule.",
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "scheduleWeeklyAt": "{days} at {time}",
+  "@scheduleWeeklyAt": {
+    "description": "Schedule: weekday names, then a time.",
+    "placeholders": {
+      "days": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "scheduleMonthlyAt": "On day {day} of every month at {time}",
+  "@scheduleMonthlyAt": {
+    "description": "Schedule.",
+    "placeholders": {
+      "day": {
+        "type": "int"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "snapshotTaskRecursiveLabel": "with child datasets",
   "@snapshotTaskRecursiveLabel": {
     "description": "Detail for recursive tasks."

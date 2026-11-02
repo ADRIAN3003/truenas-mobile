@@ -2972,6 +2972,180 @@ abstract class AppLocalizations {
   /// **'Cron: {cron}'**
   String scheduleCustom(String cron);
 
+  /// Schedule choice that opens the custom editor.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom…'**
+  String get scheduleCustomChoice;
+
+  /// Dialog title.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom schedule'**
+  String get cronEditorTitle;
+
+  /// Field label.
+  ///
+  /// In en, this message translates to:
+  /// **'Repeat'**
+  String get cronRepeat;
+
+  /// Schedule kind.
+  ///
+  /// In en, this message translates to:
+  /// **'Every few minutes'**
+  String get cronModeMinutes;
+
+  /// Schedule kind.
+  ///
+  /// In en, this message translates to:
+  /// **'Every few hours'**
+  String get cronModeHourly;
+
+  /// Schedule kind.
+  ///
+  /// In en, this message translates to:
+  /// **'Every day'**
+  String get cronModeDaily;
+
+  /// Schedule kind.
+  ///
+  /// In en, this message translates to:
+  /// **'On certain weekdays'**
+  String get cronModeWeekly;
+
+  /// Schedule kind.
+  ///
+  /// In en, this message translates to:
+  /// **'Once a month'**
+  String get cronModeMonthly;
+
+  /// Schedule kind.
+  ///
+  /// In en, this message translates to:
+  /// **'Cron expression'**
+  String get cronModeAdvanced;
+
+  /// Field label.
+  ///
+  /// In en, this message translates to:
+  /// **'Minutes between runs'**
+  String get cronMinutesBetween;
+
+  /// Field label.
+  ///
+  /// In en, this message translates to:
+  /// **'Hours between runs'**
+  String get cronHoursBetween;
+
+  /// Field label, the minute of the hour.
+  ///
+  /// In en, this message translates to:
+  /// **'At minute'**
+  String get cronAtMinute;
+
+  /// Field label, the hour of the day.
+  ///
+  /// In en, this message translates to:
+  /// **'Hour'**
+  String get cronTimeHour;
+
+  /// Field label, the minute of the hour.
+  ///
+  /// In en, this message translates to:
+  /// **'Minute'**
+  String get cronTimeMinute;
+
+  /// Field label.
+  ///
+  /// In en, this message translates to:
+  /// **'Day of the month'**
+  String get cronDayOfMonth;
+
+  /// Field label.
+  ///
+  /// In en, this message translates to:
+  /// **'On these days'**
+  String get cronWeekdays;
+
+  /// Hint under the weekday chips.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick at least one day.'**
+  String get cronPickWeekday;
+
+  /// Cron field label.
+  ///
+  /// In en, this message translates to:
+  /// **'Minute'**
+  String get cronFieldMinute;
+
+  /// Cron field label.
+  ///
+  /// In en, this message translates to:
+  /// **'Hour'**
+  String get cronFieldHour;
+
+  /// Cron field label, day of the month.
+  ///
+  /// In en, this message translates to:
+  /// **'Day'**
+  String get cronFieldDom;
+
+  /// Cron field label.
+  ///
+  /// In en, this message translates to:
+  /// **'Month'**
+  String get cronFieldMonth;
+
+  /// Cron field label, day of the week.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekday'**
+  String get cronFieldDow;
+
+  /// Error under a cron field.
+  ///
+  /// In en, this message translates to:
+  /// **'Not valid'**
+  String get cronFieldInvalid;
+
+  /// Help text under the cron fields.
+  ///
+  /// In en, this message translates to:
+  /// **'* is every, */5 every 5th, 1-5 a range, 1,15 a list. Weekdays: 0 or 7 is Sunday.'**
+  String get cronAdvancedHelp;
+
+  /// Schedule.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Every minute} other{Every {count} minutes}}'**
+  String scheduleEveryMinutes(int count);
+
+  /// Schedule: every few hours at a minute.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Every hour} other{Every {count} hours}}, at minute {minute}'**
+  String scheduleEveryHours(int count, int minute);
+
+  /// Schedule.
+  ///
+  /// In en, this message translates to:
+  /// **'Every day at {time}'**
+  String scheduleDailyAt(String time);
+
+  /// Schedule: weekday names, then a time.
+  ///
+  /// In en, this message translates to:
+  /// **'{days} at {time}'**
+  String scheduleWeeklyAt(String days, String time);
+
+  /// Schedule.
+  ///
+  /// In en, this message translates to:
+  /// **'On day {day} of every month at {time}'**
+  String scheduleMonthlyAt(int day, String time);
+
   /// Detail for recursive tasks.
   ///
   /// In en, this message translates to:

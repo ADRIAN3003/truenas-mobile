@@ -6,6 +6,7 @@ import '../../core/models/vm_config.dart';
 import '../../core/models/workloads.dart';
 import '../../core/session/truenas_session.dart';
 import '../../l10n/generated/app_localizations.dart';
+import '../../shared/connect_dialogs.dart';
 import '../../shared/dialogs.dart';
 import '../../shared/formatting.dart';
 import '../../shared/theme.dart';
@@ -216,11 +217,32 @@ class _VmScreenState extends State<VmScreen> with LoadState<VmScreen, _Loaded> {
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
           children: [
             _summary(context, vm),
-            if (loaded != null) ..._details(context, vm, loaded),
-            if (error != null && loaded == null)
+            if (loaded != null)
+              ..._details(context, vm, loaded)
+            else if (error != null)
               Padding(
-                padding: const EdgeInsets.all(16),
-                child: Text(error.toString()),
+                padding: const EdgeInsets.symmetric(vertical: 24),
+                child: Column(
+                  children: [
+                    Text(
+                      describeConnectError(l10n, error!),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 12),
+                    FilledButton.tonal(
+                      onPressed: () {
+                        setState(() => error = null);
+                        load();
+                      },
+                      child: Text(l10n.retry),
+                    ),
+                  ],
+                ),
+              )
+            else
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 48),
+                child: Center(child: CircularProgressIndicator.adaptive()),
               ),
           ],
         ),

@@ -90,14 +90,20 @@ void main() {
     expect(sent['name'], 'ubuntu');
     expect(sent['memory'], 4096);
     final devices = (sent['devices'] as List).cast<Map<String, dynamic>>();
-    expect(devices.map((d) => d['dtype']), ['DISK', 'CDROM', 'NIC']);
+    expect(devices.map((d) => (d['attributes'] as Map)['dtype']), [
+      'DISK',
+      'CDROM',
+      'NIC',
+    ]);
     expect(devices.first['attributes'], {
+      'dtype': 'DISK',
       'type': 'VIRTIO',
       'create_zvol': true,
       'zvol_name': 'tank/ubuntu-disk0',
       'zvol_volsize': 40 * 1024 * 1024 * 1024,
     });
     expect(devices.last['attributes'], {
+      'dtype': 'NIC',
       'type': 'VIRTIO',
       'nic_attach': 'enp1s0',
     });
@@ -161,8 +167,11 @@ void main() {
     await tester.tap(find.text('Save'));
     await settle(tester);
     expect(
-      server.vmDevices.where((d) => d['dtype'] == 'CDROM').single['attributes'],
-      {'path': '/mnt/tank/win11.iso'},
+      server.vmDevices
+          .map((d) => d['attributes'] as Map)
+          .where((a) => a['dtype'] == 'CDROM')
+          .single,
+      {'dtype': 'CDROM', 'path': '/mnt/tank/win11.iso'},
     );
 
     // Change: keeps the attributes the form doesn't show.
@@ -177,6 +186,7 @@ void main() {
     final nic = server.vmDevices.firstWhere((d) => d['id'] == 11);
     expect((nic['attributes'] as Map)['nic_attach'], 'br0');
     expect((nic['attributes'] as Map)['mac'], '00:a0:98:11:22:33');
+    expect((nic['attributes'] as Map)['dtype'], 'NIC');
 
     // Remove, also destroying the zvol.
     await tester.tap(find.byType(PopupMenuButton<String>).first);
@@ -192,6 +202,27 @@ void main() {
       server.calls.firstWhere((c) => c.$1 == 'vm.device.delete').$2[1],
       containsPair('zvol', true),
     );
+    await stop(tester);
+  });
+
+  testWidgets('shows a spinner while the machine loads, then named devices', (
+    tester,
+  ) async {
+    await start(tester);
+    await tester.tap(find.text('win11'));
+    // The first frame, before the server has answered.
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+    expect(find.byType(CircularProgressIndicator), findsOneWidget);
+    await settle(tester);
+    expect(find.byType(CircularProgressIndicator), findsNothing);
+    // 25.04 rows: the kind is inside the attributes, and the form is drawn
+    // for it instead of a JSON box.
+    await tester.tap(find.text('Disk (zvol)'));
+    await settle(tester);
+    expect(find.text('Edit Disk (zvol)'), findsOneWidget);
+    expect(find.text('Attributes (JSON)'), findsNothing);
+    expect(find.text('Bus'), findsOneWidget);
     await stop(tester);
   });
 

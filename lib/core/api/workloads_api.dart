@@ -376,7 +376,8 @@ class WorkloadsApi {
   }
 
   /// Creates a virtual machine with [config] and [devices] (each
-  /// `{dtype, attributes}`) in one call, so a refusal leaves nothing behind.
+  /// `{attributes: {dtype, ...}}`) in one call, so a refusal leaves nothing
+  /// behind.
   Future<VirtualMachine> createVm(
     Map<String, dynamic> config,
     List<Map<String, dynamic>> devices,
@@ -411,7 +412,11 @@ class WorkloadsApi {
     String dtype,
     Map<String, dynamic> attributes,
   ) => _client.call('vm.device.create', [
-    {'vm': vmId, 'dtype': dtype, 'attributes': attributes},
+    // The kind is part of the attributes.
+    {
+      'vm': vmId,
+      'attributes': {...attributes, 'dtype': dtype},
+    },
   ]);
 
   /// Replaces a device's [attributes] (the whole set, not a patch).

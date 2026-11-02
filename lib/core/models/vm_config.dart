@@ -27,12 +27,19 @@ class VmDevice {
     required this.order,
   });
 
-  factory VmDevice.fromJson(Map<String, dynamic> json) => VmDevice(
-    id: asInt(json['id']),
-    dtype: (json['dtype'] ?? '').toString(),
-    attributes: asMap(json['attributes']),
-    order: json['order'] is num ? asInt(json['order']) : null,
-  );
+  /// TrueNAS 25.04 and newer put `dtype` inside `attributes`; older releases
+  /// had it beside them. Either is read, and it is kept in `attributes`.
+  factory VmDevice.fromJson(Map<String, dynamic> json) {
+    final attributes = {...asMap(json['attributes'])};
+    final dtype = (attributes['dtype'] ?? json['dtype'] ?? '').toString();
+    if (dtype.isNotEmpty) attributes['dtype'] = dtype;
+    return VmDevice(
+      id: asInt(json['id']),
+      dtype: dtype,
+      attributes: attributes,
+      order: json['order'] is num ? asInt(json['order']) : null,
+    );
+  }
 
   final int id;
 

@@ -287,7 +287,10 @@ README covers what the app does; this file covers how to work on it.
   zvol: `create_zvol`, `zvol_name` = `pool/name`, `zvol_volsize` in bytes), an
   ISO (`CDROM`) and a NIC in the same `vm.create` call (`devices`), so a refusal
   leaves nothing behind. Devices (`vm.device.*`, `dtype` DISK, RAW, CDROM, NIC,
-  DISPLAY, PCI, USB): `vm.device.update` replaces the whole `attributes`, so
+  DISPLAY, PCI, USB): on 25.04 the kind is `attributes.dtype`, not a field
+  beside `attributes` (confirmed on a real NAS), for reads, `vm.device.create`
+  and the `devices` of `vm.create` alike; `VmDevice.fromJson` also accepts the
+  old top-level one. `vm.device.update` replaces the whole `attributes`, so
   `VmDeviceScreen` starts from the stored set and only overwrites the fields it
   shows; a `dtype` it does not know is edited as JSON. Pickers come from
   `vm.bootloader_options`, `vm.cpu_model_choices`, `vm.device.nic_attach_choices`,
@@ -295,8 +298,8 @@ README covers what the app does; this file covers how to work on it.
   `vm.maximum_supported_vcpus` and `vm.random_mac`, each optional (a failed one
   gives an empty list and a text field). Changes to a running VM apply at its next
   start. The payloads are written from the middleware source and unconfirmed on a
-  real NAS: check the new-zvol path, the NIC `nic_attach` choices, the display
-  attributes and `trusted_platform_module` (only sent when the row has it) on 25.04.
+  real NAS apart from the device shape above: check the new-zvol path and
+  `trusted_platform_module` (only sent when the row has it) on 25.04.
   Fake server: `vmEditor`, `vms`, `vmDevices`.
 - Apps tab bulk actions hand the work to the server as one `core.bulk` job
   (what the web UI's "Update All" does), so it carries on when the app is

@@ -2659,11 +2659,6 @@ class AppLocalizationsHu extends AppLocalizations {
       'A kapcsolat megszakadt, az állapot lehet, hogy elavult';
 
   @override
-  String jobsMoreCount(int count) {
-    return '+$count további';
-  }
-
-  @override
   String get jobsChannelName => 'Feladatok állapota';
 
   @override

@@ -4430,12 +4430,6 @@ abstract class AppLocalizations {
   /// **'Connection lost, progress may be out of date'**
   String get jobsConnectionLost;
 
-  /// Under the running jobs when there are more than shown.
-  ///
-  /// In en, this message translates to:
-  /// **'+{count} more'**
-  String jobsMoreCount(int count);
-
   /// Android notification channel name for running jobs.
   ///
   /// In en, this message translates to:

@@ -722,7 +722,6 @@
   "jobKindSystemUpdate": "Rendszerfrissítés",
   "jobsStale": "Nem frissül, nyisd meg az alkalmazást",
   "jobsConnectionLost": "A kapcsolat megszakadt, az állapot lehet, hogy elavult",
-  "jobsMoreCount": "+{count} további",
   "jobsChannelName": "Feladatok állapota",
   "jobsChannelDescription": "Scrubok, replikációk és frissítések előrehaladása",
   "serversLoadErrorTitle": "Nem olvashatók a mentett szerverek",

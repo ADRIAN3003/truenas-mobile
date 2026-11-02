@@ -3625,15 +3625,6 @@
   "@jobsConnectionLost": {
     "description": "Shown in the app under running jobs when the server cannot be reached."
   },
-  "jobsMoreCount": "+{count} more",
-  "@jobsMoreCount": {
-    "description": "Under the running jobs when there are more than shown.",
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "jobsChannelName": "Job progress",
   "@jobsChannelName": {
     "description": "Android notification channel name for running jobs."

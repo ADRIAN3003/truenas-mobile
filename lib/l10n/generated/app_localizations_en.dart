@@ -2685,11 +2685,6 @@ class AppLocalizationsEn extends AppLocalizations {
       'Connection lost, progress may be out of date';
 
   @override
-  String jobsMoreCount(int count) {
-    return '+$count more';
-  }
-
-  @override
   String get jobsChannelName => 'Job progress';
 
   @override

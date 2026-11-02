@@ -118,8 +118,8 @@ class _VmEditScreenState extends State<VmEditScreen>
     final devices = <Map<String, dynamic>>[
       if (_creating && _addDisk && _pool != null)
         {
-          'dtype': VmDeviceType.disk.value,
           'attributes': {
+            'dtype': VmDeviceType.disk.value,
             'type': _diskBus,
             'create_zvol': true,
             'zvol_name': newZvolName(_pool!, _draft.name, 0),
@@ -128,13 +128,18 @@ class _VmEditScreenState extends State<VmEditScreen>
         },
       if (_creating && _iso.text.trim().isNotEmpty)
         {
-          'dtype': VmDeviceType.cdrom.value,
-          'attributes': {'path': _iso.text.trim()},
+          'attributes': {
+            'dtype': VmDeviceType.cdrom.value,
+            'path': _iso.text.trim(),
+          },
         },
       if (_creating && _addNic)
         {
-          'dtype': VmDeviceType.nic.value,
-          'attributes': {'type': 'VIRTIO', 'nic_attach': ?_attach},
+          'attributes': {
+            'dtype': VmDeviceType.nic.value,
+            'type': 'VIRTIO',
+            'nic_attach': ?_attach,
+          },
         },
     ];
     setState(() => _saving = true);

@@ -114,8 +114,22 @@ void main() {
       expect(devices.first.type, VmDeviceType.disk);
       expect(devices.first.detail, '/dev/zvol/tank/win11');
       expect(devices.last.detail, 'enp1s0 · 00:a0:98:11:22:33');
+      // 25.04 keeps the kind inside the attributes.
+      expect(devices.first.attributes['dtype'], 'DISK');
       expect((await session.workloads.vm(1))!.raw['cores'], 4);
       expect(await session.workloads.vm(99), isNull);
+    });
+
+    test('reads a device kind that sits beside the attributes too', () {
+      final device = VmDevice.fromJson({
+        'id': 5,
+        'dtype': 'CDROM',
+        'attributes': {'path': '/a.iso'},
+      });
+      expect(device.type, VmDeviceType.cdrom);
+      expect(device.attributes, {'dtype': 'CDROM', 'path': '/a.iso'});
+      expect(device.detail, '/a.iso');
+      expect(VmDevice.fromJson({'id': 6}).dtype, '');
     });
 
     test('reads what the editors can pick from', () async {
@@ -136,8 +150,11 @@ void main() {
         ..memory = 4096;
       await session.workloads.createVm(draft.toPayload(), [
         {
-          'dtype': 'DISK',
-          'attributes': {'type': 'VIRTIO', 'create_zvol': true},
+          'attributes': {
+            'dtype': 'DISK',
+            'type': 'VIRTIO',
+            'create_zvol': true,
+          },
         },
       ]);
       final sent =
@@ -175,6 +192,13 @@ void main() {
       await connect();
       final api = session.workloads;
       await api.createVmDevice(1, 'CDROM', {'path': '/mnt/tank/win11.iso'});
+      expect(
+        server.calls.firstWhere((c) => c.$1 == 'vm.device.create').$2.single,
+        {
+          'vm': 1,
+          'attributes': {'dtype': 'CDROM', 'path': '/mnt/tank/win11.iso'},
+        },
+      );
       expect((await api.vmDevices(1)).map((d) => d.dtype), contains('CDROM'));
       await api.updateVmDevice(11, {'type': 'VIRTIO', 'nic_attach': 'br0'});
       expect(server.calls.firstWhere((c) => c.$1 == 'vm.device.update').$2, [

@@ -224,7 +224,7 @@ class _VmDeviceScreenState extends State<VmDeviceScreen>
           return null;
         }
     }
-    return a;
+    return a..['dtype'] = _dtype;
   }
 
   Future<void> _save() async {

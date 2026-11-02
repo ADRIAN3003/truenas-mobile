@@ -520,17 +520,21 @@ class FakeTrueNasServer {
   final vmDevices = <Map<String, dynamic>>[
     {
       'id': 10,
-      'dtype': 'DISK',
       'vm': 1,
       'order': 1001,
-      'attributes': {'path': '/dev/zvol/tank/win11', 'type': 'AHCI'},
+      'attributes': {
+        'dtype': 'DISK',
+        'path': '/dev/zvol/tank/win11',
+        'type': 'AHCI',
+        'iotype': 'THREADS',
+      },
     },
     {
       'id': 11,
-      'dtype': 'NIC',
       'vm': 1,
       'order': 1002,
       'attributes': {
+        'dtype': 'NIC',
         'type': 'E1000',
         'nic_attach': 'enp1s0',
         'mac': '00:a0:98:11:22:33',
@@ -1317,6 +1321,30 @@ class FakeTrueNasServer {
                       if (v['id'] == (filter.first as List<dynamic>)[2]) v,
                   ];
           case 'vm.create':
+            {
+              // Like 25.04: the kind of a device sits inside its attributes.
+              final raw =
+                  ((params[0] as Map)['devices'] as List<dynamic>? ?? []);
+              if (raw.any(
+                (d) =>
+                    d is! Map ||
+                    d.containsKey('dtype') ||
+                    (d['attributes'] as Map?)?['dtype'] == null,
+              )) {
+                socket.add(
+                  jsonEncode({
+                    'jsonrpc': '2.0',
+                    'id': message['id'],
+                    'error': {
+                      'code': -32001,
+                      'message': 'Method call error',
+                      'data': {'reason': '[EINVAL] attributes.dtype: Required'},
+                    },
+                  }),
+                );
+                return;
+              }
+            }
             final data = {...params[0] as Map<String, dynamic>};
             final id =
                 vms.fold<int>(
@@ -1366,6 +1394,29 @@ class FakeTrueNasServer {
             ];
           case 'vm.device.create':
             final data = params[0] as Map<String, dynamic>;
+            {
+              // Like 25.04: the kind of a device sits inside its attributes.
+              final raw = [params[0]];
+              if (raw.any(
+                (d) =>
+                    d is! Map ||
+                    d.containsKey('dtype') ||
+                    (d['attributes'] as Map?)?['dtype'] == null,
+              )) {
+                socket.add(
+                  jsonEncode({
+                    'jsonrpc': '2.0',
+                    'id': message['id'],
+                    'error': {
+                      'code': -32001,
+                      'message': 'Method call error',
+                      'data': {'reason': '[EINVAL] attributes.dtype: Required'},
+                    },
+                  }),
+                );
+                return;
+              }
+            }
             vmDevices.add({
               'id': 100 + vmDevices.length,
               'order': 1000 + vmDevices.length,

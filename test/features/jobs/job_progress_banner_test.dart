@@ -36,7 +36,7 @@ void main() {
     expect(find.byType(LinearProgressIndicator), findsNothing);
   });
 
-  testWidgets('lists the running jobs with their percent', (tester) async {
+  testWidgets('shows one job and swipes to the next', (tester) async {
     source.active.addAll([
       jobJson(
         1,
@@ -46,26 +46,66 @@ void main() {
         arguments: ['tank'],
       ),
       jobJson(2, 'app.upgrade', percent: 10, arguments: ['plex']),
+      jobJson(3, 'replication.run', percent: 70),
     ]);
     await pump(tester);
     expect(find.text('Scrub · tank'), findsOneWidget);
     expect(find.text('Scanning'), findsOneWidget);
     expect(find.text('42%'), findsOneWidget);
+    expect(find.text('App update · plex'), findsNothing);
+
+    await tester.fling(
+      find.byKey(const ValueKey('job-pages')),
+      const Offset(-300, 0),
+      1000,
+    );
+    await tester.pumpAndSettle();
     expect(find.text('App update · plex'), findsOneWidget);
-    expect(find.byType(LinearProgressIndicator), findsNWidgets(2));
+    expect(find.text('10%'), findsOneWidget);
+    expect(find.text('Scrub · tank'), findsNothing);
+
+    // And back again.
+    await tester.fling(
+      find.byKey(const ValueKey('job-pages')),
+      const Offset(300, 0),
+      1000,
+    );
+    await tester.pumpAndSettle();
+    expect(find.text('Scrub · tank'), findsOneWidget);
   });
 
-  testWidgets('folds jobs beyond the limit and opens the list on tap', (
-    tester,
-  ) async {
+  testWidgets('keeps the job in view when another one ends', (tester) async {
+    source.active.addAll([
+      jobJson(1, 'pool.scrub.run', percent: 42, arguments: ['tank']),
+      jobJson(2, 'app.upgrade', percent: 10, arguments: ['plex']),
+    ]);
+    await pump(tester);
+    await tester.fling(
+      find.byKey(const ValueKey('job-pages')),
+      const Offset(-300, 0),
+      1000,
+    );
+    await tester.pumpAndSettle();
+    expect(find.text('App update · plex'), findsOneWidget);
+
+    // The first job ends: the app update stays on show.
+    await tester.runAsync(() async {
+      source.emit('changed', 1, {'state': 'SUCCESS'});
+      await Future<void>.delayed(const Duration(milliseconds: 20));
+    });
+    await tester.pumpAndSettle();
+    expect(find.text('App update · plex'), findsOneWidget);
+    expect(find.text('Scrub · tank'), findsNothing);
+  });
+
+  testWidgets('opens the list on tap', (tester) async {
     source.active.addAll([
       for (var i = 1; i <= 5; i++)
         jobJson(i, 'replication.run', percent: i * 10),
     ]);
     var opened = 0;
     await pump(tester, onOpen: () => opened++);
-    expect(find.byType(LinearProgressIndicator), findsNWidgets(bannerLimit));
-    expect(find.text('+2 more'), findsOneWidget);
+    expect(find.byType(LinearProgressIndicator), findsOneWidget);
     await tester.tap(find.text('10%'));
     expect(opened, 1);
   });

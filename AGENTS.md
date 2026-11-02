@@ -151,7 +151,9 @@ README covers what the app does; this file covers how to work on it.
   `ios/Shared` is compiled into both targets) and a notification on Android
   (`LiveProgressPlugin.kt`, a promoted ongoing progress notification on
   Android 16). `JobMonitor` ties them to one open server, `ServerScreen` owns
-  it. The in-app card (`JobProgressBanner`) has a close button (hides the jobs
+  it. The in-app card (`JobProgressBanner`) shows one job at a time (running
+  ones first, a `PageView` with dots; swipe for the next, and the job you look at
+  stays in view when the list changes) and has a close button (hides the jobs
   it showed, not later ones); `JobGaugeButton` is the animated ring in the
   app bar actions. `LiveProgress.support()` (`LiveSupport`) tells a missing
   `JobActivityWidget.appex` (sideloader stripped it: the Dynamic Island is

@@ -163,7 +163,12 @@ class _AlertsTabState extends ConsumerState<AlertsTab> {
   }
 }
 
-class _AlertTile extends StatelessWidget {
+/// Longest message shown before it is folded behind "Show more".
+const _collapsedLines = 3;
+
+/// One alert: the message gets the whole row width (only a small "more" menu
+/// sits beside it), long ones fold to a few lines and open on tap.
+class _AlertTile extends StatefulWidget {
   const _AlertTile(
     this.alert, {
     required this.onToggle,
@@ -182,7 +187,17 @@ class _AlertTile extends StatelessWidget {
   final bool muted;
 
   @override
+  State<_AlertTile> createState() => _AlertTileState();
+}
+
+enum _AlertAction { toggle, mute }
+
+class _AlertTileState extends State<_AlertTile> {
+  bool _expanded = false;
+
+  @override
   Widget build(BuildContext context) {
+    final alert = widget.alert;
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final locale = Localizations.localeOf(context).toLanguageTag();
@@ -208,36 +223,89 @@ class _AlertTile extends StatelessWidget {
       label,
       if (time != null) DateFormat.yMMMd(locale).add_jm().format(time),
     ].join(' · ');
+    final messageStyle = theme.textTheme.bodyLarge ?? const TextStyle();
+    final message = alert.plainMessage;
+    final canMute = widget.onToggleMute != null && alert.klass.isNotEmpty;
     return Opacity(
       opacity: alert.dismissed ? 0.6 : 1,
-      child: ListTile(
-        leading: SoftIcon(
-          icon,
-          statusColors(context, color).$1,
-          semanticLabel: label,
-        ),
-        title: Text(alert.plainMessage),
-        subtitle: Text(meta),
-        isThreeLine: alert.plainMessage.length > 60,
-        trailing: Row(
-          mainAxisSize: MainAxisSize.min,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 10, 4, 10),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            TextButton(
-              onPressed: () => onToggle(alert),
-              child: Text(
-                alert.dismissed ? l10n.alertRestore : l10n.alertDismiss,
+            SoftIcon(
+              icon,
+              statusColors(context, color).$1,
+              semanticLabel: label,
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: LayoutBuilder(
+                builder: (context, box) {
+                  final painter = TextPainter(
+                    text: TextSpan(text: message, style: messageStyle),
+                    maxLines: _collapsedLines,
+                    textDirection: Directionality.of(context),
+                    textScaler: MediaQuery.textScalerOf(context),
+                  )..layout(maxWidth: box.maxWidth);
+                  final folds = painter.didExceedMaxLines;
+                  painter.dispose();
+                  return InkWell(
+                    onTap: folds
+                        ? () => setState(() => _expanded = !_expanded)
+                        : null,
+                    borderRadius: BorderRadius.circular(8),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          message,
+                          style: messageStyle,
+                          maxLines: _expanded ? null : _collapsedLines,
+                          overflow: _expanded ? null : TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          meta,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: theme.colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                        if (folds)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 2),
+                            child: Text(
+                              _expanded
+                                  ? l10n.alertShowLess
+                                  : l10n.alertShowMore,
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: theme.colorScheme.primary,
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  );
+                },
               ),
             ),
-            if (onToggleMute != null && alert.klass.isNotEmpty)
-              AppPopupMenu<bool>(
-                entries: [
+            AppPopupMenu<_AlertAction>(
+              entries: [
+                menuEntry(
+                  _AlertAction.toggle,
+                  alert.dismissed ? l10n.alertRestore : l10n.alertDismiss,
+                ),
+                if (canMute)
                   menuEntry(
-                    true,
-                    muted ? l10n.alertUnmuteKind : l10n.alertMuteKind,
+                    _AlertAction.mute,
+                    widget.muted ? l10n.alertUnmuteKind : l10n.alertMuteKind,
                   ),
-                ],
-                onSelected: (_) => onToggleMute!(alert),
-              ),
+              ],
+              onSelected: (action) => switch (action) {
+                _AlertAction.toggle => widget.onToggle(alert),
+                _AlertAction.mute => widget.onToggleMute!(alert),
+              },
+            ),
           ],
         ),
       ),

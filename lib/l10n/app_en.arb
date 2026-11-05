@@ -483,6 +483,14 @@
   "@alertRestore": {
     "description": "Action that restores a dismissed alert."
   },
+  "alertShowMore": "Show more",
+  "@alertShowMore": {
+    "description": "Unfolds a long alert message that is cut short in the list."
+  },
+  "alertShowLess": "Show less",
+  "@alertShowLess": {
+    "description": "Folds an unfolded alert message back to a few lines."
+  },
   "levelCritical": "Critical",
   "@levelCritical": {
     "description": "Label for critical alert level."

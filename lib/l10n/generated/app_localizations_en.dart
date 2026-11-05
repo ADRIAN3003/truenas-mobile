@@ -373,6 +373,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get alertRestore => 'Restore';
 
   @override
+  String get alertShowMore => 'Show more';
+
+  @override
+  String get alertShowLess => 'Show less';
+
+  @override
   String get levelCritical => 'Critical';
 
   @override

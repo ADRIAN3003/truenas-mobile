@@ -704,6 +704,18 @@ abstract class AppLocalizations {
   /// **'Restore'**
   String get alertRestore;
 
+  /// Unfolds a long alert message that is cut short in the list.
+  ///
+  /// In en, this message translates to:
+  /// **'Show more'**
+  String get alertShowMore;
+
+  /// Folds an unfolded alert message back to a few lines.
+  ///
+  /// In en, this message translates to:
+  /// **'Show less'**
+  String get alertShowLess;
+
   /// Label for critical alert level.
   ///
   /// In en, this message translates to:

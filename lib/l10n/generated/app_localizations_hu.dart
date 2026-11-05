@@ -371,6 +371,12 @@ class AppLocalizationsHu extends AppLocalizations {
   String get alertRestore => 'Visszaállítás';
 
   @override
+  String get alertShowMore => 'Több';
+
+  @override
+  String get alertShowLess => 'Kevesebb';
+
+  @override
   String get levelCritical => 'Kritikus';
 
   @override

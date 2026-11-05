@@ -101,6 +101,8 @@
   "alertsDismissed": "Elvetett",
   "alertDismiss": "Elvetés",
   "alertRestore": "Visszaállítás",
+  "alertShowMore": "Több",
+  "alertShowLess": "Kevesebb",
   "levelCritical": "Kritikus",
   "levelWarning": "Figyelmeztetés",
   "levelInfo": "Információ",

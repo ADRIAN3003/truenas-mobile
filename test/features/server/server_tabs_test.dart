@@ -20,6 +20,9 @@ import '../../support/alert_fakes.dart';
 import '../../support/fake_truenas_server.dart';
 import '../../support/memory_store.dart';
 
+/// The "more" menu beside each alert.
+final alertMenus = find.byWidgetPredicate((w) => w is PopupMenuButton);
+
 void main() {
   late FakeTrueNasServer server;
   late TrueNasSession session;
@@ -197,9 +200,13 @@ void main() {
     await settle(tester);
 
     expect(find.text('Pool tank state is DEGRADED'), findsOneWidget);
-    expect(find.text('Dismiss'), findsOneWidget);
-    expect(find.text('Restore'), findsOneWidget);
+    // The only control beside an alert is its menu; no text button.
+    expect(find.text('Dismiss'), findsNothing);
+    expect(alertMenus, findsNWidgets(2));
 
+    await tester.tap(alertMenus.first);
+    await tester.pumpAndSettle();
+    expect(find.text('Restore'), findsNothing);
     await tester.tap(find.text('Dismiss'));
     await settle(tester);
     expect(server.alerts.first['dismissed'], isTrue);
@@ -236,14 +243,14 @@ void main() {
     );
     await settle(tester);
 
-    await tester.tap(find.byType(PopupMenuButton<bool>).first);
+    await tester.tap(alertMenus.first);
     await tester.pumpAndSettle();
     await tester.tap(find.text("Don't notify for this type"));
     await tester.pumpAndSettle();
     expect(container.read(settingsProvider).mutedAlertKinds, {'PoolStatus'});
     expect(find.textContaining('No more notifications'), findsOneWidget);
 
-    await tester.tap(find.byType(PopupMenuButton<bool>).first);
+    await tester.tap(alertMenus.first);
     await tester.pumpAndSettle();
     await tester.tap(find.text('Notify for this type again'));
     await tester.pumpAndSettle();
@@ -251,13 +258,36 @@ void main() {
     await disconnect(tester);
   });
 
-  testWidgets('there is no mute menu where alerts do not notify', (
+  testWidgets('there is no mute entry where alerts do not notify', (
     tester,
   ) async {
     await connect(tester);
     await tester.pumpWidget(wrap(AlertsTab(session: session)));
     await settle(tester);
-    expect(find.byType(PopupMenuButton<bool>), findsNothing);
+    await tester.tap(alertMenus.first);
+    await tester.pumpAndSettle();
+    expect(find.text('Dismiss'), findsOneWidget);
+    expect(find.text("Don't notify for this type"), findsNothing);
+    await disconnect(tester);
+  });
+
+  testWidgets('a long alert folds and opens on tap', (tester) async {
+    await connect(tester);
+    server.alerts.first['formatted'] = List.filled(
+      30,
+      'Disk ST4000VN008 is DEGRADED.',
+    ).join(' ');
+    await tester.pumpWidget(wrap(AlertsTab(session: session)));
+    await settle(tester);
+
+    expect(find.text('Show more'), findsOneWidget);
+    await tester.tap(find.text('Show more'));
+    await tester.pumpAndSettle();
+    expect(find.text('Show less'), findsOneWidget);
+    // Tapping the message itself folds it again.
+    await tester.tap(find.textContaining('Disk ST4000VN008').first);
+    await tester.pumpAndSettle();
+    expect(find.text('Show more'), findsOneWidget);
     await disconnect(tester);
   });
 

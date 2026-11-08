@@ -256,6 +256,13 @@ before pointing the app at a server that holds data you care about.
 Issues and pull requests are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md)
 for setup, the checks to run before opening a PR, and the project conventions.
 
+## Privacy
+
+The app has no analytics, tracking or backend of its own: it talks to your
+TrueNAS server and, for update checks, GitHub. See the
+[privacy policy](PRIVACY.md) for what is stored on the phone and what is sent
+where. It is also linked from Settings > About in the app.
+
 ## License
 
 [MIT](LICENSE)

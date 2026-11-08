@@ -4298,6 +4298,12 @@ abstract class AppLocalizations {
   /// **'Source code'**
   String get settingsSource;
 
+  /// Row in About that opens the privacy policy web page.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy policy'**
+  String get settingsPrivacyPolicy;
+
   /// Title of the dialog shown when leaving a running shell.
   ///
   /// In en, this message translates to:

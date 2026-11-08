@@ -700,6 +700,7 @@
   "settingsVersion": "Verzió",
   "settingsLicences": "Nyílt forráskódú licencek",
   "settingsSource": "Forráskód",
+  "settingsPrivacyPolicy": "Adatvédelmi irányelvek",
   "shellLeaveTitle": "Bezárod a shellt?",
   "shellLeaveBody": "Ami benne fut, az leáll.",
   "shellLeaveConfirm": "Shell bezárása",

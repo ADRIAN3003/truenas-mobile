@@ -29,6 +29,11 @@ import 'log_screen.dart';
 /// Where the project lives, for the About section.
 final _sourceUri = Uri.parse('https://github.com/ADRIAN3003/truenas-mobile');
 
+/// The privacy policy, a plain web page (Google Play wants this exact URL).
+final _privacyUri = Uri.parse(
+  'https://github.com/ADRIAN3003/truenas-mobile/blob/main/PRIVACY.md',
+);
+
 /// The app's own settings (not a server's): appearance, behaviour, the shell,
 /// trusted certificates and About. Stored on the phone only.
 class SettingsScreen extends ConsumerWidget {
@@ -262,6 +267,16 @@ class SettingsScreen extends ConsumerWidget {
                 trailing: const Icon(Icons.open_in_new_rounded, size: 18),
                 onTap: () =>
                     launchUrl(_sourceUri, mode: LaunchMode.externalApplication),
+              ),
+              NavRow(
+                icon: Icons.privacy_tip_rounded,
+                color: AppPalette.tileBlue,
+                title: l10n.settingsPrivacyPolicy,
+                trailing: const Icon(Icons.open_in_new_rounded, size: 18),
+                onTap: () => launchUrl(
+                  _privacyUri,
+                  mode: LaunchMode.externalApplication,
+                ),
               ),
             ],
           ),

@@ -2529,6 +2529,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get settingsSource => 'Forráskód';
 
   @override
+  String get settingsPrivacyPolicy => 'Adatvédelmi irányelvek';
+
+  @override
   String get shellLeaveTitle => 'Bezárod a shellt?';
 
   @override

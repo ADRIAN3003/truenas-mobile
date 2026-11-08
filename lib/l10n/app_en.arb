@@ -3486,6 +3486,10 @@
   "@settingsSource": {
     "description": "Row that opens the project page."
   },
+  "settingsPrivacyPolicy": "Privacy policy",
+  "@settingsPrivacyPolicy": {
+    "description": "Row in About that opens the privacy policy web page."
+  },
   "shellLeaveTitle": "Close the shell?",
   "@shellLeaveTitle": {
     "description": "Title of the dialog shown when leaving a running shell."

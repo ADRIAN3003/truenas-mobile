@@ -2530,6 +2530,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsSource => 'Source code';
 
   @override
+  String get settingsPrivacyPolicy => 'Privacy policy';
+
+  @override
   String get shellLeaveTitle => 'Close the shell?';
 
   @override

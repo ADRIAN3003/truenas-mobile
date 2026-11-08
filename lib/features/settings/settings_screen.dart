@@ -23,6 +23,7 @@ import '../../shared/theme.dart';
 import '../../shared/ui.dart';
 import '../../shared/widgets.dart';
 import '../updates/update_screen.dart';
+import '../updates/updates_provider.dart';
 import 'alert_kinds_screen.dart';
 import 'log_screen.dart';
 
@@ -190,30 +191,38 @@ class SettingsScreen extends ConsumerWidget {
             ],
           ),
           SectionHeader(l10n.settingsUpdates),
-          GroupedCard(
-            indent: 16,
-            children: [
-              AppSwitchTile(
-                title: Text(l10n.settingsCheckUpdates),
-                subtitle: Text(l10n.settingsCheckUpdatesHint),
-                value: settings.checkForUpdates,
-                onChanged: (on) =>
-                    notifier.update((s) => s.copyWith(checkForUpdates: on)),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          GroupedCard(
-            children: [
-              NavRow(
-                icon: Icons.system_update_rounded,
-                color: AppPalette.tileBlue,
-                title: l10n.settingsCheckNow,
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute<void>(builder: (_) => const UpdateScreen()),
+          // The Google Play build is updated by Play: no update switch, no
+          // check, no installer. Its release notes still read GitHub, but only
+          // when the user opens them.
+          if (ref.watch(selfUpdateAllowedProvider)) ...[
+            GroupedCard(
+              indent: 16,
+              children: [
+                AppSwitchTile(
+                  title: Text(l10n.settingsCheckUpdates),
+                  subtitle: Text(l10n.settingsCheckUpdatesHint),
+                  value: settings.checkForUpdates,
+                  onChanged: (on) =>
+                      notifier.update((s) => s.copyWith(checkForUpdates: on)),
                 ),
-              ),
+              ],
+            ),
+            const SizedBox(height: 12),
+          ],
+          GroupedCard(
+            children: [
+              if (ref.watch(selfUpdateAllowedProvider))
+                NavRow(
+                  icon: Icons.system_update_rounded,
+                  color: AppPalette.tileBlue,
+                  title: l10n.settingsCheckNow,
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute<void>(
+                      builder: (_) => const UpdateScreen(),
+                    ),
+                  ),
+                ),
               NavRow(
                 icon: Icons.history_rounded,
                 color: AppPalette.tileSlate,

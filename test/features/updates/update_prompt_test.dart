@@ -31,6 +31,7 @@ void main() {
     FakeGitHub github, {
     AppSettings settings = const AppSettings(),
     bool autoCheck = true,
+    bool selfUpdate = true,
   }) async {
     container = ProviderContainer(
       overrides: [
@@ -43,6 +44,7 @@ void main() {
         initialSettingsProvider.overrideWithValue(settings),
         updateCheckerProvider.overrideWithValue(github.checker),
         updateAutoCheckProvider.overrideWithValue(autoCheck),
+        selfUpdateAllowedProvider.overrideWithValue(selfUpdate),
       ],
     );
     addTearDown(container.dispose);
@@ -76,6 +78,13 @@ void main() {
     await launch(tester, github);
     expect(github.paths, ['/repos/ADRIAN3003/truenas-mobile/releases/latest']);
     expect(find.text('Update available'), findsOneWidget);
+  });
+
+  testWidgets('the Google Play build never looks at GitHub', (tester) async {
+    final github = FakeGitHub([releaseJson('v0.1.4')]);
+    await launch(tester, github, selfUpdate: false);
+    expect(github.requests, 0);
+    expect(find.text('Update available'), findsNothing);
   });
 
   testWidgets('a repository without releases offers nothing', (tester) async {

@@ -18,8 +18,12 @@ You need Flutter **3.47.7** (the version pinned in
 
 ```sh
 flutter pub get
-flutter run
+flutter run                  # iOS, or add --flavor github on Android
 ```
+
+Android has a `github` and a `play` flavor (the Google Play one has no
+self-updater); every Android build and run needs `--flavor`. See
+[docs/GOOGLE_PLAY.md](docs/GOOGLE_PLAY.md).
 
 You can sign in to any TrueNAS 25.04 or newer server. Most tests run against a
 fake middleware (`test/support/fake_truenas_server.dart`), so you do not need

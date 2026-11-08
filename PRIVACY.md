@@ -43,8 +43,9 @@ All of this stays on the phone. None of it is uploaded to the developer.
   figures read from your server, shown by the widgets. On iOS the sign-in
   details the widgets need are kept in a Keychain group shared only between
   the app and its own widget extension.
-- **Downloaded app update** (Android): a release APK downloaded from GitHub
-  is kept in the app's cache until installed.
+- **Downloaded app update** (Android APK from GitHub only): a release APK
+  downloaded from GitHub is kept in the app's cache until installed. The
+  Google Play version cannot download or install updates itself.
 
 Deleting a server removes its details. "Clear" in the server list and in the
 error log removes those. Uninstalling the app removes everything it stored.
@@ -60,14 +61,18 @@ error log removes those. Uninstalling the app removes everything it stored.
   traffic as they would for a browser.
 - **Wake-on-LAN** (only if you set it up): a UDP "magic packet" is broadcast on
   your local network to wake your server.
-- **GitHub, for app updates.** When the app opens (you can switch this off in
-  Settings > Updates), it asks GitHub's public API for the latest release of
-  this project (`api.github.com`, no sign-in). The request carries nothing
-  about you or your servers, but, like any web request, GitHub sees your
-  IP address. If you choose to install an update on Android, the APK is
-  downloaded from the project's GitHub release. GitHub's own
+- **GitHub, for app updates and release notes.** In the APK and IPA downloaded
+  from this project's GitHub releases, the app asks GitHub's public API for the
+  latest release when it opens (you can switch this off in Settings >
+  Updates) and when you open Settings > Release notes (`api.github.com`, no
+  sign-in). The request carries nothing about you or your servers, but, like
+  any web request, GitHub sees your IP address. If you choose to install an
+  update on Android, the APK is downloaded from the project's GitHub release.
+  GitHub's own
   [privacy statement](https://docs.github.com/site-policy/privacy-policies/github-general-privacy-statement)
-  applies to that.
+  applies to that. **The version from Google Play** has no update check and no
+  installer and is updated by Google Play. It contacts GitHub only when you
+  open Settings > Release notes, to read the notes of this project's releases.
 - **App icons.** The Apps screens show icons from the TrueNAS app catalog. The
   catalog gives the app an image address and the app downloads the image from
   that address, which is a host run by the catalog's publisher or the app's
@@ -82,7 +87,8 @@ contacts, photos, camera, microphone or location.
 
 ## Permissions and phone features
 
-- **Internet / local network**: to reach your server (and GitHub as above).
+- **Internet / local network**: to reach your server (and GitHub as above, in
+  the builds from GitHub).
   iOS asks for local network access to reach a server on your home network.
 - **Notifications** (optional): alert and finished-job notifications are made
   on the phone itself. About every 15 minutes, as the phone's scheduler allows,
@@ -100,8 +106,9 @@ contacts, photos, camera, microphone or location.
   They use the saved server details on the phone and talk only to your server.
   If you use Siri or Shortcuts, Apple processes your voice requests under
   Apple's own privacy terms, not this policy.
-- **Install packages** (Android): used only to install an app update you
-  chose to download.
+- **Install packages** (Android APK from GitHub only): used only to install an
+  app update you chose to download. The Google Play version does not have
+  this permission.
 
 ## Sharing, selling and retention
 

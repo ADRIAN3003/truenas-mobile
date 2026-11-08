@@ -18,7 +18,7 @@ env:
 
 jobs:
   android:
-    name: Build APK and AAB
+    name: Build APKs and Play AAB
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -56,15 +56,35 @@ jobs:
           VERSION="${TAG#v}"
           ARGS="--release --build-name=${VERSION%%-*} --build-number=${{ github.run_number }}"
           mkdir -p dist
-          flutter build apk $ARGS
-          cp build/app/outputs/flutter-apk/app-release.apk dist/
-          flutter build apk --split-per-abi $ARGS
-          cp build/app/outputs/flutter-apk/app-*-release.apk dist/
-          flutter build appbundle $ARGS
-          cp build/app/outputs/bundle/release/app-release.aab dist/
+          # GitHub build: self-updating APKs.
+          flutter build apk $ARGS --flavor github
+          cp build/app/outputs/flutter-apk/app-github-release.apk dist/
+          flutter build apk --split-per-abi $ARGS --flavor github
+          cp build/app/outputs/flutter-apk/app-github-*-release.apk dist/
+          tools/check-play-manifest.sh github Release
           # The app's updater finds its APK by these names (ReleaseInfo.apkFor).
-          for f in dist/*; do mv "$f" "dist/truenas-mobile-$TAG-${f#dist/app-}"; done
+          for f in dist/app-github-*.apk; do mv "$f" "dist/truenas-mobile-$TAG-${f#dist/app-github-}"; done
+          # Google Play build: no updater, no REQUEST_INSTALL_PACKAGES. Signed
+          # with the same key, which Play takes as the upload key.
+          flutter build appbundle $ARGS --flavor play
+          tools/check-play-manifest.sh play Release
+          cp build/app/outputs/bundle/playRelease/app-play-release.aab "dist/truenas-mobile-$TAG-play.aab"
           ls -l dist
+      - name: Show the key the Play bundle is signed with
+        run: |
+          AAB="dist/truenas-mobile-$TAG-play.aab"
+          CERT="$(keytool -printcert -jarfile "$AAB")"
+          echo "$CERT"
+          {
+            echo "### Play bundle signing certificate"
+            echo '```'
+            echo "$CERT" | grep -E "Owner|SHA1|SHA256"
+            echo '```'
+            echo "Play Console > App integrity must list this SHA-256 as the upload key."
+          } >> "$GITHUB_STEP_SUMMARY"
+          if echo "$CERT" | grep -q "Android Debug"; then
+            echo "::warning::The Play bundle is signed with a debug key and Play will refuse it. Set the ANDROID_* signing secrets."
+          fi
       - uses: actions/upload-artifact@v7
         with:
           name: android

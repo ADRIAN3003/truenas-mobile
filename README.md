@@ -98,7 +98,8 @@ for Android and iOS that talks to the official TrueNAS middleware API
 - **App updates:** looks for a newer release on GitHub when the app opens
   (switch it off in Settings), shows the release notes, and lets you skip a
   version. On Android it downloads the APK and opens the installer; on iOS it
-  opens the release page.
+  opens the release page. The Google Play version has no update check or
+  installer (Play updates it); it keeps the release notes.
 - **Settings:** theme, haptics, shell font size and keys, trusted
   certificates, and a link to the app's language page.
 - **Languages:** English and Hungarian. The language is chosen in the phone's
@@ -185,16 +186,22 @@ channel), Android SDK for Android, Xcode on macOS for iOS.
 git clone https://github.com/ADRIAN3003/truenas-mobile.git
 cd truenas-mobile
 flutter pub get
-flutter run                      # on a connected device or emulator
+flutter run --flavor github      # Android device or emulator (iOS: flutter run)
 flutter test                     # unit and widget tests
-flutter build apk --release      # Android
+flutter build apk --release --flavor github   # Android, as on GitHub Releases
+flutter build appbundle --release --flavor play  # Android, for Google Play
 flutter build ipa --no-codesign  # iOS (macOS only)
 ```
+
+Android has two flavors: `github` (updates itself from GitHub Releases) and
+`play` (no updater and no install permission, as Google Play requires). See
+[docs/GOOGLE_PLAY.md](docs/GOOGLE_PLAY.md).
 
 ## Releases
 
 Pushing a tag like `v0.1.0` runs the release workflow, which builds the APKs,
-an AAB and an IPA and attaches them to a GitHub Release.
+an AAB for Google Play and an IPA and attaches them to a GitHub Release. How to
+upload the AAB to Play Console: [docs/GOOGLE_PLAY.md](docs/GOOGLE_PLAY.md).
 
 To sign Android releases, add these repository secrets:
 
@@ -271,7 +278,7 @@ for setup, the checks to run before opening a PR, and the project conventions.
 ## Privacy
 
 The app has no analytics, tracking or backend of its own: it talks to your
-TrueNAS server and, for update checks, GitHub. See the
+TrueNAS server and, in the builds from GitHub, for update checks, GitHub. See the
 [privacy policy](PRIVACY.md) for what is stored on the phone and what is sent
 where. It is also linked from Settings > About in the app.
 

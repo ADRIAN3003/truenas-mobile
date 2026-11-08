@@ -40,7 +40,7 @@ jobs:
       - run: tools/check-widget-shaping.sh
 
   build-android:
-    name: Build Android (debug)
+    name: Build Android (debug, both flavors)
     needs: analyze-test
     runs-on: ubuntu-latest
     steps:
@@ -54,11 +54,24 @@ jobs:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           channel: stable
           cache: true
-      - run: flutter build apk --debug
+      # Two flavors (android/app/build.gradle.kts): github updates itself,
+      # play (Google Play) has no updater and no REQUEST_INSTALL_PACKAGES.
+      - run: flutter build apk --debug --flavor github
+      - name: Check the GitHub manifest
+        run: tools/check-play-manifest.sh github Debug
+      - run: flutter build apk --debug --flavor play
+      - name: Check the Google Play manifest has nothing Play restricts
+        run: tools/check-play-manifest.sh play Debug
+      # The bundle that goes to Google Play, as the release workflow builds it
+      # (signed with the debug key here), so a release-only failure such as a
+      # lint error shows up before a tag does.
+      - run: flutter build appbundle --release --flavor play
+      - name: Check the Play bundle's manifest
+        run: tools/check-play-manifest.sh play Release
       - uses: actions/upload-artifact@v7
         with:
           name: app-debug-apk
-          path: build/app/outputs/flutter-apk/app-debug.apk
+          path: build/app/outputs/flutter-apk/app-github-debug.apk
           retention-days: 7
 
   build-ios:

@@ -559,6 +559,24 @@ README covers what the app does; this file covers how to work on it.
   `FlutterSecureStorageConfiguration:FlutterSecureStorage.xml`, list all of
   them there). `KeyValueStore.reset()` (`resetOnError: true`, also empties the
   folder) is the last resort when even the file cannot be written.
+- Android flavors (`android/app/build.gradle.kts`, `lib/core/distribution.dart`,
+  `docs/GOOGLE_PLAY.md`): `github` is the self-updating build (APKs on GitHub
+  Releases, `REQUEST_INSTALL_PACKAGES` and the update FileProvider in
+  `src/github`, the real `UpdateInstaller.kt`), `play` is the Google Play
+  bundle (no permission, no provider, an empty `UpdateInstaller` in `src/play`).
+  Google Play forbids an app that installs packages or updates itself, and a
+  runtime check would not remove the permission from the manifest, hence a
+  flavor. Every Android `flutter run/build` needs `--flavor github|play` (a
+  pubspec `default-flavor` would also hit iOS, which has no such scheme).
+  Dart sees the flavor as `appFlavor`; `selfUpdateAllowedProvider` is false in
+  `play` and hides the update switch and "Check for updates" and skips the
+  start-up check; Release notes stay (read from GitHub only when the user opens
+  them; the privacy policy says so). Anything new that adds a manifest permission,
+  a foreground service or another self-update path needs the same thought;
+  `tools/check-play-manifest.sh` (run in CI and in `release.yml`) fails if the
+  Play manifest gains a restricted permission. The release workflow builds the
+  `github` APKs and `truenas-mobile-<tag>-play.aab`; the same keystore signs
+  both and is the Play **upload** key (Google keeps the app signing key).
 - Android release APKs must be signed with a fixed key, or Android refuses
   to install one over another ("app not updated"). `release.yml` signs with
   the four `ANDROID_*` secrets; `tools/make-android-keystore.sh` makes them.

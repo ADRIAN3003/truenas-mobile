@@ -238,6 +238,18 @@ SCREENSHOTS=1 flutter test test/screenshots --update-goldens
 The same run also lays them out in `overview.png`, the single image at the
 top of this README, so it scales to the screen on phones.
 
+### Google Play graphics
+
+The store listing images are in [`docs/play-store/`](docs/play-store/): the
+phone screenshots (1080 x 1920, Android look) come from the same test run,
+
+```sh
+SCREENSHOTS=1 flutter test test/screenshots --update-goldens --plain-name 'play store'
+python3 tools/make-play-graphics.py --icon path/to/app-icon-1024.png
+```
+
+and the script makes the 512 x 512 icon and the 1024 x 500 feature graphic.
+
 ## AI usage
 
 Most of this app's code, tests and documentation were written by an AI

@@ -86,16 +86,23 @@ void main() {
     WidgetTester tester,
     Brightness brightness, {
     TargetPlatform platform = TargetPlatform.android,
+    bool play = false,
   }) async {
     debugDisableShadows = false;
     if (platform == TargetPlatform.iOS) {
       // An iPhone with a Dynamic Island and a home indicator.
       tester.view.physicalSize = const Size(1179, 2556);
       tester.view.padding = const FakeViewPadding(top: 177, bottom: 102);
+      tester.view.devicePixelRatio = 3;
+    } else if (play) {
+      // Google Play wants 9:16; a 1080 x 1920 phone with a status bar gap.
+      tester.view.physicalSize = const Size(1080, 1920);
+      tester.view.padding = const FakeViewPadding(top: 66, bottom: 0);
+      tester.view.devicePixelRatio = 2.75;
     } else {
       tester.view.physicalSize = const Size(1080, 2340);
+      tester.view.devicePixelRatio = 3;
     }
-    tester.view.devicePixelRatio = 3;
     addTearDown(tester.view.reset);
     await tester.runAsync(() async {
       server = await FakeTrueNasServer.start();
@@ -163,11 +170,15 @@ void main() {
     debugDisableShadows = true;
   }
 
-  Future<void> shot(WidgetTester tester, String name) async {
+  Future<void> shot(
+    WidgetTester tester,
+    String name, {
+    String dir = 'screenshots',
+  }) async {
     await settle(tester);
     await expectLater(
       find.byType(MaterialApp),
-      matchesGoldenFile('../../docs/screenshots/$name.png'),
+      matchesGoldenFile('../../docs/$dir/$name.png'),
     );
   }
 
@@ -215,6 +226,33 @@ void main() {
     await tap(tester, 'Storage');
     await tap(tester, 'Data protection');
     await shot(tester, 'protection');
+    await close(tester);
+  });
+
+  // Google Play phone screenshots: 1080 x 1920 (9:16), Android look, the same
+  // made-up server as the README. Written to docs/play-store/screenshots.
+  testWidgets('play store', skip: _skip, (tester) async {
+    const dir = 'play-store/screenshots';
+    await open(tester, Brightness.light, play: true);
+    await shot(tester, '8-servers', dir: dir);
+    await openServer(tester);
+    await shot(tester, '1-dashboard', dir: dir);
+    await tap(tester, 'Storage');
+    await shot(tester, '2-storage', dir: dir);
+    await tap(tester, 'Shares');
+    await shot(tester, '4-shares', dir: dir);
+    await tap(tester, 'Apps');
+    await shot(tester, '3-apps', dir: dir);
+    await close(tester);
+
+    await open(tester, Brightness.dark, play: true);
+    await openServer(tester);
+    await shot(tester, '5-dashboard-dark', dir: dir);
+    await tap(tester, 'More');
+    await shot(tester, '7-more-dark', dir: dir);
+    await tap(tester, 'Storage');
+    await tap(tester, 'Data protection');
+    await shot(tester, '6-data-protection-dark', dir: dir);
     await close(tester);
   });
 

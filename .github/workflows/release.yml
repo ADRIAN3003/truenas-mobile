@@ -60,10 +60,15 @@ jobs:
           flutter build apk $ARGS --flavor github
           cp build/app/outputs/flutter-apk/app-github-release.apk dist/
           flutter build apk --split-per-abi $ARGS --flavor github
-          cp build/app/outputs/flutter-apk/app-github-*-release.apk dist/
+          # Flutter names split APKs app-<abi>-github-release.apk.
+          cp build/app/outputs/flutter-apk/app-*-github-release.apk dist/
           tools/check-play-manifest.sh github Release
-          # The app's updater finds its APK by these names (ReleaseInfo.apkFor).
-          for f in dist/app-github-*.apk; do mv "$f" "dist/truenas-mobile-$TAG-${f#dist/app-github-}"; done
+          # The app's updater finds its APK by these names (ReleaseInfo.apkFor):
+          # truenas-mobile-<tag>-release.apk and truenas-mobile-<tag>-<abi>-release.apk.
+          for f in dist/app-*github*.apk; do
+            name="$(basename "$f" | sed -e 's/^app-//' -e 's/-github//' -e 's/^github-//')"
+            mv "$f" "dist/truenas-mobile-$TAG-$name"
+          done
           # Google Play build: no updater, no REQUEST_INSTALL_PACKAGES. Signed
           # with the same key, which Play takes as the upload key.
           flutter build appbundle $ARGS --flavor play

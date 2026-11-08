@@ -110,6 +110,22 @@ void main() {
     expect(find.text('0.1.2 (3)'), findsOneWidget);
   });
 
+  testWidgets('the Google Play build has no update rows', (tester) async {
+    await open(
+      tester,
+      overrides: [selfUpdateAllowedProvider.overrideWithValue(false)],
+    );
+    for (final gone in [
+      'Updates',
+      'Check on start',
+      'Check for updates',
+      'Release notes',
+    ]) {
+      expect(find.text(gone), findsNothing, reason: gone);
+    }
+    expect(find.text('About'), findsOneWidget);
+  });
+
   testWidgets('the error log opens from About', (tester) async {
     final log = AppLog();
     log.warning('rpc', 'pool.query failed');

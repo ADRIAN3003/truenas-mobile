@@ -40,6 +40,30 @@ android {
         versionName = flutter.versionName
     }
 
+    // Two builds of the same app (same application id, same signing key):
+    //   github  the APKs on GitHub Releases. Updates itself, so it carries the
+    //           REQUEST_INSTALL_PACKAGES permission and the update FileProvider
+    //           (src/github).
+    //   play    the Google Play bundle. Play forbids an app that installs
+    //           packages or updates itself, so it has neither the permission,
+    //           the provider nor the installer code (src/play).
+    // Android builds need `--flavor github` or `--flavor play`. (A pubspec
+    // `default-flavor` would also apply to iOS, which has no such scheme.)
+    // Dart reads the flavor through `appFlavor` (lib/core/distribution.dart).
+    flavorDimensions += "distribution"
+    productFlavors {
+        create("github") { dimension = "distribution" }
+        create("play") { dimension = "distribution" }
+    }
+
+    // The app picks its language itself (Android's per-app language page, or
+    // the in-app picker), so a Play bundle must not deliver only the phone's
+    // language. The Android resources are a few widget labels, so nothing is
+    // saved by splitting them.
+    bundle {
+        language { enableSplit = false }
+    }
+
     signingConfigs {
         if (keystorePropertiesFile.exists()) {
             create("release") {

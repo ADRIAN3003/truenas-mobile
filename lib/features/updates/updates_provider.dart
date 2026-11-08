@@ -2,6 +2,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
+import '../../core/distribution.dart';
 import '../../core/updates/apk_downloader.dart';
 import '../../core/updates/app_version.dart';
 import '../../core/updates/release.dart';
@@ -23,6 +24,10 @@ final apkDownloaderProvider = Provider<ApkDownloader>((ref) {
 final apkInstallerProvider = Provider<ApkInstaller>(
   (ref) => const PlatformApkInstaller(),
 );
+
+/// Whether this build updates itself from GitHub at all. False in the Google
+/// Play build, which leaves updating to Play (see `distribution.dart`).
+final selfUpdateAllowedProvider = Provider<bool>((ref) => selfUpdateAllowed);
 
 /// Whether the app looks for an update by itself when it opens. Off here so
 /// tests make no requests; `main` turns it on.

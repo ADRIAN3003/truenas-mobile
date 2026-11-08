@@ -30,6 +30,7 @@ class _UpdateAutoCheckState extends ConsumerState<UpdateAutoCheck> {
   }
 
   Future<void> _run() async {
+    if (!ref.read(selfUpdateAllowedProvider)) return;
     if (!ref.read(updateAutoCheckProvider)) return;
     if (!ref.read(settingsProvider).checkForUpdates) return;
     // Only the release GitHub marks as the latest counts. A failed check is

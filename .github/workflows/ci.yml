@@ -6,7 +6,7 @@ name: CI
 on:
   push:
     branches: [main]
-    paths-ignore: &docs
+    paths-ignore:
       - "**.md"
       - "docs/**"
       - "LICENSE"
@@ -16,7 +16,15 @@ on:
       - "tools/make-android-keystore.sh"
       - "tools/make-play-graphics.py"
   pull_request:
-    paths-ignore: *docs
+    paths-ignore:
+      - "**.md"
+      - "docs/**"
+      - "LICENSE"
+      - ".github/ISSUE_TEMPLATE/**"
+      - ".claude/**"
+      - ".gitignore"
+      - "tools/make-android-keystore.sh"
+      - "tools/make-play-graphics.py"
   workflow_dispatch:
 
 concurrency:

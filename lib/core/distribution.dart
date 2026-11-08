@@ -10,6 +10,7 @@ const playFlavor = 'play';
 /// Google Play does not allow an app to update itself any other way than
 /// through Play, so the `play` flavor has no updater at all: no
 /// REQUEST_INSTALL_PACKAGES permission and no installer code on the native
-/// side (`android/app/src/play`), and here the Settings rows, the start-up
-/// check and the GitHub requests that go with them are left out.
+/// side (`android/app/src/play`), and here the update rows in Settings and the
+/// start-up check are left out. The release notes stay: they only read GitHub
+/// when the user opens them.
 bool get selfUpdateAllowed => appFlavor != playFlavor;

@@ -569,9 +569,9 @@ README covers what the app does; this file covers how to work on it.
   flavor. Every Android `flutter run/build` needs `--flavor github|play` (a
   pubspec `default-flavor` would also hit iOS, which has no such scheme).
   Dart sees the flavor as `appFlavor`; `selfUpdateAllowedProvider` is false in
-  `play` and hides Settings > Updates, skips the start-up check and the release
-  notes (no request to GitHub at all; the privacy policy and the Play data
-  safety answer rely on that). Anything new that adds a manifest permission,
+  `play` and hides the update switch and "Check for updates" and skips the
+  start-up check; Release notes stay (read from GitHub only when the user opens
+  them; the privacy policy says so). Anything new that adds a manifest permission,
   a foreground service or another self-update path needs the same thought;
   `tools/check-play-manifest.sh` (run in CI and in `release.yml`) fails if the
   Play manifest gains a restricted permission. The release workflow builds the

@@ -98,8 +98,8 @@ for Android and iOS that talks to the official TrueNAS middleware API
 - **App updates:** looks for a newer release on GitHub when the app opens
   (switch it off in Settings), shows the release notes, and lets you skip a
   version. On Android it downloads the APK and opens the installer; on iOS it
-  opens the release page. The Google Play version has none of this (Play
-  updates it, and it never contacts GitHub).
+  opens the release page. The Google Play version has no update check or
+  installer (Play updates it); it keeps the release notes.
 - **Settings:** theme, haptics, shell font size and keys, trusted
   certificates, and a link to the app's language page.
 - **Languages:** English and Hungarian. The language is chosen in the phone's

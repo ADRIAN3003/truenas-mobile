@@ -52,6 +52,7 @@ void main() {
     WidgetTester tester, {
     List<ServerInstance>? servers,
     List<Override> overrides = const [],
+    FakeGitHub? github,
   }) async {
     if (servers != null) await InstanceRepository(serverStore).save(servers);
     // Tall enough that every row is built.
@@ -67,7 +68,8 @@ void main() {
           SettingsRepository(settingsStore),
         ),
         updateCheckerProvider.overrideWithValue(
-          FakeGitHub([releaseJson('v0.1.2', body: 'First notes')]).checker,
+          (github ?? FakeGitHub([releaseJson('v0.1.2', body: 'First notes')]))
+              .checker,
         ),
         ...overrides,
       ],
@@ -110,20 +112,25 @@ void main() {
     expect(find.text('0.1.2 (3)'), findsOneWidget);
   });
 
-  testWidgets('the Google Play build has no update rows', (tester) async {
+  testWidgets('the Google Play build has no updater, only release notes', (
+    tester,
+  ) async {
+    final github = FakeGitHub([releaseJson('v0.1.2', body: 'First notes')]);
     await open(
       tester,
+      github: github,
       overrides: [selfUpdateAllowedProvider.overrideWithValue(false)],
     );
-    for (final gone in [
-      'Updates',
-      'Check on start',
-      'Check for updates',
-      'Release notes',
-    ]) {
+    for (final gone in ['Check on start', 'Check for updates']) {
       expect(find.text(gone), findsNothing, reason: gone);
     }
-    expect(find.text('About'), findsOneWidget);
+    // Nothing was asked of GitHub until the user opens the release notes.
+    expect(github.requests, 0);
+    await tester.tap(find.text('Release notes'));
+    await tester.pumpAndSettle();
+    expect(github.requests, greaterThan(0));
+    expect(find.textContaining('First notes'), findsOneWidget);
+    expect(find.text('Install and restart'), findsNothing);
   });
 
   testWidgets('the error log opens from About', (tester) async {

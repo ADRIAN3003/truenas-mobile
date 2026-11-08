@@ -8,7 +8,8 @@ The Android app has two flavors of the same code (same application id
 | Built as | APKs on GitHub Releases | `truenas-mobile-<tag>-play.aab` |
 | Updates itself from GitHub | yes | **no** |
 | `REQUEST_INSTALL_PACKAGES` and the update `FileProvider` | yes | **no** |
-| GitHub requests (update check, release notes) | yes | **none** |
+| Update check at start, Settings > Updates | yes | **none** |
+| Release notes (read from GitHub only when the user opens them) | yes | yes |
 
 Google Play does not allow an app to install packages or to update itself any
 other way than through Play, so the Play bundle has none of it: not just the
@@ -22,8 +23,9 @@ How it is built:
   `android/app/src/github` (manifest entries, `UpdateInstaller.kt`) is only in
   the GitHub build; `android/app/src/play` has an empty `UpdateInstaller`.
 - Dart reads the flavor with `appFlavor` (`lib/core/distribution.dart`). In the
-  `play` flavor `selfUpdateAllowedProvider` is false: no Settings > Updates
-  section, no check at start, no request to GitHub.
+  `play` flavor `selfUpdateAllowedProvider` is false: no update switch, no
+  "Check for updates", no check at start. Settings > Release notes stays and
+  reads the public releases from GitHub, but only when the user opens it.
 - `tools/check-play-manifest.sh` reads the merged manifest Gradle built and
   fails if the Play build contains `REQUEST_INSTALL_PACKAGES`,
   `QUERY_ALL_PACKAGES`, exact alarms, location, storage, contacts, camera, an
@@ -58,7 +60,9 @@ prints the list in the CI log).
   with one thing to know: app icons in the Apps screens are loaded from the
   `icon_url` the user's TrueNAS gives, usually the TrueNAS catalog's own
   host, which sees the phone's IP address like any image on a web page. The
-  privacy policy says so. The Play build sends nothing to GitHub.
+  privacy policy says so. The Play build contacts GitHub only when the user
+  opens Settings > Release notes (a user-initiated read of public data,
+  disclosed in the privacy policy); it never checks for updates by itself.
 
 ## Signing with Play App Signing
 

@@ -190,10 +190,11 @@ class SettingsScreen extends ConsumerWidget {
               ),
             ],
           ),
-          // The Google Play build is updated by Play, and makes no requests
-          // to GitHub.
+          SectionHeader(l10n.settingsUpdates),
+          // The Google Play build is updated by Play: no update switch, no
+          // check, no installer. Its release notes still read GitHub, but only
+          // when the user opens them.
           if (ref.watch(selfUpdateAllowedProvider)) ...[
-            SectionHeader(l10n.settingsUpdates),
             GroupedCard(
               indent: 16,
               children: [
@@ -207,8 +208,10 @@ class SettingsScreen extends ConsumerWidget {
               ],
             ),
             const SizedBox(height: 12),
-            GroupedCard(
-              children: [
+          ],
+          GroupedCard(
+            children: [
+              if (ref.watch(selfUpdateAllowedProvider))
                 NavRow(
                   icon: Icons.system_update_rounded,
                   color: AppPalette.tileBlue,
@@ -220,20 +223,19 @@ class SettingsScreen extends ConsumerWidget {
                     ),
                   ),
                 ),
-                NavRow(
-                  icon: Icons.history_rounded,
-                  color: AppPalette.tileSlate,
-                  title: l10n.settingsReleaseNotes,
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute<void>(
-                      builder: (_) => const ReleaseNotesScreen(),
-                    ),
+              NavRow(
+                icon: Icons.history_rounded,
+                color: AppPalette.tileSlate,
+                title: l10n.settingsReleaseNotes,
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute<void>(
+                    builder: (_) => const ReleaseNotesScreen(),
                   ),
                 ),
-              ],
-            ),
-          ],
+              ),
+            ],
+          ),
           SectionHeader(l10n.settingsAbout),
           GroupedCard(
             children: [

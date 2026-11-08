@@ -17,6 +17,10 @@ README covers what the app does; this file covers how to work on it.
   ```
 - README screenshots are goldens, skipped by default:
   `SCREENSHOTS=1 flutter test test/screenshots --update-goldens`.
+  The `play store` test in the same file writes the Google Play phone
+  screenshots (1080x1920, 9:16, Android look) to `docs/play-store/screenshots`,
+  and `tools/make-play-graphics.py` makes the 512 px icon and 1024x500 feature
+  graphic there. No TrueNAS logo (iXsystems' trademark).
   The test renderer cannot run the liquid glass shaders, so the iOS glass
   chrome does not render faithfully there.
 - Releases: pushing a `v*` tag runs `release.yml` (APKs per ABI, AAB,

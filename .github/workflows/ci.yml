@@ -1,9 +1,22 @@
 name: CI
 
+# Nothing here needs to run for changes that cannot affect the app: text
+# (docs, README, licence, templates), agent skills, store graphics scripts and
+# the one-off keystore helper. Workflow files and the tools CI runs still do.
 on:
   push:
     branches: [main]
+    paths-ignore: &docs
+      - "**.md"
+      - "docs/**"
+      - "LICENSE"
+      - ".github/ISSUE_TEMPLATE/**"
+      - ".claude/**"
+      - ".gitignore"
+      - "tools/make-android-keystore.sh"
+      - "tools/make-play-graphics.py"
   pull_request:
+    paths-ignore: *docs
   workflow_dispatch:
 
 concurrency:
@@ -16,6 +29,11 @@ env:
 jobs:
   analyze-test:
     name: Analyze and test
+    # A version bump changes no code, so it needs no build. (Done here and not
+    # with "[skip ci]" in the message: a tag on a commit with "[skip ci]" would
+    # not start the release workflow either.) The jobs below need this one, so
+    # they are skipped with it.
+    if: ${{ !startsWith(github.event.head_commit.message || github.event.pull_request.title || '', 'Bump version') }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -34,6 +52,7 @@ jobs:
   # Dart; both are held to test/fixtures/widget_shaping.json.
   swift-widget-shaping:
     name: Check Swift widget shaping
+    if: ${{ !startsWith(github.event.head_commit.message || github.event.pull_request.title || '', 'Bump version') }}
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v7

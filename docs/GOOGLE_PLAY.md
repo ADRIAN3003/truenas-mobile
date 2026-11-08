@@ -40,7 +40,9 @@ How it is built:
 Checked against the merged manifest (see `tools/check-play-manifest.sh`, which
 prints the list in the CI log).
 
-- **Permissions**: `INTERNET`, `USE_BIOMETRIC` (optional app lock),
+- **Permissions** (the exact list CI prints for the release bundle): `INTERNET`,
+  `USE_BIOMETRIC` and `USE_FINGERPRINT` (optional app lock, the second one added
+  by the biometric library),
   `POST_NOTIFICATIONS` and `POST_PROMOTED_NOTIFICATIONS` (alerts, job
   progress), `VIBRATE` (notifications), and what WorkManager adds:
   `WAKE_LOCK`, `ACCESS_NETWORK_STATE`, `RECEIVE_BOOT_COMPLETED` (re-schedules the
